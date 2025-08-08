@@ -515,20 +515,22 @@
     </button>
   </div>
 
-      <button class="share-location-fab" id="shareBtn" onclick="toggleLocationSharing()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path
-                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-        </svg>
-    </button>
+  <button class="share-location-fab" id="shareBtn" onclick="toggleLocationSharing()">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path
+        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+    </svg>
+  </button>
 
-    <!-- Location Permission Button -->
-    <button class="location-permission-btn" id="locationPermissionBtn" onclick="requestLocationPermission()" style="position: absolute; bottom: 170px; right: 16px; width: 56px; height: 56px; border: none; border-radius: 28px; background: #ff6b35; color: white; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-        </svg>
-        <span style="font-size: 8px; margin-top: 2px;">LOC</span>
-    </button>
+  <!-- Location Permission Button -->
+  <button class="location-permission-btn" id="locationPermissionBtn" onclick="requestLocationPermission()"
+    style="position: absolute; bottom: 170px; right: 16px; width: 56px; height: 56px; border: none; border-radius: 28px; background: #ff6b35; color: white; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path
+        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+    </svg>
+    <span style="font-size: 8px; margin-top: 2px;">LOC</span>
+  </button>
 
   <div class="bottom-panel" id="bottomPanel">
     <div class="panel-handle" onclick="togglePanel()">
@@ -895,76 +897,76 @@
       map.zoomOut();
     }
 
-            function centerOnMe() {
-            if (currentLocation) {
-                map.flyTo(currentLocation, 16, {
-                    duration: 1.0
-                });
-            } else {
-                // If no location yet, try to get it
-                requestLocationPermission();
-            }
-        }
+    function centerOnMe() {
+      if (currentLocation) {
+        map.flyTo(currentLocation, 16, {
+          duration: 1.0
+        });
+      } else {
+        // If no location yet, try to get it
+        requestLocationPermission();
+      }
+    }
 
-        function requestLocationPermission() {
-            if (navigator.geolocation) {
-                // Show loading state
-                const shareBtn = document.getElementById('shareBtn');
-                shareBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>';
-                
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    currentLocation = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-                    
-                    // Add user marker
-                    L.marker(currentLocation, {
-                        icon: L.divIcon({
-                            className: 'current-user-marker',
-                            html: '<div style="background: #4285f4; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-                            iconSize: [20, 20]
-                        })
-                    }).addTo(map).bindPopup('You are here');
-                    
-                    map.flyTo(currentLocation, 16, {
-                        duration: 1.0
-                    });
-                    
-                    console.log('Location found:', currentLocation);
-                    alert('Location access granted! Your position is now on the map.');
-                }, function (error) {
-                    console.log('Location error:', error);
-                    let errorMessage = 'Unable to get your location. ';
-                    
-                    switch(error.code) {
-                        case error.PERMISSION_DENIED:
-                            errorMessage += 'Please allow location access in your browser settings.';
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            errorMessage += 'Location information is unavailable.';
-                            break;
-                        case error.TIMEOUT:
-                            errorMessage += 'Location request timed out.';
-                            break;
-                        default:
-                            errorMessage += 'An unknown error occurred.';
-                    }
-                    
-                    alert(errorMessage);
-                    
-                    // Reset button
-                    const shareBtn = document.getElementById('shareBtn');
-                    shareBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>';
-                }, {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 60000
-                });
-            } else {
-                alert('Geolocation is not supported by this browser.');
-            }
-        }
+    function requestLocationPermission() {
+      if (navigator.geolocation) {
+        // Show loading state
+        const shareBtn = document.getElementById('shareBtn');
+        shareBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>';
+
+        navigator.geolocation.getCurrentPosition(function (position) {
+          currentLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+
+          // Add user marker
+          L.marker(currentLocation, {
+            icon: L.divIcon({
+              className: 'current-user-marker',
+              html: '<div style="background: #4285f4; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
+              iconSize: [20, 20]
+            })
+          }).addTo(map).bindPopup('You are here');
+
+          map.flyTo(currentLocation, 16, {
+            duration: 1.0
+          });
+
+          console.log('Location found:', currentLocation);
+          alert('Location access granted! Your position is now on the map.');
+        }, function (error) {
+          console.log('Location error:', error);
+          let errorMessage = 'Unable to get your location. ';
+
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage += 'Please allow location access in your browser settings.';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage += 'Location information is unavailable.';
+              break;
+            case error.TIMEOUT:
+              errorMessage += 'Location request timed out.';
+              break;
+            default:
+              errorMessage += 'An unknown error occurred.';
+          }
+
+          alert(errorMessage);
+
+          // Reset button
+          const shareBtn = document.getElementById('shareBtn');
+          shareBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>';
+        }, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000
+        });
+      } else {
+        alert('Geolocation is not supported by this browser.');
+      }
+    }
 
     // Location sharing
     function toggleLocationSharing() {
