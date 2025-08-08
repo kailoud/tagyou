@@ -27,43 +27,43 @@
       z-index: 1;
     }
 
-            .top-bar {
-            position: absolute;
-            top: 20px;
-            left: 16px;
-            right: 16px;
-            z-index: 1000;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
+    .top-bar {
+      position: absolute;
+      top: 20px;
+      left: 16px;
+      right: 16px;
+      z-index: 1000;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
 
-        .top-location-control {
-            position: absolute;
-            top: 80px;
-            left: 16px;
-            z-index: 1000;
-        }
+    .top-location-control {
+      position: absolute;
+      top: 80px;
+      left: 16px;
+      z-index: 1000;
+    }
 
-        .location-control-btn {
-            width: 40px;
-            height: 40px;
-            border: none;
-            border-radius: 8px;
-            background: #4285f4;
-            color: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
+    .location-control-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 8px;
+      background: #4285f4;
+      color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
 
-        .location-control-btn:hover {
-            background: #3367d6;
-            transform: scale(1.05);
-        }
+    .location-control-btn:hover {
+      background: #3367d6;
+      transform: scale(1.05);
+    }
 
     .search-container {
       flex: 1;
@@ -284,7 +284,7 @@
       color: #2196f3;
     }
 
-    
+
 
     .share-location-fab {
       position: absolute;
@@ -512,13 +512,14 @@
     </div>
   </div>
 
-      <div class="top-location-control">
-        <button class="location-control-btn" onclick="centerOnMe()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" />
-            </svg>
-        </button>
-    </div>
+  <div class="top-location-control">
+    <button class="location-control-btn" onclick="centerOnMe()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path
+          d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" />
+      </svg>
+    </button>
+  </div>
 
   <button class="share-location-fab" id="shareBtn" onclick="toggleLocationSharing()">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
