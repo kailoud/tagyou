@@ -26,7 +26,13 @@
 # Redirects for SPA
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "/grouptracker.html"
+  status = 200
+
+# Redirect root to main app
+[[redirects]]
+  from = "/"
+  to = "/grouptracker.html"
   status = 200
 
 # Force HTTPS
