@@ -2,7 +2,7 @@
   "name": "grouptracker",
   "version": "1.0.0",
   "description": "A real-time group location tracking application for events and festivals",
-  "main": "grouptracker.html",
+  "main": "grouptracker",
   "scripts": {
     "start": "serve .",
     "dev": "live-server --port=8000",

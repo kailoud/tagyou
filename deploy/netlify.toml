@@ -35,6 +35,18 @@
   to = "/grouptracker.html"
   status = 200
 
+# Remove .html extension from URLs
+[[redirects]]
+  from = "/grouptracker"
+  to = "/grouptracker.html"
+  status = 200
+
+# Handle direct app access
+[[redirects]]
+  from = "/app"
+  to = "/grouptracker.html"
+  status = 200
+
 # Force HTTPS
 [[redirects]]
   from = "http://:host/*"
