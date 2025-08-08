@@ -171,11 +171,15 @@ typings/
 .vscode-test
 
 # IDE files
-.vscode/
 .idea/
 *.swp
 *.swo
 *~
+
+# VS Code settings (allow workspace settings)
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
 
 # OS generated files
 .DS_Store

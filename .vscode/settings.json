@@ -1,0 +1,23 @@
+{
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "files.autoSave": "onFocusChange",
+  "emmet.includeLanguages": {
+    "html": "html"
+  },
+  "html.autoClosingTags": true,
+  "css.validate": true,
+  "javascript.validate.enable": true,
+  "files.associations": {
+    "*.html": "html"
+  },
+  "liveServer.settings.root": "/",
+  "liveServer.settings.port": 8000,
+  "liveServer.settings.CustomBrowser": "chrome",
+  "liveServer.settings.https": false,
+  "git.enableSmartCommit": true,
+  "git.autofetch": true,
+  "git.confirmSync": false
+}
