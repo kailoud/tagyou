@@ -64,20 +64,21 @@
       pointer-events: none;
     }
 
-    .group-btn {
-      width: 48px;
-      height: 48px;
-      border: none;
-      border-radius: 8px;
-      background: #ff6b35;
-      color: white;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      position: relative;
-    }
+            .group-btn {
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 8px;
+            background: #ff6b35;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            z-index: 1001;
+        }
 
     .group-indicator {
       position: absolute;
@@ -113,20 +114,35 @@
       transform: translateY(0);
     }
 
-    .panel-handle {
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
+            .panel-handle {
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px 16px 0 0;
+            position: relative;
+        }
 
-    .handle-bar {
-      width: 32px;
-      height: 4px;
-      background: #ddd;
-      border-radius: 2px;
-    }
+        .panel-handle::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 4px;
+            background: #ccc;
+            border-radius: 2px;
+        }
+
+        .handle-bar {
+            width: 32px;
+            height: 4px;
+            background: #ddd;
+            border-radius: 2px;
+        }
 
     .panel-tabs {
       display: flex;
@@ -251,19 +267,26 @@
       gap: 12px;
     }
 
-    .control-btn {
-      width: 48px;
-      height: 48px;
-      border: none;
-      border-radius: 24px;
-      background: white;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 18px;
-    }
+            .control-btn {
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 24px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: #333;
+            transition: all 0.2s ease;
+        }
+
+        .control-btn:hover {
+            background: #f8f9fa;
+            transform: scale(1.05);
+        }
 
     .my-location-btn {
       background: #4285f4;
@@ -851,11 +874,72 @@
       }
     }
 
-    // Panel controls
-    function togglePanel() {
-      const panel = document.getElementById('bottomPanel');
-      panel.classList.toggle('expanded');
-    }
+            // Panel controls
+        function togglePanel() {
+            const panel = document.getElementById('bottomPanel');
+            panel.classList.toggle('expanded');
+        }
+
+        // Swipe functionality for bottom panel
+        let touchStartY = 0;
+        let touchEndY = 0;
+        let isDragging = false;
+
+        function handleTouchStart(e) {
+            touchStartY = e.touches[0].clientY;
+            isDragging = true;
+        }
+
+        function handleTouchMove(e) {
+            if (!isDragging) return;
+            
+            touchEndY = e.touches[0].clientY;
+            const diff = touchStartY - touchEndY;
+            
+            const panel = document.getElementById('bottomPanel');
+            const currentTransform = panel.style.transform;
+            const currentY = currentTransform.includes('translateY') ? 
+                parseInt(currentTransform.match(/translateY\(([^)]+)\)/)[1]) : 0;
+            
+            // Limit the drag range
+            const maxDrag = -window.innerHeight * 0.6;
+            const newY = Math.max(maxDrag, Math.min(0, currentY + diff));
+            
+            panel.style.transform = `translateY(${newY}px)`;
+            touchStartY = touchEndY;
+        }
+
+        function handleTouchEnd() {
+            if (!isDragging) return;
+            
+            const panel = document.getElementById('bottomPanel');
+            const currentTransform = panel.style.transform;
+            const currentY = currentTransform.includes('translateY') ? 
+                parseInt(currentTransform.match(/translateY\(([^)]+)\)/)[1]) : 0;
+            
+            // Snap to expanded or collapsed state
+            if (currentY < -100) {
+                panel.classList.add('expanded');
+                panel.style.transform = '';
+            } else {
+                panel.classList.remove('expanded');
+                panel.style.transform = '';
+            }
+            
+            isDragging = false;
+        }
+
+        // Add touch event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const panel = document.getElementById('bottomPanel');
+            const handle = document.querySelector('.panel-handle');
+            
+            if (handle) {
+                handle.addEventListener('touchstart', handleTouchStart, { passive: false });
+                handle.addEventListener('touchmove', handleTouchMove, { passive: false });
+                handle.addEventListener('touchend', handleTouchEnd, { passive: false });
+            }
+        });
 
     function switchTab(tabName) {
       // Hide all content
