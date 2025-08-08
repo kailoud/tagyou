@@ -741,13 +741,14 @@
 
         // Map initialization
         function initializeMap() {
-            map = L.map('map').setView([51.5074, -0.1278], 16);
+            // Start with a world view, then focus on user location
+            map = L.map('map').setView([0, 0], 2);
             
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
 
-            // Add current user marker
+            // Try to get user location immediately
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
                     currentLocation = {
@@ -755,6 +756,7 @@
                         lng: position.coords.longitude
                     };
                     
+                    // Add user marker
                     L.marker(currentLocation, {
                         icon: L.divIcon({
                             className: 'current-user-marker',
@@ -763,10 +765,23 @@
                         })
                     }).addTo(map).bindPopup('You are here');
                     
-                    map.setView(currentLocation, 16);
+                    // Smoothly fly to user location
+                    map.flyTo(currentLocation, 16, {
+                        duration: 1.5
+                    });
+                    
+                    console.log('Location found:', currentLocation);
                 }, function(error) {
                     console.log('Error getting location:', error);
+                    // If location fails, show a message
+                    alert('Please allow location access to see your position on the map.');
+                }, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000
                 });
+            } else {
+                alert('Geolocation is not supported by this browser.');
             }
         }
 
@@ -834,7 +849,26 @@
 
         function centerOnMe() {
             if (currentLocation) {
-                map.setView(currentLocation, 16);
+                map.flyTo(currentLocation, 16, {
+                    duration: 1.0
+                });
+            } else {
+                // If no location yet, try to get it
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        currentLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        map.flyTo(currentLocation, 16, {
+                            duration: 1.0
+                        });
+                    }, function(error) {
+                        alert('Unable to get your location. Please check your location permissions.');
+                    });
+                } else {
+                    alert('Geolocation is not supported by this browser.');
+                }
             }
         }
 
