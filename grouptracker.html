@@ -879,7 +879,7 @@
       if (!isDragging) return;
 
       touchEndY = e.touches[0].clientY;
-      const diff = touchStartY - touchEndY;
+      const diff = touchEndY - touchStartY; // Fixed: reversed the diff calculation
 
       const panel = document.getElementById('bottomPanel');
       const currentTransform = panel.style.transform;
