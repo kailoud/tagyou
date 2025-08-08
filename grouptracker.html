@@ -873,11 +873,13 @@
     function handleTouchStart(e) {
       touchStartY = e.touches[0].clientY;
       isDragging = true;
+      e.preventDefault(); // Prevent default browser behavior
     }
 
     function handleTouchMove(e) {
       if (!isDragging) return;
 
+      e.preventDefault(); // Prevent default browser behavior (pull-to-refresh)
       touchEndY = e.touches[0].clientY;
       const diff = touchEndY - touchStartY; // Fixed: reversed the diff calculation
 
