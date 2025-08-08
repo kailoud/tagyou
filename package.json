@@ -1,0 +1,45 @@
+{
+  "name": "grouptracker",
+  "version": "1.0.0",
+  "description": "A real-time group location tracking application for events and festivals",
+  "main": "grouptracker.html",
+  "scripts": {
+    "start": "serve .",
+    "dev": "live-server --port=8000",
+    "build": "echo 'No build step required for static HTML'",
+    "test": "echo 'No tests specified'",
+    "lint": "echo 'No linting configured'"
+  },
+  "keywords": [
+    "location",
+    "tracking",
+    "group",
+    "map",
+    "leaflet",
+    "events",
+    "festival",
+    "real-time"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/tagyou.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/tagyou/issues"
+  },
+  "homepage": "https://yourusername.github.io/tagyou",
+  "devDependencies": {
+    "serve": "^14.2.1",
+    "live-server": "^1.2.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
