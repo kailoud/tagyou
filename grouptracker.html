@@ -515,12 +515,20 @@
     </button>
   </div>
 
-  <button class="share-location-fab" id="shareBtn" onclick="toggleLocationSharing()">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path
-        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-    </svg>
-  </button>
+      <button class="share-location-fab" id="shareBtn" onclick="toggleLocationSharing()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path
+                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+        </svg>
+    </button>
+
+    <!-- Location Permission Button -->
+    <button class="location-permission-btn" id="locationPermissionBtn" onclick="requestLocationPermission()" style="position: absolute; bottom: 170px; right: 16px; width: 56px; height: 56px; border: none; border-radius: 28px; background: #ff6b35; color: white; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+        </svg>
+        <span style="font-size: 8px; margin-top: 2px;">LOC</span>
+    </button>
 
   <div class="bottom-panel" id="bottomPanel">
     <div class="panel-handle" onclick="togglePanel()">
