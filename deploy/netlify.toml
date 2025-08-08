@@ -5,6 +5,14 @@
 [build.environment]
   NODE_VERSION = "18"
 
+# Custom domain configuration
+[context.production.environment]
+  NODE_ENV = "production"
+
+[context.deploy-preview.environment]
+  NODE_ENV = "preview"
+
+# Security headers
 [[headers]]
   for = "/*"
   [headers.values]
@@ -13,14 +21,17 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=()"
+    Content-Security-Policy = "default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:; connect-src 'self' https:;"
 
+# Redirects for SPA
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-[context.production.environment]
-  NODE_ENV = "production"
-
-[context.deploy-preview.environment]
-  NODE_ENV = "preview"
+# Force HTTPS
+[[redirects]]
+  from = "http://:host/*"
+  to = "https://:host/:splat"
+  status = 301
+  force = true

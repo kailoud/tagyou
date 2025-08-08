@@ -29,7 +29,7 @@
   "bugs": {
     "url": "https://github.com/yourusername/tagyou/issues"
   },
-  "homepage": "https://yourusername.github.io/tagyou",
+  "homepage": "https://yourdomain.com",
   "devDependencies": {
     "serve": "^14.2.1",
     "live-server": "^1.2.2"
