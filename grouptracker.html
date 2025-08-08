@@ -798,7 +798,9 @@
     // Map initialization
     function initializeMap() {
       // Start with a world view, then focus on user location
-      map = L.map('map').setView([0, 0], 2);
+      map = L.map('map', {
+        zoomControl: false  // Disable default zoom controls
+      }).setView([0, 0], 2);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
@@ -955,14 +957,7 @@
       });
     }
 
-    // Map controls
-    function zoomIn() {
-      map.zoomIn();
-    }
 
-    function zoomOut() {
-      map.zoomOut();
-    }
 
     function centerOnMe() {
       if (currentLocation) {
