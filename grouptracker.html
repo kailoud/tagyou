@@ -902,7 +902,7 @@
   </button>
 
   <!-- Location Permission Button -->
-  <button class="location-permission-btn" id="locationPermissionBtn" onclick="requestLocationPermission()"
+  <button class="location-permission-btn" id="locationPermissionBtn" onclick="toggleLocationSharing()"
     style="position: absolute; bottom: 120px; right: 16px; width: 40px; height: 40px; border: none; border-radius: 8px; background: #ff6b35; color: white; font-size: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column;">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
       <path
@@ -1372,6 +1372,9 @@
 
           console.log('Location found:', currentLocation);
           alert('Location access granted! Your position is now on the map.');
+
+          // Enable location sharing automatically after permission granted
+          toggleLocationSharing();
         }, function (error) {
           console.log('Location error:', error);
           let errorMessage = 'Unable to get your location. ';
@@ -1408,15 +1411,26 @@
     // Location sharing
     function toggleLocationSharing() {
       const shareBtn = document.getElementById('shareBtn');
+      const locationPermissionBtn = document.getElementById('locationPermissionBtn');
       isSharingLocation = !isSharingLocation;
 
       if (isSharingLocation) {
         shareBtn.classList.add('sharing');
         shareBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+
+        // Update location permission button to green when active
+        locationPermissionBtn.style.background = '#4caf50';
+        locationPermissionBtn.style.boxShadow = '0 2px 8px rgba(76, 175, 80, 0.3)';
+
         startLocationSharing();
       } else {
         shareBtn.classList.remove('sharing');
         shareBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>';
+
+        // Reset location permission button to orange when inactive
+        locationPermissionBtn.style.background = '#ff6b35';
+        locationPermissionBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+
         stopLocationSharing();
       }
     }
