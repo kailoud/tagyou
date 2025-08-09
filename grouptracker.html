@@ -3298,7 +3298,6 @@
 
         // Deactivate other buttons
         document.querySelector('.truck-floats-btn').classList.remove('active');
-        document.querySelector('.find-stalls-btn').classList.remove('active');
 
         // If panel is closed, open it to show the map with food stalls
         if (!isPanelOpen) {
@@ -3320,8 +3319,7 @@
         searchInput.value = '';
 
         // If no other features are active, close the panel
-        const hasActiveFeatures = document.querySelector('.truck-floats-btn').classList.contains('active') ||
-          document.querySelector('.find-stalls-btn').classList.contains('active');
+        const hasActiveFeatures = document.querySelector('.truck-floats-btn').classList.contains('active');
         if (!hasActiveFeatures && isPanelOpen) {
           console.log('No active features, closing panel');
           panel.classList.remove('expanded');
@@ -3358,7 +3356,6 @@
 
         // Deactivate other buttons
         document.querySelector('.food-stalls-btn').classList.remove('active');
-        document.querySelector('.find-stalls-btn').classList.remove('active');
 
         // If panel is closed, open it to show the float parade information
         if (!isPanelOpen) {
@@ -3382,8 +3379,7 @@
         searchInput.placeholder = 'Find group member by phone...';
 
         // If no other features are active, close the panel
-        const hasActiveFeatures = document.querySelector('.food-stalls-btn').classList.contains('active') ||
-          document.querySelector('.find-stalls-btn').classList.contains('active');
+        const hasActiveFeatures = document.querySelector('.food-stalls-btn').classList.contains('active');
         if (!hasActiveFeatures && isPanelOpen) {
           console.log('No active features, closing panel');
           panel.classList.remove('expanded');
