@@ -1467,6 +1467,15 @@
     // Group management
     function showGroupModal() {
       document.getElementById('groupModal').classList.add('show');
+
+      // Reset search placeholder to default when group management is opened
+      const searchInput = document.getElementById('searchInput');
+      searchInput.placeholder = 'Find group member by phone...';
+      searchInput.value = '';
+
+      // Reset all button states to inactive
+      document.querySelector('.food-stalls-btn').classList.remove('active');
+      document.querySelector('.truck-floats-btn').classList.remove('active');
     }
 
     function hideGroupModal() {
@@ -1691,30 +1700,48 @@
     function toggleFoodStalls() {
       // Toggle food stalls visibility on map
       const foodStallsVisible = document.querySelector('.food-stalls-btn').classList.toggle('active');
+      const searchInput = document.getElementById('searchInput');
 
       if (foodStallsVisible) {
         // Add food stall markers to map
         addFoodStallMarkers();
         showNotification('Food stalls displayed on map');
+        // Update search placeholder
+        searchInput.placeholder = 'Find food stall...';
+        // Clear search input
+        searchInput.value = '';
       } else {
         // Remove food stall markers from map
         removeFoodStallMarkers();
         showNotification('Food stalls hidden from map');
+        // Reset search placeholder to default
+        searchInput.placeholder = 'Find group member by phone...';
+        // Clear search input
+        searchInput.value = '';
       }
     }
 
     function toggleTruckFloats() {
       // Toggle truck floats visibility on map
       const truckFloatsVisible = document.querySelector('.truck-floats-btn').classList.toggle('active');
+      const searchInput = document.getElementById('searchInput');
 
       if (truckFloatsVisible) {
         // Add truck float markers on map
         addTruckFloatMarkers();
         showNotification('Truck floats displayed on map');
+        // Update search placeholder
+        searchInput.placeholder = 'Find float location...';
+        // Clear search input
+        searchInput.value = '';
       } else {
         // Remove truck float markers from map
         removeTruckFloatMarkers();
         showNotification('Truck floats hidden from map');
+        // Reset search placeholder to default
+        searchInput.value = '';
+        // Reset search placeholder to default
+        searchInput.placeholder = 'Find group member by phone...';
       }
     }
 
