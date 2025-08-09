@@ -277,6 +277,14 @@
       background: #7b1fa2;
     }
 
+    .find-stalls-btn {
+      background: #4caf50;
+    }
+
+    .find-stalls-btn:hover {
+      background: #388e3c;
+    }
+
     /* Active state styles */
     .control-btn.active {
       transform: scale(1.1);
@@ -291,6 +299,11 @@
     .truck-floats-btn.active {
       background: #7b1fa2;
       box-shadow: 0 4px 16px rgba(156, 39, 176, 0.4);
+    }
+
+    .find-stalls-btn.active {
+      background: #388e3c;
+      box-shadow: 0 4px 16px rgba(76, 175, 80, 0.4);
     }
 
     /* Festival Dropdown Styles */
@@ -953,6 +966,321 @@
       background: #a8a8a8;
     }
 
+    /* Food Stalls Panel Styles */
+    .food-stalls-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .food-stalls-title h3 {
+      margin: 0 0 4px 0;
+      color: #ff6b35;
+      font-size: 18px;
+    }
+
+    .food-stalls-title p {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .food-stalls-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .food-stalls-control-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #f5f5f5;
+      color: #666;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .food-stalls-control-btn:hover {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .food-stalls-control-btn.active {
+      background: #ff6b35;
+      color: white;
+    }
+
+    .food-stalls-map-section {
+      margin-bottom: 24px;
+    }
+
+    .food-stalls-map-section h4 {
+      margin: 0 0 12px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .food-stalls-map {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 16px;
+      border: 2px solid #e9ecef;
+    }
+
+    .map-legend {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .legend-icon {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .food-stalls-feed {
+      margin-bottom: 24px;
+    }
+
+    .food-stalls-feed h4 {
+      margin: 0 0 16px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .food-stalls-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .food-stall-card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #ff6b35;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .food-stall-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .food-stall-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .food-stall-name {
+      font-weight: 600;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .food-stall-status {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .food-stall-status.open {
+      background: #e8f5e8;
+      color: #2e7d32;
+    }
+
+    .food-stall-status.closing-soon {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .food-stall-status.closed {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .food-stall-details {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .food-stall-detail {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .food-stall-description {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    .food-stall-image {
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(135deg, #ffe0b2, #ffcc02);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ff6b35;
+      font-size: 24px;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .food-stall-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .food-stall-image::after {
+      content: '🍔';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 32px;
+      opacity: 0.7;
+    }
+
+    .food-stalls-schedule {
+      margin-bottom: 24px;
+    }
+
+    .food-stalls-schedule h4 {
+      margin: 0 0 16px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .food-schedule-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .food-schedule-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 3px solid #ff6b35;
+    }
+
+    .food-schedule-time {
+      background: #ff6b35;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .food-schedule-info h5 {
+      margin: 0 0 4px 0;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .food-schedule-info p {
+      margin: 0;
+      color: #666;
+      font-size: 12px;
+    }
+
+    .food-stalls-categories {
+      margin-bottom: 24px;
+    }
+
+    .food-stalls-categories h4 {
+      margin: 0 0 16px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .food-category-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .food-category-tag {
+      padding: 6px 12px;
+      background: #f0f0f0;
+      color: #666;
+      border-radius: 16px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+    }
+
+    .food-category-tag:hover {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .food-category-tag.active {
+      background: #ff6b35;
+      color: white;
+      border-color: #ff6b35;
+    }
+
+    /* Custom scrollbar for food stalls cards */
+    .food-stalls-cards::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .food-stalls-cards::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    .food-stalls-cards::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+
+    .food-stalls-cards::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
     @keyframes pulse {
       0% {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -1130,6 +1458,339 @@
         display: none;
       }
     }
+
+    /* Find Stalls Panel Styles */
+    .find-stalls-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .find-stalls-title h3 {
+      margin: 0 0 4px 0;
+      color: #4caf50;
+      font-size: 18px;
+    }
+
+    .find-stalls-title p {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .find-stalls-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .find-stalls-control-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #f5f5f5;
+      color: #666;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .find-stalls-control-btn:hover {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .stalls-filters {
+      margin-bottom: 24px;
+    }
+
+    .stalls-filters h4 {
+      margin: 0 0 16px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .filter-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .filter-group label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .filter-group select {
+      padding: 8px 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      background: white;
+      cursor: pointer;
+      transition: border-color 0.2s ease;
+    }
+
+    .filter-group select:focus {
+      outline: none;
+      border-color: #4caf50;
+    }
+
+    .stalls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .stall-card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #4caf50;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .stall-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .stall-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .stall-name {
+      font-weight: 600;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .stall-origin-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+      background: #e8f5e8;
+      color: #2e7d32;
+    }
+
+    .stall-image {
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4caf50;
+      font-size: 24px;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stall-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .stall-details {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .stall-detail {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .stall-description {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    .stall-categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .stall-category {
+      padding: 4px 8px;
+      background: #f0f0f0;
+      color: #666;
+      border-radius: 12px;
+      font-size: 11px;
+    }
+
+    /* Stall Modal Styles */
+    .stall-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .stall-modal.show {
+      display: flex;
+    }
+
+    .stall-modal-content {
+      background: white;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .stall-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .stall-modal-header h3 {
+      margin: 0;
+      color: #333;
+      font-size: 20px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #666;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
+
+    .close-btn:hover {
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    .stall-modal-body {
+      padding: 0 24px 24px;
+    }
+
+    .stall-image-gallery {
+      margin-bottom: 24px;
+    }
+
+    .stall-image-gallery img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .stall-info {
+      margin-bottom: 24px;
+    }
+
+    .stall-info h4 {
+      margin: 0 0 8px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .stall-info p {
+      margin: 0 0 16px 0;
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .stall-menu {
+      margin-bottom: 16px;
+    }
+
+    .stall-menu-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .menu-item {
+      padding: 6px 12px;
+      background: #f8f9fa;
+      color: #666;
+      border-radius: 16px;
+      font-size: 12px;
+      border: 1px solid #e9ecef;
+    }
+
+    .stall-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .stall-actions .btn {
+      flex: 1;
+    }
+
+    /* Custom scrollbar for stalls grid */
+    .stalls-grid::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .stalls-grid::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    .stalls-grid::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+
+    .stalls-grid::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
   </style>
 </head>
 
@@ -1234,6 +1895,13 @@
           d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h4c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
       </svg>
     </button>
+
+    <button class="control-btn find-stalls-btn" onclick="toggleFindStalls()" title="Find Stalls">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path
+          d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+      </svg>
+    </button>
   </div>
 
   <div class="top-location-control">
@@ -1269,6 +1937,7 @@
     <div class="panel-tabs">
       <div class="tab active" onclick="switchTab('members')">Group</div>
       <div class="tab" onclick="switchTab('emergency')">Emergency</div>
+      <div class="tab" onclick="switchTab('find-stalls')">Find Stalls</div>
       <div class="tab" onclick="switchTab('settings')">Settings</div>
     </div>
 
@@ -1390,6 +2059,109 @@
       </div>
     </div>
 
+    <div class="panel-content" id="find-stalls-content">
+      <!-- Find Stalls Header -->
+      <div class="find-stalls-header">
+        <div class="find-stalls-title">
+          <h3>🏪 Find Stalls & Vendors</h3>
+          <p>Discover amazing stalls from around the world</p>
+        </div>
+        <div class="find-stalls-controls">
+          <button class="find-stalls-control-btn" onclick="refreshStallsData()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters Section -->
+      <div class="stalls-filters">
+        <h4>🔍 Filters</h4>
+        <div class="filter-row">
+          <div class="filter-group">
+            <label>Country/Origin:</label>
+            <select id="countryFilter" onchange="filterStalls()">
+              <option value="all">All Countries</option>
+              <option value="uk">United Kingdom</option>
+              <option value="us">United States</option>
+              <option value="italy">Italy</option>
+              <option value="japan">Japan</option>
+              <option value="mexico">Mexico</option>
+              <option value="india">India</option>
+              <option value="thailand">Thailand</option>
+              <option value="france">France</option>
+              <option value="germany">Germany</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Food Type:</label>
+            <select id="foodTypeFilter" onchange="filterStalls()">
+              <option value="all">All Types</option>
+              <option value="street-food">Street Food</option>
+              <option value="desserts">Desserts</option>
+              <option value="beverages">Beverages</option>
+              <option value="ethnic">Ethnic Cuisine</option>
+              <option value="fast-food">Fast Food</option>
+              <option value="healthy">Healthy Options</option>
+              <option value="seafood">Seafood</option>
+              <option value="vegetarian">Vegetarian</option>
+              <option value="vegan">Vegan</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stalls Grid -->
+      <div class="stalls-grid" id="stallsGrid">
+        <!-- Stalls will be dynamically generated -->
+      </div>
+
+      <!-- Stall Details Modal -->
+      <div class="stall-modal" id="stallModal">
+        <div class="stall-modal-content">
+          <div class="stall-modal-header">
+            <button class="close-btn" onclick="closeStallModal()">×</button>
+            <h3 id="stallModalTitle">Stall Details</h3>
+          </div>
+          <div class="stall-modal-body">
+            <div class="stall-image-gallery" id="stallImageGallery">
+              <!-- Images will be loaded here -->
+            </div>
+            <div class="stall-info">
+              <div class="stall-origin">
+                <h4>📍 Origin & Location</h4>
+                <p id="stallOrigin"></p>
+                <p id="stallLocation"></p>
+              </div>
+              <div class="stall-description">
+                <h4>📝 About</h4>
+                <p id="stallDescription"></p>
+              </div>
+              <div class="stall-menu">
+                <h4>🍽️ Popular Items</h4>
+                <div id="stallMenu"></div>
+              </div>
+              <div class="stall-hours">
+                <h4>⏰ Operating Hours</h4>
+                <p id="stallHours"></p>
+              </div>
+            </div>
+            <div class="stall-actions">
+              <button class="btn btn-primary" onclick="locateStallOnMap()">
+                📍 Show on Map
+              </button>
+              <button class="btn btn-secondary" onclick="shareStall()">
+                📤 Share Stall
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="panel-content" id="float-content">
       <!-- Float Show Header -->
       <div class="float-header">
@@ -1456,6 +2228,86 @@
           <span class="category-tag" onclick="filterFloats('fantasy')">Fantasy</span>
           <span class="category-tag" onclick="filterFloats('historical')">Historical</span>
           <span class="category-tag" onclick="filterFloats('modern')">Modern</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-content" id="food-stalls-content">
+      <!-- Food Stalls Header -->
+      <div class="food-stalls-header">
+        <div class="food-stalls-title">
+          <h3>🍔 Food Stalls & Trucks</h3>
+          <p>Discover delicious food & refreshments</p>
+        </div>
+        <div class="food-stalls-controls">
+          <button class="food-stalls-control-btn" onclick="toggleFoodStallsAutoScroll()" id="foodAutoScrollBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+            </svg>
+            Auto
+          </button>
+          <button class="food-stalls-control-btn" onclick="refreshFoodStallsData()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Food Stalls Map -->
+      <div class="food-stalls-map-section">
+        <h4>🗺️ Food Stalls Map</h4>
+        <div class="food-stalls-map">
+          <div class="map-legend">
+            <div class="legend-item">
+              <span class="legend-icon">🍔</span>
+              <span>Food Stalls</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-icon">🚚</span>
+              <span>Food Trucks</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-icon">🍦</span>
+              <span>Desserts</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-icon">🥤</span>
+              <span>Beverages</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Food Stalls Feed -->
+      <div class="food-stalls-feed">
+        <h4>🍽️ Live Food Stalls Feed</h4>
+        <div class="food-stalls-cards" id="foodStallsCards">
+          <!-- Food stall cards will be dynamically generated -->
+        </div>
+      </div>
+
+      <!-- Food Stalls Schedule -->
+      <div class="food-stalls-schedule">
+        <h4>⏰ Operating Hours</h4>
+        <div class="food-schedule-timeline" id="foodScheduleTimeline">
+          <!-- Schedule items will be dynamically generated -->
+        </div>
+      </div>
+
+      <!-- Food Categories -->
+      <div class="food-stalls-categories">
+        <h4>🍴 Food Categories</h4>
+        <div class="food-category-tags">
+          <span class="food-category-tag active" onclick="filterFoodStalls('all')">All</span>
+          <span class="food-category-tag" onclick="filterFoodStalls('fast-food')">Fast Food</span>
+          <span class="food-category-tag" onclick="filterFoodStalls('ethnic')">Ethnic</span>
+          <span class="food-category-tag" onclick="filterFoodStalls('desserts')">Desserts</span>
+          <span class="food-category-tag" onclick="filterFoodStalls('beverages')">Beverages</span>
+          <span class="food-category-tag" onclick="filterFoodStalls('healthy')">Healthy</span>
         </div>
       </div>
     </div>
@@ -1559,6 +2411,13 @@
         <button class="btn btn-primary" onclick="confirmEmergencyAlert()" style="background: #ff5722;">Send
           Alert</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Stall Modal -->
+  <div id="stall-modal" class="stall-modal">
+    <div class="stall-modal-content">
+      <!-- Modal content will be dynamically populated -->
     </div>
   </div>
 
@@ -2520,6 +3379,266 @@
       // - Show detailed float information
       // - Highlight float marker on map
     }
+
+    // Find Stalls functionality
+    let findStallsActive = false;
+    let stallsData = [];
+    let filteredStalls = [];
+
+    function toggleFindStalls() {
+      findStallsActive = !findStallsActive;
+
+      // Update button state
+      const findStallsBtn = document.querySelector('.find-stalls-btn');
+      findStallsBtn.classList.toggle('active', findStallsActive);
+
+      // Update other buttons
+      document.querySelector('.truck-floats-btn').classList.remove('active');
+      document.querySelector('.food-stalls-btn').classList.remove('active');
+
+      // Switch to find stalls tab
+      if (findStallsActive) {
+        switchTab('find-stalls');
+        loadStallsData();
+      }
+    }
+
+    function loadStallsData() {
+      // Sample stalls data - in a real app, this would come from an API
+      stallsData = [
+        {
+          id: 1,
+          name: "Thai Street Kitchen",
+          origin: "Thailand",
+          description: "Authentic Thai street food with fresh ingredients and traditional recipes.",
+          image: "🍜",
+          rating: 4.8,
+          priceRange: "$$",
+          categories: ["Thai", "Street Food", "Noodles"],
+          location: { lat: 1.3521, lng: 103.8198 },
+          menu: ["Pad Thai", "Tom Yum Soup", "Green Curry", "Mango Sticky Rice"],
+          hours: "11:00 AM - 10:00 PM",
+          contact: "+65 9123 4567"
+        },
+        {
+          id: 2,
+          name: "Mexican Fiesta",
+          origin: "Mexico",
+          description: "Traditional Mexican tacos, burritos, and authentic salsas made fresh daily.",
+          image: "🌮",
+          rating: 4.6,
+          priceRange: "$",
+          categories: ["Mexican", "Tacos", "Street Food"],
+          location: { lat: 1.3521, lng: 103.8198 },
+          menu: ["Street Tacos", "Quesadillas", "Guacamole", "Horchata"],
+          hours: "12:00 PM - 11:00 PM",
+          contact: "+65 9123 4568"
+        },
+        {
+          id: 3,
+          name: "Japanese Ramen Corner",
+          origin: "Japan",
+          description: "Authentic Japanese ramen with rich broths and perfectly cooked noodles.",
+          image: "🍜",
+          rating: 4.9,
+          priceRange: "$$$",
+          categories: ["Japanese", "Ramen", "Noodles"],
+          location: { lat: 1.3521, lng: 103.8198 },
+          menu: ["Tonkotsu Ramen", "Miso Ramen", "Gyoza", "Matcha Ice Cream"],
+          hours: "11:30 AM - 9:30 PM",
+          contact: "+65 9123 4569"
+        },
+        {
+          id: 4,
+          name: "Indian Spice Market",
+          origin: "India",
+          description: "Aromatic Indian curries, biryanis, and freshly baked naan bread.",
+          image: "🍛",
+          rating: 4.7,
+          priceRange: "$$",
+          categories: ["Indian", "Curry", "Biryani"],
+          location: { lat: 1.3521, lng: 103.8198 },
+          menu: ["Butter Chicken", "Biryani", "Naan", "Mango Lassi"],
+          hours: "11:00 AM - 10:30 PM",
+          contact: "+65 9123 4570"
+        },
+        {
+          id: 5,
+          name: "Vietnamese Pho House",
+          origin: "Vietnam",
+          description: "Traditional Vietnamese pho with aromatic herbs and tender meat.",
+          image: "🍲",
+          rating: 4.5,
+          priceRange: "$",
+          categories: ["Vietnamese", "Pho", "Soup"],
+          location: { lat: 1.3521, lng: 103.8198 },
+          menu: ["Beef Pho", "Chicken Pho", "Spring Rolls", "Vietnamese Coffee"],
+          hours: "10:00 AM - 9:00 PM",
+          contact: "+65 9123 4571"
+        },
+        {
+          id: 6,
+          name: "Korean BBQ Express",
+          origin: "Korea",
+          description: "Quick Korean BBQ with marinated meats and traditional side dishes.",
+          image: "🥩",
+          rating: 4.8,
+          priceRange: "$$$",
+          categories: ["Korean", "BBQ", "Meat"],
+          location: { lat: 1.3521, lng: 103.8198 },
+          menu: ["Bulgogi", "Galbi", "Kimchi", "Bibimbap"],
+          hours: "12:00 PM - 11:00 PM",
+          contact: "+65 9123 4572"
+        }
+      ];
+
+      filteredStalls = [...stallsData];
+      renderStalls();
+    }
+
+    function renderStalls() {
+      const stallsGrid = document.querySelector('.stalls-grid');
+      if (!stallsGrid) return;
+
+      stallsGrid.innerHTML = filteredStalls.map(stall => `
+        <div class="stall-card" onclick="openStallModal(${stall.id})">
+          <div class="stall-card-header">
+            <div class="stall-name">${stall.name}</div>
+            <div class="stall-origin-badge">${stall.origin}</div>
+          </div>
+          <div class="stall-image">
+            ${stall.image}
+          </div>
+          <div class="stall-details">
+            <div class="stall-detail">
+              <span>⭐</span>
+              <span>${stall.rating}</span>
+            </div>
+            <div class="stall-detail">
+              <span>💰</span>
+              <span>${stall.priceRange}</span>
+            </div>
+          </div>
+          <div class="stall-description">${stall.description}</div>
+          <div class="stall-categories">
+            ${stall.categories.slice(0, 3).map(cat =>
+        `<span class="stall-category">${cat}</span>`
+      ).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterStalls() {
+      const countryFilter = document.getElementById('country-filter').value;
+      const foodTypeFilter = document.getElementById('food-type-filter').value;
+
+      filteredStalls = stallsData.filter(stall => {
+        const countryMatch = countryFilter === 'all' || stall.origin.toLowerCase() === countryFilter.toLowerCase();
+        const foodMatch = foodTypeFilter === 'all' ||
+          stall.categories.some(cat => cat.toLowerCase().includes(foodTypeFilter.toLowerCase()));
+
+        return countryMatch && foodMatch;
+      });
+
+      renderStalls();
+    }
+
+    function openStallModal(stallId) {
+      const stall = stallsData.find(s => s.id === stallId);
+      if (!stall) return;
+
+      const modal = document.getElementById('stall-modal');
+      const modalContent = modal.querySelector('.stall-modal-content');
+
+      modalContent.innerHTML = `
+        <div class="stall-modal-header">
+          <h3>${stall.name}</h3>
+          <button class="close-btn" onclick="closeStallModal()">&times;</button>
+        </div>
+        <div class="stall-modal-body">
+          <div class="stall-image-gallery">
+            <img src="data:image/svg+xml;base64,${btoa(`
+              <svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
+                <rect width="400" height="200" fill="#e8f5e8"/>
+                <text x="200" y="100" font-family="Arial" font-size="48" text-anchor="middle" fill="#4caf50">${stall.image}</text>
+              </svg>
+            `)}" alt="${stall.name}">
+          </div>
+          
+          <div class="stall-info">
+            <h4>About</h4>
+            <p>${stall.description}</p>
+            
+            <h4>Origin</h4>
+            <p>${stall.origin} - Traditional recipes and authentic flavors</p>
+            
+            <h4>Details</h4>
+            <p><strong>Rating:</strong> ⭐ ${stall.rating}/5.0</p>
+            <p><strong>Price Range:</strong> ${stall.priceRange}</p>
+            <p><strong>Hours:</strong> ${stall.hours}</p>
+            <p><strong>Contact:</strong> ${stall.contact}</p>
+          </div>
+          
+          <div class="stall-menu">
+            <h4>Popular Menu Items</h4>
+            <div class="stall-menu-items">
+              ${stall.menu.map(item => `<span class="menu-item">${item}</span>`).join('')}
+            </div>
+          </div>
+          
+          <div class="stall-actions">
+            <button class="btn btn-secondary" onclick="showStallOnMap(${stall.id})">
+              📍 Show on Map
+            </button>
+            <button class="btn btn-primary" onclick="getDirectionsToStall(${stall.id})">
+              🚶 Get Directions
+            </button>
+          </div>
+        </div>
+      `;
+
+      modal.classList.add('show');
+    }
+
+    function closeStallModal() {
+      const modal = document.getElementById('stall-modal');
+      modal.classList.remove('show');
+    }
+
+    function showStallOnMap(stallId) {
+      const stall = stallsData.find(s => s.id === stallId);
+      if (!stall) return;
+
+      // In a real app, this would center the map on the stall location
+      // and add a marker
+      alert(`Map would show ${stall.name} at coordinates: ${stall.location.lat}, ${stall.location.lng}`);
+      closeStallModal();
+    }
+
+    function getDirectionsToStall(stallId) {
+      const stall = stallsData.find(s => s.id === stallId);
+      if (!stall) return;
+
+      // In a real app, this would open navigation
+      alert(`Getting directions to ${stall.name}`);
+      closeStallModal();
+    }
+
+    function refreshStallsData() {
+      loadStallsData();
+      // Reset filters
+      document.getElementById('country-filter').value = 'all';
+      document.getElementById('food-type-filter').value = 'all';
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', function (event) {
+      const modal = document.getElementById('stall-modal');
+      if (event.target === modal) {
+        closeStallModal();
+      }
+    });
   </script>
 </body>
 
