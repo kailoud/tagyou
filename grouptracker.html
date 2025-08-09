@@ -255,60 +255,27 @@
       align-items: center;
       gap: 12px;
       flex-shrink: 0;
-      animation: fadeInRight 0.6s ease 0.3s both;
-    }
-
-    @keyframes fadeInRight {
-      from {
-        opacity: 0;
-        transform: translateX(20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
     }
 
     .user-avatar {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: #ff6b35;
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 600;
+      font-weight: bold;
       font-size: 16px;
       cursor: pointer;
-      box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3);
-      transition: all 0.3s ease;
-      border: 2px solid rgba(255, 255, 255, 0.1);
-      position: relative;
-    }
-
-    .user-avatar::after {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      z-index: -1;
-      opacity: 0;
-      transition: opacity 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s ease;
     }
 
     .user-avatar:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-    }
-
-    .user-avatar:hover::after {
-      opacity: 1;
+      transform: scale(1.05);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     }
 
     .user-menu {
@@ -410,25 +377,6 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 16px 20px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      animation: slideInTop 0.6s ease;
-    }
-
-    @keyframes slideInTop {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
     .top-row {
@@ -488,38 +436,6 @@
       position: relative;
       transition: all 0.3s ease;
       margin: 0 auto;
-      position: relative;
-      animation: fadeInUp 0.6s ease 0.2s both;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .search-container::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      border-radius: 14px;
-      z-index: -1;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .search-container:focus-within::before {
-      opacity: 1;
     }
 
     .search-container.expanded {
@@ -680,41 +596,31 @@
 
     .search-box {
       width: 100%;
-      height: 44px;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(5px);
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-      padding: 0 16px 0 44px;
+      height: 40px;
+      border: none;
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      padding: 0 16px 0 40px;
       font-size: 14px;
       outline: none;
       box-sizing: border-box;
-      transition: all 0.3s ease;
-      font-weight: 500;
-    }
-
-    .search-box:focus {
-      border-color: #667eea;
-      box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
-      background: white;
     }
 
     .search-icon {
       position: absolute;
-      left: 14px;
+      left: 12px;
       top: 50%;
       transform: translateY(-50%);
-      color: #667eea;
+      color: #666;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: color 0.2s ease;
       width: 20px;
       height: 20px;
     }
 
     .search-icon:hover {
-      color: #4c5fd9;
-      transform: translateY(-50%) scale(1.1);
+      color: #333;
     }
 
     .group-btn {
@@ -801,69 +707,29 @@
       position: relative;
       z-index: 1002;
       flex-shrink: 0;
-      animation: fadeInLeft 0.6s ease 0.1s both;
-    }
-
-    @keyframes fadeInLeft {
-      from {
-        opacity: 0;
-        transform: translateX(-20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
     }
 
     .festival-btn {
       height: 40px;
-      padding: 0 20px;
+      padding: 0 16px;
       border: none;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #ff6b35, #f7931e);
+      border-radius: 8px;
+      background: #ff6b35;
       color: white;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 500;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 10px;
-      box-shadow: 0 3px 12px rgba(255, 107, 53, 0.3);
-      transition: all 0.3s ease;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s ease;
       white-space: nowrap;
-      letter-spacing: 0.5px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .festival-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: left 0.5s ease;
-    }
-
-    .festival-btn:hover::before {
-      left: 100%;
-    }
-
-    .festival-btn .festival-icon {
-      transition: transform 0.3s ease;
-    }
-
-    .festival-btn:hover .festival-icon {
-      transform: scale(1.1) rotate(5deg);
     }
 
     .festival-btn:hover {
-      background: linear-gradient(135deg, #e55a2b, #e0851a);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+      background: #e55a2b;
+      transform: scale(1.02);
     }
 
     .dropdown-arrow {
@@ -882,16 +748,14 @@
       top: 100%;
       left: 0;
       right: 0;
-      background: rgba(255, 255, 255, 0.98);
-      backdrop-filter: blur(15px);
-      border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-      margin-top: 12px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      margin-top: 8px;
       max-height: 300px;
       overflow-y: auto;
       display: none;
       z-index: 1003;
-      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .festival-dropdown.open .festival-list {
@@ -899,26 +763,13 @@
     }
 
     .festival-item {
-      padding: 14px 18px;
+      padding: 12px 16px;
       cursor: pointer;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-      transition: all 0.3s ease;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background-color 0.2s ease;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      position: relative;
-    }
-
-    .festival-item::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 3px;
-      background: linear-gradient(135deg, #ff6b35, #f7931e);
-      opacity: 0;
-      transition: opacity 0.3s ease;
+      gap: 4px;
     }
 
     .festival-item:last-child {
@@ -926,12 +777,7 @@
     }
 
     .festival-item:hover {
-      background-color: rgba(102, 126, 234, 0.05);
-      transform: translateX(4px);
-    }
-
-    .festival-item:hover::before {
-      opacity: 1;
+      background-color: #f8f9fa;
     }
 
     .festival-name {
