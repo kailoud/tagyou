@@ -1678,6 +1678,18 @@
       border-radius: 8px;
     }
 
+    .stall-emoji {
+      font-size: 48px;
+      line-height: 1;
+      display: block;
+      text-align: center;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .stall-details {
       display: flex;
       gap: 16px;
@@ -1711,6 +1723,17 @@
       color: #666;
       border-radius: 12px;
       font-size: 11px;
+    }
+
+    .menu-item {
+      display: inline-block;
+      padding: 6px 12px;
+      background: #e8f5e8;
+      color: #4caf50;
+      border-radius: 16px;
+      font-size: 12px;
+      margin: 4px;
+      border: 1px solid #c8e6c9;
     }
 
     /* Stall Modal Styles */
@@ -3064,16 +3087,15 @@
       // Close the dropdown
       document.querySelector('.festival-dropdown').classList.remove('open');
 
-      // You can add more functionality here like:
-      // - Setting the current festival context
-      // - Updating the map to show festival location
-      // - Filtering group members by festival
-      // - Adding festival-specific features
-
-      console.log(`Selected festival: ${festivalName}`);
-
-      // Optional: Show a notification
-      showNotification(`Selected: ${festivalName}`);
+      // Load festival-specific data
+      if (festivalName === 'Notting Hill Carnival') {
+        console.log('Loading Notting Hill Carnival stalls data...');
+        loadStallsData();
+        showNotification(`Loaded ${festivalName} stalls data!`);
+      } else {
+        console.log(`Selected festival: ${festivalName}`);
+        showNotification(`Selected: ${festivalName}`);
+      }
     }
 
     function showNotification(message) {
@@ -3834,6 +3856,8 @@
 
       filteredStalls = [...stallsData];
       console.log('Stalls data loaded, calling renderStalls...');
+      console.log('Stalls data:', stallsData);
+      console.log('Filtered stalls:', filteredStalls);
       renderStalls();
       console.log('=== loadStallsData completed ===');
     }
@@ -3841,7 +3865,7 @@
     function renderStalls() {
       console.log('=== renderStalls called ===');
 
-      const stallsGrid = document.querySelector('.stalls-grid');
+      const stallsGrid = document.getElementById('stallsGrid');
       console.log('Stalls grid element:', stallsGrid);
 
       if (!stallsGrid) {
@@ -3856,7 +3880,7 @@
             <div class="stall-origin-badge">${stall.origin}</div>
           </div>
           <div class="stall-image">
-            ${stall.image}
+            <span class="stall-emoji">${stall.image}</span>
           </div>
           <div class="stall-details">
             <div class="stall-detail">
@@ -3878,12 +3902,14 @@
       `).join('');
 
       console.log('Stalls rendered successfully');
+      console.log('Filtered stalls count:', filteredStalls.length);
+      console.log('Stalls grid element:', stallsGrid);
       console.log('=== renderStalls completed ===');
     }
 
     function filterStalls() {
-      const countryFilter = document.getElementById('country-filter').value;
-      const foodTypeFilter = document.getElementById('food-type-filter').value;
+      const countryFilter = document.getElementById('countryFilter').value;
+      const foodTypeFilter = document.getElementById('foodTypeFilter').value;
 
       filteredStalls = stallsData.filter(stall => {
         const countryMatch = countryFilter === 'all' || stall.origin.toLowerCase() === countryFilter.toLowerCase();
@@ -3900,53 +3926,24 @@
       const stall = stallsData.find(s => s.id === stallId);
       if (!stall) return;
 
-      const modal = document.getElementById('stall-modal');
-      const modalContent = modal.querySelector('.stall-modal-content');
+      const modal = document.getElementById('stallModal');
 
-      modalContent.innerHTML = `
-        <div class="stall-modal-header">
-          <h3>${stall.name}</h3>
-          <button class="close-btn" onclick="closeStallModal()">&times;</button>
-        </div>
-        <div class="stall-modal-body">
-          <div class="stall-image-gallery">
-            <img src="data:image/svg+xml;base64,${btoa(`
-              <svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
-                <rect width="400" height="200" fill="#e8f5e8"/>
-                <text x="200" y="100" font-family="Arial" font-size="48" text-anchor="middle" fill="#4caf50">${stall.image}</text>
-              </svg>
-            `)}" alt="${stall.name}">
-          </div>
-          
-          <div class="stall-info">
-            <h4>About</h4>
-            <p>${stall.description}</p>
-            
-            <h4>Origin</h4>
-            <p>${stall.origin} - Traditional recipes and authentic flavors</p>
-            
-            <h4>Details</h4>
-            <p><strong>Rating:</strong> ⭐ ${stall.rating}/5.0</p>
-            <p><strong>Price Range:</strong> ${stall.priceRange}</p>
-            <p><strong>Hours:</strong> ${stall.hours}</p>
-            <p><strong>Contact:</strong> ${stall.contact}</p>
-          </div>
-          
-          <div class="stall-menu">
-            <h4>Popular Menu Items</h4>
-            <div class="stall-menu-items">
-              ${stall.menu.map(item => `<span class="menu-item">${item}</span>`).join('')}
-            </div>
-          </div>
-          
-          <div class="stall-actions">
-            <button class="btn btn-secondary" onclick="showStallOnMap(${stall.id})">
-              📍 Show on Map
-            </button>
-            <button class="btn btn-primary" onclick="getDirectionsToStall(${stall.id})">
-              🚶 Get Directions
-            </button>
-          </div>
+      // Update the existing modal content instead of replacing it
+      document.getElementById('stallModalTitle').textContent = stall.name;
+      document.getElementById('stallOrigin').textContent = stall.origin;
+      document.getElementById('stallLocation').textContent = `Coordinates: ${stall.location.lat}, ${stall.location.lng}`;
+      document.getElementById('stallDescription').textContent = stall.description;
+      document.getElementById('stallHours').textContent = stall.hours;
+
+      // Update the menu items
+      const menuContainer = document.getElementById('stallMenu');
+      menuContainer.innerHTML = stall.menu.map(item => `<span class="menu-item">${item}</span>`).join('');
+
+      // Update the image gallery with the emoji
+      const imageGallery = document.getElementById('stallImageGallery');
+      imageGallery.innerHTML = `
+        <div style="text-align: center; padding: 20px; font-size: 72px; background: #e8f5e8; border-radius: 8px;">
+          ${stall.image}
         </div>
       `;
 
@@ -3954,7 +3951,7 @@
     }
 
     function closeStallModal() {
-      const modal = document.getElementById('stall-modal');
+      const modal = document.getElementById('stallModal');
       modal.classList.remove('show');
     }
 
@@ -3977,19 +3974,35 @@
       closeStallModal();
     }
 
+    function locateStallOnMap() {
+      // In a real app, this would center the map on the stall location
+      alert('Map would center on the selected stall location');
+    }
+
+    function shareStall() {
+      // In a real app, this would open sharing options
+      alert('Sharing stall information...');
+    }
+
     function refreshStallsData() {
       loadStallsData();
       // Reset filters
-      document.getElementById('country-filter').value = 'all';
-      document.getElementById('food-type-filter').value = 'all';
+      document.getElementById('countryFilter').value = 'all';
+      document.getElementById('foodTypeFilter').value = 'all';
     }
 
     // Close modal when clicking outside
     document.addEventListener('click', function (event) {
-      const modal = document.getElementById('stall-modal');
+      const modal = document.getElementById('stallModal');
       if (event.target === modal) {
         closeStallModal();
       }
+    });
+
+    // Initialize stalls data when page loads
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log('Page loaded, initializing stalls data...');
+      loadStallsData();
     });
   </script>
 </body>
