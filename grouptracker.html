@@ -120,23 +120,23 @@
       .top-bar {
         gap: 12px;
       }
-      
+
       .top-row {
         gap: 8px;
       }
-      
+
       .control-row {
         gap: 8px;
       }
-      
+
       .search-container.expanded {
         flex: 4;
       }
-      
+
       .festival-dropdown.collapsed {
         width: 32px;
       }
-      
+
       .festival-dropdown.collapsed .festival-btn {
         width: 32px;
         height: 48px;
@@ -759,7 +759,7 @@
         </svg>
         <div class="group-indicator" id="groupCount">4</div>
       </button>
-      
+
       <div class="search-container">
         <input type="text" class="search-box" placeholder="Find group member by phone..." id="searchInput"
           oninput="searchMembers()">
@@ -1765,7 +1765,7 @@
       const searchContainer = document.querySelector('.search-container');
       const festivalDropdown = document.querySelector('.festival-dropdown');
       const searchInput = document.getElementById('searchInput');
-      
+
       if (searchContainer.classList.contains('expanded')) {
         // Collapse search
         searchContainer.classList.remove('expanded');
@@ -1780,7 +1780,7 @@
     }
 
     // Add click event to search icon for mobile expansion
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const searchIcon = document.querySelector('.search-icon');
       if (searchIcon) {
         searchIcon.style.cursor = 'pointer';
