@@ -2582,6 +2582,8 @@
     });
 
     function switchTab(tabName) {
+      console.log('Switching to tab:', tabName);
+
       // Hide all content
       const contents = document.querySelectorAll('.panel-content');
       contents.forEach(content => content.classList.remove('active'));
@@ -2591,8 +2593,22 @@
       tabs.forEach(tab => tab.classList.remove('active'));
 
       // Show selected content and activate tab
-      document.getElementById(tabName + '-content').classList.add('active');
-      event.target.classList.add('active');
+      const targetContent = document.getElementById(tabName + '-content');
+      if (targetContent) {
+        targetContent.classList.add('active');
+        console.log('Content activated:', tabName + '-content');
+      } else {
+        console.error('Content not found:', tabName + '-content');
+      }
+
+      // Find and activate the correct tab
+      const targetTab = document.querySelector(`.tab[onclick*="${tabName}"]`);
+      if (targetTab) {
+        targetTab.classList.add('active');
+        console.log('Tab activated:', tabName);
+      } else {
+        console.error('Tab not found for:', tabName);
+      }
     }
 
     // Search functionality
@@ -3387,6 +3403,7 @@
 
     function toggleFindStalls() {
       findStallsActive = !findStallsActive;
+      console.log('Toggle Find Stalls clicked, active:', findStallsActive);
 
       // Update button state
       const findStallsBtn = document.querySelector('.find-stalls-btn');
@@ -3396,8 +3413,20 @@
       document.querySelector('.truck-floats-btn').classList.remove('active');
       document.querySelector('.food-stalls-btn').classList.remove('active');
 
-      // Switch to find stalls tab
+      // Switch to find stalls tab and open panel
       if (findStallsActive) {
+        console.log('Opening panel and switching to find stalls tab');
+
+        // Open the panel first
+        const panel = document.getElementById('bottomPanel');
+        if (panel) {
+          panel.classList.add('expanded');
+          console.log('Panel expanded');
+        } else {
+          console.error('Panel not found!');
+        }
+
+        // Then switch to find stalls tab
         switchTab('find-stalls');
         loadStallsData();
       }
