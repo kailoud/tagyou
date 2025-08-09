@@ -1960,6 +1960,39 @@
     .stalls-grid::-webkit-scrollbar-thumb:hover {
       background: #a8a8a8;
     }
+
+    /* Carnival Route Visualization Styles */
+    .carnival-route-marker {
+      background: transparent;
+      border: none;
+      font-size: 24px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      transition: transform 0.2s ease;
+    }
+
+    .carnival-route-marker:hover {
+      transform: scale(1.2);
+    }
+
+    /* Carnival route polyline styling */
+    .leaflet-interactive.carnival-route {
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
+
+    .leaflet-interactive.carnival-route:hover {
+      opacity: 1;
+    }
+
+    /* Grid overlay styling */
+    .carnival-grid-line {
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .carnival-grid-line:hover {
+      opacity: 0.6;
+    }
   </style>
 </head>
 
@@ -3217,10 +3250,13 @@
       if (festivalName === 'Notting Hill Carnival') {
         console.log('Loading Notting Hill Carnival stalls data...');
         loadStallsData();
-        showNotification(`Loaded ${festivalName} stalls data!`);
+        showCarnivalFloatRoute();
+        showNotification(`Loaded ${festivalName} stalls data and parade route!`);
       } else {
         console.log(`Selected festival: ${festivalName}`);
         showNotification(`Selected: ${festivalName}`);
+        // Remove carnival route if switching to different festival
+        removeCarnivalFloatRoute();
       }
     }
 
@@ -3452,6 +3488,132 @@
       // Remove all truck float markers
       map.eachLayer(layer => {
         if (layer.truckFloatData) {
+          map.removeLayer(layer);
+        }
+      });
+    }
+
+    // Carnival Float Route Visualization Functions
+    function showCarnivalFloatRoute() {
+      console.log('Showing Notting Hill Carnival float route...');
+
+      // Remove existing route if any
+      removeCarnivalFloatRoute();
+
+      // Define the carnival parade route coordinates (Notting Hill area)
+      const carnivalRoute = [
+        [51.5170, -0.2050], // Starting point - Ladbroke Grove
+        [51.5175, -0.2040], // Westbourne Grove
+        [51.5180, -0.2030], // Portobello Road
+        [51.5185, -0.2020], // Kensal Road
+        [51.5190, -0.2010], // Golborne Road
+        [51.5195, -0.2000], // Harrow Road
+        [51.5200, -0.1990], // Elgin Avenue
+        [51.5205, -0.1980], // Maida Vale
+        [51.5210, -0.1970], // Paddington
+        [51.5215, -0.1960], // Bayswater
+        [51.5220, -0.1950], // Queensway
+        [51.5225, -0.1940], // Notting Hill Gate
+        [51.5230, -0.1930], // Holland Park
+        [51.5235, -0.1920], // Shepherd's Bush
+        [51.5240, -0.1910]  // End point - White City
+      ];
+
+      // Create the parade route polyline with carnival styling
+      const routeLine = L.polyline(carnivalRoute, {
+        color: '#FF6B35',
+        weight: 8,
+        opacity: 0.8,
+        dashArray: '20, 10',
+        lineCap: 'round',
+        lineJoin: 'round'
+      }).addTo(map);
+
+      // Store reference for removal
+      routeLine.carnivalRouteData = true;
+
+      // Add route markers at key points
+      carnivalRoute.forEach((coord, index) => {
+        const isStart = index === 0;
+        const isEnd = index === carnivalRoute.length - 1;
+        const isKeyPoint = index % 3 === 0; // Every 3rd point is a key location
+
+        if (isStart || isEnd || isKeyPoint) {
+          const marker = L.marker(coord, {
+            icon: L.divIcon({
+              className: 'carnival-route-marker',
+              html: isStart ? '🎭' : isEnd ? '🏁' : '🎪',
+              iconSize: [30, 30],
+              iconAnchor: [15, 15]
+            })
+          }).addTo(map);
+
+          marker.bindPopup(`
+            <b>${isStart ? 'Carnival Start' : isEnd ? 'Carnival End' : 'Key Point ' + (index + 1)}</b><br>
+            ${isStart ? 'Ladbroke Grove' : isEnd ? 'White City' : 'Route Checkpoint'}<br>
+            <small>Parade Route</small>
+          `);
+          marker.carnivalRouteData = true;
+        }
+      });
+
+      // Add grid overlay for the carnival area
+      const gridBounds = L.latLngBounds([
+        [51.5160, -0.2060], // Southwest
+        [51.5250, -0.1920]  // Northeast
+      ]);
+
+      // Create grid lines
+      const gridSpacing = 0.002; // Grid spacing in degrees
+      const gridLines = [];
+
+      // Vertical grid lines
+      for (let lng = -0.2060; lng <= -0.1920; lng += gridSpacing) {
+        const line = L.polyline([
+          [51.5160, lng],
+          [51.5250, lng]
+        ], {
+          color: '#FFD700',
+          weight: 1,
+          opacity: 0.3,
+          dashArray: '5, 5'
+        }).addTo(map);
+        line.carnivalRouteData = true;
+        gridLines.push(line);
+      }
+
+      // Horizontal grid lines
+      for (let lat = 51.5160; lat <= 51.5250; lat += gridSpacing) {
+        const line = L.polyline([
+          [lat, -0.2060],
+          [lat, -0.1920]
+        ], {
+          color: '#FFD700',
+          weight: 1,
+          opacity: 0.3,
+          dashArray: '5, 5'
+        }).addTo(map);
+        line.carnivalRouteData = true;
+        gridLines.push(line);
+      }
+
+      // Store grid lines for removal
+      gridLines.forEach(line => {
+        line.carnivalRouteData = true;
+      });
+
+      // Fit map to show the entire carnival route
+      map.fitBounds(gridBounds, { padding: [20, 20] });
+
+      showNotification('🎭 Carnival parade route displayed!');
+    }
+
+    function removeCarnivalFloatRoute() {
+      console.log('Removing carnival float route...');
+
+      // Remove all carnival route elements
+      map.eachLayer(layer => {
+        if (layer.carnivalRouteData) {
           map.removeLayer(layer);
         }
       });
