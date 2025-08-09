@@ -1512,6 +1512,8 @@
         width: 100vw;
         margin: 0;
         border-radius: 16px 16px 0 0;
+        /* Mobile-specific touch handling */
+        touch-action: pan-y;
       }
 
       .panel-content {
@@ -1532,10 +1534,23 @@
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         -ms-overflow-style: none;
+        /* Mobile-specific touch handling */
+        touch-action: pan-x;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
       }
 
       .panel-tabs::-webkit-scrollbar {
         display: none;
+      }
+
+      /* Ensure tabs on mobile scroll smoothly and don't interfere with panel */
+      .tab {
+        touch-action: pan-x;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
       }
 
       .left-controls {
@@ -2667,6 +2682,21 @@
       touchStartX = e.touches[0].clientX;
       isDragging = true;
       isVerticalSwipe = false;
+
+      // On mobile, be more restrictive about touch handling
+      if (window.innerWidth <= 480) {
+        // Only allow touches on the handle area, not the entire panel
+        const handle = e.currentTarget;
+        const rect = handle.getBoundingClientRect();
+        const touchX = e.touches[0].clientX;
+
+        // If touch is outside the handle area, don't start dragging
+        if (touchX < rect.left || touchX > rect.right) {
+          isDragging = false;
+          return;
+        }
+      }
+
       e.preventDefault(); // Prevent default browser behavior
     }
 
@@ -2681,10 +2711,14 @@
       const diffX = touchEndX - touchStartX;
 
       // Determine if this is a vertical or horizontal swipe
+      // Use smaller threshold for mobile devices
+      const isMobile = window.innerWidth <= 480;
+      const threshold = isMobile ? 5 : 10;
+
       if (!isVerticalSwipe) {
-        if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 10) {
+        if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > threshold) {
           isVerticalSwipe = true;
-        } else if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+        } else if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
           // This is a horizontal swipe, don't move the panel
           isDragging = false;
           return;
@@ -2738,9 +2772,19 @@
       const handle = document.querySelector('.panel-handle');
 
       if (handle) {
+        // Add touch event listeners with mobile-specific handling
         handle.addEventListener('touchstart', handleTouchStart, { passive: false });
         handle.addEventListener('touchmove', handleTouchMove, { passive: false });
         handle.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+        // For mobile, also add touch events to the panel tabs to prevent panel movement
+        const panelTabs = document.querySelector('.panel-tabs');
+        if (panelTabs && window.innerWidth <= 480) {
+          panelTabs.addEventListener('touchstart', function (e) {
+            // Prevent panel movement when touching tabs on mobile
+            e.stopPropagation();
+          }, { passive: false });
+        }
       }
     });
 
