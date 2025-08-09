@@ -2657,11 +2657,16 @@
     // Swipe functionality for bottom panel
     let touchStartY = 0;
     let touchEndY = 0;
+    let touchStartX = 0;
+    let touchEndX = 0;
     let isDragging = false;
+    let isVerticalSwipe = false;
 
     function handleTouchStart(e) {
       touchStartY = e.touches[0].clientY;
+      touchStartX = e.touches[0].clientX;
       isDragging = true;
+      isVerticalSwipe = false;
       e.preventDefault(); // Prevent default browser behavior
     }
 
@@ -2670,7 +2675,24 @@
 
       e.preventDefault(); // Prevent default browser behavior (pull-to-refresh)
       touchEndY = e.touches[0].clientY;
-      const diff = touchEndY - touchStartY; // Fixed: reversed the diff calculation
+      touchEndX = e.touches[0].clientX;
+
+      const diffY = touchEndY - touchStartY;
+      const diffX = touchEndX - touchStartX;
+
+      // Determine if this is a vertical or horizontal swipe
+      if (!isVerticalSwipe) {
+        if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 10) {
+          isVerticalSwipe = true;
+        } else if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+          // This is a horizontal swipe, don't move the panel
+          isDragging = false;
+          return;
+        }
+      }
+
+      // Only proceed if this is a vertical swipe
+      if (!isVerticalSwipe) return;
 
       const panel = document.getElementById('bottomPanel');
       const currentTransform = panel.style.transform;
@@ -2679,7 +2701,7 @@
 
       // Limit the drag range
       const maxDrag = -window.innerHeight * 0.6;
-      const newY = Math.max(maxDrag, Math.min(0, currentY + diff));
+      const newY = Math.max(maxDrag, Math.min(0, currentY + diffY));
 
       panel.style.transform = `translateY(${newY}px)`;
       touchStartY = touchEndY;
@@ -2707,6 +2729,7 @@
       }
 
       isDragging = false;
+      isVerticalSwipe = false;
     }
 
     // Add touch event listeners
