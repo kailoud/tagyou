@@ -2528,6 +2528,8 @@
         document.body.classList.add('panel-expanded');
       } else {
         document.body.classList.remove('panel-expanded');
+        // Reset all button states when panel is manually closed
+        resetAllButtonStates();
       }
     }
 
@@ -2579,6 +2581,8 @@
         panel.classList.remove('expanded');
         document.body.classList.remove('panel-expanded');
         panel.style.transform = '';
+        // Reset button states when panel is closed via swipe
+        resetAllButtonStates();
       }
 
       isDragging = false;
@@ -2791,6 +2795,22 @@
 
     // Group management
     function showGroupModal() {
+      const panel = document.getElementById('bottomPanel');
+      const isPanelOpen = panel.classList.contains('expanded');
+
+      // If panel is closed, open it and switch to members tab
+      if (!isPanelOpen) {
+        console.log('Panel closed - opening panel for group management');
+
+        // Open the panel
+        panel.classList.add('expanded');
+        document.body.classList.add('panel-expanded');
+
+        // Switch to members tab
+        switchTab('members');
+      }
+
+      // Show group modal
       document.getElementById('groupModal').classList.add('show');
 
       // Reset search placeholder to default when group management is opened
@@ -2801,6 +2821,7 @@
       // Reset all button states to inactive
       document.querySelector('.food-stalls-btn').classList.remove('active');
       document.querySelector('.truck-floats-btn').classList.remove('active');
+      document.querySelector('.find-stalls-btn').classList.remove('active');
 
       // Hide float panel and show group content
       hideFloatPanel();
@@ -3026,8 +3047,25 @@
 
     // Control Button Functions
     function toggleFoodStalls() {
+      const panel = document.getElementById('bottomPanel');
+      const isPanelOpen = panel.classList.contains('expanded');
+      const foodStallsBtn = document.querySelector('.food-stalls-btn');
+
+      // If panel is closed, open it and activate this tab
+      if (!isPanelOpen) {
+        console.log('Panel closed - opening panel for food stalls');
+
+        // Open the panel
+        panel.classList.add('expanded');
+        document.body.classList.add('panel-expanded');
+
+        // Switch to food stalls tab (if it exists)
+        // For now, just show the food stalls on map
+        switchTab('members'); // Default to members tab since food stalls is map-based
+      }
+
       // Toggle food stalls visibility on map
-      const foodStallsVisible = document.querySelector('.food-stalls-btn').classList.toggle('active');
+      const foodStallsVisible = foodStallsBtn.classList.toggle('active');
       const searchInput = document.getElementById('searchInput');
 
       if (foodStallsVisible) {
@@ -3041,6 +3079,10 @@
 
         // Hide float panel when food stalls are shown
         hideFloatPanel();
+
+        // Deactivate other buttons
+        document.querySelector('.truck-floats-btn').classList.remove('active');
+        document.querySelector('.find-stalls-btn').classList.remove('active');
       } else {
         // Remove food stall markers from map
         removeFoodStallMarkers();
@@ -3053,8 +3095,24 @@
     }
 
     function toggleTruckFloats() {
+      const panel = document.getElementById('bottomPanel');
+      const isPanelOpen = panel.classList.contains('expanded');
+      const truckFloatsBtn = document.querySelector('.truck-floats-btn');
+
+      // If panel is closed, open it and activate this tab
+      if (!isPanelOpen) {
+        console.log('Panel closed - opening panel for truck floats');
+
+        // Open the panel
+        panel.classList.add('expanded');
+        document.body.classList.add('panel-expanded');
+
+        // Switch to members tab since truck floats is map-based
+        switchTab('members');
+      }
+
       // Toggle truck floats visibility on map
-      const truckFloatsVisible = document.querySelector('.truck-floats-btn').classList.toggle('active');
+      const truckFloatsVisible = truckFloatsBtn.classList.toggle('active');
       const searchInput = document.getElementById('searchInput');
 
       if (truckFloatsVisible) {
@@ -3068,6 +3126,10 @@
 
         // Show float panel
         showFloatPanel();
+
+        // Deactivate other buttons
+        document.querySelector('.food-stalls-btn').classList.remove('active');
+        document.querySelector('.find-stalls-btn').classList.remove('active');
       } else {
         // Remove truck float markers from map
         removeTruckFloatMarkers();
@@ -3416,44 +3478,45 @@
     let stallsData = [];
     let filteredStalls = [];
 
-    function toggleFindStalls() {
-      findStallsActive = !findStallsActive;
-      console.log('Toggle Find Stalls clicked, active:', findStallsActive);
-
-      // Update button state
-      const findStallsBtn = document.querySelector('.find-stalls-btn');
-      findStallsBtn.classList.toggle('active', findStallsActive);
-
-      // Update other buttons
+    // Reset all button states
+    function resetAllButtonStates() {
+      document.querySelector('.find-stalls-btn').classList.remove('active');
       document.querySelector('.truck-floats-btn').classList.remove('active');
       document.querySelector('.food-stalls-btn').classList.remove('active');
+      findStallsActive = false;
+    }
 
-      // Switch to find stalls tab and open panel
-      if (findStallsActive) {
-        console.log('Opening panel and switching to find stalls tab');
+    function toggleFindStalls() {
+      const panel = document.getElementById('bottomPanel');
+      const isPanelOpen = panel.classList.contains('expanded');
 
-        // Open the panel first
-        const panel = document.getElementById('bottomPanel');
-        if (panel) {
-          panel.classList.add('expanded');
-          document.body.classList.add('panel-expanded');
-          console.log('Panel expanded');
-        } else {
-          console.error('Panel not found!');
-        }
+      // If panel is closed, open it and activate this tab
+      if (!isPanelOpen) {
+        findStallsActive = true;
+        console.log('Panel closed - opening panel and switching to find stalls tab');
 
-        // Then switch to find stalls tab
+        // Open the panel
+        panel.classList.add('expanded');
+        document.body.classList.add('panel-expanded');
+
+        // Switch to find stalls tab
         switchTab('find-stalls');
         loadStallsData();
       } else {
-        // Close panel when deactivating
-        const panel = document.getElementById('bottomPanel');
-        if (panel) {
-          panel.classList.remove('expanded');
-          document.body.classList.remove('panel-expanded');
-          console.log('Panel collapsed');
-        }
+        // Panel is open - just switch to this tab
+        findStallsActive = true;
+        console.log('Panel open - switching to find stalls tab');
+        switchTab('find-stalls');
+        loadStallsData();
       }
+
+      // Update button states
+      const findStallsBtn = document.querySelector('.find-stalls-btn');
+      findStallsBtn.classList.add('active');
+
+      // Deactivate other buttons
+      document.querySelector('.truck-floats-btn').classList.remove('active');
+      document.querySelector('.food-stalls-btn').classList.remove('active');
     }
 
     function loadStallsData() {
