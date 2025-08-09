@@ -136,6 +136,28 @@
         right: 0;
       }
 
+      /* Full bleed mobile design */
+      .bottom-panel {
+        left: 0;
+        right: 0;
+        width: 100%;
+        border-radius: 20px 20px 0 0;
+      }
+
+      .panel-content {
+        padding: 0 16px 32px;
+        margin: 0;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .panel-tabs {
+        margin: 0 -16px;
+        padding: 0 16px;
+        width: calc(100% + 32px);
+        box-sizing: border-box;
+      }
+
       .left-controls {
         position: absolute;
         left: 16px;
@@ -484,16 +506,28 @@
     .panel-tabs {
       display: flex;
       border-bottom: 1px solid #eee;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .panel-tabs::-webkit-scrollbar {
+      display: none;
     }
 
     .tab {
-      flex: 1;
-      padding: 16px;
+      flex: none;
+      padding: 16px 20px;
       text-align: center;
       cursor: pointer;
       font-weight: 500;
       color: #666;
       border-bottom: 2px solid transparent;
+      font-size: 0.85em;
+      min-width: max-content;
     }
 
     .tab.active {
@@ -1449,6 +1483,29 @@
         padding: 0 12px;
       }
 
+      /* Extra full bleed for small mobile */
+      .bottom-panel {
+        left: 0;
+        right: 0;
+        width: 100vw;
+        margin: 0;
+        border-radius: 16px 16px 0 0;
+      }
+
+      .panel-content {
+        padding: 0 12px 24px;
+        margin: 0;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .panel-tabs {
+        margin: 0 -12px;
+        padding: 0 12px;
+        width: calc(100% + 24px);
+        box-sizing: border-box;
+      }
+
       .left-controls {
         top: 64px;
         left: 12px;
@@ -1947,7 +2004,6 @@
     </div>
     <div class="panel-tabs">
       <div class="tab active" onclick="switchTab('members')">Group</div>
-      <div class="tab" onclick="switchTab('emergency')">Emergency</div>
       <div class="tab" onclick="switchTab('find-stalls')">Find Stalls</div>
       <div class="tab" onclick="switchTab('float')">Floats</div>
       <div class="tab" onclick="switchTab('settings')">Settings</div>
