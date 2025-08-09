@@ -602,6 +602,357 @@
       animation: pulse 2s infinite;
     }
 
+    /* Float Panel Styles */
+    .float-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .float-title h3 {
+      margin: 0 0 4px 0;
+      color: #9c27b0;
+      font-size: 18px;
+    }
+
+    .float-title p {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .float-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .float-control-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #f5f5f5;
+      color: #666;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .float-control-btn:hover {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .float-control-btn.active {
+      background: #9c27b0;
+      color: white;
+    }
+
+    .float-route-section {
+      margin-bottom: 24px;
+    }
+
+    .float-route-section h4 {
+      margin: 0 0 12px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .route-progress {
+      position: relative;
+    }
+
+    .route-line {
+      height: 4px;
+      background: #e0e0e0;
+      border-radius: 2px;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .route-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #9c27b0, #ff9800);
+      border-radius: 2px;
+      width: 35%;
+      transition: width 0.5s ease;
+      position: relative;
+    }
+
+    .route-progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    .route-stops {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .route-stop {
+      position: relative;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .route-stop.active {
+      background: #9c27b0;
+      color: white;
+      font-weight: 500;
+    }
+
+    .float-feed {
+      margin-bottom: 24px;
+    }
+
+    .float-feed h4 {
+      margin: 0 0 16px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .float-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .float-card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #9c27b0;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .float-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .float-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .float-name {
+      font-weight: 600;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .float-status {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .float-status.live {
+      background: #e8f5e8;
+      color: #2e7d32;
+    }
+
+    .float-status.upcoming {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .float-status.completed {
+      background: #f3e5f5;
+      color: #7b1fa2;
+    }
+
+    .float-details {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .float-detail {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .float-description {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    .float-image {
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9c27b0;
+      font-size: 24px;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .float-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .float-image::after {
+      content: '🎭';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 32px;
+      opacity: 0.7;
+    }
+
+    .float-schedule {
+      margin-bottom: 24px;
+    }
+
+    .float-schedule h4 {
+      margin: 0 0 16px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .schedule-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .schedule-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 3px solid #9c27b0;
+    }
+
+    .schedule-time {
+      background: #9c27b0;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .schedule-info h5 {
+      margin: 0 0 4px 0;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .schedule-info p {
+      margin: 0;
+      color: #666;
+      font-size: 12px;
+    }
+
+    .float-categories {
+      margin-bottom: 24px;
+    }
+
+    .float-categories h4 {
+      margin: 0 0 16px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .category-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .category-tag {
+      padding: 6px 12px;
+      background: #f0f0f0;
+      color: #666;
+      border-radius: 16px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+    }
+
+    .category-tag:hover {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .category-tag.active {
+      background: #9c27b0;
+      color: white;
+      border-color: #9c27b0;
+    }
+
+    /* Custom scrollbar for float cards */
+    .float-cards::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .float-cards::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    .float-cards::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+
+    .float-cards::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
     @keyframes pulse {
       0% {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -1036,6 +1387,76 @@
         <p style="font-size: 14px; color: #666; margin-top: 16px;">
           Emergency alerts notify all group members and can automatically contact event security if enabled.
         </p>
+      </div>
+    </div>
+
+    <div class="panel-content" id="float-content">
+      <!-- Float Show Header -->
+      <div class="float-header">
+        <div class="float-title">
+          <h3>🎪 Carnival Float Show</h3>
+          <p>Live parade tracking & float information</p>
+        </div>
+        <div class="float-controls">
+          <button class="float-control-btn" onclick="toggleFloatAutoScroll()" id="autoScrollBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+            </svg>
+            Auto
+          </button>
+          <button class="float-control-btn" onclick="refreshFloatData()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Float Parade Route -->
+      <div class="float-route-section">
+        <h4>📍 Parade Route</h4>
+        <div class="route-progress">
+          <div class="route-line">
+            <div class="route-progress-bar" id="routeProgress"></div>
+          </div>
+          <div class="route-stops">
+            <span class="route-stop active">Start</span>
+            <span class="route-stop">Main St</span>
+            <span class="route-stop">Center</span>
+            <span class="route-stop">End</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Float Feed -->
+      <div class="float-feed">
+        <h4>🎭 Live Float Feed</h4>
+        <div class="float-cards" id="floatCards">
+          <!-- Float cards will be dynamically generated -->
+        </div>
+      </div>
+
+      <!-- Float Schedule -->
+      <div class="float-schedule">
+        <h4>⏰ Float Schedule</h4>
+        <div class="schedule-timeline" id="scheduleTimeline">
+          <!-- Schedule items will be dynamically generated -->
+        </div>
+      </div>
+
+      <!-- Float Categories -->
+      <div class="float-categories">
+        <h4>🎨 Float Categories</h4>
+        <div class="category-tags">
+          <span class="category-tag active" onclick="filterFloats('all')">All</span>
+          <span class="category-tag" onclick="filterFloats('cultural')">Cultural</span>
+          <span class="category-tag" onclick="filterFloats('fantasy')">Fantasy</span>
+          <span class="category-tag" onclick="filterFloats('historical')">Historical</span>
+          <span class="category-tag" onclick="filterFloats('modern')">Modern</span>
+        </div>
       </div>
     </div>
 
@@ -1490,6 +1911,9 @@
       // Reset all button states to inactive
       document.querySelector('.food-stalls-btn').classList.remove('active');
       document.querySelector('.truck-floats-btn').classList.remove('active');
+
+      // Hide float panel and show group content
+      hideFloatPanel();
     }
 
     function hideGroupModal() {
@@ -1724,6 +2148,9 @@
         searchInput.placeholder = 'Find food stall...';
         // Clear search input
         searchInput.value = '';
+
+        // Hide float panel when food stalls are shown
+        hideFloatPanel();
       } else {
         // Remove food stall markers from map
         removeFoodStallMarkers();
@@ -1748,6 +2175,9 @@
         searchInput.placeholder = 'Find float location...';
         // Clear search input
         searchInput.value = '';
+
+        // Show float panel
+        showFloatPanel();
       } else {
         // Remove truck float markers from map
         removeTruckFloatMarkers();
@@ -1756,6 +2186,9 @@
         searchInput.value = '';
         // Reset search placeholder to default
         searchInput.placeholder = 'Find group member by phone...';
+
+        // Hide float panel and show default content
+        hideFloatPanel();
       }
     }
 
@@ -1814,6 +2247,9 @@
         marker.bindPopup(`<b>${float.name}</b><br>Truck Float`);
         marker.truckFloatData = float;
       });
+
+      // Show float panel content
+      showFloatPanel();
     }
 
     function removeTruckFloatMarkers() {
@@ -1875,6 +2311,215 @@
         });
       }
     });
+
+    // Float Panel Functions
+    function showFloatPanel() {
+      // Hide all panel contents
+      const panelContents = document.querySelectorAll('.panel-content');
+      panelContents.forEach(content => content.style.display = 'none');
+
+      // Show float content
+      document.getElementById('float-content').style.display = 'block';
+
+      // Load float data
+      loadFloatData();
+      loadFloatSchedule();
+      updateRouteProgress();
+    }
+
+    function hideFloatPanel() {
+      // Hide float content
+      document.getElementById('float-content').style.display = 'none';
+
+      // Show default panel content (group management)
+      document.getElementById('group-content').style.display = 'block';
+    }
+
+    function loadFloatData() {
+      const floatCards = document.getElementById('floatCards');
+
+      // Sample float data
+      const floats = [
+        {
+          id: 1,
+          name: 'Dragon Fantasy Float',
+          status: 'live',
+          category: 'fantasy',
+          description: 'A magnificent dragon float with moving wings and fire effects',
+          location: 'Main Street',
+          time: '2:30 PM',
+          image: '🐉'
+        },
+        {
+          id: 2,
+          name: 'Cultural Heritage Float',
+          status: 'upcoming',
+          category: 'cultural',
+          description: 'Celebrating local traditions with traditional dancers',
+          location: 'Center Square',
+          time: '3:15 PM',
+          image: '🏛️'
+        },
+        {
+          id: 3,
+          name: 'Modern Tech Float',
+          status: 'upcoming',
+          category: 'modern',
+          description: 'LED lights and interactive displays showcasing innovation',
+          location: 'Tech District',
+          time: '4:00 PM',
+          image: '💡'
+        },
+        {
+          id: 4,
+          name: 'Historical Parade Float',
+          status: 'completed',
+          category: 'historical',
+          description: 'Reenactment of historical events with period costumes',
+          location: 'Heritage Lane',
+          time: '1:45 PM',
+          image: '📜'
+        }
+      ];
+
+      floatCards.innerHTML = floats.map(float => `
+        <div class="float-card" onclick="selectFloat(${float.id})">
+          <div class="float-card-header">
+            <span class="float-name">${float.name}</span>
+            <span class="float-status ${float.status}">${float.status.toUpperCase()}</span>
+          </div>
+          <div class="float-details">
+            <div class="float-detail">
+              <span>📍</span>
+              <span>${float.location}</span>
+            </div>
+            <div class="float-detail">
+              <span>⏰</span>
+              <span>${float.time}</span>
+            </div>
+            <div class="float-detail">
+              <span>🏷️</span>
+              <span>${float.category}</span>
+            </div>
+          </div>
+          <div class="float-description">${float.description}</div>
+          <div class="float-image">
+            <span style="font-size: 48px;">${float.image}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function loadFloatSchedule() {
+      const scheduleTimeline = document.getElementById('scheduleTimeline');
+
+      const schedule = [
+        { time: '1:00 PM', title: 'Parade Start', description: 'Opening ceremony and first float' },
+        { time: '1:45 PM', title: 'Historical Float', description: 'Historical reenactment parade' },
+        { time: '2:30 PM', title: 'Dragon Float', description: 'Fantasy dragon float performance' },
+        { time: '3:15 PM', title: 'Cultural Float', description: 'Traditional dance performance' },
+        { time: '4:00 PM', title: 'Tech Float', description: 'Modern technology showcase' },
+        { time: '4:45 PM', title: 'Grand Finale', description: 'All floats gather for finale' }
+      ];
+
+      scheduleTimeline.innerHTML = schedule.map(item => `
+        <div class="schedule-item">
+          <div class="schedule-time">${item.time}</div>
+          <div class="schedule-info">
+            <h5>${item.title}</h5>
+            <p>${item.description}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateRouteProgress() {
+      const progressBar = document.getElementById('routeProgress');
+      const routeStops = document.querySelectorAll('.route-stop');
+
+      // Simulate parade progress
+      const progress = Math.floor(Math.random() * 100);
+      progressBar.style.width = progress + '%';
+
+      // Update active stop based on progress
+      routeStops.forEach((stop, index) => {
+        stop.classList.remove('active');
+        if (progress >= (index * 25)) {
+          stop.classList.add('active');
+        }
+      });
+    }
+
+    function toggleFloatAutoScroll() {
+      const autoScrollBtn = document.getElementById('autoScrollBtn');
+      autoScrollBtn.classList.toggle('active');
+
+      if (autoScrollBtn.classList.contains('active')) {
+        // Start auto-scrolling float cards
+        startFloatAutoScroll();
+      } else {
+        // Stop auto-scrolling
+        stopFloatAutoScroll();
+      }
+    }
+
+    function startFloatAutoScroll() {
+      const floatCards = document.getElementById('floatCards');
+      let scrollPosition = 0;
+
+      window.floatScrollInterval = setInterval(() => {
+        scrollPosition += 2;
+        if (scrollPosition >= floatCards.scrollHeight - floatCards.clientHeight) {
+          scrollPosition = 0;
+        }
+        floatCards.scrollTop = scrollPosition;
+      }, 100);
+    }
+
+    function stopFloatAutoScroll() {
+      if (window.floatScrollInterval) {
+        clearInterval(window.floatScrollInterval);
+      }
+    }
+
+    function refreshFloatData() {
+      // Simulate refreshing float data
+      loadFloatData();
+      loadFloatSchedule();
+      updateRouteProgress();
+
+      // Show refresh notification
+      showNotification('Float data refreshed!');
+    }
+
+    function filterFloats(category) {
+      const categoryTags = document.querySelectorAll('.category-tag');
+      const floatCards = document.querySelectorAll('.float-card');
+
+      // Update active category tag
+      categoryTags.forEach(tag => tag.classList.remove('active'));
+      event.target.classList.add('active');
+
+      // Filter float cards
+      floatCards.forEach(card => {
+        const cardCategory = card.querySelector('.float-detail:last-child span:last-child').textContent;
+        if (category === 'all' || cardCategory === category) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function selectFloat(floatId) {
+      // Handle float selection
+      showNotification(`Selected float ${floatId} - showing details on map`);
+
+      // You can add more functionality here like:
+      // - Center map on selected float
+      // - Show detailed float information
+      // - Highlight float marker on map
+    }
   </script>
 </body>
 
