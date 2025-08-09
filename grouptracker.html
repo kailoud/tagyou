@@ -54,6 +54,12 @@
       gap: 12px;
       align-items: center;
       z-index: 1001;
+      transition: z-index 0.3s ease;
+    }
+
+    /* When panel is expanded, put left controls behind it */
+    body.panel-expanded .left-controls {
+      z-index: 999;
     }
 
     .top-location-control {
@@ -2516,6 +2522,13 @@
     function togglePanel() {
       const panel = document.getElementById('bottomPanel');
       panel.classList.toggle('expanded');
+
+      // Update body class for z-index control
+      if (panel.classList.contains('expanded')) {
+        document.body.classList.add('panel-expanded');
+      } else {
+        document.body.classList.remove('panel-expanded');
+      }
     }
 
     // Swipe functionality for bottom panel
@@ -2560,9 +2573,11 @@
       // Snap to expanded or collapsed state
       if (currentY < -100) {
         panel.classList.add('expanded');
+        document.body.classList.add('panel-expanded');
         panel.style.transform = '';
       } else {
         panel.classList.remove('expanded');
+        document.body.classList.remove('panel-expanded');
         panel.style.transform = '';
       }
 
@@ -3421,6 +3436,7 @@
         const panel = document.getElementById('bottomPanel');
         if (panel) {
           panel.classList.add('expanded');
+          document.body.classList.add('panel-expanded');
           console.log('Panel expanded');
         } else {
           console.error('Panel not found!');
@@ -3429,6 +3445,14 @@
         // Then switch to find stalls tab
         switchTab('find-stalls');
         loadStallsData();
+      } else {
+        // Close panel when deactivating
+        const panel = document.getElementById('bottomPanel');
+        if (panel) {
+          panel.classList.remove('expanded');
+          document.body.classList.remove('panel-expanded');
+          console.log('Panel collapsed');
+        }
       }
     }
 
