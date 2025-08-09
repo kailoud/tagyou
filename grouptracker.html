@@ -105,6 +105,117 @@
       cursor: pointer;
       position: relative;
       z-index: 1001;
+      transition: all 0.2s ease;
+    }
+
+    .group-btn:hover {
+      background: #e55a2b;
+      transform: scale(1.05);
+    }
+
+    /* Festival Dropdown Styles */
+    .festival-dropdown {
+      position: relative;
+      z-index: 1002;
+    }
+
+    .festival-btn {
+      height: 48px;
+      padding: 0 16px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ff6b35, #f7931e);
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .festival-btn:hover {
+      background: linear-gradient(135deg, #e55a2b, #e0851a);
+      transform: scale(1.02);
+    }
+
+    .dropdown-arrow {
+      font-size: 12px;
+      transition: transform 0.2s ease;
+    }
+
+    .festival-dropdown.open .dropdown-arrow {
+      transform: rotate(180deg);
+    }
+
+    .festival-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      margin-top: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+      z-index: 1003;
+    }
+
+    .festival-dropdown.open .festival-list {
+      display: block;
+    }
+
+    .festival-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background-color 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .festival-item:last-child {
+      border-bottom: none;
+    }
+
+    .festival-item:hover {
+      background-color: #f8f9fa;
+    }
+
+    .festival-name {
+      font-weight: 500;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .festival-location {
+      font-size: 12px;
+      color: #666;
+    }
+
+    /* Custom scrollbar for festival list */
+    .festival-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .festival-list::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    .festival-list::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+
+    .festival-list::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
     }
 
     .group-indicator {
@@ -509,6 +620,56 @@
         <path
           d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
       </svg>
+    </div>
+    
+    <!-- Festival Dropdown -->
+    <div class="festival-dropdown">
+      <button class="festival-btn" onclick="toggleFestivalDropdown()">
+        🎪 UK Festivals
+        <span class="dropdown-arrow">▼</span>
+      </button>
+      <div class="festival-list" id="festivalList">
+        <div class="festival-item" onclick="selectFestival('Glastonbury Festival')">
+          <span class="festival-name">Glastonbury Festival</span>
+          <span class="festival-location">Somerset</span>
+        </div>
+        <div class="festival-item" onclick="selectFestival('Reading & Leeds Festival')">
+          <span class="festival-name">Reading & Leeds Festival</span>
+          <span class="festival-location">Berkshire & West Yorkshire</span>
+        </div>
+        <div class="festival-item" onclick="selectFestival('Download Festival')">
+          <span class="festival-name">Download Festival</span>
+          <span class="festival-location">Derbyshire</span>
+        </div>
+        <div class="festival-item" onclick="selectFestival('Isle of Wight Festival')">
+          <span class="festival-name">Isle of Wight Festival</span>
+          <span class="festival-location">Isle of Wight</span>
+        </div>
+        <div class="festival-item" onclick="selectFestival('Latitude Festival')">
+          <span class="festival-name">Latitude Festival</span>
+          <span class="festival-location">Suffolk</span>
+        </div>
+        <div class="festival-item" onclick="selectFestival('Boomtown Fair')">
+          <span class="festival-name">Boomtown Fair</span>
+          <span class="festival-location">Hampshire</span>
+        </div>
+        <div class="festival-item" onclick="selectFestival('Creamfields')">
+          <span class="festival-name">Creamfields</span>
+          <span class="festival-location">Cheshire</span>
+        </div>
+        <div class="festival-item" onclick="selectFestival('Parklife Festival')">
+          <span class="festival-name">Parklife Festival</span>
+          <span class="festival-location">Manchester</span>
+        </div>
+        <div class="festival-item" onclick="selectFestival('Wireless Festival')">
+          <span class="festival-name">Wireless Festival</span>
+          <span class="festival-location">London</span>
+        </div>
+        <div class="festival-item" onclick="selectFestival('Boardmasters')">
+          <span class="festival-name">Boardmasters</span>
+          <span class="festival-location">Cornwall</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1233,6 +1394,85 @@
           modal.classList.remove('show');
         }
       });
+    });
+
+    // Festival Dropdown Functions
+    function toggleFestivalDropdown() {
+      const dropdown = document.querySelector('.festival-dropdown');
+      dropdown.classList.toggle('open');
+      
+      // Close other dropdowns if any
+      const allDropdowns = document.querySelectorAll('.festival-dropdown');
+      allDropdowns.forEach(dd => {
+        if (dd !== dropdown) {
+          dd.classList.remove('open');
+        }
+      });
+    }
+
+    function selectFestival(festivalName) {
+      // Update the button text to show selected festival
+      const festivalBtn = document.querySelector('.festival-btn');
+      festivalBtn.innerHTML = `🎪 ${festivalName} <span class="dropdown-arrow">▼</span>`;
+      
+      // Close the dropdown
+      document.querySelector('.festival-dropdown').classList.remove('open');
+      
+      // You can add more functionality here like:
+      // - Setting the current festival context
+      // - Updating the map to show festival location
+      // - Filtering group members by festival
+      // - Adding festival-specific features
+      
+      console.log(`Selected festival: ${festivalName}`);
+      
+      // Optional: Show a notification
+      showNotification(`Selected: ${festivalName}`);
+    }
+
+    function showNotification(message) {
+      // Create a simple notification
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4caf50;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-size: 14px;
+        font-weight: 500;
+        animation: slideIn 0.3s ease;
+      `;
+      notification.textContent = message;
+      
+      // Add animation CSS
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+      `;
+      document.head.appendChild(style);
+      
+      document.body.appendChild(notification);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
+
+    // Close festival dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const dropdown = document.querySelector('.festival-dropdown');
+      if (!dropdown.contains(event.target)) {
+        dropdown.classList.remove('open');
+      }
     });
   </script>
 </body>
