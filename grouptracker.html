@@ -156,6 +156,16 @@
         padding: 0 16px;
         width: calc(100% + 32px);
         box-sizing: border-box;
+        /* Ensure only tabs scroll horizontally, not the entire panel */
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      .panel-tabs::-webkit-scrollbar {
+        display: none;
       }
 
       .left-controls {
@@ -512,6 +522,11 @@
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
       -ms-overflow-style: none;
+      /* Ensure only horizontal scrolling for tabs, not the entire panel */
+      flex-wrap: nowrap;
+      min-height: fit-content;
+      height: auto;
+      max-height: none;
     }
 
     .panel-tabs::-webkit-scrollbar {
@@ -528,6 +543,10 @@
       border-bottom: 2px solid transparent;
       font-size: 0.85em;
       min-width: max-content;
+      /* Ensure consistent height and no vertical overflow */
+      height: auto;
+      line-height: 1.2;
+      box-sizing: border-box;
     }
 
     .tab.active {
@@ -539,7 +558,10 @@
       padding: 0 20px 32px;
       max-height: 60vh;
       overflow-y: auto;
+      overflow-x: hidden;
       display: none;
+      /* Ensure content doesn't interfere with tab scrolling */
+      position: relative;
     }
 
     .panel-content.active {
@@ -1504,6 +1526,16 @@
         padding: 0 12px;
         width: calc(100% + 24px);
         box-sizing: border-box;
+        /* Ensure only tabs scroll horizontally, not the entire panel */
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      .panel-tabs::-webkit-scrollbar {
+        display: none;
       }
 
       .left-controls {
