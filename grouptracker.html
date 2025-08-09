@@ -1949,6 +1949,7 @@
       <div class="tab active" onclick="switchTab('members')">Group</div>
       <div class="tab" onclick="switchTab('emergency')">Emergency</div>
       <div class="tab" onclick="switchTab('find-stalls')">Find Stalls</div>
+      <div class="tab" onclick="switchTab('float')">Floats</div>
       <div class="tab" onclick="switchTab('settings')">Settings</div>
     </div>
 
@@ -3151,14 +3152,16 @@
         document.querySelector('.food-stalls-btn').classList.remove('active');
         document.querySelector('.find-stalls-btn').classList.remove('active');
 
-        // If panel is closed, open it to show the map with truck floats
+        // If panel is closed, open it to show the float parade information
         if (!isPanelOpen) {
-          console.log('Opening panel to show truck floats on map');
+          console.log('Opening panel to show float parade information');
           panel.classList.add('expanded');
           document.body.classList.add('panel-expanded');
         }
-        // Switch to members tab to show the map (since truck floats are map-based)
-        switchTab('members');
+        // Switch to float-content tab to show parade information
+        switchTab('float');
+        loadFloatData();
+        loadFloatSchedule();
       } else {
         console.log('Deactivating truck floats');
 
@@ -3313,7 +3316,10 @@
     }
 
     function loadFloatData() {
+      console.log('=== loadFloatData called ===');
+      
       const floatCards = document.getElementById('floatCards');
+      console.log('Float cards element:', floatCards);
 
       // Sample float data
       const floats = [
