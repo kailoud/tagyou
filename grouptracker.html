@@ -47,7 +47,7 @@
 
     .top-location-control {
       position: absolute;
-      top: 80px;
+      top: 200px;
       left: 16px;
       z-index: 1000;
     }
@@ -704,7 +704,7 @@
 
       <button class="control-btn zoom-btn" onclick="toggleZoom()" title="Zoom">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
         </svg>
       </button>
     </div>
@@ -1589,7 +1589,7 @@
     function toggleTruckFloats() {
       // Toggle truck floats visibility on map
       const truckFloatsVisible = document.querySelector('.truck-floats-btn').classList.toggle('active');
-      
+
       if (truckFloatsVisible) {
         // Add truck float markers to map
         addTruckFloatMarkers();
@@ -1604,7 +1604,7 @@
     function toggleZoom() {
       // Toggle zoom controls
       const zoomActive = document.querySelector('.zoom-btn').classList.toggle('active');
-      
+
       if (zoomActive) {
         // Enable zoom controls
         map.scrollWheelZoom.enable();
