@@ -129,8 +129,14 @@
       }
 
       .left-controls {
+        position: absolute;
+        left: 16px;
         top: 6px;
+        display: flex;
+        flex-direction: column;
         gap: 8px;
+        align-items: center;
+        z-index: 1001;
       }
 
       .top-row {
@@ -722,6 +728,11 @@
         top: 10px;
         left: 12px;
         right: 12px;
+      }
+
+      .left-controls {
+        top: 10px;
+        left: 12px;
       }
 
       .floating-controls {
