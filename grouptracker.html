@@ -29,13 +29,14 @@
 
     .top-bar {
       position: absolute;
-      top: 20px;
+      top: 16px;
       left: 16px;
       right: 16px;
       z-index: 1000;
       display: flex;
       flex-direction: column;
       gap: 16px;
+      padding-left: 80px;
     }
 
     .top-row {
@@ -47,16 +48,12 @@
     .left-controls {
       position: absolute;
       left: 16px;
-      top: 20px;
+      top: 16px;
       display: flex;
       flex-direction: column;
       gap: 12px;
       align-items: center;
       z-index: 1001;
-    }
-
-    .top-bar {
-      padding-left: 80px;
     }
 
     .top-location-control {
@@ -123,29 +120,31 @@
       transform: rotate(90deg);
     }
 
-    /* Mobile Responsive Styles */
+        /* Mobile Responsive Styles */
     @media (max-width: 768px) {
       .top-bar {
         gap: 12px;
         padding-left: 70px;
+        top: 12px;
       }
-
+      
+      .left-controls {
+        top: 12px;
+        gap: 8px;
+      }
+      
       .top-row {
         gap: 8px;
       }
-
-      .left-controls {
-        gap: 8px;
-      }
-
+      
       .search-container.expanded {
         flex: 4;
       }
-
+      
       .festival-dropdown.collapsed {
         width: 32px;
       }
-
+      
       .festival-dropdown.collapsed .festival-btn {
         width: 32px;
         height: 40px;
