@@ -38,6 +38,13 @@
       align-items: center;
     }
 
+    .left-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+    }
+
     .top-location-control {
       position: absolute;
       top: 80px;
@@ -111,6 +118,72 @@
     .group-btn:hover {
       background: #e55a2b;
       transform: scale(1.05);
+    }
+
+    /* Control Button Styles */
+    .control-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 8px;
+      background: #4285f4;
+      color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .control-btn:hover {
+      background: #3367d6;
+      transform: scale(1.05);
+    }
+
+    .food-stalls-btn {
+      background: #ff9800;
+    }
+
+    .food-stalls-btn:hover {
+      background: #f57c00;
+    }
+
+    .truck-floats-btn {
+      background: #9c27b0;
+    }
+
+    .truck-floats-btn:hover {
+      background: #7b1fa2;
+    }
+
+    .zoom-btn {
+      background: #4caf50;
+    }
+
+    .zoom-btn:hover {
+      background: #388e3c;
+    }
+
+    /* Active state styles */
+    .control-btn.active {
+      transform: scale(1.1);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    }
+
+    .food-stalls-btn.active {
+      background: #f57c00;
+      box-shadow: 0 4px 16px rgba(255, 152, 0, 0.4);
+    }
+
+    .truck-floats-btn.active {
+      background: #7b1fa2;
+      box-shadow: 0 4px 16px rgba(156, 39, 176, 0.4);
+    }
+
+    .zoom-btn.active {
+      background: #388e3c;
+      box-shadow: 0 4px 16px rgba(76, 175, 80, 0.4);
     }
 
     /* Festival Dropdown Styles */
@@ -606,13 +679,33 @@
   </div>
 
   <div class="top-bar">
-    <button class="group-btn" onclick="showGroupModal()">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-        <path
-          d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A3.01 3.01 0 0 0 17.11 7c-.8 0-1.54.37-2.01.97l-.65.65c-.36.36-.36.95 0 1.31l.65.65c.36.36.95.36 1.31 0l.33-.33L18 14h-2v8h4zM12.5 11.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S11 9.17 11 10s.67 1.5 1.5 1.5zM5.5 6c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2zm2 16v-7H9V9.5C9 8.12 7.88 7 6.5 7S4 8.12 4 9.5V15H5.5v7h2zm6-10.5c1.25 0 2.25-1 2.25-2.25S14.75 7 13.5 7s-2.25 1-2.25 2.25 1 2.25 2.25 2.25zM15.5 22v-6h1.5V10.5C17 9.12 15.88 8 14.5 8S12 9.12 12 10.5V16h1.5v6h2z" />
-      </svg>
-      <div class="group-indicator" id="groupCount">4</div>
-    </button>
+    <div class="left-controls">
+      <button class="group-btn" onclick="showGroupModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A3.01 3.01 0 0 0 17.11 7c-.8 0-1.54.37-2.01.97l-.65.65c-.36.36-.36.95 0 1.31l.65.65c.36.36.95.36 1.31 0l.33-.33L18 14h-2v8h4zM12.5 11.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S11 9.17 11 10s.67 1.5 1.5 1.5zM5.5 6c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2zm2 16v-7H9V9.5C9 8.12 7.88 7 6.5 7S4 8.12 4 9.5V15H5.5v7h2zm6-10.5c1.25 0 2.25-1 2.25-2.25S14.75 7 13.5 7s-2.25 1-2.25 2.25 1 2.25 2.25 2.25zM15.5 22v-6h1.5V10.5C17 9.12 15.88 8 14.5 8S12 9.12 12 10.5V16h1.5v6h2z" />
+        </svg>
+        <div class="group-indicator" id="groupCount">4</div>
+      </button>
+      
+      <button class="control-btn food-stalls-btn" onclick="toggleFoodStalls()" title="Food Stalls">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.2-1.1-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/>
+        </svg>
+      </button>
+      
+      <button class="control-btn truck-floats-btn" onclick="toggleTruckFloats()" title="Truck Floats">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h4c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+        </svg>
+      </button>
+      
+      <button class="control-btn zoom-btn" onclick="toggleZoom()" title="Zoom">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+      </button>
+    </div>
     <div class="search-container">
       <input type="text" class="search-box" placeholder="Find group member by phone..." id="searchInput"
         oninput="searchMembers()">
@@ -621,7 +714,7 @@
           d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
       </svg>
     </div>
-    
+
     <!-- Festival Dropdown -->
     <div class="festival-dropdown">
       <button class="festival-btn" onclick="toggleFestivalDropdown()">
@@ -1400,7 +1493,7 @@
     function toggleFestivalDropdown() {
       const dropdown = document.querySelector('.festival-dropdown');
       dropdown.classList.toggle('open');
-      
+
       // Close other dropdowns if any
       const allDropdowns = document.querySelectorAll('.festival-dropdown');
       allDropdowns.forEach(dd => {
@@ -1414,18 +1507,18 @@
       // Update the button text to show selected festival
       const festivalBtn = document.querySelector('.festival-btn');
       festivalBtn.innerHTML = `🎪 ${festivalName} <span class="dropdown-arrow">▼</span>`;
-      
+
       // Close the dropdown
       document.querySelector('.festival-dropdown').classList.remove('open');
-      
+
       // You can add more functionality here like:
       // - Setting the current festival context
       // - Updating the map to show festival location
       // - Filtering group members by festival
       // - Adding festival-specific features
-      
+
       console.log(`Selected festival: ${festivalName}`);
-      
+
       // Optional: Show a notification
       showNotification(`Selected: ${festivalName}`);
     }
@@ -1448,7 +1541,7 @@
         animation: slideIn 0.3s ease;
       `;
       notification.textContent = message;
-      
+
       // Add animation CSS
       const style = document.createElement('style');
       style.textContent = `
@@ -1458,9 +1551,9 @@
         }
       `;
       document.head.appendChild(style);
-      
+
       document.body.appendChild(notification);
-      
+
       // Remove after 3 seconds
       setTimeout(() => {
         notification.remove();
@@ -1468,12 +1561,126 @@
     }
 
     // Close festival dropdown when clicking outside
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
       const dropdown = document.querySelector('.festival-dropdown');
       if (!dropdown.contains(event.target)) {
         dropdown.classList.remove('open');
       }
     });
+
+    // Control Button Functions
+    function toggleFoodStalls() {
+      // Toggle food stalls visibility on map
+      const foodStallsVisible = document.querySelector('.food-stalls-btn').classList.toggle('active');
+      
+      if (foodStallsVisible) {
+        // Add food stall markers to map
+        addFoodStallMarkers();
+        showNotification('Food stalls displayed on map');
+      } else {
+        // Remove food stall markers from map
+        removeFoodStallMarkers();
+        showNotification('Food stalls hidden from map');
+      }
+    }
+
+    function toggleTruckFloats() {
+      // Toggle truck floats visibility on map
+      const truckFloatsVisible = document.querySelector('.truck-floats-btn').classList.toggle('active');
+      
+      if (truckFloatsVisible) {
+        // Add truck float markers to map
+        addTruckFloatMarkers();
+        showNotification('Truck floats displayed on map');
+      } else {
+        // Remove truck float markers from map
+        removeTruckFloatMarkers();
+        showNotification('Truck floats hidden from map');
+      }
+    }
+
+    function toggleZoom() {
+      // Toggle zoom controls
+      const zoomActive = document.querySelector('.zoom-btn').classList.toggle('active');
+      
+      if (zoomActive) {
+        // Enable zoom controls
+        map.scrollWheelZoom.enable();
+        map.doubleClickZoom.enable();
+        showNotification('Zoom controls enabled');
+      } else {
+        // Disable zoom controls
+        map.scrollWheelZoom.disable();
+        map.doubleClickZoom.disable();
+        showNotification('Zoom controls disabled');
+      }
+    }
+
+    // Helper functions for markers
+    function addFoodStallMarkers() {
+      // Sample food stall locations - you can customize these
+      const foodStalls = [
+        { lat: 51.5074, lng: -0.1278, name: 'Burger Palace' },
+        { lat: 51.5080, lng: -0.1280, name: 'Pizza Corner' },
+        { lat: 51.5068, lng: -0.1275, name: 'Taco Truck' },
+        { lat: 51.5078, lng: -0.1285, name: 'Ice Cream Stand' }
+      ];
+
+      foodStalls.forEach(stall => {
+        const marker = L.marker([stall.lat, stall.lng], {
+          icon: L.divIcon({
+            className: 'food-stall-marker',
+            html: '🍔',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+          })
+        }).addTo(map);
+
+        marker.bindPopup(`<b>${stall.name}</b><br>Food Stall`);
+        marker.foodStallData = stall;
+      });
+    }
+
+    function removeFoodStallMarkers() {
+      // Remove all food stall markers
+      map.eachLayer(layer => {
+        if (layer.foodStallData) {
+          map.removeLayer(layer);
+        }
+      });
+    }
+
+    function addTruckFloatMarkers() {
+      // Sample truck float locations - you can customize these
+      const truckFloats = [
+        { lat: 51.5070, lng: -0.1270, name: 'Main Stage Float' },
+        { lat: 51.5085, lng: -0.1285, name: 'VIP Float' },
+        { lat: 51.5065, lng: -0.1265, name: 'Food Court Float' }
+      ];
+
+      truckFloats.forEach(float => {
+        const marker = L.marker([float.lat, float.lng], {
+          icon: L.divIcon({
+            className: 'truck-float-marker',
+            html: '🚛',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+          })
+        }).addTo(map);
+
+        marker.bindPopup(`<b>${float.name}</b><br>Truck Float`);
+        marker.truckFloatData = float;
+      });
+    }
+
+    function removeTruckFloatMarkers() {
+      // Remove all truck float markers
+      map.eachLayer(layer => {
+        if (layer.truckFloatData) {
+          map.removeLayer(layer);
+        }
+      });
+    }
   </script>
 </body>
 
