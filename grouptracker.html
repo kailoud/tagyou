@@ -3096,9 +3096,9 @@
           console.log('Opening panel to show food stalls on map');
           panel.classList.add('expanded');
           document.body.classList.add('panel-expanded');
-          // Switch to members tab to show the map
-          switchTab('members');
         }
+        // Switch to find-stalls tab to show stall information
+        switchTab('find-stalls');
       } else {
         console.log('Deactivating food stalls');
 
@@ -3156,9 +3156,9 @@
           console.log('Opening panel to show truck floats on map');
           panel.classList.add('expanded');
           document.body.classList.add('panel-expanded');
-          // Switch to members tab to show the map
-          switchTab('members');
         }
+        // Switch to members tab to show the map (since truck floats are map-based)
+        switchTab('members');
       } else {
         console.log('Deactivating truck floats');
 
@@ -3540,8 +3540,12 @@
     }
 
     function toggleFindStalls() {
+      console.log('=== toggleFindStalls called ===');
+
       const panel = document.getElementById('bottomPanel');
       const isPanelOpen = panel.classList.contains('expanded');
+
+      console.log('Panel open:', isPanelOpen);
 
       // If panel is closed, open it and activate this tab
       if (!isPanelOpen) {
@@ -3551,6 +3555,7 @@
         // Open the panel
         panel.classList.add('expanded');
         document.body.classList.add('panel-expanded');
+        console.log('Panel expanded, switching to find-stalls tab...');
 
         // Switch to find stalls tab
         switchTab('find-stalls');
@@ -3566,13 +3571,19 @@
       // Update button states
       const findStallsBtn = document.querySelector('.find-stalls-btn');
       findStallsBtn.classList.add('active');
+      console.log('Find stalls button activated');
 
       // Deactivate other buttons
       document.querySelector('.truck-floats-btn').classList.remove('active');
       document.querySelector('.food-stalls-btn').classList.remove('active');
+      console.log('Other buttons deactivated');
+
+      console.log('=== toggleFindStalls completed ===');
     }
 
     function loadStallsData() {
+      console.log('=== loadStallsData called ===');
+
       // Sample stalls data - in a real app, this would come from an API
       stallsData = [
         {
@@ -3662,12 +3673,21 @@
       ];
 
       filteredStalls = [...stallsData];
+      console.log('Stalls data loaded, calling renderStalls...');
       renderStalls();
+      console.log('=== loadStallsData completed ===');
     }
 
     function renderStalls() {
+      console.log('=== renderStalls called ===');
+
       const stallsGrid = document.querySelector('.stalls-grid');
-      if (!stallsGrid) return;
+      console.log('Stalls grid element:', stallsGrid);
+
+      if (!stallsGrid) {
+        console.error('❌ Stalls grid not found!');
+        return;
+      }
 
       stallsGrid.innerHTML = filteredStalls.map(stall => `
         <div class="stall-card" onclick="openStallModal(${stall.id})">
@@ -3696,6 +3716,9 @@
           </div>
         </div>
       `).join('');
+
+      console.log('Stalls rendered successfully');
+      console.log('=== renderStalls completed ===');
     }
 
     function filterStalls() {
