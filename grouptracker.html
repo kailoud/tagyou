@@ -2153,30 +2153,34 @@
             <label>Country/Origin:</label>
             <select id="countryFilter" onchange="filterStalls()">
               <option value="all">All Countries</option>
-              <option value="uk">United Kingdom</option>
-              <option value="us">United States</option>
-              <option value="italy">Italy</option>
-              <option value="japan">Japan</option>
-              <option value="mexico">Mexico</option>
-              <option value="india">India</option>
-              <option value="thailand">Thailand</option>
-              <option value="france">France</option>
-              <option value="germany">Germany</option>
+              <option value="jamaica">Jamaica</option>
+              <option value="trinidad">Trinidad</option>
+              <option value="guyana">Guyana</option>
+              <option value="barbados">Barbados</option>
+              <option value="grenada">Grenada</option>
+              <option value="st. lucia">St. Lucia</option>
+              <option value="dominica">Dominica</option>
+              <option value="antigua">Antigua</option>
+              <option value="st. kitts">St. Kitts</option>
+              <option value="st. vincent">St. Vincent</option>
+              <option value="haiti">Haiti</option>
+              <option value="cuba">Cuba</option>
             </select>
           </div>
           <div class="filter-group">
             <label>Food Type:</label>
             <select id="foodTypeFilter" onchange="filterStalls()">
               <option value="all">All Types</option>
-              <option value="street-food">Street Food</option>
-              <option value="desserts">Desserts</option>
-              <option value="beverages">Beverages</option>
-              <option value="ethnic">Ethnic Cuisine</option>
-              <option value="fast-food">Fast Food</option>
-              <option value="healthy">Healthy Options</option>
+              <option value="caribbean">Caribbean</option>
+              <option value="jerk">Jerk</option>
+              <option value="curry">Curry</option>
               <option value="seafood">Seafood</option>
-              <option value="vegetarian">Vegetarian</option>
-              <option value="vegan">Vegan</option>
+              <option value="roti">Roti & Breads</option>
+              <option value="stew">Stews & Soups</option>
+              <option value="street-food">Street Food</option>
+              <option value="traditional">Traditional</option>
+              <option value="creole">Creole</option>
+              <option value="spices">Spices & Herbs</option>
             </select>
           </div>
         </div>
@@ -3656,91 +3660,175 @@
     function loadStallsData() {
       console.log('=== loadStallsData called ===');
 
-      // Sample stalls data - in a real app, this would come from an API
+      // Notting Hill Carnival Stalls Data - Authentic Caribbean food vendors
       stallsData = [
         {
           id: 1,
-          name: "Thai Street Kitchen",
-          origin: "Thailand",
-          description: "Authentic Thai street food with fresh ingredients and traditional recipes.",
-          image: "🍜",
-          rating: 4.8,
-          priceRange: "$$",
-          categories: ["Thai", "Street Food", "Noodles"],
-          location: { lat: 1.3521, lng: 103.8198 },
-          menu: ["Pad Thai", "Tom Yum Soup", "Green Curry", "Mango Sticky Rice"],
-          hours: "11:00 AM - 10:00 PM",
-          contact: "+65 9123 4567"
+          name: "Auntie's Jamaican Kitchen",
+          origin: "Jamaica",
+          description: "Family recipe jerk chicken, curry goat, and rice & peas. Spicy and authentic!",
+          image: "🍗",
+          rating: 4.9,
+          priceRange: "££",
+          categories: ["Caribbean", "Jamaican", "Jerk", "Curry"],
+          location: { lat: 51.5200, lng: -0.2030 },
+          menu: ["Jerk Chicken", "Curry Goat", "Rice & Peas", "Plantains", "Callaloo"],
+          hours: "11:00 AM - 11:00 PM",
+          contact: "+44 20 7123 4567"
         },
         {
           id: 2,
-          name: "Mexican Fiesta",
-          origin: "Mexico",
-          description: "Traditional Mexican tacos, burritos, and authentic salsas made fresh daily.",
-          image: "🌮",
-          rating: 4.6,
-          priceRange: "$",
-          categories: ["Mexican", "Tacos", "Street Food"],
-          location: { lat: 1.3521, lng: 103.8198 },
-          menu: ["Street Tacos", "Quesadillas", "Guacamole", "Horchata"],
-          hours: "12:00 PM - 11:00 PM",
-          contact: "+65 9123 4568"
+          name: "Trini Taste Paradise",
+          origin: "Trinidad",
+          description: "Fresh doubles, roti, and curry dishes made with love and tradition",
+          image: "🥙",
+          rating: 4.8,
+          priceRange: "£",
+          categories: ["Caribbean", "Trinidad", "Doubles", "Roti"],
+          location: { lat: 51.5190, lng: -0.2040 },
+          menu: ["Doubles", "Roti", "Curry Chicken", "Dhal Puri", "Pholourie"],
+          hours: "10:00 AM - 10:00 PM",
+          contact: "+44 20 7123 4568"
         },
         {
           id: 3,
-          name: "Japanese Ramen Corner",
-          origin: "Japan",
-          description: "Authentic Japanese ramen with rich broths and perfectly cooked noodles.",
-          image: "🍜",
-          rating: 4.9,
-          priceRange: "$$$",
-          categories: ["Japanese", "Ramen", "Noodles"],
-          location: { lat: 1.3521, lng: 103.8198 },
-          menu: ["Tonkotsu Ramen", "Miso Ramen", "Gyoza", "Matcha Ice Cream"],
-          hours: "11:30 AM - 9:30 PM",
-          contact: "+65 9123 4569"
+          name: "Guyana Gold",
+          origin: "Guyana",
+          description: "Traditional pepperpot, metemgee, and cassava bread. Rich flavors!",
+          image: "🍲",
+          rating: 4.7,
+          priceRange: "££",
+          categories: ["Caribbean", "Guyana", "Pepperpot", "Traditional"],
+          location: { lat: 51.5170, lng: -0.2060 },
+          menu: ["Pepperpot", "Metemgee", "Cassava Bread", "Cook-up Rice", "Black Cake"],
+          hours: "11:30 AM - 10:30 PM",
+          contact: "+44 20 7123 4569"
         },
         {
           id: 4,
-          name: "Indian Spice Market",
-          origin: "India",
-          description: "Aromatic Indian curries, biryanis, and freshly baked naan bread.",
-          image: "🍛",
-          rating: 4.7,
-          priceRange: "$$",
-          categories: ["Indian", "Curry", "Biryani"],
-          location: { lat: 1.3521, lng: 103.8198 },
-          menu: ["Butter Chicken", "Biryani", "Naan", "Mango Lassi"],
-          hours: "11:00 AM - 10:30 PM",
-          contact: "+65 9123 4570"
+          name: "Barbados Beach Bites",
+          origin: "Barbados",
+          description: "Flying fish sandwiches, cou-cou, and Bajan fish cakes",
+          image: "🐟",
+          rating: 4.6,
+          priceRange: "££",
+          categories: ["Caribbean", "Barbados", "Seafood", "Flying Fish"],
+          location: { lat: 51.5160, lng: -0.2070 },
+          menu: ["Flying Fish", "Cou-cou", "Fish Cakes", "Bajan Macaroni", "Sweet Bread"],
+          hours: "12:00 PM - 11:00 PM",
+          contact: "+44 20 7123 4570"
         },
         {
           id: 5,
-          name: "Vietnamese Pho House",
-          origin: "Vietnam",
-          description: "Traditional Vietnamese pho with aromatic herbs and tender meat.",
-          image: "🍲",
+          name: "Grenada Spice Island",
+          origin: "Grenada",
+          description: "Nutmeg-infused dishes, oil down, and callaloo soup",
+          image: "🌶️",
           rating: 4.5,
-          priceRange: "$",
-          categories: ["Vietnamese", "Pho", "Soup"],
-          location: { lat: 1.3521, lng: 103.8198 },
-          menu: ["Beef Pho", "Chicken Pho", "Spring Rolls", "Vietnamese Coffee"],
-          hours: "10:00 AM - 9:00 PM",
-          contact: "+65 9123 4571"
+          priceRange: "££",
+          categories: ["Caribbean", "Grenada", "Spices", "Nutmeg"],
+          location: { lat: 51.5150, lng: -0.2080 },
+          menu: ["Oil Down", "Callaloo", "Nutmeg Ice Cream", "Lambi", "Bake & Shark"],
+          hours: "11:00 AM - 10:00 PM",
+          contact: "+44 20 7123 4571"
         },
         {
           id: 6,
-          name: "Korean BBQ Express",
-          origin: "Korea",
-          description: "Quick Korean BBQ with marinated meats and traditional side dishes.",
-          image: "🥩",
-          rating: 4.8,
-          priceRange: "$$$",
-          categories: ["Korean", "BBQ", "Meat"],
-          location: { lat: 1.3521, lng: 103.8198 },
-          menu: ["Bulgogi", "Galbi", "Kimchi", "Bibimbap"],
+          name: "St. Lucia Creole Kitchen",
+          origin: "St. Lucia",
+          description: "Green fig and saltfish, bouyon, and accra fritters",
+          image: "🍌",
+          rating: 4.4,
+          priceRange: "£",
+          categories: ["Caribbean", "St. Lucia", "Creole", "Saltfish"],
+          location: { lat: 51.5140, lng: -0.2090 },
+          menu: ["Green Fig & Saltfish", "Bouyon", "Accra", "Breadfruit", "Cocoa Tea"],
+          hours: "10:30 AM - 9:30 PM",
+          contact: "+44 20 7123 4572"
+        },
+        {
+          id: 7,
+          name: "Dominica Nature's Bounty",
+          origin: "Dominica",
+          description: "Mountain chicken, crab backs, and fresh fruit juices",
+          image: "🦀",
+          rating: 4.3,
+          priceRange: "£££",
+          categories: ["Caribbean", "Dominica", "Wildlife", "Seafood"],
+          location: { lat: 51.5130, lng: -0.2100 },
+          menu: ["Mountain Chicken", "Crab Backs", "Fresh Juices", "Sancoche", "Bouyon"],
+          hours: "11:00 AM - 10:00 PM",
+          contact: "+44 20 7123 4573"
+        },
+        {
+          id: 8,
+          name: "Antigua & Barbuda Seafood",
+          origin: "Antigua",
+          description: "Conch fritters, ducana, and fresh seafood platters",
+          image: "🦪",
+          rating: 4.6,
+          priceRange: "£££",
+          categories: ["Caribbean", "Antigua", "Seafood", "Conch"],
+          location: { lat: 51.5120, lng: -0.2110 },
+          menu: ["Conch Fritters", "Ducana", "Seafood Platter", "Fungee", "Pepperpot"],
           hours: "12:00 PM - 11:00 PM",
-          contact: "+65 9123 4572"
+          contact: "+44 20 7123 4574"
+        },
+        {
+          id: 9,
+          name: "St. Kitts & Nevis Heritage",
+          origin: "St. Kitts",
+          description: "Goat water stew, conkie, and sugar cake",
+          image: "🍖",
+          rating: 4.4,
+          priceRange: "££",
+          categories: ["Caribbean", "St. Kitts", "Heritage", "Goat Water"],
+          location: { lat: 51.5110, lng: -0.2120 },
+          menu: ["Goat Water", "Conkie", "Sugar Cake", "Saltfish", "Breadfruit"],
+          hours: "11:00 AM - 10:00 PM",
+          contact: "+44 20 7123 4575"
+        },
+        {
+          id: 10,
+          name: "St. Vincent Spice Garden",
+          origin: "St. Vincent",
+          description: "Roasted breadfruit, callaloo, and arrowroot biscuits",
+          image: "🌿",
+          rating: 4.2,
+          priceRange: "£",
+          categories: ["Caribbean", "St. Vincent", "Spices", "Breadfruit"],
+          location: { lat: 51.5100, lng: -0.2130 },
+          menu: ["Roasted Breadfruit", "Callaloo", "Arrowroot Biscuits", "Dumplings", "Fish Broth"],
+          hours: "10:00 AM - 9:00 PM",
+          contact: "+44 20 7123 4576"
+        },
+        {
+          id: 11,
+          name: "Haitian Creole Delights",
+          origin: "Haiti",
+          description: "Griot, rice and beans, and pikliz. Spicy and flavorful!",
+          image: "🍚",
+          rating: 4.7,
+          priceRange: "££",
+          categories: ["Caribbean", "Haiti", "Creole", "Griot"],
+          location: { lat: 51.5090, lng: -0.2140 },
+          menu: ["Griot", "Rice & Beans", "Pikliz", "Tasso", "Diri ak Pwa"],
+          hours: "11:00 AM - 10:00 PM",
+          contact: "+44 20 7123 4577"
+        },
+        {
+          id: 12,
+          name: "Cuban Havana Nights",
+          origin: "Cuba",
+          description: "Ropa vieja, black beans, and Cuban sandwiches",
+          image: "🥪",
+          rating: 4.5,
+          priceRange: "££",
+          categories: ["Caribbean", "Cuba", "Havana", "Ropa Vieja"],
+          location: { lat: 51.5080, lng: -0.2150 },
+          menu: ["Ropa Vieja", "Black Beans", "Cuban Sandwich", "Tostones", "Café Cubano"],
+          hours: "12:00 PM - 10:00 PM",
+          contact: "+44 20 7123 4578"
         }
       ];
 
