@@ -482,28 +482,23 @@
         top: 6px;
         left: 0;
         right: 0;
-        flex-direction: column;
-      }
-
-      .top-row {
-        flex-direction: column;
-        gap: 12px;
-        align-items: stretch;
+        flex-direction: row;
       }
 
       .search-container {
         max-width: none;
         order: 1;
+        flex: 1;
       }
 
       .festival-dropdown {
         order: 2;
-        align-self: center;
+        flex-shrink: 0;
       }
 
       .user-profile {
         order: 3;
-        align-self: center;
+        flex-shrink: 0;
       }
 
       /* Full bleed mobile design */
