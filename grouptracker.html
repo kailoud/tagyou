@@ -516,7 +516,7 @@
     .panel-tabs {
       display: flex;
       border-bottom: 1px solid #eee;
-      overflow-x: auto;
+      overflow-x: scroll;
       overflow-y: hidden;
       white-space: nowrap;
       -webkit-overflow-scrolling: touch;
@@ -527,10 +527,25 @@
       min-height: fit-content;
       height: auto;
       max-height: none;
+      /* Hide scrollbars completely */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
 
     .panel-tabs::-webkit-scrollbar {
       display: none;
+    }
+
+    /* Additional scrollbar hiding for all browsers */
+    .panel-tabs {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    .panel-tabs::-webkit-scrollbar {
+      width: 0 !important;
+      height: 0 !important;
+      background: transparent !important;
     }
 
     .tab {
@@ -562,6 +577,10 @@
       display: none;
       /* Ensure content doesn't interfere with tab scrolling */
       position: relative;
+      /* Prevent horizontal overflow */
+      width: 100%;
+      box-sizing: border-box;
+      max-width: 100%;
     }
 
     .panel-content.active {
@@ -1529,7 +1548,7 @@
         width: calc(100% + 24px);
         box-sizing: border-box;
         /* Ensure only tabs scroll horizontally, not the entire panel */
-        overflow-x: auto;
+        overflow-x: scroll;
         overflow-y: hidden;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
@@ -1539,10 +1558,25 @@
         -webkit-touch-callout: none;
         -webkit-user-select: none;
         user-select: none;
+        /* Ensure no horizontal scrollbar appears */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
       }
 
       .panel-tabs::-webkit-scrollbar {
         display: none;
+      }
+
+      /* Additional scrollbar hiding for mobile */
+      .panel-tabs {
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+      }
+
+      .panel-tabs::-webkit-scrollbar {
+        width: 0 !important;
+        height: 0 !important;
+        background: transparent !important;
       }
 
       /* Ensure tabs on mobile scroll smoothly and don't interfere with panel */
