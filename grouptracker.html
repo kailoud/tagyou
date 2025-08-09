@@ -34,14 +34,20 @@
       right: 16px;
       z-index: 1000;
       display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .top-row {
+      display: flex;
       gap: 12px;
       align-items: center;
     }
 
-    .left-controls {
+    .control-row {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
+      justify-content: center;
+      gap: 12px;
       align-items: center;
     }
 
@@ -75,6 +81,66 @@
     .search-container {
       flex: 1;
       position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .search-container.expanded {
+      flex: 3;
+    }
+
+    .search-container.expanded .search-box {
+      width: 100%;
+    }
+
+    .festival-dropdown {
+      transition: all 0.3s ease;
+    }
+
+    .festival-dropdown.collapsed {
+      width: 40px;
+      overflow: hidden;
+    }
+
+    .festival-dropdown.collapsed .festival-btn {
+      width: 40px;
+      padding: 0;
+      justify-content: center;
+    }
+
+    .festival-dropdown.collapsed .festival-btn span:not(.dropdown-arrow) {
+      display: none;
+    }
+
+    .festival-dropdown.collapsed .dropdown-arrow {
+      transform: rotate(90deg);
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      .top-bar {
+        gap: 12px;
+      }
+      
+      .top-row {
+        gap: 8px;
+      }
+      
+      .control-row {
+        gap: 8px;
+      }
+      
+      .search-container.expanded {
+        flex: 4;
+      }
+      
+      .festival-dropdown.collapsed {
+        width: 32px;
+      }
+      
+      .festival-dropdown.collapsed .festival-btn {
+        width: 32px;
+        height: 48px;
+      }
     }
 
     .search-box {
@@ -95,7 +161,12 @@
       top: 50%;
       transform: translateY(-50%);
       color: #666;
-      pointer-events: none;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .search-icon:hover {
+      color: #333;
     }
 
     .group-btn {
@@ -679,7 +750,8 @@
   </div>
 
   <div class="top-bar">
-    <div class="left-controls">
+    <!-- First Row: Group Button + Search Bar + Festival Button -->
+    <div class="top-row">
       <button class="group-btn" onclick="showGroupModal()">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
           <path
@@ -687,7 +759,69 @@
         </svg>
         <div class="group-indicator" id="groupCount">4</div>
       </button>
+      
+      <div class="search-container">
+        <input type="text" class="search-box" placeholder="Find group member by phone..." id="searchInput"
+          oninput="searchMembers()">
+        <svg class="search-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+        </svg>
+      </div>
 
+      <!-- Festival Dropdown -->
+      <div class="festival-dropdown">
+        <button class="festival-btn" onclick="toggleFestivalDropdown()">
+          🎪 UK Festivals
+          <span class="dropdown-arrow">▼</span>
+        </button>
+        <div class="festival-list" id="festivalList">
+          <div class="festival-item" onclick="selectFestival('Glastonbury Festival')">
+            <span class="festival-name">Glastonbury Festival</span>
+            <span class="festival-location">Somerset</span>
+          </div>
+          <div class="festival-item" onclick="selectFestival('Reading & Leeds Festival')">
+            <span class="festival-name">Reading & Leeds Festival</span>
+            <span class="festival-location">Berkshire & West Yorkshire</span>
+          </div>
+          <div class="festival-item" onclick="selectFestival('Download Festival')">
+            <span class="festival-name">Download Festival</span>
+            <span class="festival-location">Derbyshire</span>
+          </div>
+          <div class="festival-item" onclick="selectFestival('Isle of Wight Festival')">
+            <span class="festival-name">Isle of Wight Festival</span>
+            <span class="festival-location">Isle of Wight</span>
+          </div>
+          <div class="festival-item" onclick="selectFestival('Latitude Festival')">
+            <span class="festival-name">Latitude Festival</span>
+            <span class="festival-location">Suffolk</span>
+          </div>
+          <div class="festival-item" onclick="selectFestival('Boomtown Fair')">
+            <span class="festival-name">Boomtown Fair</span>
+            <span class="festival-location">Hampshire</span>
+          </div>
+          <div class="festival-item" onclick="selectFestival('Creamfields')">
+            <span class="festival-name">Creamfields</span>
+            <span class="festival-location">Cheshire</span>
+          </div>
+          <div class="festival-item" onclick="selectFestival('Parklife Festival')">
+            <span class="festival-name">Parklife Festival</span>
+            <span class="festival-location">Manchester</span>
+          </div>
+          <div class="festival-item" onclick="selectFestival('Wireless Festival')">
+            <span class="festival-name">Wireless Festival</span>
+            <span class="festival-location">London</span>
+          </div>
+          <div class="festival-item" onclick="selectFestival('Boardmasters')">
+            <span class="festival-name">Boardmasters</span>
+            <span class="festival-location">Cornwall</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Second Row: Control Buttons (Centered) -->
+    <div class="control-row">
       <button class="control-btn food-stalls-btn" onclick="toggleFoodStalls()" title="Food Stalls">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <path
@@ -707,64 +841,6 @@
           <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
         </svg>
       </button>
-    </div>
-    <div class="search-container">
-      <input type="text" class="search-box" placeholder="Find group member by phone..." id="searchInput"
-        oninput="searchMembers()">
-      <svg class="search-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-        <path
-          d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
-      </svg>
-    </div>
-
-    <!-- Festival Dropdown -->
-    <div class="festival-dropdown">
-      <button class="festival-btn" onclick="toggleFestivalDropdown()">
-        🎪 UK Festivals
-        <span class="dropdown-arrow">▼</span>
-      </button>
-      <div class="festival-list" id="festivalList">
-        <div class="festival-item" onclick="selectFestival('Glastonbury Festival')">
-          <span class="festival-name">Glastonbury Festival</span>
-          <span class="festival-location">Somerset</span>
-        </div>
-        <div class="festival-item" onclick="selectFestival('Reading & Leeds Festival')">
-          <span class="festival-name">Reading & Leeds Festival</span>
-          <span class="festival-location">Berkshire & West Yorkshire</span>
-        </div>
-        <div class="festival-item" onclick="selectFestival('Download Festival')">
-          <span class="festival-name">Download Festival</span>
-          <span class="festival-location">Derbyshire</span>
-        </div>
-        <div class="festival-item" onclick="selectFestival('Isle of Wight Festival')">
-          <span class="festival-name">Isle of Wight Festival</span>
-          <span class="festival-location">Isle of Wight</span>
-        </div>
-        <div class="festival-item" onclick="selectFestival('Latitude Festival')">
-          <span class="festival-name">Latitude Festival</span>
-          <span class="festival-location">Suffolk</span>
-        </div>
-        <div class="festival-item" onclick="selectFestival('Boomtown Fair')">
-          <span class="festival-name">Boomtown Fair</span>
-          <span class="festival-location">Hampshire</span>
-        </div>
-        <div class="festival-item" onclick="selectFestival('Creamfields')">
-          <span class="festival-name">Creamfields</span>
-          <span class="festival-location">Cheshire</span>
-        </div>
-        <div class="festival-item" onclick="selectFestival('Parklife Festival')">
-          <span class="festival-name">Parklife Festival</span>
-          <span class="festival-location">Manchester</span>
-        </div>
-        <div class="festival-item" onclick="selectFestival('Wireless Festival')">
-          <span class="festival-name">Wireless Festival</span>
-          <span class="festival-location">London</span>
-        </div>
-        <div class="festival-item" onclick="selectFestival('Boardmasters')">
-          <span class="festival-name">Boardmasters</span>
-          <span class="festival-location">Cornwall</span>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -1683,6 +1759,35 @@
         }
       });
     }
+
+    // Mobile Search Expansion Functionality
+    function toggleSearchExpansion() {
+      const searchContainer = document.querySelector('.search-container');
+      const festivalDropdown = document.querySelector('.festival-dropdown');
+      const searchInput = document.getElementById('searchInput');
+      
+      if (searchContainer.classList.contains('expanded')) {
+        // Collapse search
+        searchContainer.classList.remove('expanded');
+        festivalDropdown.classList.remove('collapsed');
+        searchInput.blur();
+      } else {
+        // Expand search
+        searchContainer.classList.add('expanded');
+        festivalDropdown.classList.add('collapsed');
+        searchInput.focus();
+      }
+    }
+
+    // Add click event to search icon for mobile expansion
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchIcon = document.querySelector('.search-icon');
+      if (searchIcon) {
+        searchIcon.style.cursor = 'pointer';
+        searchIcon.style.pointerEvents = 'auto';
+        searchIcon.addEventListener('click', toggleSearchExpansion);
+      }
+    });
   </script>
 </body>
 
