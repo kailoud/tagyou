@@ -3317,7 +3317,7 @@
 
     function loadFloatData() {
       console.log('=== loadFloatData called ===');
-      
+
       const floatCards = document.getElementById('floatCards');
       console.log('Float cards element:', floatCards);
 
@@ -3391,10 +3391,17 @@
           </div>
         </div>
       `).join('');
+
+      updateRouteProgress();
+      console.log('Float data loaded and route progress updated');
+      console.log('=== loadFloatData completed ===');
     }
 
     function loadFloatSchedule() {
+      console.log('=== loadFloatSchedule called ===');
+
       const scheduleTimeline = document.getElementById('scheduleTimeline');
+      console.log('Schedule timeline element:', scheduleTimeline);
 
       const schedule = [
         { time: '1:00 PM', title: 'Parade Start', description: 'Opening ceremony and first float' },
@@ -3414,6 +3421,9 @@
           </div>
         </div>
       `).join('');
+
+      console.log('Float schedule loaded successfully');
+      console.log('=== loadFloatSchedule completed ===');
     }
 
     function updateRouteProgress() {
