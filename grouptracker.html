@@ -1908,6 +1908,11 @@
           d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
       </svg>
     </button>
+
+    <!-- Test button for debugging -->
+    <button class="control-btn" onclick="testPanel()" title="Test Panel" style="background: #ff5722;">
+      🧪
+    </button>
   </div>
 
   <div class="top-location-control">
@@ -2601,33 +2606,43 @@
     });
 
     function switchTab(tabName) {
-      console.log('Switching to tab:', tabName);
+      console.log('=== switchTab called with:', tabName, '===');
 
       // Hide all content
       const contents = document.querySelectorAll('.panel-content');
-      contents.forEach(content => content.classList.remove('active'));
+      console.log('Found', contents.length, 'panel contents');
+      contents.forEach(content => {
+        console.log('Removing active from:', content.id);
+        content.classList.remove('active');
+      });
 
       // Remove active class from all tabs
       const tabs = document.querySelectorAll('.tab');
-      tabs.forEach(tab => tab.classList.remove('active'));
+      console.log('Found', tabs.length, 'tabs');
+      tabs.forEach(tab => {
+        console.log('Removing active from tab:', tab.textContent);
+        tab.classList.remove('active');
+      });
 
       // Show selected content and activate tab
       const targetContent = document.getElementById(tabName + '-content');
       if (targetContent) {
         targetContent.classList.add('active');
-        console.log('Content activated:', tabName + '-content');
+        console.log('✅ Content activated:', tabName + '-content');
       } else {
-        console.error('Content not found:', tabName + '-content');
+        console.error('❌ Content not found:', tabName + '-content');
       }
 
       // Find and activate the correct tab
       const targetTab = document.querySelector(`.tab[onclick*="${tabName}"]`);
       if (targetTab) {
         targetTab.classList.add('active');
-        console.log('Tab activated:', tabName);
+        console.log('✅ Tab activated:', tabName);
       } else {
-        console.error('Tab not found for:', tabName);
+        console.error('❌ Tab not found for:', tabName);
       }
+
+      console.log('=== switchTab completed ===');
     }
 
     // Search functionality
@@ -3047,15 +3062,23 @@
 
     // Control Button Functions
     function toggleFoodStalls() {
+      console.log('toggleFoodStalls called');
+
       const foodStallsBtn = document.querySelector('.food-stalls-btn');
       const panel = document.getElementById('bottomPanel');
       const isPanelOpen = panel.classList.contains('expanded');
 
+      console.log('Panel open:', isPanelOpen);
+
       // Toggle food stalls visibility on map
       const foodStallsVisible = foodStallsBtn.classList.toggle('active');
+      console.log('Food stalls visible:', foodStallsVisible);
+
       const searchInput = document.getElementById('searchInput');
 
       if (foodStallsVisible) {
+        console.log('Activating food stalls');
+
         // Add food stall markers to map
         addFoodStallMarkers();
         showNotification('Food stalls displayed on map');
@@ -3063,9 +3086,6 @@
         searchInput.placeholder = 'Find food stall...';
         // Clear search input
         searchInput.value = '';
-
-        // Hide float panel when food stalls are shown
-        hideFloatPanel();
 
         // Deactivate other buttons
         document.querySelector('.truck-floats-btn').classList.remove('active');
@@ -3080,6 +3100,8 @@
           switchTab('members');
         }
       } else {
+        console.log('Deactivating food stalls');
+
         // Remove food stall markers from map
         removeFoodStallMarkers();
         showNotification('Food stalls hidden from map');
@@ -3100,15 +3122,23 @@
     }
 
     function toggleTruckFloats() {
+      console.log('toggleTruckFloats called');
+
       const truckFloatsBtn = document.querySelector('.truck-floats-btn');
       const panel = document.getElementById('bottomPanel');
       const isPanelOpen = panel.classList.contains('expanded');
 
+      console.log('Panel open:', isPanelOpen);
+
       // Toggle truck floats visibility on map
       const truckFloatsVisible = truckFloatsBtn.classList.toggle('active');
+      console.log('Truck floats visible:', truckFloatsVisible);
+
       const searchInput = document.getElementById('searchInput');
 
       if (truckFloatsVisible) {
+        console.log('Activating truck floats');
+
         // Add truck float markers on map
         addTruckFloatMarkers();
         showNotification('Truck floats displayed on map');
@@ -3116,9 +3146,6 @@
         searchInput.placeholder = 'Find float location...';
         // Clear search input
         searchInput.value = '';
-
-        // Show float panel
-        showFloatPanel();
 
         // Deactivate other buttons
         document.querySelector('.food-stalls-btn').classList.remove('active');
@@ -3133,6 +3160,8 @@
           switchTab('members');
         }
       } else {
+        console.log('Deactivating truck floats');
+
         // Remove truck float markers from map
         removeTruckFloatMarkers();
         showNotification('Truck floats hidden from map');
@@ -3140,9 +3169,6 @@
         searchInput.value = '';
         // Reset search placeholder to default
         searchInput.placeholder = 'Find group member by phone...';
-
-        // Hide float panel and show default content
-        hideFloatPanel();
 
         // If no other features are active, close the panel
         const hasActiveFeatures = document.querySelector('.food-stalls-btn').classList.contains('active') ||
@@ -3277,25 +3303,13 @@
 
     // Float Panel Functions
     function showFloatPanel() {
-      // Hide all panel contents
-      const panelContents = document.querySelectorAll('.panel-content');
-      panelContents.forEach(content => content.style.display = 'none');
-
-      // Show float content
-      document.getElementById('float-content').style.display = 'block';
-
-      // Load float data
-      loadFloatData();
-      loadFloatSchedule();
-      updateRouteProgress();
+      // Switch to members tab to show the map
+      switchTab('members');
     }
 
     function hideFloatPanel() {
-      // Hide float content
-      document.getElementById('float-content').style.display = 'none';
-
-      // Show default panel content (group management)
-      document.getElementById('group-content').style.display = 'block';
+      // Switch to members tab to show the map
+      switchTab('members');
     }
 
     function loadFloatData() {
@@ -3506,9 +3520,23 @@
         searchInput.placeholder = 'Find group member by phone...';
         searchInput.value = '';
       }
+    }
 
-      // Hide float panel
-      hideFloatPanel();
+    // Test function to debug panel issues
+    function testPanel() {
+      console.log('=== Testing Panel ===');
+      const panel = document.getElementById('bottomPanel');
+      console.log('Panel element:', panel);
+      console.log('Panel classes:', panel.classList);
+      console.log('Panel expanded:', panel.classList.contains('expanded'));
+
+      // Try to expand
+      panel.classList.add('expanded');
+      document.body.classList.add('panel-expanded');
+      console.log('After adding expanded class:', panel.classList.contains('expanded'));
+
+      // Try to switch tab
+      switchTab('members');
     }
 
     function toggleFindStalls() {
