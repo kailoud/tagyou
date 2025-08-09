@@ -1772,10 +1772,32 @@
     // Add click event to search icon for mobile expansion
     document.addEventListener('DOMContentLoaded', function () {
       const searchIcon = document.querySelector('.search-icon');
+      const searchInput = document.getElementById('searchInput');
+      const festivalBtn = document.querySelector('.festival-btn');
+
       if (searchIcon) {
         searchIcon.style.cursor = 'pointer';
         searchIcon.style.pointerEvents = 'auto';
         searchIcon.addEventListener('click', toggleSearchExpansion);
+      }
+
+      // Expand search when clicking inside the search bar
+      if (searchInput) {
+        searchInput.addEventListener('click', function () {
+          if (!searchInput.classList.contains('expanded')) {
+            toggleSearchExpansion();
+          }
+        });
+      }
+
+      // Reset expansion when clicking the collapsed festival button
+      if (festivalBtn) {
+        festivalBtn.addEventListener('click', function () {
+          const searchContainer = document.querySelector('.search-container');
+          if (searchContainer.classList.contains('expanded')) {
+            toggleSearchExpansion();
+          }
+        });
       }
     });
   </script>
