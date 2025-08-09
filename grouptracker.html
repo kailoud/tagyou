@@ -3047,22 +3047,9 @@
 
     // Control Button Functions
     function toggleFoodStalls() {
+      const foodStallsBtn = document.querySelector('.food-stalls-btn');
       const panel = document.getElementById('bottomPanel');
       const isPanelOpen = panel.classList.contains('expanded');
-      const foodStallsBtn = document.querySelector('.food-stalls-btn');
-
-      // If panel is closed, open it and activate this tab
-      if (!isPanelOpen) {
-        console.log('Panel closed - opening panel for food stalls');
-
-        // Open the panel
-        panel.classList.add('expanded');
-        document.body.classList.add('panel-expanded');
-
-        // Switch to food stalls tab (if it exists)
-        // For now, just show the food stalls on map
-        switchTab('members'); // Default to members tab since food stalls is map-based
-      }
 
       // Toggle food stalls visibility on map
       const foodStallsVisible = foodStallsBtn.classList.toggle('active');
@@ -3083,6 +3070,15 @@
         // Deactivate other buttons
         document.querySelector('.truck-floats-btn').classList.remove('active');
         document.querySelector('.find-stalls-btn').classList.remove('active');
+
+        // If panel is closed, open it to show the map with food stalls
+        if (!isPanelOpen) {
+          console.log('Opening panel to show food stalls on map');
+          panel.classList.add('expanded');
+          document.body.classList.add('panel-expanded');
+          // Switch to members tab to show the map
+          switchTab('members');
+        }
       } else {
         // Remove food stall markers from map
         removeFoodStallMarkers();
@@ -3091,25 +3087,22 @@
         searchInput.placeholder = 'Find group member by phone...';
         // Clear search input
         searchInput.value = '';
+
+        // If no other features are active, close the panel
+        const hasActiveFeatures = document.querySelector('.truck-floats-btn').classList.contains('active') ||
+          document.querySelector('.find-stalls-btn').classList.contains('active');
+        if (!hasActiveFeatures && isPanelOpen) {
+          console.log('No active features, closing panel');
+          panel.classList.remove('expanded');
+          document.body.classList.remove('panel-expanded');
+        }
       }
     }
 
     function toggleTruckFloats() {
+      const truckFloatsBtn = document.querySelector('.truck-floats-btn');
       const panel = document.getElementById('bottomPanel');
       const isPanelOpen = panel.classList.contains('expanded');
-      const truckFloatsBtn = document.querySelector('.truck-floats-btn');
-
-      // If panel is closed, open it and activate this tab
-      if (!isPanelOpen) {
-        console.log('Panel closed - opening panel for truck floats');
-
-        // Open the panel
-        panel.classList.add('expanded');
-        document.body.classList.add('panel-expanded');
-
-        // Switch to members tab since truck floats is map-based
-        switchTab('members');
-      }
 
       // Toggle truck floats visibility on map
       const truckFloatsVisible = truckFloatsBtn.classList.toggle('active');
@@ -3130,6 +3123,15 @@
         // Deactivate other buttons
         document.querySelector('.food-stalls-btn').classList.remove('active');
         document.querySelector('.find-stalls-btn').classList.remove('active');
+
+        // If panel is closed, open it to show the map with truck floats
+        if (!isPanelOpen) {
+          console.log('Opening panel to show truck floats on map');
+          panel.classList.add('expanded');
+          document.body.classList.add('panel-expanded');
+          // Switch to members tab to show the map
+          switchTab('members');
+        }
       } else {
         // Remove truck float markers from map
         removeTruckFloatMarkers();
@@ -3141,6 +3143,15 @@
 
         // Hide float panel and show default content
         hideFloatPanel();
+
+        // If no other features are active, close the panel
+        const hasActiveFeatures = document.querySelector('.food-stalls-btn').classList.contains('active') ||
+          document.querySelector('.find-stalls-btn').classList.contains('active');
+        if (!hasActiveFeatures && isPanelOpen) {
+          console.log('No active features, closing panel');
+          panel.classList.remove('expanded');
+          document.body.classList.remove('panel-expanded');
+        }
       }
     }
 
@@ -3484,6 +3495,20 @@
       document.querySelector('.truck-floats-btn').classList.remove('active');
       document.querySelector('.food-stalls-btn').classList.remove('active');
       findStallsActive = false;
+
+      // Also remove map markers when resetting
+      removeFoodStallMarkers();
+      removeTruckFloatMarkers();
+
+      // Reset search placeholder
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchInput.placeholder = 'Find group member by phone...';
+        searchInput.value = '';
+      }
+
+      // Hide float panel
+      hideFloatPanel();
     }
 
     function toggleFindStalls() {
