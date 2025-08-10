@@ -4161,118 +4161,24 @@
 
             console.log('Map initialized successfully');
 
-            // Try to get user location as a secondary step
-            if (navigator.geolocation) {
-              navigator.geolocation.getCurrentPosition(function (position) {
-                try {
-                  // Validate position data first
-                  if (!position || !position.coords) {
-                    console.error('Invalid position data received');
-                    return;
-                  }
+            // For now, skip geolocation and use default location to avoid LatLng errors
+            console.log('Using default location to avoid geolocation issues');
+            currentLocation = { lat: 51.5074, lng: -0.1278 };
 
-                  const lat = position.coords.latitude;
-                  const lng = position.coords.longitude;
+            try {
+              if (map) {
+                const userMarker = L.marker([currentLocation.lat, currentLocation.lng], {
+                  icon: L.divIcon({
+                    className: 'current-user-marker',
+                    html: '<div style="background: #4285f4; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
+                    iconSize: [20, 20]
+                  })
+                }).addTo(map).bindPopup('You are here (London)');
 
-                  // Validate coordinates are numbers and within valid ranges
-                  if (typeof lat !== 'number' || typeof lng !== 'number' ||
-                    isNaN(lat) || isNaN(lng) ||
-                    lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-                    console.error('Invalid coordinates received:', { lat, lng });
-                    return;
-                  }
-
-                  currentLocation = { lat, lng };
-
-                  // Validate map is ready before using it
-                  if (!map) {
-                    console.error('Map not ready for location update');
-                    return;
-                  }
-
-                  // Add user marker
-                  const userMarker = L.marker(currentLocation, {
-                    icon: L.divIcon({
-                      className: 'current-user-marker',
-                      html: '<div style="background: #4285f4; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-                      iconSize: [20, 20]
-                    })
-                  }).addTo(map).bindPopup('You are here');
-
-                  // Smoothly fly to user location with additional validation
-                  try {
-                    // Double-check coordinates right before flyTo
-                    console.log('About to flyTo with coordinates:', currentLocation);
-                    if (isNaN(currentLocation.lat) || isNaN(currentLocation.lng)) {
-                      console.error('Coordinates became NaN before flyTo:', currentLocation);
-                      map.setView([51.5074, -0.1278], 16);
-                      return;
-                    }
-
-                    // Create a fresh coordinate object to avoid any reference issues
-                    const flyCoords = [currentLocation.lat, currentLocation.lng];
-                    console.log('Flying to coordinates:', flyCoords);
-
-                    map.flyTo(flyCoords, 16, {
-                      duration: 1.5
-                    });
-                  } catch (flyError) {
-                    console.error('Error flying to location:', flyError);
-                    // Fallback to setView if flyTo fails
-                    map.setView([51.5074, -0.1278], 16);
-                  }
-
-                  console.log('Location found:', currentLocation);
-                } catch (error) {
-                  console.error('Error processing location:', error);
-                }
-              }, function (error) {
-                console.log('Error getting location:', error);
-                // If location fails, set a default location (London)
-                currentLocation = { lat: 51.5074, lng: -0.1278 };
-                console.log('Using default location:', currentLocation);
-
-                // Add user marker at default location
-                try {
-                  if (map) {
-                    const userMarker = L.marker(currentLocation, {
-                      icon: L.divIcon({
-                        className: 'current-user-marker',
-                        html: '<div style="background: #4285f4; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-                        iconSize: [20, 20]
-                      })
-                    }).addTo(map).bindPopup('You are here (default location)');
-
-                    map.setView([currentLocation.lat, currentLocation.lng], 16);
-                  }
-                } catch (markerError) {
-                  console.error('Error adding default location marker:', markerError);
-                }
-              }, {
-                enableHighAccuracy: false, // Use false to avoid potential issues
-                timeout: 5000, // Shorter timeout
-                maximumAge: 300000 // 5 minutes
-              });
-            } else {
-              console.log('Geolocation not supported, using default location');
-              // Set default location if geolocation is not supported
-              currentLocation = { lat: 51.5074, lng: -0.1278 };
-
-              try {
-                if (map) {
-                  const userMarker = L.marker(currentLocation, {
-                    icon: L.divIcon({
-                      className: 'current-user-marker',
-                      html: '<div style="background: #4285f4; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-                      iconSize: [20, 20]
-                    })
-                  }).addTo(map).bindPopup('You are here (default location)');
-
-                  map.setView([currentLocation.lat, currentLocation.lng], 16);
-                }
-              } catch (markerError) {
-                console.error('Error adding default location marker:', markerError);
+                console.log('Map should now be visible with default location');
               }
+            } catch (markerError) {
+              console.error('Error adding default location marker:', markerError);
             }
           } catch (error) {
             console.error('Error initializing map:', error);
