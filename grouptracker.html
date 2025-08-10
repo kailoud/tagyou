@@ -7782,6 +7782,9 @@
         // Store reference to user marker for updates
         window.userMarker = userMarker;
 
+        // Clear any existing duplicate markers
+        clearDuplicateMarkers();
+
         // Mark map as initialized
         window.mapInitialized = true;
 
@@ -7885,6 +7888,9 @@
           }
         }
 
+        // Clear any duplicate markers that might have been created
+        clearDuplicateMarkers();
+
         // Instant location display update
         updateLocationDisplay(newLocation);
 
@@ -7949,6 +7955,23 @@
 
       // Add refresh function to global scope
       window.refreshLocationNow = refreshLocationNow;
+
+      // Clear duplicate markers function
+      function clearDuplicateMarkers() {
+        if (map) {
+          // Remove any markers that aren't our main user marker
+          map.eachLayer((layer) => {
+            if (layer instanceof L.Marker && layer !== window.userMarker) {
+              // Check if it's a blue user marker (from the old location permission code)
+              const icon = layer.getIcon();
+              if (icon && icon.options && icon.options.html && icon.options.html.includes('#4285f4')) {
+                console.log('Removing duplicate blue user marker');
+                map.removeLayer(layer);
+              }
+            }
+          });
+        }
+      }
 
       // Update location display with high-precision details
       function updateLocationDisplay(location) {
@@ -8203,14 +8226,11 @@
               lng: position.coords.longitude
             };
 
-            // Add user marker
-            L.marker(currentLocation, {
-              icon: L.divIcon({
-                className: 'current-user-marker',
-                html: '<div style="background: #4285f4; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-                iconSize: [20, 20]
-              })
-            }).addTo(map).bindPopup('You are here');
+            // Update existing user marker instead of creating a new one
+            if (window.userMarker) {
+              window.userMarker.setLatLng(currentLocation);
+              console.log('Updated existing user marker to:', currentLocation);
+            }
 
             map.flyTo(currentLocation, 16, {
               duration: 1.0
