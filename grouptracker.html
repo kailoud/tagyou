@@ -3576,65 +3576,24 @@
         }
 
         function authenticateUser() {
-          console.log('authenticateUser called');
+          console.log('authenticateUser called - just show the map!');
 
-          // Hide auth overlay and show app
+          // Hide auth overlay
           const authOverlay = document.getElementById('authOverlay');
-          const appContent = document.getElementById('appContent');
-          const userProfile = document.getElementById('userProfile');
-
           if (authOverlay) {
             authOverlay.style.display = 'none';
-            authOverlay.style.position = 'absolute';
-            authOverlay.style.top = '-9999px';
-            authOverlay.style.left = '-9999px';
-            authOverlay.style.zIndex = '-1';
-            console.log('Auth overlay completely hidden and moved off-screen');
-            console.log('Auth overlay display style:', window.getComputedStyle(authOverlay).display);
           }
 
-          if (appContent) {
-            appContent.classList.add('authenticated');
-            console.log('App content authenticated class added');
-
-            // Check if app content is visible
-            const rect = appContent.getBoundingClientRect();
-            console.log('App content dimensions:', rect.width, 'x', rect.height);
-            console.log('App content visible:', rect.width > 0 && rect.height > 0);
-            console.log('App content display style:', window.getComputedStyle(appContent).display);
-
-            // Force app content to be visible if it's not
-            if (rect.width === 0 || rect.height === 0) {
-              console.log('App content has zero dimensions, forcing visibility');
-              appContent.style.display = 'block';
-              appContent.style.width = '100vw';
-              appContent.style.height = '100vh';
-              appContent.style.position = 'absolute';
-              appContent.style.top = '0';
-              appContent.style.left = '0';
-              appContent.style.zIndex = '1';
-              console.log('App content forced to be visible');
-            }
-          }
-
+          // Show user profile
+          const userProfile = document.getElementById('userProfile');
           if (userProfile) {
             userProfile.style.display = 'flex';
-            console.log('User profile shown');
           }
 
-          // Update user avatar
-          updateUserAvatar();
+          // Initialize map immediately
+          initializeMap();
 
-          // Initialize app features with a small delay to ensure DOM is ready
-          setTimeout(() => {
-            initializeMap();
-            initializeLocationServices();
-            updateGroupCount();
-            simulateMemberLocations();
-          }, 100);
-
-          // Set up session monitoring
-          setupSessionMonitoring();
+          console.log('Map should be visible now!');
         }
 
         function setupSessionMonitoring() {
@@ -4176,121 +4135,45 @@
           return true;
         }
 
-        // Map initialization
+        // Simple map initialization - just make it work!
         function initializeMap() {
-          try {
-            // Check if map is already initialized
-            if (map) {
-              console.log('Map already initialized, skipping');
-              return;
-            }
+          console.log('Starting simple map initialization');
 
-            // Check if map container exists
-            const mapContainer = document.getElementById('map');
-            if (!mapContainer) {
-              console.error('Map container not found');
-              return;
-            }
-
-            // Force map container to have proper dimensions
-            mapContainer.style.display = 'block';
-            mapContainer.style.width = '100vw';
-            mapContainer.style.height = '100vh';
-            mapContainer.style.position = 'absolute';
-            mapContainer.style.top = '0';
-            mapContainer.style.left = '0';
-            mapContainer.style.zIndex = '1';
-            console.log('Map container forced to have dimensions');
-
-            // Check map container dimensions
-            const rect = mapContainer.getBoundingClientRect();
-            console.log('Map container dimensions:', rect.width, 'x', rect.height);
-            console.log('Map container visible:', rect.width > 0 && rect.height > 0);
-
-            // Check if Leaflet is available
-            if (typeof L === 'undefined') {
-              console.error('Leaflet library not loaded');
-              return;
-            }
-
-            // Start with a world view, then focus on user location
-            map = L.map('map', {
-              zoomControl: false  // Disable default zoom controls
-            }).setView([0, 0], 2);
-
-            // Add tile layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-
-            console.log('Tile layer added to map');
-
-            // Verify map is properly initialized
-            if (!map || !map.setView) {
-              console.error('Map initialization failed');
-              return;
-            }
-
-            // Wait a moment for map to be fully ready
-            setTimeout(() => {
-              if (map && map.setView) {
-                console.log('Map is fully ready');
-                // Set a default view first to ensure map is working
-                map.setView([51.5074, -0.1278], 16);
-                console.log('Map set to default view');
-
-                // Force map container to be visible for testing
-                const mapContainer = document.getElementById('map');
-                if (mapContainer) {
-                  mapContainer.style.backgroundColor = '#e0e0e0';
-                  mapContainer.style.border = '2px solid red';
-                  console.log('Map container styled for visibility testing');
-
-                  // Re-check map container dimensions after forcing visibility
-                  setTimeout(() => {
-                    const newRect = mapContainer.getBoundingClientRect();
-                    console.log('Map container dimensions after forcing visibility:', newRect.width, 'x', newRect.height);
-                    console.log('Map container now visible:', newRect.width > 0 && newRect.height > 0);
-
-                    if (newRect.width > 0 && newRect.height > 0) {
-                      console.log('Map should now be visible!');
-                      // Trigger map resize to ensure it renders properly
-                      if (map.invalidateSize) {
-                        map.invalidateSize();
-                        console.log('Map size invalidated to force re-render');
-                      }
-                    }
-                  }, 200);
-                }
-              } else {
-                console.error('Map not ready after delay');
-              }
-            }, 100);
-
-            console.log('Map initialized successfully');
-
-            // For now, skip geolocation and use default location to avoid LatLng errors
-            console.log('Using default location to avoid geolocation issues');
-            currentLocation = { lat: 51.5074, lng: -0.1278 };
-
-            try {
-              if (map) {
-                const userMarker = L.marker([currentLocation.lat, currentLocation.lng], {
-                  icon: L.divIcon({
-                    className: 'current-user-marker',
-                    html: '<div style="background: #4285f4; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-                    iconSize: [20, 20]
-                  })
-                }).addTo(map).bindPopup('You are here (London)');
-
-                console.log('Map should now be visible with default location');
-              }
-            } catch (markerError) {
-              console.error('Error adding default location marker:', markerError);
-            }
-          } catch (error) {
-            console.error('Error initializing map:', error);
+          // Create map container if it doesn't exist
+          let mapContainer = document.getElementById('map');
+          if (!mapContainer) {
+            mapContainer = document.createElement('div');
+            mapContainer.id = 'map';
+            document.body.appendChild(mapContainer);
+            console.log('Created map container');
           }
+
+          // Force it to be visible and sized
+          mapContainer.style.cssText = `
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 1 !important;
+            background: #e0e0e0 !important;
+            border: 3px solid red !important;
+          `;
+
+          console.log('Map container styled and ready');
+
+          // Initialize map
+          map = L.map('map').setView([51.5074, -0.1278], 16);
+
+          // Add tiles
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+          }).addTo(map);
+
+          // Add user marker
+          L.marker([51.5074, -0.1278]).addTo(map).bindPopup('You are here (London)');
+
+          console.log('Map should be visible now!');
         }
 
         // Location services
