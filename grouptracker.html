@@ -4594,6 +4594,12 @@
 
         // Simple map initialization - just make it work!
         function initializeMap() {
+          // Prevent duplicate initialization
+          if (window.mapInitialized) {
+            console.log('Map already initialized, skipping...');
+            return;
+          }
+          
           console.log('=== MAP INITIALIZATION START ===');
           console.log('Starting simple map initialization');
 
@@ -4642,6 +4648,9 @@
           // Add user marker
           L.marker([51.5074, -0.1278]).addTo(map).bindPopup('You are here (London)');
 
+          // Mark map as initialized
+          window.mapInitialized = true;
+
           console.log('Map initialized successfully');
           console.log('Map object:', map);
           console.log('=== MAP INITIALIZATION COMPLETE ===');
@@ -4652,7 +4661,10 @@
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', initializeMap);
         } else {
-          initializeMap();
+          // Only initialize if not already done
+          if (!window.mapInitialized) {
+            initializeMap();
+          }
         }
 
         // Location services
