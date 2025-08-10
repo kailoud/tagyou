@@ -4562,6 +4562,7 @@
       </div>
 
       <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+      <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
       <script>
         // Authentication System - REMOVED
         // App now works without authentication
@@ -4576,6 +4577,11 @@
         let locationUpdateInterval;
         let groupCode = 'ABC123';
         let isProUser = true; // Give full access
+
+        // Supabase Configuration
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // Replace with your Supabase URL
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Replace with your Supabase anon key
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentGroup = {
           name: 'Festival Squad 2025',
           members: [
@@ -5530,7 +5536,7 @@
         }
 
         // Admin Portal Functions
-        function showAdminPortal() {
+        async function showAdminPortal() {
           // Check if user is admin (demo@tagyou.com or any email ending with @admin.com)
           const isAdmin = currentUser?.email === 'demo@tagyou.com' || 
                          currentUser?.email?.endsWith('@admin.com') ||
@@ -5541,10 +5547,17 @@
             return;
           }
 
-          // Create admin portal modal
-          const adminModal = document.createElement('div');
-          adminModal.className = 'modal-overlay';
-          adminModal.id = 'adminModal';
+          // Show loading state
+          showNotification('Loading admin data...', 'info');
+
+          try {
+            // Load data from Supabase
+            await loadAdminData();
+            
+            // Create admin portal modal
+            const adminModal = document.createElement('div');
+            adminModal.className = 'modal-overlay';
+            adminModal.id = 'adminModal';
           adminModal.innerHTML = `
             <div class="modal-content admin-portal-content">
               <div class="modal-header">
@@ -5616,6 +5629,10 @@
           document.body.appendChild(adminModal);
           setTimeout(() => adminModal.classList.add('show'), 10);
           document.getElementById('userMenu').classList.remove('show');
+          } catch (error) {
+            console.error('Error loading admin portal:', error);
+            showNotification('Error loading admin data from database', 'error');
+          }
         }
 
         function closeAdminPortal() {
@@ -5628,72 +5645,107 @@
 
         // Admin data and configuration
         let activeAdminTab = 'food-stalls';
-        const adminData = {
-          'food-stalls': [
-            {
-              id: 1,
-              name: "Mike's Burger Stand",
-              category: "Fast Food",
-              location: "Downtown Plaza",
-              coordinates: { lat: 40.7128, lng: -74.0060 },
-              phone: "+1 (555) 123-4567",
-              email: "mike@burgerstand.com",
-              hours: "10:00 AM - 10:00 PM",
-              rating: 4.5,
-              description: "Best burgers in downtown",
-              status: "active",
-              image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=100&h=100&fit=crop&crop=center"
-            }
-          ],
-          'float-trucks': [
-            {
-              id: 1,
-              name: "Tropical Paradise Float",
-              category: "Drinks & Smoothies",
-              currentLocation: "Central Park",
-              coordinates: { lat: 40.7850, lng: -73.9680 },
-              phone: "+1 (555) 987-6543",
-              email: "info@tropicalfloat.com",
-              schedule: "Monday-Friday: Various locations",
-              rating: 4.8,
-              description: "Mobile tropical drink experience",
-              status: "active",
-              trackingMethod: "gps",
-              gpsTrackerId: "TRK-001-TROP",
-              driverPhone: "+1 (555) 987-6543",
-              lastUpdate: "2024-08-09T14:30:00Z",
-              isLive: true,
-              estimatedSpeed: 25,
-              nextStop: "Downtown Plaza",
-              estimatedArrival: "15:45",
-              image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=100&h=100&fit=crop&crop=center"
-            }
-          ],
-          'groups': [
-            {
-              id: 1,
-              name: "Downtown Food Lovers",
-              type: "Food Community",
-              memberCount: 156,
-              description: "Local food enthusiasts sharing reviews and recommendations",
-              admin: "Sarah Johnson",
-              email: "admin@downtownfoodlovers.com",
-              status: "active"
-            }
-          ],
-          'friends': [
-            {
-              id: 1,
-              name: "John Smith",
-              username: "johnsmith123",
-              email: "john@email.com",
-              phone: "+1 (555) 456-7890",
-              location: "New York, NY",
-              joinDate: "2024-01-15",
-              status: "active"
-            }
-          ]
+        let adminData = {
+          'food-stalls': [],
+          'float-trucks': [],
+          'groups': [],
+          'friends': []
         };
+
+        // Supabase Database Functions
+        async function loadAdminData() {
+          try {
+            // Load food stalls
+            const { data: foodStalls, error: foodError } = await supabase
+              .from('food_stalls')
+              .select('*')
+              .order('created_at', { ascending: false });
+            
+            if (foodError) throw foodError;
+            adminData['food-stalls'] = foodStalls || [];
+
+            // Load float trucks
+            const { data: floatTrucks, error: floatError } = await supabase
+              .from('float_trucks')
+              .select('*')
+              .order('created_at', { ascending: false });
+            
+            if (floatError) throw floatError;
+            adminData['float-trucks'] = floatTrucks || [];
+
+            // Load groups
+            const { data: groups, error: groupsError } = await supabase
+              .from('groups')
+              .select('*')
+              .order('created_at', { ascending: false });
+            
+            if (groupsError) throw groupsError;
+            adminData['groups'] = groups || [];
+
+            // Load friends
+            const { data: friends, error: friendsError } = await supabase
+              .from('friends')
+              .select('*')
+              .order('created_at', { ascending: false });
+            
+            if (friendsError) throw friendsError;
+            adminData['friends'] = friends || [];
+
+            // Update table display
+            if (document.getElementById('adminTableBody')) {
+              document.getElementById('adminTableBody').innerHTML = renderAdminTableData();
+            }
+
+            console.log('Admin data loaded successfully from Supabase');
+          } catch (error) {
+            console.error('Error loading admin data:', error);
+            showNotification('Error loading data from database', 'error');
+          }
+        }
+
+        async function saveToSupabase(tableName, data) {
+          try {
+            const { data: result, error } = await supabase
+              .from(tableName)
+              .insert([data]);
+
+            if (error) throw error;
+            return result;
+          } catch (error) {
+            console.error(`Error saving to ${tableName}:`, error);
+            throw error;
+          }
+        }
+
+        async function updateInSupabase(tableName, id, data) {
+          try {
+            const { data: result, error } = await supabase
+              .from(tableName)
+              .update(data)
+              .eq('id', id);
+
+            if (error) throw error;
+            return result;
+          } catch (error) {
+            console.error(`Error updating ${tableName}:`, error);
+            throw error;
+          }
+        }
+
+        async function deleteFromSupabase(tableName, id) {
+          try {
+            const { error } = await supabase
+              .from(tableName)
+              .delete()
+              .eq('id', id);
+
+            if (error) throw error;
+            return true;
+          } catch (error) {
+            console.error(`Error deleting from ${tableName}:`, error);
+            throw error;
+          }
+        }
 
         const adminTabConfig = {
           'food-stalls': { title: 'Food Stalls', icon: '🍔' },
@@ -5781,11 +5833,30 @@
           }
         }
 
-        function deleteAdminItem(id) {
+        async function deleteAdminItem(id) {
           if (confirm('Are you sure you want to delete this item?')) {
-            adminData[activeAdminTab] = adminData[activeAdminTab].filter(item => item.id !== id);
-            document.getElementById('adminTableBody').innerHTML = renderAdminTableData();
-            showNotification('Item deleted successfully!', 'success');
+            try {
+              // Map table names
+              const tableMap = {
+                'food-stalls': 'food_stalls',
+                'float-trucks': 'float_trucks',
+                'groups': 'groups',
+                'friends': 'friends'
+              };
+              
+              const tableName = tableMap[activeAdminTab];
+              
+              // Delete from Supabase
+              await deleteFromSupabase(tableName, id);
+              
+              // Reload data from database
+              await loadAdminData();
+              
+              showNotification('Item deleted successfully!', 'success');
+            } catch (error) {
+              console.error('Error deleting item:', error);
+              showNotification(`Error deleting item: ${error.message}`, 'error');
+            }
           }
         }
 
@@ -5987,26 +6058,37 @@
           completeSave(itemData, id, isEditing);
         }
 
-        function completeSave(itemData, id, isEditing) {
-          
-          if (isEditing) {
-            // Update existing item
-            const index = adminData[activeAdminTab].findIndex(item => item.id === id);
-            if (index !== -1) {
-              adminData[activeAdminTab][index] = { ...adminData[activeAdminTab][index], ...itemData };
+        async function completeSave(itemData, id, isEditing) {
+          try {
+            // Map table names
+            const tableMap = {
+              'food-stalls': 'food_stalls',
+              'float-trucks': 'float_trucks',
+              'groups': 'groups',
+              'friends': 'friends'
+            };
+            
+            const tableName = tableMap[activeAdminTab];
+            
+            if (isEditing) {
+              // Update existing item in Supabase
+              await updateInSupabase(tableName, id, itemData);
+            } else {
+              // Add new item to Supabase
+              itemData.status = 'active';
+              await saveToSupabase(tableName, itemData);
             }
-          } else {
-            // Add new item
-            const newId = Math.max(...adminData[activeAdminTab].map(item => item.id), 0) + 1;
-            itemData.id = newId;
-            itemData.status = 'active';
-            adminData[activeAdminTab].push(itemData);
+            
+            // Reload data from database
+            await loadAdminData();
+            
+            // Close form
+            closeAdminForm();
+            showNotification(`${isEditing ? 'Updated' : 'Added'} ${adminTabConfig[activeAdminTab].title.slice(0, -1)} successfully!`, 'success');
+          } catch (error) {
+            console.error('Error saving item:', error);
+            showNotification(`Error ${isEditing ? 'updating' : 'adding'} item: ${error.message}`, 'error');
           }
-          
-          // Update table and close form
-          document.getElementById('adminTableBody').innerHTML = renderAdminTableData();
-          closeAdminForm();
-          showNotification(`${isEditing ? 'Updated' : 'Added'} ${adminTabConfig[activeAdminTab].title.slice(0, -1)} successfully!`, 'success');
         }
 
         function previewImage(input, previewId) {
