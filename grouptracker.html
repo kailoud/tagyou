@@ -4200,21 +4200,46 @@
             const newAvatarIcon = L.divIcon({
               className: 'avatar-marker',
               html: `<div style="
-                background: #ff6b35;
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                border: 3px solid white;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-size: 20px;
-                font-weight: bold;
-              ">${avatar}</div>`,
-              iconSize: [40, 40],
-              iconAnchor: [20, 20]
+                position: relative;
+                width: 0;
+                height: 0;
+              ">
+                <div style="
+                  position: absolute;
+                  top: 0;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  width: 36px;
+                  height: 36px;
+                  background: #ff6b35;
+                  border-radius: 50% 50% 50% 0;
+                  transform: translateX(-50%) rotate(-45deg);
+                  border: 3px solid white;
+                  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: white;
+                  font-size: 16px;
+                  font-weight: bold;
+                  z-index: 2;
+                ">${avatar}</div>
+                <div style="
+                  position: absolute;
+                  top: 32px;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  width: 8px;
+                  height: 8px;
+                  background: #ff6b35;
+                  border-radius: 50%;
+                  border: 2px solid white;
+                  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                  z-index: 1;
+                "></div>
+              </div>`,
+              iconSize: [40, 50],
+              iconAnchor: [20, 50]
             });
 
             window.userMarker.setIcon(newAvatarIcon);
@@ -4892,21 +4917,46 @@
           const avatarIcon = L.divIcon({
             className: 'avatar-marker',
             html: `<div style="
-              background: #ff6b35;
-              width: 40px;
-              height: 40px;
-              border-radius: 50%;
-              border: 3px solid white;
-              box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              color: white;
-              font-size: 20px;
-              font-weight: bold;
-            ">${userAvatar}</div>`,
-            iconSize: [40, 40],
-            iconAnchor: [20, 20]
+              position: relative;
+              width: 0;
+              height: 0;
+            ">
+              <div style="
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 36px;
+                height: 36px;
+                background: #ff6b35;
+                border-radius: 50% 50% 50% 0;
+                transform: translateX(-50%) rotate(-45deg);
+                border: 3px solid white;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 16px;
+                font-weight: bold;
+                z-index: 2;
+              ">${userAvatar}</div>
+              <div style="
+                position: absolute;
+                top: 32px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 8px;
+                height: 8px;
+                background: #ff6b35;
+                border-radius: 50%;
+                border: 2px solid white;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                z-index: 1;
+              "></div>
+            </div>`,
+            iconSize: [40, 50],
+            iconAnchor: [20, 50]
           });
 
           const userMarker = L.marker([51.5074, -0.1278], { icon: avatarIcon })
