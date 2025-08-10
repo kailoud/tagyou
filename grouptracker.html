@@ -7632,7 +7632,6 @@
             width: 100vw !important;
             height: 100vh !important;
             z-index: 1 !important;
-            background: #e0e0e0 !important;
           `;
 
         console.log('Map container styled and ready');
@@ -7658,12 +7657,35 @@
           zoomControl: false
         }).setView([51.5074, -0.1278], 16);
 
-        // Add modern colorful tiles
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-          attribution: '© OpenStreetMap contributors, © CARTO',
-          subdomains: 'abcd',
+        // Add modern colorful tiles with fallback
+        const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors, © Humanitarian OpenStreetMap Team',
+          subdomains: 'abc',
           maxZoom: 19
         }).addTo(map);
+
+        // Fallback to default OSM if the colorful tiles fail
+        tileLayer.on('tileerror', function() {
+          console.log('Colorful tiles failed, falling back to default OSM');
+          map.removeLayer(tileLayer);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+          }).addTo(map);
+        });
+
+        // Add tile load success handler
+        tileLayer.on('tileload', function() {
+          console.log('Map tiles loaded successfully');
+        });
+
+        // Force map refresh after a short delay
+        setTimeout(() => {
+          if (map) {
+            map.invalidateSize();
+            console.log('Map size invalidated and refreshed');
+          }
+        }, 1000);
 
         // Add user marker with avatar
         const userAvatar = currentUser?.avatar || '👤';
@@ -7731,6 +7753,10 @@
 
         console.log('Map initialized successfully');
         console.log('Map object:', map);
+        console.log('Map container:', document.getElementById('map'));
+        console.log('Map size:', map.getSize());
+        console.log('Map center:', map.getCenter());
+        console.log('Map zoom:', map.getZoom());
         console.log('=== MAP INITIALIZATION COMPLETE ===');
       }
 
