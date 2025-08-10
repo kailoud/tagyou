@@ -902,6 +902,61 @@
       background: #e5e7eb;
     }
 
+    /* Header Actions and Expand/Minimize */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .expand-btn {
+      background: transparent;
+      border: none;
+      color: #6b7280;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .expand-btn:hover {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .expand-btn svg {
+      transition: transform 0.3s ease;
+    }
+
+    .expand-btn:hover svg {
+      transform: scale(1.1);
+    }
+
+    /* Expanded state styles */
+    .admin-portal-content.expanded,
+    .admin-form-content.expanded {
+      width: 95vw !important;
+      height: 95vh !important;
+      max-width: 95vw !important;
+      max-height: 95vh !important;
+      margin: 2.5vh auto !important;
+    }
+
+    .admin-portal-content.expanded .modal-body,
+    .admin-form-content.expanded .modal-body {
+      height: calc(95vh - 120px);
+      overflow-y: auto;
+    }
+
+    .admin-portal-content.expanded .admin-table-container,
+    .admin-form-content.expanded .form-grid {
+      height: 100%;
+      overflow-y: auto;
+    }
+
     /* Mobile Optimization */
     @media (max-width: 768px) {
       .admin-portal-content {
@@ -1026,6 +1081,30 @@
 
       .admin-subtitle {
         font-size: 12px;
+      }
+
+      /* Mobile expand/minimize optimization */
+      .header-actions {
+        gap: 4px;
+      }
+
+      .expand-btn {
+        padding: 8px;
+      }
+
+      .expand-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .admin-portal-content.expanded,
+      .admin-form-content.expanded {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
       }
     }
 
@@ -5089,7 +5168,14 @@
             <div class="modal-content admin-portal-content">
               <div class="modal-header">
                 <h2>🔧 Live Tracker Admin Portal</h2>
-                <button onclick="closeAdminPortal()" class="close-btn">&times;</button>
+                <div class="header-actions">
+                  <button onclick="toggleAdminPortalSize()" class="expand-btn" title="Expand/Minimize">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                    </svg>
+                  </button>
+                  <button onclick="closeAdminPortal()" class="close-btn">&times;</button>
+                </div>
               </div>
               <div class="modal-body">
                 <p class="admin-subtitle">Manage food stalls, food trucks, groups, and friends for your tracking app</p>
@@ -5329,7 +5415,14 @@
             <div class="modal-content admin-form-content">
               <div class="modal-header">
                 <h2>${isEditing ? '✏️ Edit' : '➕ Add'} ${adminTabConfig[activeAdminTab].title.slice(0, -1)}</h2>
-                <button onclick="closeAdminForm()" class="close-btn">&times;</button>
+                <div class="header-actions">
+                  <button onclick="toggleAdminFormSize()" class="expand-btn" title="Expand/Minimize">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                    </svg>
+                  </button>
+                  <button onclick="closeAdminForm()" class="close-btn">&times;</button>
+                </div>
               </div>
               <div class="modal-body">
                 <form id="adminForm" class="admin-form">
@@ -5494,6 +5587,59 @@
           document.getElementById('adminTableBody').innerHTML = renderAdminTableData();
           closeAdminForm();
           showNotification(`${isEditing ? 'Updated' : 'Added'} ${adminTabConfig[activeAdminTab].title.slice(0, -1)} successfully!`, 'success');
+        }
+
+        // Expand/Minimize Functions
+        function toggleAdminPortalSize() {
+          const modal = document.getElementById('adminModal');
+          const content = modal.querySelector('.admin-portal-content');
+          const expandBtn = modal.querySelector('.expand-btn');
+          
+          if (content.classList.contains('expanded')) {
+            // Minimize
+            content.classList.remove('expanded');
+            expandBtn.innerHTML = `
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+              </svg>
+            `;
+            expandBtn.title = 'Expand';
+          } else {
+            // Expand
+            content.classList.add('expanded');
+            expandBtn.innerHTML = `
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+              </svg>
+            `;
+            expandBtn.title = 'Minimize';
+          }
+        }
+
+        function toggleAdminFormSize() {
+          const modal = document.getElementById('adminFormModal');
+          const content = modal.querySelector('.admin-form-content');
+          const expandBtn = modal.querySelector('.expand-btn');
+          
+          if (content.classList.contains('expanded')) {
+            // Minimize
+            content.classList.remove('expanded');
+            expandBtn.innerHTML = `
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+              </svg>
+            `;
+            expandBtn.title = 'Expand';
+          } else {
+            // Expand
+            content.classList.add('expanded');
+            expandBtn.innerHTML = `
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+              </svg>
+            `;
+            expandBtn.title = 'Minimize';
+          }
         }
 
         // Add search functionality to admin portal
