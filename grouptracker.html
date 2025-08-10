@@ -4236,15 +4236,23 @@
     }
 
     @keyframes pulse-location {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(1); }
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.2);
+      }
+
+      100% {
+        transform: scale(1);
+      }
     }
 
     /* Modern map controls */
     .leaflet-control-zoom {
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       overflow: hidden;
     }
 
@@ -4268,7 +4276,7 @@
       gap: 8px;
       font-size: 12px;
       color: #666;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255, 255, 255, 0.9);
       padding: 4px 8px;
       border-radius: 6px;
       backdrop-filter: blur(10px);
@@ -4279,68 +4287,9 @@
       font-size: 14px;
     }
 
-
-
-    .location-accuracy {
-      color: #888;
-      font-size: 11px;
-    }
-
-    .location-time {
-      color: #666;
-      font-size: 11px;
-    }
-
-    .location-details {
-      color: #888;
-      font-size: 11px;
-      font-weight: 500;
-    }
-
-    /* Enhanced location update animation */
-    .location-display.location-update {
-      animation: location-pulse 0.3s ease-in-out;
-    }
-
-    @keyframes location-pulse {
-      0% { transform: translateX(-50%) scale(1); }
-      50% { transform: translateX(-50%) scale(1.05); }
-      100% { transform: translateX(-50%) scale(1); }
-    }
-
-    .location-refresh-btn {
-      background: none;
-      border: none;
-      font-size: 14px;
-      cursor: pointer;
-      padding: 2px;
-      border-radius: 4px;
-      transition: all 0.2s ease;
-      margin-left: 4px;
-    }
-
-    .location-refresh-btn:hover {
-      background: rgba(255, 107, 53, 0.1);
-      transform: scale(1.1);
-    }
-
-    .location-refresh-btn:active {
-      transform: scale(0.95);
-    }
-
-    /* Location display container */
+    /* Hide location display */
     .location-display {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000;
-      background: rgba(255,255,255,0.95);
-      border-radius: 12px;
-      padding: 8px 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.2);
+      display: none !important;
     }
   </style>
 </head>
@@ -4488,18 +4437,7 @@
         </svg>
       </div>
 
-      <!-- Live Location Display -->
-      <div id="locationDisplay" class="location-display" style="display: none;">
-        <div class="location-info">
-          <span class="location-icon">📍</span>
-          <span class="location-accuracy"></span>
-          <span class="location-details"></span>
-          <span class="location-time"></span>
-          <button class="location-refresh-btn" onclick="refreshLocationNow()" title="Refresh location instantly">
-            🔄
-          </button>
-        </div>
-      </div>
+
 
       <!-- Festival Dropdown -->
       <div class="festival-dropdown">
@@ -6662,7 +6600,7 @@
         console.log('showAdminPortal called');
         console.log('Current user:', currentUser);
         console.log('isProUser:', isProUser);
-        
+
         // Check if user has admin privileges
         if (!isProUser) {
           console.log('Access denied - user is not admin');
@@ -6779,7 +6717,7 @@
       async function loadAdminData() {
         try {
           console.log('Loading admin data from Supabase...');
-          
+
           // Load food stalls
           const { data: foodStalls, error: foodError } = await supabase
             .from('food_stalls')
@@ -6845,11 +6783,11 @@
           adminData['float-trucks'] = getMockFloatTrucks();
           adminData['groups'] = getMockGroups();
           adminData['friends'] = getMockFriends();
-          
+
           if (document.getElementById('adminTableBody')) {
             document.getElementById('adminTableBody').innerHTML = renderAdminTableData();
           }
-          
+
           showNotification('Using demo data (database not configured)', 'info');
         }
       }
@@ -7192,10 +7130,10 @@
             { key: 'email', label: 'Email', type: 'email', required: true },
             { key: 'schedule', label: 'Schedule', type: 'text', required: true },
             { key: 'tracking_method', label: 'Tracking Method', type: 'select', options: ['gps', 'mobile-app', 'social-media', 'hybrid'], required: true },
-                    { key: 'gps_tracker_id', label: 'GPS Tracker ID', type: 'text', required: false },
-        { key: 'driver_phone', label: 'Driver Phone', type: 'tel', required: false },
-        { key: 'next_stop', label: 'Next Stop', type: 'text', required: false },
-        { key: 'estimated_arrival', label: 'Estimated Arrival', type: 'time', required: false },
+            { key: 'gps_tracker_id', label: 'GPS Tracker ID', type: 'text', required: false },
+            { key: 'driver_phone', label: 'Driver Phone', type: 'tel', required: false },
+            { key: 'next_stop', label: 'Next Stop', type: 'text', required: false },
+            { key: 'estimated_arrival', label: 'Estimated Arrival', type: 'time', required: false },
             { key: 'rating', label: 'Rating', type: 'number', min: 0, max: 5, step: 0.1, required: false },
             { key: 'description', label: 'Description', type: 'textarea', required: false },
             { key: 'image', label: 'Image', type: 'file', accept: 'image/*', required: false }
@@ -7702,7 +7640,7 @@
         }).addTo(map);
 
         // Fallback to default OSM if the colorful tiles fail
-        tileLayer.on('tileerror', function() {
+        tileLayer.on('tileerror', function () {
           console.log('Colorful tiles failed, falling back to default OSM');
           map.removeLayer(tileLayer);
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -7712,7 +7650,7 @@
         });
 
         // Add tile load success handler
-        tileLayer.on('tileload', function() {
+        tileLayer.on('tileload', function () {
           console.log('Map tiles loaded successfully');
         });
 
@@ -7815,7 +7753,7 @@
       function initializeLocationServices() {
         if (navigator.geolocation) {
           console.log('Initializing HIGH-PRECISION location services...');
-          
+
           // Get initial high-accuracy position with better settings
           navigator.geolocation.getCurrentPosition(
             function (position) {
@@ -7838,7 +7776,7 @@
               maximumAge: 30000 // Accept cached position up to 30 seconds old
             }
           );
-          
+
           // Watch position for real-time updates with maximum precision
           const watchId = navigator.geolocation.watchPosition(
             function (position) {
@@ -7857,7 +7795,7 @@
 
           // Store watch ID for cleanup
           window.locationWatchId = watchId;
-          
+
           console.log('High-precision location tracking started');
         } else {
           console.error('Geolocation not supported');
@@ -7889,7 +7827,7 @@
             currentLocation.lat, currentLocation.lng,
             newLocation.lat, newLocation.lng
           );
-          
+
           // Only update if movement is significant (>2 meters) or accuracy improved significantly
           if (distance < 2 && newLocation.accuracy >= currentLocation.accuracy) {
             console.log('📍 Filtering out minor movement:', distance.toFixed(1) + 'm');
@@ -7911,7 +7849,7 @@
         // Instant map marker update
         if (window.userMarker) {
           window.userMarker.setLatLng([newLocation.lat, newLocation.lng]);
-          
+
           // Enhanced pulsing effect for instant feedback
           const markerElement = window.userMarker.getElement();
           if (markerElement) {
@@ -7924,9 +7862,6 @@
 
         // Clear any duplicate markers that might have been created
         clearDuplicateMarkers();
-
-        // Instant location display update
-        updateLocationDisplay(newLocation);
 
         // Update group location if sharing (with instant feedback)
         if (isSharingLocation) {
@@ -7946,7 +7881,7 @@
       // Handle location errors with specific feedback
       function handleLocationError(error) {
         let message = 'Location error: ';
-        switch(error.code) {
+        switch (error.code) {
           case error.PERMISSION_DENIED:
             message += 'Please enable location access in your browser settings.';
             break;
@@ -7967,7 +7902,7 @@
         if (navigator.geolocation) {
           console.log('🔄 Manual location refresh requested');
           showNotification('Getting fresh location...', 'info');
-          
+
           navigator.geolocation.getCurrentPosition(
             function (position) {
               console.log('✅ Manual location refresh successful');
@@ -7999,8 +7934,8 @@
         const Δλ = (lon2 - lon1) * Math.PI / 180;
 
         const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-                  Math.cos(φ1) * Math.cos(φ2) *
-                  Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+          Math.cos(φ1) * Math.cos(φ2) *
+          Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         return R * c; // Distance in meters
@@ -8023,42 +7958,7 @@
         }
       }
 
-      // Update location display with high-precision details
-      function updateLocationDisplay(location) {
-        const locationDisplay = document.getElementById('locationDisplay');
-        if (locationDisplay) {
-          locationDisplay.style.display = 'block';
-          
-          // Format accuracy with color coding (hidden numbers for privacy)
-          const accuracyColor = location.accuracy <= 5 ? '#22c55e' : 
-                               location.accuracy <= 10 ? '#eab308' : '#ef4444';
-          const accuracyText = location.accuracy <= 5 ? 'High' : 
-                              location.accuracy <= 10 ? 'Good' : 'Low';
-          
-          // Format speed if available (hidden for privacy)
-          const speedText = location.speed ? 
-            ` | Moving` : '';
-          
-          // Format heading if available (hidden for privacy)
-          const headingText = location.heading ? 
-            ` | Direction` : '';
-          
-          locationDisplay.innerHTML = `
-            <div class="location-info">
-              <span class="location-icon">📍</span>
-              <span class="location-accuracy" style="color: ${accuracyColor}">${accuracyText}</span>
-              <span class="location-details">${speedText}${headingText}</span>
-              <span class="location-time">${new Date().toLocaleTimeString()}</span>
-            </div>
-          `;
-          
-          // Add instant update animation
-          locationDisplay.classList.add('location-update');
-          setTimeout(() => {
-            locationDisplay.classList.remove('location-update');
-          }, 300);
-        }
-      }
+
 
       // Panel controls
       function togglePanel() {
