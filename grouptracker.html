@@ -3552,6 +3552,13 @@
             authOverlay.style.display = 'none';
           }
 
+          // Show app content
+          const appContent = document.getElementById('appContent');
+          if (appContent) {
+            appContent.classList.add('authenticated');
+            console.log('App content authenticated class added');
+          }
+
           // Show user profile
           const userProfile = document.getElementById('userProfile');
           if (userProfile) {
