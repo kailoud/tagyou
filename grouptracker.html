@@ -6931,13 +6931,13 @@
               <td data-label="Details">
                 <div class="item-details">
                   ${item.location ? `<div>📍 ${item.location}</div>` : ''}
-                  ${item.currentLocation ? `<div>📍 ${item.currentLocation}</div>` : ''}
+                  ${item.current_location ? `<div>📍 ${item.current_location}</div>` : ''}
                   ${item.type ? `<div>${item.type}</div>` : ''}
                   ${item.memberCount ? `<div>👥 ${item.memberCount} members</div>` : ''}
                   ${item.hours ? `<div>🕐 ${item.hours}</div>` : ''}
                   ${item.rating ? `<div>⭐ ${item.rating}/5</div>` : ''}
-                  ${item.trackingMethod ? `<div class="tracking-badge">📡 ${item.trackingMethod}</div>` : ''}
-                  ${item.nextStop ? `<div>➡️ Next: ${item.nextStop} (${item.estimatedArrival})</div>` : ''}
+                  ${item.tracking_method ? `<div class="tracking-badge">📡 ${item.tracking_method}</div>` : ''}
+                  ${item.next_stop ? `<div>➡️ Next: ${item.next_stop} (${item.estimated_arrival})</div>` : ''}
                 </div>
               </td>
               <td data-label="Contact">
@@ -7060,16 +7060,16 @@
           'float-trucks': [
             { key: 'name', label: 'Float Truck Name', type: 'text', required: true },
             { key: 'category', label: 'Category', type: 'select', options: ['Drinks & Smoothies', 'Ice Cream', 'Snacks', 'Entertainment', 'Food Truck', 'Other'], required: true },
-            { key: 'currentLocation', label: 'Current Location', type: 'text', required: true },
+            { key: 'current_location', label: 'Current Location', type: 'text', required: true },
             { key: 'coordinates', label: 'Coordinates (lat, lng)', type: 'coordinates', required: true },
             { key: 'phone', label: 'Phone', type: 'tel', required: true },
             { key: 'email', label: 'Email', type: 'email', required: true },
             { key: 'schedule', label: 'Schedule', type: 'text', required: true },
-            { key: 'trackingMethod', label: 'Tracking Method', type: 'select', options: ['gps', 'mobile-app', 'social-media', 'hybrid'], required: true },
-            { key: 'gpsTrackerId', label: 'GPS Tracker ID', type: 'text', required: false },
-            { key: 'driverPhone', label: 'Driver Phone', type: 'tel', required: false },
-            { key: 'nextStop', label: 'Next Stop', type: 'text', required: false },
-            { key: 'estimatedArrival', label: 'Estimated Arrival', type: 'time', required: false },
+            { key: 'tracking_method', label: 'Tracking Method', type: 'select', options: ['gps', 'mobile-app', 'social-media', 'hybrid'], required: true },
+                    { key: 'gps_tracker_id', label: 'GPS Tracker ID', type: 'text', required: false },
+        { key: 'driver_phone', label: 'Driver Phone', type: 'tel', required: false },
+        { key: 'next_stop', label: 'Next Stop', type: 'text', required: false },
+        { key: 'estimated_arrival', label: 'Estimated Arrival', type: 'time', required: false },
             { key: 'rating', label: 'Rating', type: 'number', min: 0, max: 5, step: 0.1, required: false },
             { key: 'description', label: 'Description', type: 'textarea', required: false },
             { key: 'image', label: 'Image', type: 'file', accept: 'image/*', required: false }
