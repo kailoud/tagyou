@@ -4085,7 +4085,11 @@
 
           console.log('Body and HTML forced to have proper dimensions');
 
-          checkAuthentication();
+          // Force map to show immediately
+          console.log('FORCING MAP TO SHOW NOW!');
+          setTimeout(() => {
+            initializeMap();
+          }, 100);
         });
 
         // Map validation helper
@@ -4156,6 +4160,14 @@
           console.log('Map initialized successfully');
           console.log('Map object:', map);
           console.log('=== MAP INITIALIZATION COMPLETE ===');
+        }
+
+        // EMERGENCY MAP SHOW - Run immediately
+        console.log('EMERGENCY: Attempting to show map immediately');
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initializeMap);
+        } else {
+          initializeMap();
         }
 
         // Location services
