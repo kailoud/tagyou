@@ -4133,6 +4133,9 @@
             <div class="password-match" id="passwordMatch"></div>
           </div>
           <button type="submit" class="auth-btn">Create Account</button>
+          <div class="auth-links">
+            <a href="#" onclick="switchAuthTab('login')">Already have an account? Sign In</a>
+          </div>
         </form>
         
         <!-- Forgot Password Form -->
@@ -4904,7 +4907,10 @@
 
         async function checkAuthStatus() {
           try {
+            console.log('Checking auth status...'); // Debug log
             const { data: { user }, error } = await supabase.auth.getUser();
+            
+            console.log('Auth check result:', { user: !!user, error }); // Debug log
             
             if (error) throw error;
             
@@ -4918,16 +4924,28 @@
               isAuthenticated = true;
               isProUser = user.email.endsWith('@admin.com') || user.email === 'demo@tagyou.com';
               
+              console.log('User authenticated:', currentUser); // Debug log
+              
               // Hide auth overlay and show app
-              document.getElementById('authOverlay').style.display = 'none';
-              document.getElementById('appContent').classList.add('authenticated');
+              const authOverlay = document.getElementById('authOverlay');
+              const appContent = document.getElementById('appContent');
+              
+              if (authOverlay) {
+                authOverlay.style.display = 'none';
+                console.log('Auth overlay hidden'); // Debug log
+              }
+              
+              if (appContent) {
+                appContent.classList.add('authenticated');
+                console.log('App content authenticated class added'); // Debug log
+              }
               
               // Initialize app
               initializeApp();
               
-              console.log('User authenticated:', currentUser);
             } else {
               // User is not authenticated
+              console.log('No authenticated user found'); // Debug log
               showAuthOverlay();
             }
           } catch (error) {
@@ -5031,10 +5049,55 @@
             
             if (error) throw error;
             
-            showAuthMessage('Account created successfully! Please check your email to verify your account.', 'success');
-            
-            // Clear form
-            event.target.reset();
+            // Check if email confirmation is required
+            if (data.user && !data.user.email_confirmed_at) {
+              showAuthMessage('Account created successfully! Please check your email to verify your account, then sign in.', 'success');
+              
+              // Clear form
+              event.target.reset();
+              
+              // Switch back to login tab after 2 seconds
+              setTimeout(() => {
+                switchAuthTab('login');
+                showAuthMessage('Please check your email and sign in with your new account.', 'info');
+              }, 2000);
+            } else {
+              // If email confirmation is not required, log in immediately
+              showAuthMessage('Account created successfully! Logging you in...', 'success');
+              
+              // Automatically sign in the user
+              try {
+                const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+                  email: email,
+                  password: password
+                });
+                
+                if (signInError) throw signInError;
+                
+                // Update user state
+                currentUser = {
+                  id: signInData.user.id,
+                  email: signInData.user.email,
+                  name: signInData.user.user_metadata?.full_name || email.split('@')[0]
+                };
+                isAuthenticated = true;
+                isProUser = email.endsWith('@admin.com') || email === 'demo@tagyou.com';
+                
+                // Hide auth overlay and show app
+                document.getElementById('authOverlay').style.display = 'none';
+                document.getElementById('appContent').classList.add('authenticated');
+                
+                // Initialize app
+                initializeApp();
+                
+                showAuthMessage('Welcome! You are now logged in.', 'success');
+                
+              } catch (signInError) {
+                console.error('Auto-login error:', signInError);
+                showAuthMessage('Account created! Please sign in manually.', 'info');
+                switchAuthTab('login');
+              }
+            }
             
           } catch (error) {
             console.error('Registration error:', error);
