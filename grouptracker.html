@@ -5438,6 +5438,53 @@
         console.log('Local logout completed');
       }
 
+      // Debug function to check admin status
+      async function debugAdminStatus() {
+        console.log('=== ADMIN STATUS DEBUG ===');
+        console.log('Current user:', currentUser);
+        console.log('isAuthenticated:', isAuthenticated);
+        console.log('isProUser:', isProUser);
+
+        if (currentUser && supabase) {
+          try {
+            // Check user profile in database
+            const { data: profileData, error: profileError } = await supabase
+              .from('user_profiles')
+              .select('*')
+              .eq('email', currentUser.email)
+              .single();
+
+            console.log('Database profile:', profileData);
+            console.log('Profile error:', profileError);
+
+            if (profileData) {
+              console.log('Admin status from DB:', {
+                is_admin: profileData.is_admin,
+                role: profileData.role,
+                email: profileData.email
+              });
+            }
+          } catch (error) {
+            console.error('Error checking database profile:', error);
+          }
+        }
+
+        // Check localStorage
+        console.log('localStorage isProUser:', localStorage.getItem('isProUser'));
+
+        // Check admin portal element
+        const adminPortal = document.getElementById('adminPortalMenuItem');
+        console.log('Admin portal element:', adminPortal);
+        if (adminPortal) {
+          console.log('Admin portal display style:', adminPortal.style.display);
+        }
+
+        console.log('=== END DEBUG ===');
+      }
+
+      // Add debug function to window for console access
+      window.debugAdminStatus = debugAdminStatus;
+
       // Email Verification Popup
       function showEmailVerificationPopup(email) {
         // Create popup overlay
