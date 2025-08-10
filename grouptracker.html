@@ -4147,9 +4147,21 @@
               return;
             }
 
+            // Wait a moment for map to be fully ready
+            setTimeout(() => {
+              if (map && map.setView) {
+                console.log('Map is fully ready');
+                // Set a default view first to ensure map is working
+                map.setView([51.5074, -0.1278], 16);
+                console.log('Map set to default view');
+              } else {
+                console.error('Map not ready after delay');
+              }
+            }, 100);
+
             console.log('Map initialized successfully');
 
-            // Try to get user location immediately
+            // Try to get user location as a secondary step
             if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(function (position) {
                 try {
@@ -4189,13 +4201,25 @@
 
                   // Smoothly fly to user location with additional validation
                   try {
-                    map.flyTo(currentLocation, 16, {
+                    // Double-check coordinates right before flyTo
+                    console.log('About to flyTo with coordinates:', currentLocation);
+                    if (isNaN(currentLocation.lat) || isNaN(currentLocation.lng)) {
+                      console.error('Coordinates became NaN before flyTo:', currentLocation);
+                      map.setView([51.5074, -0.1278], 16);
+                      return;
+                    }
+
+                    // Create a fresh coordinate object to avoid any reference issues
+                    const flyCoords = [currentLocation.lat, currentLocation.lng];
+                    console.log('Flying to coordinates:', flyCoords);
+
+                    map.flyTo(flyCoords, 16, {
                       duration: 1.5
                     });
                   } catch (flyError) {
                     console.error('Error flying to location:', flyError);
                     // Fallback to setView if flyTo fails
-                    map.setView(currentLocation, 16);
+                    map.setView([51.5074, -0.1278], 16);
                   }
 
                   console.log('Location found:', currentLocation);
@@ -4219,15 +4243,15 @@
                       })
                     }).addTo(map).bindPopup('You are here (default location)');
 
-                    map.setView(currentLocation, 16);
+                    map.setView([currentLocation.lat, currentLocation.lng], 16);
                   }
                 } catch (markerError) {
                   console.error('Error adding default location marker:', markerError);
                 }
               }, {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 60000
+                enableHighAccuracy: false, // Use false to avoid potential issues
+                timeout: 5000, // Shorter timeout
+                maximumAge: 300000 // 5 minutes
               });
             } else {
               console.log('Geolocation not supported, using default location');
@@ -4244,7 +4268,7 @@
                     })
                   }).addTo(map).bindPopup('You are here (default location)');
 
-                  map.setView(currentLocation, 16);
+                  map.setView([currentLocation.lat, currentLocation.lng], 16);
                 }
               } catch (markerError) {
                 console.error('Error adding default location marker:', markerError);
