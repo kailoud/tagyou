@@ -4229,6 +4229,85 @@
       font-weight: 500;
       color: #333;
     }
+
+    /* Live location update animation */
+    .location-update {
+      animation: pulse-location 1s ease-in-out;
+    }
+
+    @keyframes pulse-location {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    /* Modern map controls */
+    .leaflet-control-zoom {
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+
+    .leaflet-control-zoom a {
+      background: white;
+      color: #333;
+      border: none;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+
+    .leaflet-control-zoom a:hover {
+      background: #f0f0f0;
+      color: #000;
+    }
+
+    /* Location display styles */
+    .location-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #666;
+      background: rgba(255,255,255,0.9);
+      padding: 4px 8px;
+      border-radius: 6px;
+      backdrop-filter: blur(10px);
+    }
+
+    .location-icon {
+      color: #ff6b35;
+      font-size: 14px;
+    }
+
+    .location-coords {
+      font-family: monospace;
+      font-weight: 500;
+    }
+
+    .location-accuracy {
+      color: #888;
+      font-size: 11px;
+    }
+
+    .location-time {
+      color: #666;
+      font-size: 11px;
+    }
+
+    /* Location display container */
+    .location-display {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: rgba(255,255,255,0.95);
+      border-radius: 12px;
+      padding: 8px 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
   </style>
 </head>
 
@@ -4373,6 +4452,16 @@
           <path
             d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
         </svg>
+      </div>
+
+      <!-- Live Location Display -->
+      <div id="locationDisplay" class="location-display" style="display: none;">
+        <div class="location-info">
+          <span class="location-icon">📍</span>
+          <span class="location-coords">Getting location...</span>
+          <span class="location-accuracy"></span>
+          <span class="location-time"></span>
+        </div>
       </div>
 
       <!-- Festival Dropdown -->
@@ -7569,9 +7658,11 @@
           zoomControl: false
         }).setView([51.5074, -0.1278], 16);
 
-        // Add tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors'
+        // Add modern colorful tiles
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+          attribution: '© OpenStreetMap contributors, © CARTO',
+          subdomains: 'abcd',
+          maxZoom: 19
         }).addTo(map);
 
         // Add user marker with avatar
@@ -7635,6 +7726,9 @@
         // Mark map as initialized
         window.mapInitialized = true;
 
+        // Initialize location services for live updates
+        initializeLocationServices();
+
         console.log('Map initialized successfully');
         console.log('Map object:', map);
         console.log('=== MAP INITIALIZATION COMPLETE ===');
@@ -7651,19 +7745,74 @@
         }
       }
 
-      // Location services
+      // Location services with live updates
       function initializeLocationServices() {
         if (navigator.geolocation) {
-          navigator.geolocation.watchPosition(function (position) {
-            currentLocation = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
+          console.log('Initializing location services with live updates...');
+          
+          // Watch position for real-time updates
+          navigator.geolocation.watchPosition(
+            function (position) {
+              const newLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+                accuracy: position.coords.accuracy,
+                timestamp: new Date().toISOString()
+              };
 
-            if (isSharingLocation) {
-              updateLocationInGroup();
+              // Update current location
+              currentLocation = newLocation;
+
+              // Update user marker on map
+              if (window.userMarker) {
+                window.userMarker.setLatLng([newLocation.lat, newLocation.lng]);
+                
+                // Add pulsing effect for live updates
+                window.userMarker.getElement()?.classList.add('location-update');
+                setTimeout(() => {
+                  window.userMarker.getElement()?.classList.remove('location-update');
+                }, 1000);
+              }
+
+              // Update group location if sharing
+              if (isSharingLocation) {
+                updateLocationInGroup();
+              }
+
+              // Update location display
+              updateLocationDisplay(newLocation);
+              
+              console.log('Location updated:', newLocation);
+            },
+            function (error) {
+              console.error('Location error:', error);
+              showNotification('Location access denied. Please enable location services.', 'error');
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 30000 // Update every 30 seconds
             }
-          });
+          );
+        } else {
+          console.error('Geolocation not supported');
+          showNotification('Location services not supported by your browser.', 'error');
+        }
+      }
+
+      // Update location display
+      function updateLocationDisplay(location) {
+        const locationDisplay = document.getElementById('locationDisplay');
+        if (locationDisplay) {
+          locationDisplay.style.display = 'block';
+          locationDisplay.innerHTML = `
+            <div class="location-info">
+              <span class="location-icon">📍</span>
+              <span class="location-coords">${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}</span>
+              <span class="location-accuracy">±${Math.round(location.accuracy)}m</span>
+              <span class="location-time">${new Date().toLocaleTimeString()}</span>
+            </div>
+          `;
         }
       }
 
