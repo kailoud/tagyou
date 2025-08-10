@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FestivalFinder</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100vw;
+            z-index: 1;
+        }
+
+        .top-bar {
+            position: absolute;
+            top: 20px;
+            left: 16px;
+            right: 16px;
+            z-index: 1000;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-box {
+            width: 100%;
+            height: 48px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            padding: 0 16px 0 48px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            pointer-events: none;
+        }
+
+        .group-btn {
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 8px;
+            background: #ff6b35;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .group-indicator {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 20px;
+            height: 20px;
+            background: #4caf50;
+            border-radius: 10px;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .bottom-panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 -2px 16px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            transform: translateY(calc(100% - 80px));
+        }
+
+        .bottom-panel.expanded {
+            transform: translateY(0);
+        }
+
+        .panel-handle {
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .handle-bar {
+            width: 32px;
+            height: 4px;
+            background: #ddd;
+            border-radius: 2px;
+        }
+
+        .panel-tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            color: #ff6b35;
+            border-bottom-color: #ff6b35;
+        }
+
+        .panel-content {
+            padding: 0 20px 32px;
+            max-height: 60vh;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .panel-content.active {
+            display: block;
+        }
+
+        .member-item {
+            padding: 16px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .member-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .status-indicator {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            border: 2px solid white;
+        }
+
+        .online { background: #4caf50; }
+        .away { background: #ffc107; }
+        .offline { background: #757575; }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-info h3 {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .member-info p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .member-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 18px;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .locate-btn {
+            background: #e3f2fd;
+            color: #2196f3;
+        }
+
+        .floating-controls {
+            position: absolute;
+            right: 16px;
+            bottom: 120px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .control-btn {
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 24px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .my-location-btn {
+            background: #4285f4;
+            color: white;
+        }
+
+        .share-location-fab {
+            position: absolute;
+            bottom: 96px;
+            right: 16px;
+            width: 56px;
+            height: 56px;
+            border: none;
+            border-radius: 28px;
+            background: #4caf50;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-location-fab.sharing {
+            background: #ff5722;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+            50% { box-shadow: 0 4px 20px rgba(255, 87, 34, 0.4); }
+            100% { box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .modal-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: #ff6b35;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .group-code {
+            background: #e3f2fd;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 16px 0;
+            font-family: monospace;
+            font-size: 24px;
+            font-weight: bold;
+            color: #1976d2;
+            letter-spacing: 2px;
+        }
+
+        .emergency-banner {
+            position: absolute;
+            top: 80px;
+            left: 16px;
+            right: 16px;
+            background: #ff5722;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            z-index: 999;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            animation: emergencyBlink 1s infinite alternate;
+        }
+
+        @keyframes emergencyBlink {
+            from { opacity: 1; }
+            to { opacity: 0.7; }
+        }
+
+        .distance-info {
+            font-size: 12px;
+            color: #4caf50;
+            font-weight: 500;
+        }
+
+        @media (max-width: 480px) {
+            .top-bar {
+                top: 10px;
+                left: 12px;
+                right: 12px;
+            }
+            
+            .floating-controls {
+                right: 12px;
+                bottom: 100px;
+            }
+            
+            .share-location-fab {
+                right: 12px;
+                bottom: 76px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <div class="emergency-banner" id="emergencyBanner">
+        <span>🚨</span>
+        <span>Emergency Alert: Sarah needs help!</span>
+        <button onclick="hideEmergencyBanner()" style="margin-left: auto; background: none; border: none; color: white; font-size: 18px;">×</button>
+    </div>
+    
+    <div class="top-bar">
+        <button class="group-btn" onclick="showGroupModal()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A3.01 3.01 0 0 0 17.11 7c-.8 0-1.54.37-2.01.97l-.65.65c-.36.36-.36.95 0 1.31l.65.65c.36.36.95.36 1.31 0l.33-.33L18 14h-2v8h4zM12.5 11.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S11 9.17 11 10s.67 1.5 1.5 1.5zM5.5 6c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2zm2 16v-7H9V9.5C9 8.12 7.88 7 6.5 7S4 8.12 4 9.5V15H5.5v7h2zm6-10.5c1.25 0 2.25-1 2.25-2.25S14.75 7 13.5 7s-2.25 1-2.25 2.25 1 2.25 2.25 2.25zM15.5 22v-6h1.5V10.5C17 9.12 15.88 8 14.5 8S12 9.12 12 10.5V16h1.5v6h2z"/>
+            </svg>
+            <div class="group-indicator" id="groupCount">4</div>
+        </button>
+        <div class="search-container">
+            <input type="text" class="search-box" placeholder="Find group member by phone..." id="searchInput" oninput="searchMembers()">
+            <svg class="search-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+        </div>
+    </div>
+
+    <div class="floating-controls">
+        <button class="control-btn" onclick="zoomIn()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+        </button>
+        <button class="control-btn" onclick="zoomOut()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13H5v-2h14v2z"/>
+            </svg>
+        </button>
+        <button class="control-btn my-location-btn" onclick="centerOnMe()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
+            </svg>
+        </button>
+    </div>
+
+    <button class="share-location-fab" id="shareBtn" onclick="toggleLocationSharing()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+        </svg>
+    </button>
+
+    <div class="bottom-panel" id="bottomPanel">
+        <div class="panel-handle" onclick="togglePanel()">
+            <div class="handle-bar"></div>
+        </div>
+        <div class="panel-tabs">
+            <div class="tab active" onclick="switchTab('members')">Group</div>
+            <div class="tab" onclick="switchTab('emergency')">Emergency</div>
+            <div class="tab" onclick="switchTab('settings')">Settings</div>
+        </div>
+        
+        <div class="panel-content active" id="members-content">
+            <div class="member-item">
+                <div class="member-avatar">
+                    You
+                    <div class="status-indicator online"></div>
+                </div>
+                <div class="member-info">
+                    <h3>Alex (You)</h3>
+                    <p>+44 7700 900123</p>
+                    <div class="distance-info">Location sharing: ON</div>
+                </div>
+                <div class="member-actions">
+                    <button class="action-btn locate-btn" onclick="centerOnMe()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="member-item">
+                <div class="member-avatar">
+                    S
+                    <div class="status-indicator online"></div>
+                </div>
+                <div class="member-info">
+                    <h3>Sarah</h3>
+                    <p>+44 7700 900124</p>
+                    <div class="distance-info">120m away • Main Stage</div>
+                </div>
+                <div class="member-actions">
+                    <button class="action-btn locate-btn" onclick="locateMember('sarah')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                    </button>
+                    <button class="action-btn" onclick="callMember('+44 7700 900124')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="member-item">
+                <div class="member-avatar">
+                    M
+                    <div class="status-indicator away"></div>
+                </div>
+                <div class="member-info">
+                    <h3>Mike</h3>
+                    <p>+44 7700 900125</p>
+                    <div class="distance-info">350m away • Food Court</div>
+                </div>
+                <div class="member-actions">
+                    <button class="action-btn locate-btn" onclick="locateMember('mike')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                    </button>
+                    <button class="action-btn" onclick="callMember('+44 7700 900125')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="member-item">
+                <div class="member-avatar">
+                    J
+                    <div class="status-indicator online"></div>
+                </div>
+                <div class="member-info">
+                    <h3>Jenny</h3>
+                    <p>+44 7700 900126</p>
+                    <div class="distance-info">80m away • Merchandise Stand</div>
+                </div>
+                <div class="member-actions">
+                    <button class="action-btn locate-btn" onclick="locateMember('jenny')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                    </button>
+                    <button class="action-btn" onclick="callMember('+44 7700 900126')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel-content" id="emergency-content">
+            <div style="text-align: center; padding: 20px 0;">
+                <div style="font-size: 48px; margin-bottom: 16px;">🚨</div>
+                <h3 style="margin-bottom: 16px; color: #ff5722;">Emergency Features</h3>
+                <button class="btn btn-primary" onclick="sendEmergencyAlert()" style="width: 100%; margin-bottom: 12px; background: #ff5722;">
+                    Send Emergency Alert
+                </button>
+                <button class="btn btn-secondary" onclick="shareLocationWithAuthorities()" style="width: 100%; margin-bottom: 12px;">
+                    Share Location with Security
+                </button>
+                <p style="font-size: 14px; color: #666; margin-top: 16px;">
+                    Emergency alerts notify all group members and can automatically contact event security if enabled.
+                </p>
+            </div>
+        </div>
+        
+        <div class="panel-content" id="settings-content">
+            <div style="padding: 20px 0;">
+                <div class="input-group">
+                    <label class="input-label">Your Name</label>
+                    <input type="text" class="input-field" value="Alex" id="userName">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Your Phone</label>
+                    <input type="tel" class="input-field" value="+44 7700 900123" id="userPhone">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Location Sharing</label>
+                    <select class="input-field" id="locationSharing">
+                        <option value="always">Always On</option>
+                        <option value="group">Only with Group</option>
+                        <option value="manual">Manual Only</option>
+                        <option value="off">Off</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="leaveGroup()" style="width: 100%; background: #ff5722; margin-top: 20px;">
+                    Leave Current Group
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Group Management Modal -->
+    <div class="modal" id="groupModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Group Management</h2>
+                <p class="modal-subtitle">Join or create a festival group</p>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">Join Group by Code</label>
+                <input type="text" class="input-field" placeholder="Enter 6-digit code" id="joinCode" maxlength="6">
+            </div>
+            
+            <button class="btn btn-primary" onclick="joinGroup()" style="width: 100%; margin-bottom: 20px;">
+                Join Group
+            </button>
+            
+            <div style="text-align: center; margin: 20px 0; color: #666;">OR</div>
+            
+            <div class="input-group">
+                <label class="input-label">Create New Group</label>
+                <input type="text" class="input-field" placeholder="Group name (e.g., Festival Squad 2025)" id="groupName">
+            </div>
+            
+            <button class="btn btn-primary" onclick="createGroup()" style="width: 100%; margin-bottom: 20px;">
+                Create Group
+            </button>
+            
+            <div id="currentGroupInfo" style="display: none;">
+                <div style="text-align: center; margin: 20px 0;">
+                    <h3>Current Group Code

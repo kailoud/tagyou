@@ -31,8 +31,8 @@
   },
   "homepage": "https://yourdomain.com",
   "devDependencies": {
-    "serve": "^14.2.1",
-    "live-server": "^1.2.2"
+    "live-server": "^1.2.0",
+    "serve": "^10.0.2"
   },
   "engines": {
     "node": ">=14.0.0"

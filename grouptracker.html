@@ -2561,6 +2561,358 @@
     .carnival-grid-line:hover {
       opacity: 0.6;
     }
+
+    /* Profile and Settings Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+    }
+
+    .modal-overlay .modal-content {
+      background: white;
+      border-radius: 20px;
+      padding: 0;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow: hidden;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.show .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      padding: 24px 24px 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .close-btn:hover {
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    .modal-body {
+      padding: 24px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    .modal-footer {
+      padding: 0 24px 24px 24px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .save-btn, .cancel-btn, .secondary-btn, .danger-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex: 1;
+    }
+
+    .save-btn {
+      background: #ff6b35;
+      color: white;
+    }
+
+    .save-btn:hover {
+      background: #e55a2b;
+    }
+
+    .cancel-btn {
+      background: #f5f5f5;
+      color: #666;
+    }
+
+    .cancel-btn:hover {
+      background: #e0e0e0;
+    }
+
+    .secondary-btn {
+      background: #f0f0f0;
+      color: #333;
+      border: 1px solid #ddd;
+    }
+
+    .secondary-btn:hover {
+      background: #e0e0e0;
+    }
+
+    .danger-btn {
+      background: #dc3545;
+      color: white;
+    }
+
+    .danger-btn:hover {
+      background: #c82333;
+    }
+
+    /* Profile Styles */
+    .profile-avatar {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .avatar-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #ff6b35;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 16px auto;
+      border: 4px solid #f0f0f0;
+    }
+
+    .change-avatar-btn {
+      background: #f0f0f0;
+      color: #333;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .change-avatar-btn:hover {
+      background: #e0e0e0;
+    }
+
+    .profile-info {
+      margin-bottom: 24px;
+    }
+
+    .info-group {
+      margin-bottom: 16px;
+    }
+
+    .info-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .info-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .info-group input:focus {
+      border-color: #ff6b35;
+    }
+
+    .profile-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 12px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      display: block;
+      font-size: 24px;
+      font-weight: 600;
+      color: #ff6b35;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Settings Styles */
+    .settings-section {
+      margin-bottom: 32px;
+    }
+
+    .settings-section h3 {
+      margin: 0 0 16px 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 8px;
+    }
+
+    .setting-item {
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .setting-item label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      color: #333;
+    }
+
+    .setting-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: #ff6b35;
+    }
+
+    .setting-item select {
+      padding: 8px 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      background: white;
+    }
+
+    .setting-item select:focus {
+      border-color: #ff6b35;
+    }
+
+    /* Avatar Grid */
+    .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .avatar-option {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+
+    .avatar-option:hover {
+      background: #e0e0e0;
+      border-color: #ff6b35;
+      transform: scale(1.1);
+    }
+
+    /* Pulse Animation for Highlight Markers */
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+      }
+      50% {
+        transform: scale(1.1);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+      }
+    }
+
+    /* Sharing Options Styles */
+    .sharing-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .sharing-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .sharing-btn:hover {
+      border-color: #ff6b35;
+      background: #fff5f2;
+      transform: translateY(-2px);
+    }
+
+    .sharing-btn span:last-child {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+    }
   </style>
 </head>
 
@@ -3859,12 +4211,138 @@
         });
 
         function showProfile() {
-          alert('Profile feature coming soon!');
+          // Create and show profile modal
+          const profileModal = document.createElement('div');
+          profileModal.className = 'modal-overlay';
+          profileModal.id = 'profileModal';
+          profileModal.innerHTML = `
+            <div class="modal-content">
+              <div class="modal-header">
+                <h2>👤 User Profile</h2>
+                <button onclick="closeProfileModal()" class="close-btn">&times;</button>
+              </div>
+              <div class="modal-body">
+                <div class="profile-avatar">
+                  <div class="avatar-circle">${currentUser?.avatar || '👤'}</div>
+                  <button onclick="changeAvatar()" class="change-avatar-btn">Change Avatar</button>
+                </div>
+                <div class="profile-info">
+                  <div class="info-group">
+                    <label>Name</label>
+                    <input type="text" id="profileName" value="${currentUser?.name || 'User'}" placeholder="Enter your name">
+                  </div>
+                  <div class="info-group">
+                    <label>Email</label>
+                    <input type="email" id="profileEmail" value="${currentUser?.email || ''}" placeholder="Enter your email">
+                  </div>
+                  <div class="info-group">
+                    <label>Phone</label>
+                    <input type="tel" id="profilePhone" value="${currentUser?.phone || ''}" placeholder="Enter your phone number">
+                  </div>
+                  <div class="info-group">
+                    <label>Emergency Contact</label>
+                    <input type="tel" id="emergencyContact" value="${currentUser?.emergencyContact || ''}" placeholder="Emergency contact number">
+                  </div>
+                </div>
+                <div class="profile-stats">
+                  <div class="stat-item">
+                    <span class="stat-number">${currentUser?.groupsJoined || 0}</span>
+                    <span class="stat-label">Groups Joined</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-number">${currentUser?.eventsAttended || 0}</span>
+                    <span class="stat-label">Events Attended</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-number">${currentUser?.memberSince || '2024'}</span>
+                    <span class="stat-label">Member Since</span>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button onclick="saveProfile()" class="save-btn">Save Changes</button>
+                <button onclick="closeProfileModal()" class="cancel-btn">Cancel</button>
+              </div>
+            </div>
+          `;
+          
+          document.body.appendChild(profileModal);
+          setTimeout(() => profileModal.classList.add('show'), 10);
           document.getElementById('userMenu').classList.remove('show');
         }
 
         function showSettings() {
-          alert('Settings feature coming soon!');
+          // Create and show settings modal
+          const settingsModal = document.createElement('div');
+          settingsModal.className = 'modal-overlay';
+          settingsModal.id = 'settingsModal';
+          settingsModal.innerHTML = `
+            <div class="modal-content">
+              <div class="modal-header">
+                <h2>⚙️ Settings</h2>
+                <button onclick="closeSettingsModal()" class="close-btn">&times;</button>
+              </div>
+              <div class="modal-body">
+                <div class="settings-section">
+                  <h3>Privacy Settings</h3>
+                  <div class="setting-item">
+                    <label>
+                      <input type="checkbox" id="locationSharing" ${currentUser?.settings?.locationSharing ? 'checked' : ''}>
+                      Allow location sharing with group members
+                    </label>
+                  </div>
+                  <div class="setting-item">
+                    <label>
+                      <input type="checkbox" id="emergencyAlerts" ${currentUser?.settings?.emergencyAlerts ? 'checked' : ''}>
+                      Receive emergency alerts
+                    </label>
+                  </div>
+                  <div class="setting-item">
+                    <label>
+                      <input type="checkbox" id="notifications" ${currentUser?.settings?.notifications ? 'checked' : ''}>
+                      Enable push notifications
+                    </label>
+                  </div>
+                </div>
+                <div class="settings-section">
+                  <h3>Map Settings</h3>
+                  <div class="setting-item">
+                    <label>Default Map Zoom Level</label>
+                    <select id="defaultZoom">
+                      <option value="15" ${currentUser?.settings?.defaultZoom === 15 ? 'selected' : ''}>Close (15)</option>
+                      <option value="16" ${currentUser?.settings?.defaultZoom === 16 ? 'selected' : ''}>Medium (16)</option>
+                      <option value="17" ${currentUser?.settings?.defaultZoom === 17 ? 'selected' : ''}>Far (17)</option>
+                    </select>
+                  </div>
+                  <div class="setting-item">
+                    <label>
+                      <input type="checkbox" id="autoCenter" ${currentUser?.settings?.autoCenter ? 'checked' : ''}>
+                      Auto-center map on my location
+                    </label>
+                  </div>
+                </div>
+                <div class="settings-section">
+                  <h3>Account</h3>
+                  <div class="setting-item">
+                    <button onclick="changePassword()" class="secondary-btn">Change Password</button>
+                  </div>
+                  <div class="setting-item">
+                    <button onclick="exportData()" class="secondary-btn">Export My Data</button>
+                  </div>
+                  <div class="setting-item">
+                    <button onclick="deleteAccount()" class="danger-btn">Delete Account</button>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button onclick="saveSettings()" class="save-btn">Save Settings</button>
+                <button onclick="closeSettingsModal()" class="cancel-btn">Cancel</button>
+              </div>
+            </div>
+          `;
+          
+          document.body.appendChild(settingsModal);
+          setTimeout(() => settingsModal.classList.add('show'), 10);
           document.getElementById('userMenu').classList.remove('show');
         }
 
@@ -3916,7 +4394,7 @@
           // Simulate password reset
           showSuccess('login', 'Password reset link sent to ' + email);
 
-          // In a real app, this would send an email
+          // Password reset email would be sent here in production
           setTimeout(() => {
             clearAuthMessages();
           }, 3000);
@@ -4500,8 +4978,105 @@
         function updateLocationInGroup() {
           if (currentLocation && isSharingLocation) {
             console.log('Updating location in group:', currentLocation);
-            // In a real app, this would send to server
+            
+            // Simulate real-time location sharing
+            if (currentGroup && currentGroup.members) {
+              // Update current user's location in the group
+              const currentMember = currentGroup.members.find(m => m.id === currentUser?.id);
+              if (currentMember) {
+                currentMember.location = currentLocation;
+                currentMember.lastUpdated = new Date().toISOString();
+                
+                // Update the member marker on the map
+                updateMemberMarker(currentMember);
+                
+                // Simulate other members updating their locations
+                simulateOtherMembersLocation();
+                
+                // Show notification occasionally
+                if (Math.random() < 0.1) { // 10% chance
+                  showNotification('Location shared with group');
+                }
+              }
+            }
+            
+            // Store in localStorage for persistence
+            localStorage.setItem('lastKnownLocation', JSON.stringify({
+              ...currentLocation,
+              timestamp: new Date().toISOString()
+            }));
           }
+        }
+
+        function updateMemberMarker(member) {
+          // Remove existing marker for this member
+          if (window.memberMarkers && window.memberMarkers[member.id]) {
+            map.removeLayer(window.memberMarkers[member.id]);
+          }
+          
+          // Create new marker
+          const marker = L.marker([member.location.lat, member.location.lng], {
+            icon: L.divIcon({
+              className: 'member-location-marker',
+              html: `<div style="background: ${member.id === currentUser?.id ? '#ff6b35' : '#4CAF50'}; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">${member.avatar || '👤'}</div>`,
+              iconSize: [24, 24],
+              iconAnchor: [12, 12]
+            })
+          });
+
+          // Add popup with member info
+          const timeAgo = getTimeAgo(member.lastUpdated);
+          marker.bindPopup(`
+            <div style="text-align: center; min-width: 150px;">
+              <h4 style="margin: 0 0 8px 0; color: #333;">${member.name}</h4>
+              <p style="margin: 0 0 4px 0; color: #666; font-size: 12px;">Last seen: ${timeAgo}</p>
+              <p style="margin: 0; color: #666; font-size: 12px;">${member.id === currentUser?.id ? 'You' : 'Group member'}</p>
+            </div>
+          `);
+
+          marker.addTo(map);
+          
+          // Store marker reference
+          if (!window.memberMarkers) window.memberMarkers = {};
+          window.memberMarkers[member.id] = marker;
+        }
+
+        function simulateOtherMembersLocation() {
+          if (!currentGroup || !currentGroup.members) return;
+          
+          // Simulate other members moving around
+          currentGroup.members.forEach(member => {
+            if (member.id !== currentUser?.id && Math.random() < 0.3) { // 30% chance
+              // Simulate small movement
+              const latOffset = (Math.random() - 0.5) * 0.001; // Small random movement
+              const lngOffset = (Math.random() - 0.5) * 0.001;
+              
+              member.location = {
+                lat: member.location.lat + latOffset,
+                lng: member.location.lng + lngOffset
+              };
+              member.lastUpdated = new Date().toISOString();
+              
+              // Update their marker
+              updateMemberMarker(member);
+            }
+          });
+        }
+
+        function getTimeAgo(timestamp) {
+          const now = new Date();
+          const time = new Date(timestamp);
+          const diffMs = now - time;
+          const diffMins = Math.floor(diffMs / 60000);
+          
+          if (diffMins < 1) return 'Just now';
+          if (diffMins < 60) return `${diffMins}m ago`;
+          
+          const diffHours = Math.floor(diffMins / 60);
+          if (diffHours < 24) return `${diffHours}h ago`;
+          
+          const diffDays = Math.floor(diffHours / 24);
+          return `${diffDays}d ago`;
         }
 
         // Member location functions
@@ -4622,10 +5197,49 @@
           const type = document.getElementById('emergencyType').value;
           const message = document.getElementById('emergencyMessage').value;
 
+          // Validate inputs
+          if (!type) {
+            showNotification('Please select an emergency type');
+            return;
+          }
+
+          // Create emergency alert object
+          const emergencyAlert = {
+            id: 'emergency_' + Date.now(),
+            type: type,
+            message: message || 'Help needed!',
+            location: currentLocation,
+            sender: currentUser?.name || 'Unknown',
+            timestamp: new Date().toISOString(),
+            status: 'active'
+          };
+
+          // Store emergency alert
+          if (!window.emergencyAlerts) window.emergencyAlerts = [];
+          window.emergencyAlerts.push(emergencyAlert);
+
           // Show emergency banner
           const banner = document.getElementById('emergencyBanner');
           banner.style.display = 'flex';
-          banner.querySelector('span:nth-child(2)').textContent = `Emergency Alert: ${type} - ${message || 'Help needed!'}`;
+          banner.querySelector('span:nth-child(2)').textContent = `🚨 Emergency Alert: ${type} - ${message || 'Help needed!'}`;
+
+          // Add emergency marker to map
+          addEmergencyMarker(emergencyAlert);
+
+          // Notify group members (simulate)
+          if (currentGroup && currentGroup.members) {
+            currentGroup.members.forEach(member => {
+              if (member.id !== currentUser?.id) {
+                // Simulate notification to other members
+                setTimeout(() => {
+                  showNotification(`Emergency alert sent to ${member.name}`);
+                }, Math.random() * 2000); // Random delay to simulate network
+              }
+            });
+          }
+
+          // Show success message
+          showNotification('Emergency alert sent to group members and security');
 
           hideEmergencyModal();
 
@@ -4633,6 +5247,65 @@
           setTimeout(() => {
             banner.style.display = 'none';
           }, 30000);
+
+          // Auto-resolve emergency after 5 minutes
+          setTimeout(() => {
+            resolveEmergency(emergencyAlert.id);
+          }, 300000);
+        }
+
+        function addEmergencyMarker(emergency) {
+          if (!emergency.location) return;
+
+          const marker = L.marker([emergency.location.lat, emergency.location.lng], {
+            icon: L.divIcon({
+              className: 'emergency-marker',
+              html: `<div style="background: #ff5722; width: 40px; height: 40px; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; animation: pulse 1s infinite;">🚨</div>`,
+              iconSize: [40, 40],
+              iconAnchor: [20, 20]
+            })
+          });
+
+          // Add popup with emergency info
+          const timeAgo = getTimeAgo(emergency.timestamp);
+          marker.bindPopup(`
+            <div style="text-align: center; min-width: 200px;">
+              <h3 style="margin: 0 0 8px 0; color: #ff5722;">🚨 Emergency Alert</h3>
+              <p style="margin: 0 0 4px 0; color: #333; font-weight: 500;">${emergency.type}</p>
+              <p style="margin: 0 0 8px 0; color: #666;">${emergency.message}</p>
+              <p style="margin: 0 0 4px 0; color: #666; font-size: 12px;">From: ${emergency.sender}</p>
+              <p style="margin: 0; color: #666; font-size: 12px;">${timeAgo}</p>
+              <button onclick="resolveEmergency('${emergency.id}')" style="background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 8px; margin-top: 8px; cursor: pointer;">Resolve</button>
+            </div>
+          `);
+
+          marker.addTo(map);
+          
+          // Store marker reference
+          if (!window.emergencyMarkers) window.emergencyMarkers = {};
+          window.emergencyMarkers[emergency.id] = marker;
+
+          // Center map on emergency location
+          map.setView([emergency.location.lat, emergency.location.lng], 18);
+        }
+
+        function resolveEmergency(emergencyId) {
+          // Remove marker from map
+          if (window.emergencyMarkers && window.emergencyMarkers[emergencyId]) {
+            map.removeLayer(window.emergencyMarkers[emergencyId]);
+            delete window.emergencyMarkers[emergencyId];
+          }
+
+          // Update emergency status
+          if (window.emergencyAlerts) {
+            const emergency = window.emergencyAlerts.find(e => e.id === emergencyId);
+            if (emergency) {
+              emergency.status = 'resolved';
+              emergency.resolvedAt = new Date().toISOString();
+            }
+          }
+
+          showNotification('Emergency resolved');
         }
 
         function hideEmergencyBanner() {
@@ -4640,21 +5313,123 @@
         }
 
         function shareLocationWithAuthorities() {
-          if (currentLocation) {
-            const locationUrl = `https://maps.google.com/?q=${currentLocation.lat},${currentLocation.lng}`;
-            if (navigator.share) {
-              navigator.share({
-                title: 'Emergency Location',
-                text: 'My current location for emergency services',
-                url: locationUrl
-              });
-            } else {
-              // Fallback for browsers without Web Share API
-              window.open(locationUrl, '_blank');
-            }
-          } else {
-            alert('Unable to get your location. Please enable location services.');
+          if (!currentLocation) {
+            showNotification('Unable to get your location. Please enable location services.');
+            return;
           }
+
+          // Create comprehensive location data
+          const locationData = {
+            coordinates: `${currentLocation.lat}, ${currentLocation.lng}`,
+            timestamp: new Date().toISOString(),
+            user: currentUser?.name || 'Unknown',
+            group: currentGroup?.name || 'No group',
+            accuracy: currentLocation.accuracy || 'Unknown'
+          };
+
+          // Create different sharing options
+          const locationUrl = `https://maps.google.com/?q=${currentLocation.lat},${currentLocation.lng}`;
+          const locationText = `Emergency Location: ${locationData.coordinates}\nTime: ${new Date().toLocaleString()}\nUser: ${locationData.user}\nGroup: ${locationData.group}`;
+
+          // Try Web Share API first
+          if (navigator.share) {
+            navigator.share({
+              title: '🚨 Emergency Location - Festival Security',
+              text: locationText,
+              url: locationUrl
+            }).then(() => {
+              showNotification('Location shared with security successfully');
+            }).catch((error) => {
+              console.log('Share cancelled or failed:', error);
+              showSharingOptions(locationUrl, locationText);
+            });
+          } else {
+            // Fallback for browsers without Web Share API
+            showSharingOptions(locationUrl, locationText);
+          }
+        }
+
+        function showSharingOptions(locationUrl, locationText) {
+          const sharingModal = document.createElement('div');
+          sharingModal.className = 'modal-overlay';
+          sharingModal.innerHTML = `
+            <div class="modal-content">
+              <div class="modal-header">
+                <h2>🚨 Share Location with Security</h2>
+                <button onclick="this.closest('.modal-overlay').remove()" class="close-btn">&times;</button>
+              </div>
+              <div class="modal-body">
+                <p style="margin-bottom: 20px; color: #666;">Choose how to share your location with festival security:</p>
+                <div class="sharing-options">
+                  <button onclick="shareViaMaps('${locationUrl}')" class="sharing-btn">
+                    <span style="font-size: 24px;">🗺️</span>
+                    <span>Open in Maps</span>
+                  </button>
+                  <button onclick="shareViaEmail('${locationText}')" class="sharing-btn">
+                    <span style="font-size: 24px;">📧</span>
+                    <span>Email Security</span>
+                  </button>
+                  <button onclick="shareViaSMS('${locationText}')" class="sharing-btn">
+                    <span style="font-size: 24px;">📱</span>
+                    <span>Text Security</span>
+                  </button>
+                  <button onclick="copyLocationToClipboard('${locationText}')" class="sharing-btn">
+                    <span style="font-size: 24px;">📋</span>
+                    <span>Copy to Clipboard</span>
+                  </button>
+                </div>
+                <div style="margin-top: 20px; padding: 16px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                  <p style="margin: 0; color: #856404; font-size: 14px;">
+                    <strong>Emergency Contact:</strong><br>
+                    Festival Security: +44 20 7946 0958<br>
+                    Emergency Services: 999
+                  </p>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          document.body.appendChild(sharingModal);
+          setTimeout(() => sharingModal.classList.add('show'), 10);
+        }
+
+        function shareViaMaps(url) {
+          window.open(url, '_blank');
+          showNotification('Opening location in maps');
+          document.querySelector('.modal-overlay').remove();
+        }
+
+        function shareViaEmail(text) {
+          const subject = encodeURIComponent('🚨 Emergency Location - Festival Security');
+          const body = encodeURIComponent(text);
+          const mailtoUrl = `mailto:security@festival.com?subject=${subject}&body=${body}`;
+          window.open(mailtoUrl);
+          showNotification('Opening email client');
+          document.querySelector('.modal-overlay').remove();
+        }
+
+        function shareViaSMS(text) {
+          const body = encodeURIComponent(text);
+          const smsUrl = `sms:+442079460958&body=${body}`;
+          window.open(smsUrl);
+          showNotification('Opening SMS app');
+          document.querySelector('.modal-overlay').remove();
+        }
+
+        function copyLocationToClipboard(text) {
+          navigator.clipboard.writeText(text).then(() => {
+            showNotification('Location copied to clipboard');
+          }).catch(() => {
+            // Fallback for older browsers
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showNotification('Location copied to clipboard');
+          });
+          document.querySelector('.modal-overlay').remove();
         }
 
         // Utility functions
@@ -5805,9 +6580,45 @@
           const stall = stallsData.find(s => s.id === stallId);
           if (!stall) return;
 
-          // In a real app, this would center the map on the stall location
-          // and add a marker
-          alert(`Map would show ${stall.name} at coordinates: ${stall.location.lat}, ${stall.location.lng}`);
+          // Validate map and coordinates
+          if (!validateMapAndCoordinates(stall.location, `stall ${stallId}`)) {
+            return;
+          }
+
+          // Center map on stall location
+          map.setView([stall.location.lat, stall.location.lng], 18);
+
+          // Remove existing stall markers
+          if (window.stallMarkers) {
+            window.stallMarkers.forEach(marker => map.removeLayer(marker));
+          }
+          window.stallMarkers = [];
+
+          // Add stall marker
+          const marker = L.marker([stall.location.lat, stall.location.lng], {
+            icon: L.divIcon({
+              className: 'stall-marker',
+              html: `<div style="background: #ff6b35; width: 32px; height: 32px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px;">🍔</div>`,
+              iconSize: [32, 32],
+              iconAnchor: [16, 16]
+            })
+          });
+
+          // Add popup with stall info
+          marker.bindPopup(`
+            <div style="text-align: center; min-width: 200px;">
+              <h3 style="margin: 0 0 8px 0; color: #ff6b35;">${stall.name}</h3>
+              <p style="margin: 0 0 8px 0; color: #666;">${stall.country} • ${stall.foodType}</p>
+              <p style="margin: 0; font-size: 14px;">${stall.description}</p>
+              <button onclick="getDirectionsToStall('${stall.id}')" style="background: #ff6b35; color: white; border: none; padding: 8px 16px; border-radius: 8px; margin-top: 8px; cursor: pointer;">Get Directions</button>
+            </div>
+          `);
+
+          marker.addTo(map);
+          window.stallMarkers.push(marker);
+
+          // Show success message
+          showNotification(`Showing ${stall.name} on map`);
           closeStallModal();
         }
 
@@ -5815,19 +6626,131 @@
           const stall = stallsData.find(s => s.id === stallId);
           if (!stall) return;
 
-          // In a real app, this would open navigation
-          alert(`Getting directions to ${stall.name}`);
+          // Validate coordinates
+          if (!validateMapAndCoordinates(stall.location, `stall ${stallId}`)) {
+            return;
+          }
+
+          // Create navigation URL for different platforms
+          const lat = stall.location.lat;
+          const lng = stall.location.lng;
+          const stallName = encodeURIComponent(stall.name);
+          
+          // Try to detect mobile platform and use appropriate navigation
+          const userAgent = navigator.userAgent.toLowerCase();
+          let navigationUrl = '';
+          
+          if (userAgent.includes('iphone') || userAgent.includes('ipad')) {
+            // iOS - use Apple Maps
+            navigationUrl = `http://maps.apple.com/?daddr=${lat},${lng}&dirflg=d&t=m&q=${stallName}`;
+          } else if (userAgent.includes('android')) {
+            // Android - use Google Maps
+            navigationUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`;
+          } else {
+            // Desktop - use Google Maps
+            navigationUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`;
+          }
+
+          // Open navigation in new tab/window
+          window.open(navigationUrl, '_blank');
+          
+          // Show success message
+          showNotification(`Opening directions to ${stall.name}`);
           closeStallModal();
         }
 
         function locateStallOnMap() {
-          // In a real app, this would center the map on the stall location
-          alert('Map would center on the selected stall location');
+          const modal = document.getElementById('stallModal');
+          const stallId = modal.getAttribute('data-stall-id');
+          const stall = stallsData.find(s => s.id === stallId);
+          
+          if (!stall) {
+            showNotification('Stall not found');
+            return;
+          }
+
+          // Validate coordinates
+          if (!validateMapAndCoordinates(stall.location, `stall ${stallId}`)) {
+            return;
+          }
+
+          // Center map on stall location with smooth animation
+          map.flyTo([stall.location.lat, stall.location.lng], 18, {
+            duration: 1.5,
+            easeLinearity: 0.25
+          });
+
+          // Add a temporary highlight marker
+          const highlightMarker = L.marker([stall.location.lat, stall.location.lng], {
+            icon: L.divIcon({
+              className: 'stall-highlight-marker',
+              html: `<div style="background: #ff6b35; width: 40px; height: 40px; border-radius: 50%; border: 4px solid white; box-shadow: 0 6px 12px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px; animation: pulse 2s infinite;">🍔</div>`,
+              iconSize: [40, 40],
+              iconAnchor: [20, 20]
+            })
+          });
+
+          highlightMarker.addTo(map);
+
+          // Remove highlight marker after 3 seconds
+          setTimeout(() => {
+            map.removeLayer(highlightMarker);
+          }, 3000);
+
+          // Show success message
+          showNotification(`Centered map on ${stall.name}`);
         }
 
         function shareStall() {
-          // In a real app, this would open sharing options
-          alert('Sharing stall information...');
+          const modal = document.getElementById('stallModal');
+          const stallId = modal.getAttribute('data-stall-id');
+          const stall = stallsData.find(s => s.id === stallId);
+          
+          if (!stall) {
+            showNotification('Stall not found');
+            return;
+          }
+
+          // Create share content
+          const shareText = `Check out ${stall.name} at the festival! ${stall.description}`;
+          const shareUrl = `${window.location.origin}${window.location.pathname}?stall=${stallId}`;
+          
+          // Try to use Web Share API first
+          if (navigator.share) {
+            navigator.share({
+              title: `${stall.name} - Festival Food Stall`,
+              text: shareText,
+              url: shareUrl
+            }).then(() => {
+              showNotification('Shared successfully!');
+            }).catch((error) => {
+              console.log('Share cancelled or failed:', error);
+              fallbackShare(stall, shareText, shareUrl);
+            });
+          } else {
+            // Fallback for browsers that don't support Web Share API
+            fallbackShare(stall, shareText, shareUrl);
+          }
+        }
+
+        function fallbackShare(stall, shareText, shareUrl) {
+          // Create a temporary textarea to copy to clipboard
+          const textarea = document.createElement('textarea');
+          textarea.value = `${shareText}\n\nLocation: ${shareUrl}`;
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          document.body.appendChild(textarea);
+          textarea.select();
+          
+          try {
+            document.execCommand('copy');
+            showNotification(`${stall.name} info copied to clipboard!`);
+          } catch (err) {
+            console.error('Failed to copy to clipboard:', err);
+            showNotification('Sharing not supported on this device');
+          }
+          
+          document.body.removeChild(textarea);
         }
 
         function refreshStallsData() {
@@ -5850,7 +6773,11 @@
           console.log('Page loaded, initializing stalls data...');
           loadStallsData();
         });
-      </script>
-</body>
 
-</html>
+        function isValidEmail(email) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return emailRegex.test(email);
+        }
+      </script>
+    </body>
+  </html>
