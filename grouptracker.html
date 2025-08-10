@@ -7816,11 +7816,17 @@
         if (navigator.geolocation) {
           console.log('Initializing HIGH-PRECISION location services...');
           
-          // Get initial high-accuracy position immediately
+          // Get initial high-accuracy position with better settings
           navigator.geolocation.getCurrentPosition(
             function (position) {
               console.log('Initial high-accuracy position obtained');
-              updateLocationWithHighPrecision(position);
+              // Only accept high-accuracy initial readings
+              if (position.coords.accuracy <= 10) {
+                updateLocationWithHighPrecision(position);
+              } else {
+                console.log('Waiting for better accuracy...');
+                showNotification('Getting precise location...', 'info');
+              }
             },
             function (error) {
               console.error('Initial position error:', error);
@@ -7828,8 +7834,8 @@
             },
             {
               enableHighAccuracy: true,
-              timeout: 5000,
-              maximumAge: 0
+              timeout: 15000, // Longer timeout for initial fix
+              maximumAge: 30000 // Accept cached position up to 30 seconds old
             }
           );
           
@@ -7844,8 +7850,8 @@
             },
             {
               enableHighAccuracy: true,
-              timeout: 3000, // Faster timeout
-              maximumAge: 1000 // Update every 1 second for maximum responsiveness
+              timeout: 10000, // Longer timeout for better accuracy
+              maximumAge: 5000 // Update every 5 seconds for stability
             }
           );
 
@@ -7859,7 +7865,7 @@
         }
       }
 
-      // Update location with high precision and instant feedback
+      // Update location with high precision and stability filtering
       function updateLocationWithHighPrecision(position) {
         const newLocation = {
           lat: position.coords.latitude,
@@ -7870,6 +7876,34 @@
           altitude: position.coords.altitude,
           timestamp: new Date().toISOString()
         };
+
+        // Filter out low-accuracy readings (like Google Maps does)
+        if (newLocation.accuracy > 20) {
+          console.log('📍 Filtering out low-accuracy reading:', newLocation.accuracy.toFixed(1) + 'm');
+          return;
+        }
+
+        // Check if the new location is significantly different from the current one
+        if (currentLocation && currentLocation.lat && currentLocation.lng) {
+          const distance = calculateDistance(
+            currentLocation.lat, currentLocation.lng,
+            newLocation.lat, newLocation.lng
+          );
+          
+          // Only update if movement is significant (>2 meters) or accuracy improved significantly
+          if (distance < 2 && newLocation.accuracy >= currentLocation.accuracy) {
+            console.log('📍 Filtering out minor movement:', distance.toFixed(1) + 'm');
+            return;
+          }
+        }
+
+        // Apply smoothing to reduce jitter (like Google Maps)
+        if (currentLocation && currentLocation.lat && currentLocation.lng) {
+          // Simple moving average for small movements
+          const smoothingFactor = 0.7; // 70% new, 30% old
+          newLocation.lat = (newLocation.lat * smoothingFactor) + (currentLocation.lat * (1 - smoothingFactor));
+          newLocation.lng = (newLocation.lng * smoothingFactor) + (currentLocation.lng * (1 - smoothingFactor));
+        }
 
         // Update current location
         currentLocation = newLocation;
@@ -7955,6 +7989,22 @@
 
       // Add refresh function to global scope
       window.refreshLocationNow = refreshLocationNow;
+
+      // Calculate distance between two points (Haversine formula)
+      function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371e3; // Earth's radius in meters
+        const φ1 = lat1 * Math.PI / 180;
+        const φ2 = lat2 * Math.PI / 180;
+        const Δφ = (lat2 - lat1) * Math.PI / 180;
+        const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+        const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                  Math.cos(φ1) * Math.cos(φ2) *
+                  Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c; // Distance in meters
+      }
 
       // Clear duplicate markers function
       function clearDuplicateMarkers() {
