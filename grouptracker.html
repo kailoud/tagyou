@@ -3579,11 +3579,13 @@
           // Update user avatar
           updateUserAvatar();
 
-          // Initialize app features
-          initializeMap();
-          initializeLocationServices();
-          updateGroupCount();
-          simulateMemberLocations();
+          // Initialize app features with a small delay to ensure DOM is ready
+          setTimeout(() => {
+            initializeMap();
+            initializeLocationServices();
+            updateGroupCount();
+            simulateMemberLocations();
+          }, 100);
 
           // Set up session monitoring
           setupSessionMonitoring();
@@ -4098,6 +4100,21 @@
           checkAuthentication();
         });
 
+        // Map validation helper
+        function validateMapAndCoordinates(coordinates, context = '') {
+          if (!map) {
+            console.error('Map not initialized', context);
+            return false;
+          }
+
+          if (!coordinates || isNaN(coordinates.lat) || isNaN(coordinates.lng)) {
+            console.error('Invalid coordinates', context, coordinates);
+            return false;
+          }
+
+          return true;
+        }
+
         // Map initialization
         function initializeMap() {
           try {
@@ -4105,6 +4122,12 @@
             const mapContainer = document.getElementById('map');
             if (!mapContainer) {
               console.error('Map container not found');
+              return;
+            }
+
+            // Check if Leaflet is available
+            if (typeof L === 'undefined') {
+              console.error('Leaflet library not loaded');
               return;
             }
 
@@ -4498,6 +4521,11 @@
         function locateMember(memberId) {
           const member = currentGroup.members.find(m => m.id === memberId);
           if (member && member.location) {
+            // Validate map and coordinates
+            if (!validateMapAndCoordinates(member.location, `member ${memberId}`)) {
+              return;
+            }
+
             map.setView([member.location.lat, member.location.lng], 18);
 
             // Add temporary marker
@@ -4511,7 +4539,9 @@
 
             // Remove marker after 5 seconds
             setTimeout(() => {
-              map.removeLayer(marker);
+              if (marker && map.hasLayer(marker)) {
+                map.removeLayer(marker);
+              }
             }, 5000);
           }
         }
@@ -4916,17 +4946,27 @@
           ];
 
           foodStalls.forEach(stall => {
-            const marker = L.marker([stall.lat, stall.lng], {
-              icon: L.divIcon({
-                className: 'food-stall-marker',
-                html: '🍔',
-                iconSize: [30, 30],
-                iconAnchor: [15, 15]
-              })
-            }).addTo(map);
+            try {
+              // Validate coordinates before creating marker
+              if (isNaN(stall.lat) || isNaN(stall.lng)) {
+                console.error('Invalid coordinates for food stall:', stall.name, stall);
+                return;
+              }
 
-            marker.bindPopup(`<b>${stall.name}</b><br>Food Stall`);
-            marker.foodStallData = stall;
+              const marker = L.marker([stall.lat, stall.lng], {
+                icon: L.divIcon({
+                  className: 'food-stall-marker',
+                  html: '🍔',
+                  iconSize: [30, 30],
+                  iconAnchor: [15, 15]
+                })
+              }).addTo(map);
+
+              marker.bindPopup(`<b>${stall.name}</b><br>Food Stall`);
+              marker.foodStallData = stall;
+            } catch (error) {
+              console.error('Error creating food stall marker:', error);
+            }
           });
         }
 
@@ -4948,17 +4988,27 @@
           ];
 
           truckFloats.forEach(float => {
-            const marker = L.marker([float.lat, float.lng], {
-              icon: L.divIcon({
-                className: 'truck-float-marker',
-                html: '🚛',
-                iconSize: [30, 30],
-                iconAnchor: [15, 15]
-              })
-            }).addTo(map);
+            try {
+              // Validate coordinates before creating marker
+              if (isNaN(float.lat) || isNaN(float.lng)) {
+                console.error('Invalid coordinates for truck float:', float.name, float);
+                return;
+              }
 
-            marker.bindPopup(`<b>${float.name}</b><br>Truck Float`);
-            marker.truckFloatData = float;
+              const marker = L.marker([float.lat, float.lng], {
+                icon: L.divIcon({
+                  className: 'truck-float-marker',
+                  html: '🚛',
+                  iconSize: [30, 30],
+                  iconAnchor: [15, 15]
+                })
+              }).addTo(map);
+
+              marker.bindPopup(`<b>${float.name}</b><br>Truck Float`);
+              marker.truckFloatData = float;
+            } catch (error) {
+              console.error('Error creating truck float marker:', error);
+            }
           });
 
           // Show float panel content
