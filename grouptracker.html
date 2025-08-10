@@ -3585,7 +3585,11 @@
 
           if (authOverlay) {
             authOverlay.style.display = 'none';
-            console.log('Auth overlay hidden');
+            authOverlay.style.position = 'absolute';
+            authOverlay.style.top = '-9999px';
+            authOverlay.style.left = '-9999px';
+            authOverlay.style.zIndex = '-1';
+            console.log('Auth overlay completely hidden and moved off-screen');
             console.log('Auth overlay display style:', window.getComputedStyle(authOverlay).display);
           }
 
@@ -3605,7 +3609,10 @@
               appContent.style.display = 'block';
               appContent.style.width = '100vw';
               appContent.style.height = '100vh';
-              appContent.style.position = 'relative';
+              appContent.style.position = 'absolute';
+              appContent.style.top = '0';
+              appContent.style.left = '0';
+              appContent.style.zIndex = '1';
               console.log('App content forced to be visible');
             }
           }
@@ -4137,6 +4144,20 @@
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function () {
           console.log('DOMContentLoaded - checking authentication');
+
+          // Force body and html to have proper dimensions
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.width = '100vw';
+          document.body.style.height = '100vh';
+          document.body.style.overflow = 'hidden';
+
+          document.documentElement.style.width = '100vw';
+          document.documentElement.style.height = '100vh';
+          document.documentElement.style.overflow = 'hidden';
+
+          console.log('Body and HTML forced to have proper dimensions');
+
           checkAuthentication();
         });
 
@@ -4170,6 +4191,16 @@
               console.error('Map container not found');
               return;
             }
+
+            // Force map container to have proper dimensions
+            mapContainer.style.display = 'block';
+            mapContainer.style.width = '100vw';
+            mapContainer.style.height = '100vh';
+            mapContainer.style.position = 'absolute';
+            mapContainer.style.top = '0';
+            mapContainer.style.left = '0';
+            mapContainer.style.zIndex = '1';
+            console.log('Map container forced to have dimensions');
 
             // Check map container dimensions
             const rect = mapContainer.getBoundingClientRect();
