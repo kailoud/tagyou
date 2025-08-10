@@ -793,6 +793,35 @@
       background: #fef2f2;
     }
 
+    .item-image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+    }
+
+    .admin-item-img {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 2px solid #e5e7eb;
+    }
+
+    .no-image {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      background: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: #9ca3af;
+      border: 2px solid #e5e7eb;
+    }
+
     .no-data {
       text-align: center;
       color: #6b7280;
@@ -5480,6 +5509,7 @@
                   <table class="admin-table">
                     <thead>
                       <tr>
+                        <th>Image</th>
                         <th>Name</th>
                         <th>Details</th>
                         <th>Contact</th>
@@ -5524,7 +5554,8 @@
               hours: "10:00 AM - 10:00 PM",
               rating: 4.5,
               description: "Best burgers in downtown",
-              status: "active"
+              status: "active",
+              image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=100&h=100&fit=crop&crop=center"
             }
           ],
           'float-trucks': [
@@ -5547,7 +5578,8 @@
               isLive: true,
               estimatedSpeed: 25,
               nextStop: "Downtown Plaza",
-              estimatedArrival: "15:45"
+              estimatedArrival: "15:45",
+              image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=100&h=100&fit=crop&crop=center"
             }
           ],
           'groups': [
@@ -5611,11 +5643,16 @@
           );
 
           if (filteredData.length === 0) {
-            return '<tr><td colspan="5" class="no-data">No data found</td></tr>';
+            return '<tr><td colspan="6" class="no-data">No data found</td></tr>';
           }
 
           return filteredData.map(item => `
             <tr>
+              <td data-label="Image">
+                <div class="item-image">
+                  ${item.image ? `<img src="${item.image}" alt="${item.name}" class="admin-item-img">` : '<div class="no-image">📷</div>'}
+                </div>
+              </td>
               <td data-label="Name">
                 <div class="item-name">${item.name}</div>
                 ${item.category ? `<div class="item-category">${item.category}</div>` : ''}
@@ -5728,7 +5765,8 @@
               { key: 'email', label: 'Email', type: 'email', required: true },
               { key: 'hours', label: 'Operating Hours', type: 'text', required: true },
               { key: 'rating', label: 'Rating', type: 'number', min: 0, max: 5, step: 0.1, required: false },
-              { key: 'description', label: 'Description', type: 'textarea', required: false }
+              { key: 'description', label: 'Description', type: 'textarea', required: false },
+              { key: 'image', label: 'Image URL', type: 'text', required: false }
             ],
             'float-trucks': [
               { key: 'name', label: 'Float Truck Name', type: 'text', required: true },
@@ -5744,7 +5782,8 @@
               { key: 'nextStop', label: 'Next Stop', type: 'text', required: false },
               { key: 'estimatedArrival', label: 'Estimated Arrival', type: 'time', required: false },
               { key: 'rating', label: 'Rating', type: 'number', min: 0, max: 5, step: 0.1, required: false },
-              { key: 'description', label: 'Description', type: 'textarea', required: false }
+              { key: 'description', label: 'Description', type: 'textarea', required: false },
+              { key: 'image', label: 'Image URL', type: 'text', required: false }
             ],
             'groups': [
               { key: 'name', label: 'Group Name', type: 'text', required: true },
