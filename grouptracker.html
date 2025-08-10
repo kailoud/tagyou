@@ -517,8 +517,182 @@
       background: rgba(231, 76, 60, 0.08);
     }
 
-    /* App content always visible - no authentication required */
+    /* Authentication Styles */
+    .auth-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+
+    .auth-container {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .auth-header h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+      color: #1f2937;
+    }
+
+    .auth-header p {
+      color: #6b7280;
+      margin-bottom: 32px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 24px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      background: #f9fafb;
+      color: #6b7280;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .auth-tab.active {
+      background: #1e40af;
+      color: white;
+    }
+
+    .auth-form {
+      text-align: left;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #1e40af;
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    .auth-btn {
+      width: 100%;
+      padding: 12px;
+      background: #1e40af;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .auth-btn:hover {
+      background: #1e3a8a;
+    }
+
+    .auth-btn:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .auth-links {
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    .auth-links a {
+      color: #1e40af;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .auth-links a:hover {
+      text-decoration: underline;
+    }
+
+    .auth-messages {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .auth-messages.success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .auth-messages.error {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+
+    .password-strength,
+    .password-match {
+      margin-top: 4px;
+      font-size: 12px;
+    }
+
+    .password-strength.weak {
+      color: #dc2626;
+    }
+
+    .password-strength.medium {
+      color: #d97706;
+    }
+
+    .password-strength.strong {
+      color: #059669;
+    }
+
+    .password-match.match {
+      color: #059669;
+    }
+
+    .password-match.no-match {
+      color: #dc2626;
+    }
+
+    /* App content - hidden by default, shown after authentication */
     .app-content {
+      display: none;
+    }
+
+    .app-content.authenticated {
       display: block;
     }
 
@@ -3891,6 +4065,74 @@
 
 
     <!-- Main App Content -->
+    <!-- Authentication Overlay -->
+    <div id="authOverlay" class="auth-overlay">
+      <div class="auth-container">
+        <div class="auth-header">
+          <h1>🎪 GroupTracker</h1>
+          <p>Real-time group location tracking for events and festivals</p>
+        </div>
+        
+        <div class="auth-tabs">
+          <button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
+          <button class="auth-tab" onclick="switchAuthTab('register')">Sign Up</button>
+        </div>
+        
+        <!-- Login Form -->
+        <form id="loginForm" class="auth-form">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" required>
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" required>
+          </div>
+          <button type="submit" class="auth-btn">Sign In</button>
+          <div class="auth-links">
+            <a href="#" onclick="switchAuthTab('forgot')">Forgot Password?</a>
+          </div>
+        </form>
+        
+        <!-- Register Form -->
+        <form id="registerForm" class="auth-form" style="display: none;">
+          <div class="form-group">
+            <label for="registerName">Full Name</label>
+            <input type="text" id="registerName" required>
+          </div>
+          <div class="form-group">
+            <label for="registerEmail">Email</label>
+            <input type="email" id="registerEmail" required>
+          </div>
+          <div class="form-group">
+            <label for="registerPassword">Password</label>
+            <input type="password" id="registerPassword" required>
+            <div class="password-strength" id="passwordStrength"></div>
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" required>
+            <div class="password-match" id="passwordMatch"></div>
+          </div>
+          <button type="submit" class="auth-btn">Create Account</button>
+        </form>
+        
+        <!-- Forgot Password Form -->
+        <form id="forgotForm" class="auth-form" style="display: none;">
+          <div class="form-group">
+            <label for="forgotEmail">Email</label>
+            <input type="email" id="forgotEmail" required>
+          </div>
+          <button type="submit" class="auth-btn">Reset Password</button>
+          <div class="auth-links">
+            <a href="#" onclick="switchAuthTab('login')">Back to Sign In</a>
+          </div>
+        </form>
+        
+        <div class="auth-messages" id="authMessages"></div>
+      </div>
+    </div>
+
     <div id="appContent" class="app-content">
       <div id="map"></div>
 
@@ -4564,10 +4806,10 @@
       <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
       <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
       <script>
-        // Authentication System - REMOVED
-        // App now works without authentication
-        let currentUser = { name: 'Demo User', email: 'demo@tagyou.com' };
-        let isAuthenticated = true; // Always authenticated
+        // Supabase Authentication System
+        let currentUser = null;
+        let isAuthenticated = false;
+        let isProUser = false;
 
         // Global variables
         let map;
@@ -4576,7 +4818,6 @@
         let isSharingLocation = false;
         let locationUpdateInterval;
         let groupCode = 'ABC123';
-        let isProUser = true; // Give full access
 
         // Supabase Configuration
         const SUPABASE_URL = 'https://ttgsohnskgujbfvopzzi.supabase.co'; // Your Supabase URL
@@ -4594,8 +4835,205 @@
 
         // Authentication Functions - REMOVED
         // App now works without authentication
+        // Authentication Functions
+        function switchAuthTab(tab) {
+          // Update tab buttons
+          document.querySelectorAll('.auth-tab').forEach(btn => btn.classList.remove('active'));
+          event.target.classList.add('active');
+          
+          // Hide all forms
+          document.querySelectorAll('.auth-form').forEach(form => form.style.display = 'none');
+          
+          // Show selected form
+          if (tab === 'login') {
+            document.getElementById('loginForm').style.display = 'block';
+          } else if (tab === 'register') {
+            document.getElementById('registerForm').style.display = 'block';
+          } else if (tab === 'forgot') {
+            document.getElementById('forgotForm').style.display = 'block';
+          }
+          
+          // Clear messages
+          clearAuthMessages();
+        }
+
+        function clearAuthMessages() {
+          const messages = document.getElementById('authMessages');
+          messages.innerHTML = '';
+          messages.className = 'auth-messages';
+        }
+
+        function showAuthMessage(message, type = 'error') {
+          const messages = document.getElementById('authMessages');
+          messages.innerHTML = message;
+          messages.className = `auth-messages ${type}`;
+        }
+
+        function showLoading(button) {
+          button.disabled = true;
+          button.innerHTML = 'Loading...';
+        }
+
+        function hideLoading(button, originalText) {
+          button.disabled = false;
+          button.innerHTML = originalText;
+        }
+
+        async function checkAuthStatus() {
+          try {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            
+            if (error) throw error;
+            
+            if (user) {
+              // User is authenticated
+              currentUser = {
+                id: user.id,
+                email: user.email,
+                name: user.user_metadata?.full_name || user.email.split('@')[0]
+              };
+              isAuthenticated = true;
+              isProUser = user.email.endsWith('@admin.com') || user.email === 'demo@tagyou.com';
+              
+              // Hide auth overlay and show app
+              document.getElementById('authOverlay').style.display = 'none';
+              document.getElementById('appContent').classList.add('authenticated');
+              
+              // Initialize app
+              initializeApp();
+              
+              console.log('User authenticated:', currentUser);
+            } else {
+              // User is not authenticated
+              showAuthOverlay();
+            }
+          } catch (error) {
+            console.error('Error checking auth status:', error);
+            showAuthOverlay();
+          }
+        }
+
+        function showAuthOverlay() {
+          document.getElementById('authOverlay').style.display = 'flex';
+          document.getElementById('appContent').classList.remove('authenticated');
+        }
+
+        async function handleLogin(event) {
+          event.preventDefault();
+          
+          const email = document.getElementById('loginEmail').value;
+          const password = document.getElementById('loginPassword').value;
+          const button = event.target.querySelector('button[type="submit"]');
+          
+          showLoading(button);
+          clearAuthMessages();
+          
+          try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+              email: email,
+              password: password
+            });
+            
+            if (error) throw error;
+            
+            showAuthMessage('Login successful! Redirecting...', 'success');
+            setTimeout(() => {
+              checkAuthStatus();
+            }, 1000);
+            
+          } catch (error) {
+            console.error('Login error:', error);
+            showAuthMessage(error.message);
+          } finally {
+            hideLoading(button, 'Sign In');
+          }
+        }
+
+        async function handleRegister(event) {
+          event.preventDefault();
+          
+          const name = document.getElementById('registerName').value;
+          const email = document.getElementById('registerEmail').value;
+          const password = document.getElementById('registerPassword').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+          const button = event.target.querySelector('button[type="submit"]');
+          
+          if (password !== confirmPassword) {
+            showAuthMessage('Passwords do not match');
+            return;
+          }
+          
+          showLoading(button);
+          clearAuthMessages();
+          
+          try {
+            const { data, error } = await supabase.auth.signUp({
+              email: email,
+              password: password,
+              options: {
+                data: {
+                  full_name: name
+                }
+              }
+            });
+            
+            if (error) throw error;
+            
+            showAuthMessage('Account created successfully! Please check your email to verify your account.', 'success');
+            
+          } catch (error) {
+            console.error('Registration error:', error);
+            showAuthMessage(error.message);
+          } finally {
+            hideLoading(button, 'Create Account');
+          }
+        }
+
+        async function handleForgotPassword(event) {
+          event.preventDefault();
+          
+          const email = document.getElementById('forgotEmail').value;
+          const button = event.target.querySelector('button[type="submit"]');
+          
+          showLoading(button);
+          clearAuthMessages();
+          
+          try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email);
+            
+            if (error) throw error;
+            
+            showAuthMessage('Password reset email sent! Please check your inbox.', 'success');
+            
+          } catch (error) {
+            console.error('Password reset error:', error);
+            showAuthMessage(error.message);
+          } finally {
+            hideLoading(button, 'Reset Password');
+          }
+        }
+
+        async function handleLogout() {
+          try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            
+            // Reset user state
+            currentUser = null;
+            isAuthenticated = false;
+            isProUser = false;
+            
+            // Show auth overlay
+            showAuthOverlay();
+            
+            console.log('User logged out successfully');
+          } catch (error) {
+            console.error('Logout error:', error);
+          }
+        }
+
         function initializeApp() {
-          console.log('Initializing app without authentication...');
+          console.log('Initializing app with authentication...');
           
           // Initialize Supabase client
           try {
@@ -4605,13 +5043,6 @@
             console.error('Error initializing Supabase client:', error);
           }
           
-          // Show app content
-          const appContent = document.getElementById('appContent');
-          if (appContent) {
-            appContent.classList.add('authenticated');
-            console.log('App content authenticated class added');
-          }
-
           // Show user profile
           const userProfile = document.getElementById('userProfile');
           if (userProfile) {
@@ -6203,23 +6634,8 @@
         });
 
         function logout() {
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('userData');
-          localStorage.removeItem('tokenExpiry');
-          localStorage.removeItem('rememberMe');
-          currentUser = null;
-          isAuthenticated = false;
-
-          // Hide app content and show auth
-          showAuthOverlay();
-
-          // Clear any existing data
-          if (map) {
-            map.remove();
-            map = null;
-          }
-
-          console.log('User logged out');
+          // Use the new Supabase logout function
+          handleLogout();
         }
 
         function socialLogin(provider) {
@@ -6411,7 +6827,7 @@
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function () {
-          console.log('DOMContentLoaded - initializing app without authentication');
+          console.log('DOMContentLoaded - initializing app with Supabase authentication');
 
           // Force body and html to have proper dimensions
           document.body.style.margin = '0';
@@ -6426,9 +6842,22 @@
 
           console.log('Body and HTML forced to have proper dimensions');
 
-          // Initialize app immediately
-          console.log('Initializing app now!');
-          initializeApp();
+          // Initialize Supabase client first
+          try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase client initialized successfully');
+            
+            // Check authentication status
+            checkAuthStatus();
+          } catch (error) {
+            console.error('Error initializing Supabase client:', error);
+            showAuthOverlay();
+          }
+          
+          // Add authentication form event listeners
+          document.getElementById('loginForm').addEventListener('submit', handleLogin);
+          document.getElementById('registerForm').addEventListener('submit', handleRegister);
+          document.getElementById('forgotForm').addEventListener('submit', handleForgotPassword);
         });
 
         // Map validation helper
