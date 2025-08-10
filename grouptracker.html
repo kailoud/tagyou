@@ -4610,6 +4610,12 @@
           if (!mapContainer) {
             mapContainer = document.createElement('div');
             mapContainer.id = 'map';
+            mapContainer.style.height = '100vh';
+            mapContainer.style.width = '100vw';
+            mapContainer.style.position = 'absolute';
+            mapContainer.style.top = '0';
+            mapContainer.style.left = '0';
+            mapContainer.style.zIndex = '1';
             document.body.appendChild(mapContainer);
             console.log('Created map container');
           } else {
@@ -4630,6 +4636,13 @@
 
           console.log('Map container styled and ready');
           console.log('Map container dimensions:', mapContainer.offsetWidth, 'x', mapContainer.offsetHeight);
+
+          // Ensure container has dimensions before initializing map
+          if (mapContainer.offsetWidth === 0 || mapContainer.offsetHeight === 0) {
+            console.log('Map container has no dimensions, forcing layout...');
+            mapContainer.style.display = 'block';
+            mapContainer.offsetHeight; // Force reflow
+          }
 
           // Check if Leaflet is available
           if (typeof L === 'undefined') {
