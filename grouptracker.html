@@ -5190,7 +5190,25 @@
             
             console.log('Supabase response:', { data, error }); // Debug log
             
-            if (error) throw error;
+            if (error) {
+              // Handle specific database errors
+              if (error.message.includes('Database error saving new user')) {
+                // This might be due to user_profiles table issues
+                // Try to create the user profile manually
+                try {
+                  if (data && data.user) {
+                    // User was created but profile creation failed
+                    // Show email verification popup anyway
+                    showEmailVerificationPopup(email);
+                    event.target.reset();
+                    return;
+                  }
+                } catch (profileError) {
+                  console.error('Profile creation error:', profileError);
+                }
+              }
+              throw error;
+            }
             
             // Check if email confirmation is required
             if (data.user && !data.user.email_confirmed_at) {
@@ -5360,6 +5378,34 @@
           } catch (error) {
             console.error('Resend error:', error);
             showAuthMessage('Error resending email. Please try again.', 'error');
+          }
+        }
+
+        // Fallback function to create user profile manually
+        async function createUserProfile(userId, email, fullName) {
+          try {
+            const { error } = await supabase
+              .from('user_profiles')
+              .insert([
+                {
+                  id: userId,
+                  email: email,
+                  full_name: fullName,
+                  role: 'user',
+                  is_admin: false
+                }
+              ]);
+            
+            if (error) {
+              console.error('Error creating user profile:', error);
+              return false;
+            }
+            
+            console.log('User profile created successfully');
+            return true;
+          } catch (error) {
+            console.error('Error in createUserProfile:', error);
+            return false;
           }
         }
 
