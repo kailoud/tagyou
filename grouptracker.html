@@ -4294,6 +4294,43 @@
       font-size: 11px;
     }
 
+    .location-details {
+      color: #888;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* Enhanced location update animation */
+    .location-display.location-update {
+      animation: location-pulse 0.3s ease-in-out;
+    }
+
+    @keyframes location-pulse {
+      0% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.05); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+
+    .location-refresh-btn {
+      background: none;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 2px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      margin-left: 4px;
+    }
+
+    .location-refresh-btn:hover {
+      background: rgba(255, 107, 53, 0.1);
+      transform: scale(1.1);
+    }
+
+    .location-refresh-btn:active {
+      transform: scale(0.95);
+    }
+
     /* Location display container */
     .location-display {
       position: absolute;
@@ -4460,7 +4497,11 @@
           <span class="location-icon">📍</span>
           <span class="location-coords">Getting location...</span>
           <span class="location-accuracy"></span>
+          <span class="location-details"></span>
           <span class="location-time"></span>
+          <button class="location-refresh-btn" onclick="refreshLocationNow()" title="Refresh location instantly">
+            🔄
+          </button>
         </div>
       </div>
 
@@ -7771,74 +7812,181 @@
         }
       }
 
-      // Location services with live updates
+      // High-precision location services with instant updates
       function initializeLocationServices() {
         if (navigator.geolocation) {
-          console.log('Initializing location services with live updates...');
+          console.log('Initializing HIGH-PRECISION location services...');
           
-          // Watch position for real-time updates
-          navigator.geolocation.watchPosition(
+          // Get initial high-accuracy position immediately
+          navigator.geolocation.getCurrentPosition(
             function (position) {
-              const newLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-                accuracy: position.coords.accuracy,
-                timestamp: new Date().toISOString()
-              };
-
-              // Update current location
-              currentLocation = newLocation;
-
-              // Update user marker on map
-              if (window.userMarker) {
-                window.userMarker.setLatLng([newLocation.lat, newLocation.lng]);
-                
-                // Add pulsing effect for live updates
-                window.userMarker.getElement()?.classList.add('location-update');
-                setTimeout(() => {
-                  window.userMarker.getElement()?.classList.remove('location-update');
-                }, 1000);
-              }
-
-              // Update group location if sharing
-              if (isSharingLocation) {
-                updateLocationInGroup();
-              }
-
-              // Update location display
-              updateLocationDisplay(newLocation);
-              
-              console.log('Location updated:', newLocation);
+              console.log('Initial high-accuracy position obtained');
+              updateLocationWithHighPrecision(position);
             },
             function (error) {
-              console.error('Location error:', error);
-              showNotification('Location access denied. Please enable location services.', 'error');
+              console.error('Initial position error:', error);
+              showNotification('Getting initial location...', 'info');
             },
             {
               enableHighAccuracy: true,
-              timeout: 10000,
-              maximumAge: 30000 // Update every 30 seconds
+              timeout: 5000,
+              maximumAge: 0
             }
           );
+          
+          // Watch position for real-time updates with maximum precision
+          const watchId = navigator.geolocation.watchPosition(
+            function (position) {
+              updateLocationWithHighPrecision(position);
+            },
+            function (error) {
+              console.error('Location watch error:', error);
+              handleLocationError(error);
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 3000, // Faster timeout
+              maximumAge: 1000 // Update every 1 second for maximum responsiveness
+            }
+          );
+
+          // Store watch ID for cleanup
+          window.locationWatchId = watchId;
+          
+          console.log('High-precision location tracking started');
         } else {
           console.error('Geolocation not supported');
           showNotification('Location services not supported by your browser.', 'error');
         }
       }
 
-      // Update location display
+      // Update location with high precision and instant feedback
+      function updateLocationWithHighPrecision(position) {
+        const newLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+          heading: position.coords.heading,
+          speed: position.coords.speed,
+          altitude: position.coords.altitude,
+          timestamp: new Date().toISOString()
+        };
+
+        // Update current location
+        currentLocation = newLocation;
+
+        // Instant map marker update
+        if (window.userMarker) {
+          window.userMarker.setLatLng([newLocation.lat, newLocation.lng]);
+          
+          // Enhanced pulsing effect for instant feedback
+          const markerElement = window.userMarker.getElement();
+          if (markerElement) {
+            markerElement.classList.add('location-update');
+            setTimeout(() => {
+              markerElement.classList.remove('location-update');
+            }, 500); // Shorter animation for instant feel
+          }
+        }
+
+        // Instant location display update
+        updateLocationDisplay(newLocation);
+
+        // Update group location if sharing (with instant feedback)
+        if (isSharingLocation) {
+          updateLocationInGroup();
+        }
+
+        // Log high-precision details
+        console.log('📍 High-precision location:', {
+          coords: `${newLocation.lat.toFixed(8)}, ${newLocation.lng.toFixed(8)}`,
+          accuracy: `${newLocation.accuracy.toFixed(1)}m`,
+          heading: newLocation.heading ? `${newLocation.heading.toFixed(1)}°` : 'N/A',
+          speed: newLocation.speed ? `${(newLocation.speed * 3.6).toFixed(1)} km/h` : 'N/A',
+          timestamp: new Date().toLocaleTimeString()
+        });
+      }
+
+      // Handle location errors with specific feedback
+      function handleLocationError(error) {
+        let message = 'Location error: ';
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            message += 'Please enable location access in your browser settings.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            message += 'Location information unavailable.';
+            break;
+          case error.TIMEOUT:
+            message += 'Location request timed out.';
+            break;
+          default:
+            message += 'Unknown location error.';
+        }
+        showNotification(message, 'error');
+      }
+
+      // Manual location refresh for instant updates
+      function refreshLocationNow() {
+        if (navigator.geolocation) {
+          console.log('🔄 Manual location refresh requested');
+          showNotification('Getting fresh location...', 'info');
+          
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              console.log('✅ Manual location refresh successful');
+              updateLocationWithHighPrecision(position);
+              showNotification('Location refreshed!', 'success');
+            },
+            function (error) {
+              console.error('❌ Manual location refresh failed:', error);
+              handleLocationError(error);
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 2000, // Very fast timeout for manual refresh
+              maximumAge: 0
+            }
+          );
+        }
+      }
+
+      // Add refresh function to global scope
+      window.refreshLocationNow = refreshLocationNow;
+
+      // Update location display with high-precision details
       function updateLocationDisplay(location) {
         const locationDisplay = document.getElementById('locationDisplay');
         if (locationDisplay) {
           locationDisplay.style.display = 'block';
+          
+          // Format accuracy with color coding
+          const accuracyColor = location.accuracy <= 5 ? '#22c55e' : 
+                               location.accuracy <= 10 ? '#eab308' : '#ef4444';
+          
+          // Format speed if available
+          const speedText = location.speed ? 
+            ` | ${(location.speed * 3.6).toFixed(1)} km/h` : '';
+          
+          // Format heading if available
+          const headingText = location.heading ? 
+            ` | ${location.heading.toFixed(0)}°` : '';
+          
           locationDisplay.innerHTML = `
             <div class="location-info">
               <span class="location-icon">📍</span>
-              <span class="location-coords">${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}</span>
-              <span class="location-accuracy">±${Math.round(location.accuracy)}m</span>
+              <span class="location-coords">${location.lat.toFixed(8)}, ${location.lng.toFixed(8)}</span>
+              <span class="location-accuracy" style="color: ${accuracyColor}">±${location.accuracy.toFixed(1)}m</span>
+              <span class="location-details">${speedText}${headingText}</span>
               <span class="location-time">${new Date().toLocaleTimeString()}</span>
             </div>
           `;
+          
+          // Add instant update animation
+          locationDisplay.classList.add('location-update');
+          setTimeout(() => {
+            locationDisplay.classList.remove('location-update');
+          }, 300);
         }
       }
 
