@@ -4121,22 +4121,6 @@
         document.addEventListener('DOMContentLoaded', function () {
           console.log('DOMContentLoaded - checking authentication');
           checkAuthentication();
-
-          // Temporary: Force show app for testing (remove this later)
-          setTimeout(() => {
-            console.log('Forcing app to show for testing');
-            const appContent = document.getElementById('appContent');
-            if (appContent) {
-              appContent.classList.add('authenticated');
-              console.log('App content forced to show');
-            }
-
-            // Force initialize map
-            if (typeof initializeMap === 'function') {
-              console.log('Forcing map initialization');
-              initializeMap();
-            }
-          }, 2000);
         });
 
         // Map validation helper
@@ -4157,6 +4141,12 @@
         // Map initialization
         function initializeMap() {
           try {
+            // Check if map is already initialized
+            if (map) {
+              console.log('Map already initialized, skipping');
+              return;
+            }
+
             // Check if map container exists
             const mapContainer = document.getElementById('map');
             if (!mapContainer) {
@@ -5753,10 +5743,17 @@
             return;
           }
 
+          console.log('isProUser status:', isProUser);
+          console.log('Total stalls to render:', filteredStalls.length);
+
           stallsGrid.innerHTML = filteredStalls.map((stall, index) => {
             const isBlurred = !isProUser && index >= 4;
             const clickHandler = isBlurred ? 'showSubscriptionOverlay()' : `openStallModal(${stall.id})`;
             const blurredClass = isBlurred ? 'blurred' : '';
+
+            if (isBlurred) {
+              console.log(`Stall ${index + 1} (${stall.name}) will be blurred`);
+            }
 
             return `
         <div class="stall-card ${blurredClass}" onclick="${clickHandler}">
