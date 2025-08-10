@@ -687,21 +687,7 @@
       color: #dc2626;
     }
 
-    .demo-btn {
-      background: #059669;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-size: 14px;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: background 0.3s ease;
-    }
-
-    .demo-btn:hover {
-      background: #047857;
-    }
+    /* Demo button styles removed */
 
     /* App content - hidden by default, shown after authentication */
     .app-content {
@@ -4107,8 +4093,6 @@
           <button type="submit" class="auth-btn">Sign In</button>
           <div class="auth-links">
             <a href="#" onclick="switchAuthTab('forgot')">Forgot Password?</a>
-            <br>
-            <button type="button" onclick="demoLogin()" class="demo-btn">Demo Login (Admin)</button>
           </div>
         </form>
         
@@ -5164,49 +5148,7 @@
           }
         }
 
-        async function demoLogin() {
-          const button = document.querySelector('.demo-btn');
-          const originalText = button.textContent;
-          
-          showLoading(button);
-          clearAuthMessages();
-          
-          try {
-            // Try to sign in with demo credentials
-            const { data, error } = await supabase.auth.signInWithPassword({
-              email: 'demo@tagyou.com',
-              password: 'demo123456'
-            });
-            
-            if (error) {
-              // If demo account doesn't exist, create it
-              const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-                email: 'demo@tagyou.com',
-                password: 'demo123456',
-                options: {
-                  data: {
-                    full_name: 'Demo Admin User'
-                  }
-                }
-              });
-              
-              if (signUpError) throw signUpError;
-              
-              showAuthMessage('Demo account created! Please check your email to verify, then try logging in again.', 'success');
-            } else {
-              showAuthMessage('Demo login successful! Redirecting...', 'success');
-              setTimeout(() => {
-                checkAuthStatus();
-              }, 1000);
-            }
-            
-          } catch (error) {
-            console.error('Demo login error:', error);
-            showAuthMessage('Demo login failed. Please try creating a regular account.');
-          } finally {
-            hideLoading(button, originalText);
-          }
-        }
+        // Demo login function removed
 
         function initializeApp() {
           console.log('Initializing app with authentication...');
