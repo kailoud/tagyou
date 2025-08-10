@@ -4355,7 +4355,7 @@
             </svg>
             Admin Portal
           </div>
-          <div class="user-menu-item danger" onclick="logout()">
+          <div class="user-menu-item danger" onclick="handleLogoutClick(event)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path
                 d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
@@ -5367,8 +5367,29 @@
 
       async function handleLogout() {
         try {
+          console.log('Starting logout process...');
+
+          // Check if Supabase client is initialized
+          if (!supabase) {
+            console.warn('Supabase client not initialized, performing local logout only');
+            // Fallback to local logout
+            performLocalLogout();
+            return;
+          }
+
           const { error } = await supabase.auth.signOut();
-          if (error) throw error;
+          if (error) {
+            console.warn('Supabase logout failed, performing local logout:', error);
+            // Fallback to local logout
+            performLocalLogout();
+            return;
+          }
+
+          // Clear local storage
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('userData');
+          localStorage.removeItem('tokenExpiry');
+          localStorage.removeItem('rememberMe');
 
           // Reset user state
           currentUser = null;
@@ -5380,11 +5401,41 @@
 
           // Show auth overlay
           showAuthOverlay();
+          console.log('Auth overlay shown');
 
           console.log('User logged out successfully');
         } catch (error) {
           console.error('Logout error:', error);
+          // Fallback to local logout
+          performLocalLogout();
         }
+      }
+
+      function performLocalLogout() {
+        console.log('Performing local logout...');
+
+        // Clear local storage
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userData');
+        localStorage.removeItem('tokenExpiry');
+        localStorage.removeItem('rememberMe');
+        console.log('Local storage cleared');
+
+        // Reset user state
+        currentUser = null;
+        isAuthenticated = false;
+        isProUser = false;
+        console.log('User state reset');
+
+        // Hide Admin Portal
+        updateAdminPortalVisibility();
+        console.log('Admin portal visibility updated');
+
+        // Show auth overlay
+        showAuthOverlay();
+        console.log('Auth overlay shown');
+
+        console.log('Local logout completed');
       }
 
       // Email Verification Popup
@@ -6435,8 +6486,12 @@
 
       // Admin Portal Functions
       async function showAdminPortal() {
-        // Check if user is admin using the database-based isProUser variable
-        if (!isProUser) {
+        // Check if user is admin (demo@tagyou.com or any email ending with @admin.com)
+        const isAdmin = currentUser?.email === 'demo@tagyou.com' ||
+          currentUser?.email?.endsWith('@admin.com') ||
+          currentUser?.email === 'admin@tagyou.com';
+
+        if (!isAdmin) {
           showNotification('Access denied. Admin privileges required.', 'error');
           return;
         }
@@ -7088,9 +7143,42 @@
         }
       });
 
-      function logout() {
+      async function logout() {
         // Use the new Supabase logout function
-        handleLogout();
+        await handleLogout();
+      }
+
+      async function handleLogoutClick(event) {
+        console.log('Logout button clicked');
+
+        // Show loading state
+        const logoutButton = event.target.closest('.user-menu-item');
+        const originalText = logoutButton.innerHTML;
+        logoutButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Logging out...';
+        logoutButton.style.pointerEvents = 'none';
+
+        try {
+          console.log('Calling logout function...');
+          await logout();
+          console.log('Logout completed successfully');
+
+          // Close the user menu
+          const userMenu = document.getElementById('userMenu');
+          if (userMenu) {
+            userMenu.classList.remove('show');
+            console.log('User menu closed');
+          }
+
+        } catch (error) {
+          console.error('Logout failed:', error);
+          // Show error message
+          alert('Logout failed. Please try again.');
+        } finally {
+          // Restore button state
+          logoutButton.innerHTML = originalText;
+          logoutButton.style.pointerEvents = 'auto';
+          console.log('Button state restored');
+        }
       }
 
       function socialLogin(provider) {
