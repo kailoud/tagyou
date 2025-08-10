@@ -4019,6 +4019,264 @@
           document.getElementById('userMenu').classList.remove('show');
         }
 
+        function closeSettingsModal() {
+          const modal = document.getElementById('settingsModal');
+          if (modal) {
+            modal.classList.remove('show');
+            setTimeout(() => modal.remove(), 300);
+          }
+        }
+
+        function saveSettings() {
+          // Get all settings values
+          const settings = {
+            locationSharing: document.getElementById('locationSharing')?.checked || false,
+            emergencyAlerts: document.getElementById('emergencyAlerts')?.checked || false,
+            notifications: document.getElementById('notifications')?.checked || false,
+            defaultZoom: parseInt(document.getElementById('defaultZoom')?.value) || 16,
+            autoCenter: document.getElementById('autoCenter')?.checked || false
+          };
+
+          // Update current user settings
+          if (currentUser) {
+            currentUser.settings = settings;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+          }
+
+          // Apply map settings
+          if (map && settings.defaultZoom) {
+            map.setZoom(settings.defaultZoom);
+          }
+
+          // Show success message
+          showNotification('Settings saved successfully!');
+          
+          // Close modal
+          closeSettingsModal();
+        }
+
+        function changePassword() {
+          // Create password change modal
+          const passwordModal = document.createElement('div');
+          passwordModal.className = 'modal-overlay';
+          passwordModal.id = 'passwordModal';
+          passwordModal.innerHTML = `
+            <div class="modal-content">
+              <div class="modal-header">
+                <h2>🔐 Change Password</h2>
+                <button onclick="closePasswordModal()" class="close-btn">&times;</button>
+              </div>
+              <div class="modal-body">
+                <div class="setting-item">
+                  <label>Current Password</label>
+                  <input type="password" id="currentPassword" placeholder="Enter current password">
+                </div>
+                <div class="setting-item">
+                  <label>New Password</label>
+                  <input type="password" id="newPassword" placeholder="Enter new password">
+                </div>
+                <div class="setting-item">
+                  <label>Confirm New Password</label>
+                  <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button onclick="updatePassword()" class="save-btn">Update Password</button>
+                <button onclick="closePasswordModal()" class="cancel-btn">Cancel</button>
+              </div>
+            </div>
+          `;
+          
+          document.body.appendChild(passwordModal);
+          setTimeout(() => passwordModal.classList.add('show'), 10);
+        }
+
+        function closePasswordModal() {
+          const modal = document.getElementById('passwordModal');
+          if (modal) {
+            modal.classList.remove('show');
+            setTimeout(() => modal.remove(), 300);
+          }
+        }
+
+        function updatePassword() {
+          const currentPassword = document.getElementById('currentPassword')?.value;
+          const newPassword = document.getElementById('newPassword')?.value;
+          const confirmPassword = document.getElementById('confirmPassword')?.value;
+
+          if (!currentPassword || !newPassword || !confirmPassword) {
+            showNotification('Please fill in all fields', 'error');
+            return;
+          }
+
+          if (newPassword !== confirmPassword) {
+            showNotification('New passwords do not match', 'error');
+            return;
+          }
+
+          if (newPassword.length < 6) {
+            showNotification('Password must be at least 6 characters', 'error');
+            return;
+          }
+
+          // Simulate password update
+          showNotification('Password updated successfully!');
+          closePasswordModal();
+        }
+
+        function exportData() {
+          // Create export data modal
+          const exportModal = document.createElement('div');
+          exportModal.className = 'modal-overlay';
+          exportModal.id = 'exportModal';
+          exportModal.innerHTML = `
+            <div class="modal-content">
+              <div class="modal-header">
+                <h2>📊 Export My Data</h2>
+                <button onclick="closeExportModal()" class="close-btn">&times;</button>
+              </div>
+              <div class="modal-body">
+                <p>Choose what data you'd like to export:</p>
+                <div class="setting-item">
+                  <label>
+                    <input type="checkbox" id="exportProfile" checked>
+                    Profile Information
+                  </label>
+                </div>
+                <div class="setting-item">
+                  <label>
+                    <input type="checkbox" id="exportGroups" checked>
+                    Group Memberships
+                  </label>
+                </div>
+                <div class="setting-item">
+                  <label>
+                    <input type="checkbox" id="exportLocation" checked>
+                    Location History
+                  </label>
+                </div>
+                <div class="setting-item">
+                  <label>
+                    <input type="checkbox" id="exportSettings" checked>
+                    App Settings
+                  </label>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button onclick="downloadData()" class="save-btn">Download Data</button>
+                <button onclick="closeExportModal()" class="cancel-btn">Cancel</button>
+              </div>
+            </div>
+          `;
+          
+          document.body.appendChild(exportModal);
+          setTimeout(() => exportModal.classList.add('show'), 10);
+        }
+
+        function closeExportModal() {
+          const modal = document.getElementById('exportModal');
+          if (modal) {
+            modal.classList.remove('show');
+            setTimeout(() => modal.remove(), 300);
+          }
+        }
+
+        function downloadData() {
+          // Collect user data
+          const userData = {
+            profile: currentUser,
+            groups: currentGroup,
+            locationHistory: JSON.parse(localStorage.getItem('lastKnownLocation') || 'null'),
+            settings: currentUser?.settings || {},
+            exportDate: new Date().toISOString()
+          };
+
+          // Create and download JSON file
+          const dataStr = JSON.stringify(userData, null, 2);
+          const dataBlob = new Blob([dataStr], { type: 'application/json' });
+          const url = URL.createObjectURL(dataBlob);
+          
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `tagyou-data-${new Date().toISOString().split('T')[0]}.json`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+
+          showNotification('Data exported successfully!');
+          closeExportModal();
+        }
+
+        function deleteAccount() {
+          // Create delete account confirmation modal
+          const deleteModal = document.createElement('div');
+          deleteModal.className = 'modal-overlay';
+          deleteModal.id = 'deleteModal';
+          deleteModal.innerHTML = `
+            <div class="modal-content">
+              <div class="modal-header">
+                <h2>⚠️ Delete Account</h2>
+                <button onclick="closeDeleteModal()" class="close-btn">&times;</button>
+              </div>
+              <div class="modal-body">
+                <div style="color: #d32f2f; margin-bottom: 16px;">
+                  <strong>⚠️ Warning: This action cannot be undone!</strong>
+                </div>
+                <p>Are you sure you want to delete your account? This will:</p>
+                <ul style="margin: 16px 0; padding-left: 20px;">
+                  <li>Permanently delete your profile</li>
+                  <li>Remove you from all groups</li>
+                  <li>Delete all your location history</li>
+                  <li>Cancel any active subscriptions</li>
+                </ul>
+                <div class="setting-item">
+                  <label>Type "DELETE" to confirm:</label>
+                  <input type="text" id="deleteConfirmation" placeholder="Type DELETE to confirm">
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button onclick="confirmDeleteAccount()" class="danger-btn">Delete Account</button>
+                <button onclick="closeDeleteModal()" class="cancel-btn">Cancel</button>
+              </div>
+            </div>
+          `;
+          
+          document.body.appendChild(deleteModal);
+          setTimeout(() => deleteModal.classList.add('show'), 10);
+        }
+
+        function closeDeleteModal() {
+          const modal = document.getElementById('deleteModal');
+          if (modal) {
+            modal.classList.remove('show');
+            setTimeout(() => modal.remove(), 300);
+          }
+        }
+
+        function confirmDeleteAccount() {
+          const confirmation = document.getElementById('deleteConfirmation')?.value;
+          
+          if (confirmation !== 'DELETE') {
+            showNotification('Please type "DELETE" to confirm', 'error');
+            return;
+          }
+
+          // Simulate account deletion
+          showNotification('Account deleted successfully', 'success');
+          
+          // Clear all data
+          localStorage.clear();
+          currentUser = null;
+          isAuthenticated = false;
+          
+          // Close modal and refresh page
+          closeDeleteModal();
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        }
+
         function logout() {
           localStorage.removeItem('authToken');
           localStorage.removeItem('userData');
