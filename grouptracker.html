@@ -810,6 +810,266 @@
       background: #eff6ff;
     }
 
+    /* Admin Form Styles */
+    .admin-form-content {
+      max-width: 95vw;
+      width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .admin-form {
+      padding: 0;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-field.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-label {
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .required {
+      color: #dc2626;
+      margin-left: 2px;
+    }
+
+    .form-input {
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #1e40af;
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      padding-top: 16px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .save-btn {
+      background: #1e40af;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.3s ease;
+    }
+
+    .save-btn:hover {
+      background: #1e3a8a;
+    }
+
+    .cancel-btn {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #d1d5db;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .cancel-btn:hover {
+      background: #e5e7eb;
+    }
+
+    /* Mobile Optimization */
+    @media (max-width: 768px) {
+      .admin-portal-content {
+        max-width: 95vw;
+        width: 95vw;
+        margin: 10px;
+        max-height: 95vh;
+      }
+
+      .admin-tabs {
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+
+      .admin-tab {
+        padding: 8px 12px;
+        font-size: 12px;
+        flex: 1;
+        min-width: 80px;
+      }
+
+      .admin-controls {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+      }
+
+      .admin-search {
+        width: 100%;
+      }
+
+      .add-btn {
+        width: 100%;
+        padding: 12px;
+      }
+
+      .admin-table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .admin-table {
+        min-width: 600px;
+      }
+
+      .admin-table th,
+      .admin-table td {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+
+      .item-name {
+        font-size: 14px;
+      }
+
+      .item-category,
+      .item-username {
+        font-size: 11px;
+      }
+
+      .item-details {
+        font-size: 12px;
+      }
+
+      .item-details > div {
+        margin-bottom: 2px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .edit-btn,
+      .delete-btn {
+        padding: 6px;
+        font-size: 14px;
+      }
+
+      /* Form mobile optimization */
+      .admin-form-content {
+        max-width: 95vw;
+        width: 95vw;
+        margin: 10px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .form-field {
+        margin-bottom: 8px;
+      }
+
+      .form-input {
+        padding: 12px;
+        font-size: 16px; /* Prevents zoom on iOS */
+      }
+
+      .form-actions {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .save-btn,
+      .cancel-btn {
+        width: 100%;
+        padding: 14px;
+        font-size: 16px;
+      }
+
+      /* Modal mobile optimization */
+      .modal-content {
+        margin: 10px;
+        max-height: calc(100vh - 20px);
+      }
+
+      .modal-header h2 {
+        font-size: 18px;
+      }
+
+      .admin-subtitle {
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .admin-tab {
+        padding: 6px 8px;
+        font-size: 11px;
+        min-width: 60px;
+      }
+
+      .tab-count {
+        padding: 1px 4px;
+        font-size: 10px;
+      }
+
+      .admin-table {
+        min-width: 500px;
+      }
+
+      .admin-table th,
+      .admin-table td {
+        padding: 6px 8px;
+        font-size: 11px;
+      }
+
+      .item-name {
+        font-size: 13px;
+      }
+
+      .item-details {
+        font-size: 11px;
+      }
+
+      .tracking-badge {
+        font-size: 10px;
+        padding: 1px 6px;
+      }
+
+      .status-badge {
+        font-size: 10px;
+        padding: 2px 6px;
+      }
+    }
+
     #map {
       height: 100vh;
       width: 100vw;
@@ -5040,7 +5300,10 @@
         }
 
         function editAdminItem(id) {
-          showNotification('Edit functionality coming soon!', 'info');
+          const item = adminData[activeAdminTab].find(item => item.id === id);
+          if (item) {
+            showAdminForm(item, true);
+          }
         }
 
         function deleteAdminItem(id) {
@@ -5052,7 +5315,185 @@
         }
 
         function showAdminAddForm() {
-          showNotification('Add form functionality coming soon!', 'info');
+          showAdminForm(null, false);
+        }
+
+        function showAdminForm(item = null, isEditing = false) {
+          const formFields = getAdminFormFields();
+          const formData = item ? { ...item } : {};
+          
+          const formModal = document.createElement('div');
+          formModal.className = 'modal-overlay';
+          formModal.id = 'adminFormModal';
+          formModal.innerHTML = `
+            <div class="modal-content admin-form-content">
+              <div class="modal-header">
+                <h2>${isEditing ? '✏️ Edit' : '➕ Add'} ${adminTabConfig[activeAdminTab].title.slice(0, -1)}</h2>
+                <button onclick="closeAdminForm()" class="close-btn">&times;</button>
+              </div>
+              <div class="modal-body">
+                <form id="adminForm" class="admin-form">
+                  <div class="form-grid">
+                    ${formFields.map(field => renderAdminFormField(field, formData[field.key])).join('')}
+                  </div>
+                  <div class="form-actions">
+                    <button type="button" onclick="saveAdminItem(${item?.id || 'null'}, ${isEditing})" class="save-btn">
+                      ${isEditing ? 'Update' : 'Add'} ${adminTabConfig[activeAdminTab].title.slice(0, -1)}
+                    </button>
+                    <button type="button" onclick="closeAdminForm()" class="cancel-btn">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          `;
+          
+          document.body.appendChild(formModal);
+          setTimeout(() => formModal.classList.add('show'), 10);
+        }
+
+        function closeAdminForm() {
+          const modal = document.getElementById('adminFormModal');
+          if (modal) {
+            modal.classList.remove('show');
+            setTimeout(() => modal.remove(), 300);
+          }
+        }
+
+        function getAdminFormFields() {
+          const fieldConfigs = {
+            'food-stalls': [
+              { key: 'name', label: 'Stall Name', type: 'text', required: true },
+              { key: 'category', label: 'Category', type: 'select', options: ['Fast Food', 'Asian', 'Mexican', 'Italian', 'Desserts', 'Beverages', 'Other'], required: true },
+              { key: 'location', label: 'Location', type: 'text', required: true },
+              { key: 'coordinates', label: 'Coordinates (lat, lng)', type: 'coordinates', required: true },
+              { key: 'phone', label: 'Phone', type: 'tel', required: true },
+              { key: 'email', label: 'Email', type: 'email', required: true },
+              { key: 'hours', label: 'Operating Hours', type: 'text', required: true },
+              { key: 'rating', label: 'Rating', type: 'number', min: 0, max: 5, step: 0.1, required: false },
+              { key: 'description', label: 'Description', type: 'textarea', required: false }
+            ],
+            'float-trucks': [
+              { key: 'name', label: 'Float Truck Name', type: 'text', required: true },
+              { key: 'category', label: 'Category', type: 'select', options: ['Drinks & Smoothies', 'Ice Cream', 'Snacks', 'Entertainment', 'Food Truck', 'Other'], required: true },
+              { key: 'currentLocation', label: 'Current Location', type: 'text', required: true },
+              { key: 'coordinates', label: 'Coordinates (lat, lng)', type: 'coordinates', required: true },
+              { key: 'phone', label: 'Phone', type: 'tel', required: true },
+              { key: 'email', label: 'Email', type: 'email', required: true },
+              { key: 'schedule', label: 'Schedule', type: 'text', required: true },
+              { key: 'trackingMethod', label: 'Tracking Method', type: 'select', options: ['gps', 'mobile-app', 'social-media', 'hybrid'], required: true },
+              { key: 'gpsTrackerId', label: 'GPS Tracker ID', type: 'text', required: false },
+              { key: 'driverPhone', label: 'Driver Phone', type: 'tel', required: false },
+              { key: 'nextStop', label: 'Next Stop', type: 'text', required: false },
+              { key: 'estimatedArrival', label: 'Estimated Arrival', type: 'time', required: false },
+              { key: 'rating', label: 'Rating', type: 'number', min: 0, max: 5, step: 0.1, required: false },
+              { key: 'description', label: 'Description', type: 'textarea', required: false }
+            ],
+            'groups': [
+              { key: 'name', label: 'Group Name', type: 'text', required: true },
+              { key: 'type', label: 'Group Type', type: 'select', options: ['Food Community', 'Friends Group', 'Business Network', 'Event Group', 'Other'], required: true },
+              { key: 'admin', label: 'Admin Name', type: 'text', required: true },
+              { key: 'email', label: 'Contact Email', type: 'email', required: true },
+              { key: 'memberCount', label: 'Member Count', type: 'number', min: 0, required: false },
+              { key: 'description', label: 'Description', type: 'textarea', required: false }
+            ],
+            'friends': [
+              { key: 'name', label: 'Full Name', type: 'text', required: true },
+              { key: 'username', label: 'Username', type: 'text', required: true },
+              { key: 'email', label: 'Email', type: 'email', required: true },
+              { key: 'phone', label: 'Phone', type: 'tel', required: false },
+              { key: 'location', label: 'Location', type: 'text', required: false },
+              { key: 'joinDate', label: 'Join Date', type: 'date', required: true }
+            ]
+          };
+          
+          return fieldConfigs[activeAdminTab] || [];
+        }
+
+        function renderAdminFormField(field, value) {
+          const fieldValue = field.key === 'coordinates' && value && typeof value === 'object'
+            ? `${value.lat}, ${value.lng}`
+            : value || '';
+
+          const fieldClass = field.type === 'textarea' ? 'form-field full-width' : 'form-field';
+          
+          let inputHtml = '';
+          
+          switch (field.type) {
+            case 'select':
+              inputHtml = `
+                <select name="${field.key}" required="${field.required}" class="form-input">
+                  <option value="">Select ${field.label}</option>
+                  ${field.options.map(option => 
+                    `<option value="${option}" ${fieldValue === option ? 'selected' : ''}>${option}</option>`
+                  ).join('')}
+                </select>
+              `;
+              break;
+            case 'textarea':
+              inputHtml = `
+                <textarea name="${field.key}" required="${field.required}" class="form-input" rows="3" placeholder="Enter ${field.label.toLowerCase()}">${fieldValue}</textarea>
+              `;
+              break;
+            case 'coordinates':
+              inputHtml = `
+                <input type="text" name="${field.key}" value="${fieldValue}" required="${field.required}" class="form-input" placeholder="40.7128, -74.0060">
+              `;
+              break;
+            default:
+              inputHtml = `
+                <input type="${field.type}" name="${field.key}" value="${fieldValue}" required="${field.required}" class="form-input" 
+                  ${field.min ? `min="${field.min}"` : ''} 
+                  ${field.max ? `max="${field.max}"` : ''} 
+                  ${field.step ? `step="${field.step}"` : ''}
+                  placeholder="Enter ${field.label.toLowerCase()}">
+              `;
+          }
+          
+          return `
+            <div class="${fieldClass}">
+              <label class="form-label">
+                ${field.label}
+                ${field.required ? '<span class="required">*</span>' : ''}
+              </label>
+              ${inputHtml}
+            </div>
+          `;
+        }
+
+        function saveAdminItem(id, isEditing) {
+          const form = document.getElementById('adminForm');
+          const formData = new FormData(form);
+          const itemData = {};
+          
+          for (let [key, value] of formData.entries()) {
+            if (key === 'coordinates') {
+              const [lat, lng] = value.split(',').map(v => parseFloat(v.trim()));
+              itemData[key] = { lat: lat || 0, lng: lng || 0 };
+            } else if (key === 'memberCount' || key === 'rating') {
+              itemData[key] = parseFloat(value) || 0;
+            } else {
+              itemData[key] = value;
+            }
+          }
+          
+          if (isEditing) {
+            // Update existing item
+            const index = adminData[activeAdminTab].findIndex(item => item.id === id);
+            if (index !== -1) {
+              adminData[activeAdminTab][index] = { ...adminData[activeAdminTab][index], ...itemData };
+            }
+          } else {
+            // Add new item
+            const newId = Math.max(...adminData[activeAdminTab].map(item => item.id), 0) + 1;
+            itemData.id = newId;
+            itemData.status = 'active';
+            adminData[activeAdminTab].push(itemData);
+          }
+          
+          // Update table and close form
+          document.getElementById('adminTableBody').innerHTML = renderAdminTableData();
+          closeAdminForm();
+          showNotification(`${isEditing ? 'Updated' : 'Added'} ${adminTabConfig[activeAdminTab].title.slice(0, -1)} successfully!`, 'success');
         }
 
         // Add search functionality to admin portal
