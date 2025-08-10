@@ -4984,6 +4984,7 @@
         }
 
         async function handleRegister(event) {
+          console.log('handleRegister called'); // Debug log
           event.preventDefault();
           
           const name = document.getElementById('registerName').value;
@@ -4991,6 +4992,8 @@
           const password = document.getElementById('registerPassword').value;
           const confirmPassword = document.getElementById('confirmPassword').value;
           const button = event.target.querySelector('button[type="submit"]');
+          
+          console.log('Form values:', { name, email, password: password ? '***' : 'empty', confirmPassword: confirmPassword ? '***' : 'empty' }); // Debug log
           
           // Validate inputs
           if (!name || !email || !password || !confirmPassword) {
@@ -5008,10 +5011,12 @@
             return;
           }
           
+          console.log('Validation passed, attempting registration...'); // Debug log
           showLoading(button);
           clearAuthMessages();
           
           try {
+            console.log('Calling Supabase auth.signUp...'); // Debug log
             const { data, error } = await supabase.auth.signUp({
               email: email,
               password: password,
@@ -5021,6 +5026,8 @@
                 }
               }
             });
+            
+            console.log('Supabase response:', { data, error }); // Debug log
             
             if (error) throw error;
             
@@ -6808,127 +6815,11 @@
           console.log('User logged in:', userData, 'Remember me:', rememberMe);
         }
 
-        // Event Listeners for Forms
-        document.addEventListener('DOMContentLoaded', function () {
-          // Login form submission
-          document.getElementById('loginForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            handleLogin();
-          });
+        // Remove old event listeners - these are now handled in the main DOMContentLoaded
 
-          // Register form submission
-          document.getElementById('registerForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            handleRegister();
-          });
-        });
+        // Old handleLogin function removed - using new async version
 
-        function handleLogin() {
-          const email = document.getElementById('loginEmail').value.trim();
-          const password = document.getElementById('loginPassword').value.trim();
-
-          if (!email || !password) {
-            showError('login', 'Please fill in all fields');
-            return;
-          }
-
-          // Check rate limiting
-          const now = Date.now();
-          if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
-            if (now - lastLoginAttempt < LOGIN_COOLDOWN) {
-              const remainingTime = Math.ceil((LOGIN_COOLDOWN - (now - lastLoginAttempt)) / 1000 / 60);
-              showError('login', `Too many login attempts. Please wait ${remainingTime} minutes.`);
-              return;
-            } else {
-              // Reset attempts after cooldown
-              loginAttempts = 0;
-            }
-          }
-
-          showLoading('loginBtn');
-          clearAuthMessages();
-
-          // Simulate API call
-          setTimeout(() => {
-            // Mock validation - in real app, this would be an API call
-            if (email === 'demo@tagyou.com' && password === 'password') {
-              const userData = {
-                id: 'demo_user',
-                name: 'Demo User',
-                email: email,
-                provider: 'email'
-              };
-              loginUser(userData);
-              loginAttempts = 0; // Reset on successful login
-            } else if (email.includes('@') && password.length >= 6) {
-              // Accept any valid email format with password >= 6 chars for demo
-              const userData = {
-                id: 'user_' + Date.now(),
-                name: email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1),
-                email: email,
-                provider: 'email'
-              };
-              loginUser(userData);
-              loginAttempts = 0; // Reset on successful login
-            } else {
-              loginAttempts++;
-              lastLoginAttempt = now;
-              showError('login', 'Invalid email or password');
-            }
-
-            hideLoading('loginBtn');
-          }, 1000);
-        }
-
-        function handleRegister() {
-          const name = document.getElementById('registerName').value.trim();
-          const email = document.getElementById('registerEmail').value.trim();
-          const password = document.getElementById('registerPassword').value.trim();
-          const confirmPassword = document.getElementById('registerConfirmPassword').value.trim();
-
-          if (!name || !email || !password || !confirmPassword) {
-            showError('register', 'Please fill in all fields');
-            return;
-          }
-
-          if (password !== confirmPassword) {
-            showError('register', 'Passwords do not match');
-            return;
-          }
-
-          if (password.length < 6) {
-            showError('register', 'Password must be at least 6 characters');
-            return;
-          }
-
-          if (!email.includes('@')) {
-            showError('register', 'Please enter a valid email address');
-            return;
-          }
-
-          showLoading('registerBtn');
-          clearAuthMessages();
-
-          // Simulate API call
-          setTimeout(() => {
-            const userData = {
-              id: 'user_' + Date.now(),
-              name: name,
-              email: email,
-              provider: 'email'
-            };
-
-            // Show success message
-            showSuccess('register', 'Account created successfully! Redirecting...');
-
-            // Login user after successful registration
-            setTimeout(() => {
-              loginUser(userData);
-            }, 1500);
-
-            hideLoading('registerBtn');
-          }, 1000);
-        }
+        // Old handleRegister function removed - using new async version
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function () {
@@ -6960,9 +6851,28 @@
           }
           
           // Add authentication form event listeners
-          document.getElementById('loginForm').addEventListener('submit', handleLogin);
-          document.getElementById('registerForm').addEventListener('submit', handleRegister);
-          document.getElementById('forgotForm').addEventListener('submit', handleForgotPassword);
+          console.log('Setting up auth event listeners...'); // Debug log
+          
+          const loginForm = document.getElementById('loginForm');
+          const registerForm = document.getElementById('registerForm');
+          const forgotForm = document.getElementById('forgotForm');
+          
+          console.log('Forms found:', { loginForm: !!loginForm, registerForm: !!registerForm, forgotForm: !!forgotForm }); // Debug log
+          
+          if (loginForm) {
+            loginForm.addEventListener('submit', handleLogin);
+            console.log('Login form event listener added');
+          }
+          
+          if (registerForm) {
+            registerForm.addEventListener('submit', handleRegister);
+            console.log('Register form event listener added');
+          }
+          
+          if (forgotForm) {
+            forgotForm.addEventListener('submit', handleForgotPassword);
+            console.log('Forgot form event listener added');
+          }
           
           // Add real-time password validation
           document.getElementById('registerPassword').addEventListener('input', checkPasswordStrength);
