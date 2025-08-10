@@ -48,9 +48,9 @@ BEGIN
         NEW.email,
         COALESCE(NEW.raw_user_meta_data->>'full_name', 'User'),
         CASE 
-            WHEN NEW.email = 'admin@tagyou.com' THEN 'admin'
-            WHEN NEW.email LIKE '%@admin.com' THEN 'admin'
-            ELSE 'user'
+            WHEN NEW.email = 'admin@tagyou.com' THEN 'admin'::TEXT
+            WHEN NEW.email LIKE '%@admin.com' THEN 'admin'::TEXT
+            ELSE 'user'::TEXT
         END,
         CASE 
             WHEN NEW.email = 'admin@tagyou.com' THEN TRUE
@@ -83,9 +83,9 @@ SELECT
     au.email,
     COALESCE(au.raw_user_meta_data->>'full_name', 'User'),
     CASE 
-        WHEN au.email = 'admin@tagyou.com' THEN 'admin'
-        WHEN au.email LIKE '%@admin.com' THEN 'admin'
-        ELSE 'user'
+        WHEN au.email = 'admin@tagyou.com' THEN 'admin'::TEXT
+        WHEN au.email LIKE '%@admin.com' THEN 'admin'::TEXT
+        ELSE 'user'::TEXT
     END,
     CASE 
         WHEN au.email = 'admin@tagyou.com' THEN TRUE
