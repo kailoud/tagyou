@@ -4279,10 +4279,7 @@
       font-size: 14px;
     }
 
-    .location-coords {
-      font-family: monospace;
-      font-weight: 500;
-    }
+
 
     .location-accuracy {
       color: #888;
@@ -4495,7 +4492,6 @@
       <div id="locationDisplay" class="location-display" style="display: none;">
         <div class="location-info">
           <span class="location-icon">📍</span>
-          <span class="location-coords">Getting location...</span>
           <span class="location-accuracy"></span>
           <span class="location-details"></span>
           <span class="location-time"></span>
@@ -7975,7 +7971,6 @@
           locationDisplay.innerHTML = `
             <div class="location-info">
               <span class="location-icon">📍</span>
-              <span class="location-coords">${location.lat.toFixed(8)}, ${location.lng.toFixed(8)}</span>
               <span class="location-accuracy" style="color: ${accuracyColor}">±${location.accuracy.toFixed(1)}m</span>
               <span class="location-details">${speedText}${headingText}</span>
               <span class="location-time">${new Date().toLocaleTimeString()}</span>
