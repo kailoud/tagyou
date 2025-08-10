@@ -2490,44 +2490,8 @@
       background: #a8a8a8;
     }
 
-    /* Freemium blur styles */
-    .stall-card.blurred,
-    .float-card.blurred {
-      filter: blur(3px);
-      opacity: 0.6;
-      pointer-events: none;
-      position: relative;
-    }
-
-    .stall-card.blurred::after,
-    .float-card.blurred::after {
-      content: "🔒 Pro Only";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      z-index: 10;
-      white-space: nowrap;
-    }
-
-    .stall-card.blurred:hover,
-    .float-card.blurred:hover {
-      cursor: pointer;
-      filter: blur(2px);
-      opacity: 0.7;
-    }
-
-    .stall-card.blurred:hover::after,
-    .float-card.blurred:hover::after {
-      content: "🔒 Upgrade to Pro";
-      background: rgba(255, 107, 53, 0.9);
-    }
+    /* Freemium blur styles - REMOVED */
+    /* All stalls and floats are now fully accessible */
 
     /* Carnival Route Visualization Styles */
     .carnival-route-marker {
@@ -6092,12 +6056,10 @@
           ];
 
           floatCards.innerHTML = floats.map((float, index) => {
-            const isBlurred = !isProUser && index >= 5;
-            const clickHandler = isBlurred ? 'showSubscriptionOverlay()' : `selectFloat(${float.id})`;
-            const blurredClass = isBlurred ? 'blurred' : '';
+            const clickHandler = `selectFloat(${float.id})`;
 
             return `
-        <div class="float-card ${blurredClass}" onclick="${clickHandler}">
+        <div class="float-card" onclick="${clickHandler}">
           <div class="float-card-header">
             <span class="float-name">${float.name}</span>
             <span class="float-status ${float.status}">${float.status.toUpperCase()}</span>
@@ -6512,16 +6474,10 @@
           console.log('Total stalls to render:', filteredStalls.length);
 
           stallsGrid.innerHTML = filteredStalls.map((stall, index) => {
-            const isBlurred = !isProUser && index >= 4;
-            const clickHandler = isBlurred ? 'showSubscriptionOverlay()' : `openStallModal(${stall.id})`;
-            const blurredClass = isBlurred ? 'blurred' : '';
-
-            if (isBlurred) {
-              console.log(`Stall ${index + 1} (${stall.name}) will be blurred`);
-            }
+            const clickHandler = `openStallModal(${stall.id})`;
 
             return `
-        <div class="stall-card ${blurredClass}" onclick="${clickHandler}">
+        <div class="stall-card" onclick="${clickHandler}">
           <div class="stall-card-header">
             <div class="stall-name">${stall.name}</div>
             <div class="stall-origin-badge">${stall.origin}</div>
