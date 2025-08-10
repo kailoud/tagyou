@@ -4078,6 +4078,11 @@
             }
           }
 
+          // Update map marker with new name
+          if (window.userMarker && map) {
+            window.userMarker.setPopupContent(`<strong>${currentUser.name}</strong><br>You are here (London)`);
+          }
+
           // Show success message
           showNotification('Profile updated successfully!');
           
@@ -4186,6 +4191,34 @@
           const userInitials = document.getElementById('userInitials');
           if (userInitials) {
             userInitials.textContent = avatar;
+          }
+
+          // Update avatar on map marker
+          if (window.userMarker && map) {
+            const userName = currentUser?.name || 'Demo User';
+            
+            const newAvatarIcon = L.divIcon({
+              className: 'avatar-marker',
+              html: `<div style="
+                background: #ff6b35;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                border: 3px solid white;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 20px;
+                font-weight: bold;
+              ">${avatar}</div>`,
+              iconSize: [40, 40],
+              iconAnchor: [20, 20]
+            });
+
+            window.userMarker.setIcon(newAvatarIcon);
+            window.userMarker.setPopupContent(`<strong>${userName}</strong><br>You are here (London)`);
           }
 
           showNotification('Avatar updated successfully!');
@@ -4852,8 +4885,36 @@
             attribution: '© OpenStreetMap contributors'
           }).addTo(map);
 
-          // Add user marker
-          L.marker([51.5074, -0.1278]).addTo(map).bindPopup('You are here (London)');
+          // Add user marker with avatar
+          const userAvatar = currentUser?.avatar || '👤';
+          const userName = currentUser?.name || 'Demo User';
+          
+          const avatarIcon = L.divIcon({
+            className: 'avatar-marker',
+            html: `<div style="
+              background: #ff6b35;
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              border: 3px solid white;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-size: 20px;
+              font-weight: bold;
+            ">${userAvatar}</div>`,
+            iconSize: [40, 40],
+            iconAnchor: [20, 20]
+          });
+
+          const userMarker = L.marker([51.5074, -0.1278], { icon: avatarIcon })
+            .addTo(map)
+            .bindPopup(`<strong>${userName}</strong><br>You are here (London)`);
+          
+          // Store reference to user marker for updates
+          window.userMarker = userMarker;
 
           // Mark map as initialized
           window.mapInitialized = true;
