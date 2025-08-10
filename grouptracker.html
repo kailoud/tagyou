@@ -687,6 +687,165 @@
       color: #dc2626;
     }
 
+    /* Email Verification Popup Styles */
+    .email-verification-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      padding: 20px;
+    }
+
+    .email-verification-overlay.show {
+      opacity: 1;
+    }
+
+    .email-verification-popup {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 450px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .email-verification-overlay.show .email-verification-popup {
+      transform: scale(1);
+    }
+
+    .email-verification-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-10px);
+      }
+      60% {
+        transform: translateY(-5px);
+      }
+    }
+
+    .email-verification-popup h2 {
+      font-size: 28px;
+      color: #1f2937;
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    .email-verification-popup p {
+      color: #6b7280;
+      margin-bottom: 16px;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .email-display {
+      background: #f3f4f6;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      color: #1f2937;
+      font-size: 14px;
+    }
+
+    .verification-instructions {
+      color: #374151 !important;
+      font-weight: 500;
+      margin-bottom: 24px !important;
+    }
+
+    .verification-actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .verification-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 120px;
+    }
+
+    .verification-btn.primary {
+      background: #ff6b35;
+      color: white;
+    }
+
+    .verification-btn.primary:hover {
+      background: #e55a2b;
+      transform: translateY(-2px);
+    }
+
+    .verification-btn.secondary {
+      background: #f3f4f6;
+      color: #374151;
+      border: 2px solid #e5e7eb;
+    }
+
+    .verification-btn.secondary:hover {
+      background: #e5e7eb;
+      transform: translateY(-2px);
+    }
+
+    .verification-footer {
+      border-top: 1px solid #e5e7eb;
+      padding-top: 16px;
+      margin-top: 16px;
+    }
+
+    .verification-footer p {
+      font-size: 14px;
+      color: #9ca3af;
+      margin: 0;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 480px) {
+      .email-verification-popup {
+        padding: 30px 20px;
+        margin: 20px;
+      }
+
+      .email-verification-popup h2 {
+        font-size: 24px;
+      }
+
+      .verification-actions {
+        flex-direction: column;
+      }
+
+      .verification-btn {
+        width: 100%;
+      }
+    }
+
     /* Demo button styles removed */
 
     /* App content - hidden by default, shown after authentication */
@@ -5035,16 +5194,11 @@
             
             // Check if email confirmation is required
             if (data.user && !data.user.email_confirmed_at) {
-              showAuthMessage('Account created successfully! Please check your email to verify your account, then sign in.', 'success');
+              // Show email verification popup
+              showEmailVerificationPopup(email);
               
               // Clear form
               event.target.reset();
-              
-              // Switch back to login tab after 2 seconds
-              setTimeout(() => {
-                switchAuthTab('login');
-                showAuthMessage('Please check your email and sign in with your new account.', 'info');
-              }, 2000);
             } else {
               // If email confirmation is not required, log in immediately
               showAuthMessage('Account created successfully! Logging you in...', 'success');
@@ -5145,6 +5299,67 @@
             console.log('User logged out successfully');
           } catch (error) {
             console.error('Logout error:', error);
+          }
+        }
+
+        // Email Verification Popup
+        function showEmailVerificationPopup(email) {
+          // Create popup overlay
+          const popupOverlay = document.createElement('div');
+          popupOverlay.className = 'email-verification-overlay';
+          popupOverlay.innerHTML = `
+            <div class="email-verification-popup">
+              <div class="email-verification-icon">📧</div>
+              <h2>Check Your Email!</h2>
+              <p>We've sent a verification link to:</p>
+              <div class="email-display">${email}</div>
+              <p class="verification-instructions">
+                Click the link in your email to verify your account and start using GroupTracker!
+              </p>
+              <div class="verification-actions">
+                <button onclick="closeEmailVerificationPopup()" class="verification-btn primary">Got it!</button>
+                <button onclick="resendVerificationEmail('${email}')" class="verification-btn secondary">Resend Email</button>
+              </div>
+              <div class="verification-footer">
+                <p>Didn't receive the email? Check your spam folder or try resending.</p>
+              </div>
+            </div>
+          `;
+          
+          document.body.appendChild(popupOverlay);
+          
+          // Add animation
+          setTimeout(() => {
+            popupOverlay.classList.add('show');
+          }, 10);
+        }
+
+        function closeEmailVerificationPopup() {
+          const popup = document.querySelector('.email-verification-overlay');
+          if (popup) {
+            popup.classList.remove('show');
+            setTimeout(() => {
+              popup.remove();
+              // Switch back to login tab
+              switchAuthTab('login');
+              showAuthMessage('Please check your email and sign in with your verified account.', 'info');
+            }, 300);
+          }
+        }
+
+        async function resendVerificationEmail(email) {
+          try {
+            const { error } = await supabase.auth.resend({
+              type: 'signup',
+              email: email
+            });
+            
+            if (error) throw error;
+            
+            showAuthMessage('Verification email resent! Please check your inbox.', 'success');
+          } catch (error) {
+            console.error('Resend error:', error);
+            showAuthMessage('Error resending email. Please try again.', 'error');
           }
         }
 
