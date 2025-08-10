@@ -3586,11 +3586,18 @@
           if (authOverlay) {
             authOverlay.style.display = 'none';
             console.log('Auth overlay hidden');
+            console.log('Auth overlay display style:', window.getComputedStyle(authOverlay).display);
           }
 
           if (appContent) {
             appContent.classList.add('authenticated');
             console.log('App content authenticated class added');
+
+            // Check if app content is visible
+            const rect = appContent.getBoundingClientRect();
+            console.log('App content dimensions:', rect.width, 'x', rect.height);
+            console.log('App content visible:', rect.width > 0 && rect.height > 0);
+            console.log('App content display style:', window.getComputedStyle(appContent).display);
           }
 
           if (userProfile) {
@@ -4154,6 +4161,11 @@
               return;
             }
 
+            // Check map container dimensions
+            const rect = mapContainer.getBoundingClientRect();
+            console.log('Map container dimensions:', rect.width, 'x', rect.height);
+            console.log('Map container visible:', rect.width > 0 && rect.height > 0);
+
             // Check if Leaflet is available
             if (typeof L === 'undefined') {
               console.error('Leaflet library not loaded');
@@ -4170,6 +4182,8 @@
               attribution: '© OpenStreetMap contributors'
             }).addTo(map);
 
+            console.log('Tile layer added to map');
+
             // Verify map is properly initialized
             if (!map || !map.setView) {
               console.error('Map initialization failed');
@@ -4183,6 +4197,14 @@
                 // Set a default view first to ensure map is working
                 map.setView([51.5074, -0.1278], 16);
                 console.log('Map set to default view');
+
+                // Force map container to be visible for testing
+                const mapContainer = document.getElementById('map');
+                if (mapContainer) {
+                  mapContainer.style.backgroundColor = '#e0e0e0';
+                  mapContainer.style.border = '2px solid red';
+                  console.log('Map container styled for visibility testing');
+                }
               } else {
                 console.error('Map not ready after delay');
               }
