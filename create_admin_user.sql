@@ -9,7 +9,7 @@
 DO $$
 BEGIN
     -- Check if admin user already exists
-    /*IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'admin@tagyou.com') THEN
+    IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'admin@tagyou.com') THEN
         -- Insert admin user into auth.users table
         INSERT INTO auth.users (
             instance_id,
