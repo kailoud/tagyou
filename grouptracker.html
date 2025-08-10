@@ -687,6 +687,22 @@
       color: #dc2626;
     }
 
+    .demo-btn {
+      background: #059669;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.3s ease;
+    }
+
+    .demo-btn:hover {
+      background: #047857;
+    }
+
     /* App content - hidden by default, shown after authentication */
     .app-content {
       display: none;
@@ -4074,8 +4090,8 @@
         </div>
         
         <div class="auth-tabs">
-          <button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
-          <button class="auth-tab" onclick="switchAuthTab('register')">Sign Up</button>
+          <button class="auth-tab active" onclick="switchAuthTab('login')" id="loginTab">Sign In</button>
+          <button class="auth-tab" onclick="switchAuthTab('register')" id="registerTab">Sign Up</button>
         </div>
         
         <!-- Login Form -->
@@ -4091,6 +4107,8 @@
           <button type="submit" class="auth-btn">Sign In</button>
           <div class="auth-links">
             <a href="#" onclick="switchAuthTab('forgot')">Forgot Password?</a>
+            <br>
+            <button type="button" onclick="demoLogin()" class="demo-btn">Demo Login (Admin)</button>
           </div>
         </form>
         
@@ -4839,7 +4857,12 @@
         function switchAuthTab(tab) {
           // Update tab buttons
           document.querySelectorAll('.auth-tab').forEach(btn => btn.classList.remove('active'));
-          event.target.classList.add('active');
+          
+          if (tab === 'login') {
+            document.getElementById('loginTab').classList.add('active');
+          } else if (tab === 'register') {
+            document.getElementById('registerTab').classList.add('active');
+          }
           
           // Hide all forms
           document.querySelectorAll('.auth-form').forEach(form => form.style.display = 'none');
@@ -4925,6 +4948,17 @@
           const password = document.getElementById('loginPassword').value;
           const button = event.target.querySelector('button[type="submit"]');
           
+          // Validate inputs
+          if (!email || !password) {
+            showAuthMessage('Please fill in all fields');
+            return;
+          }
+          
+          if (!email.includes('@')) {
+            showAuthMessage('Please enter a valid email address');
+            return;
+          }
+          
           showLoading(button);
           clearAuthMessages();
           
@@ -4958,8 +4992,19 @@
           const confirmPassword = document.getElementById('confirmPassword').value;
           const button = event.target.querySelector('button[type="submit"]');
           
+          // Validate inputs
+          if (!name || !email || !password || !confirmPassword) {
+            showAuthMessage('Please fill in all fields');
+            return;
+          }
+          
           if (password !== confirmPassword) {
             showAuthMessage('Passwords do not match');
+            return;
+          }
+          
+          if (password.length < 6) {
+            showAuthMessage('Password must be at least 6 characters long');
             return;
           }
           
@@ -4981,6 +5026,9 @@
             
             showAuthMessage('Account created successfully! Please check your email to verify your account.', 'success');
             
+            // Clear form
+            event.target.reset();
+            
           } catch (error) {
             console.error('Registration error:', error);
             showAuthMessage(error.message);
@@ -4995,6 +5043,17 @@
           const email = document.getElementById('forgotEmail').value;
           const button = event.target.querySelector('button[type="submit"]');
           
+          // Validate email
+          if (!email) {
+            showAuthMessage('Please enter your email address');
+            return;
+          }
+          
+          if (!email.includes('@')) {
+            showAuthMessage('Please enter a valid email address');
+            return;
+          }
+          
           showLoading(button);
           clearAuthMessages();
           
@@ -5004,6 +5063,9 @@
             if (error) throw error;
             
             showAuthMessage('Password reset email sent! Please check your inbox.', 'success');
+            
+            // Clear form
+            event.target.reset();
             
           } catch (error) {
             console.error('Password reset error:', error);
@@ -5029,6 +5091,50 @@
             console.log('User logged out successfully');
           } catch (error) {
             console.error('Logout error:', error);
+          }
+        }
+
+        async function demoLogin() {
+          const button = document.querySelector('.demo-btn');
+          const originalText = button.textContent;
+          
+          showLoading(button);
+          clearAuthMessages();
+          
+          try {
+            // Try to sign in with demo credentials
+            const { data, error } = await supabase.auth.signInWithPassword({
+              email: 'demo@tagyou.com',
+              password: 'demo123456'
+            });
+            
+            if (error) {
+              // If demo account doesn't exist, create it
+              const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                email: 'demo@tagyou.com',
+                password: 'demo123456',
+                options: {
+                  data: {
+                    full_name: 'Demo Admin User'
+                  }
+                }
+              });
+              
+              if (signUpError) throw signUpError;
+              
+              showAuthMessage('Demo account created! Please check your email to verify, then try logging in again.', 'success');
+            } else {
+              showAuthMessage('Demo login successful! Redirecting...', 'success');
+              setTimeout(() => {
+                checkAuthStatus();
+              }, 1000);
+            }
+            
+          } catch (error) {
+            console.error('Demo login error:', error);
+            showAuthMessage('Demo login failed. Please try creating a regular account.');
+          } finally {
+            hideLoading(button, originalText);
           }
         }
 
@@ -5260,6 +5366,7 @@
 
           if (!password) {
             strengthDiv.textContent = '';
+            strengthDiv.className = 'password-strength';
             return;
           }
 
@@ -5275,42 +5382,40 @@
           if (/[^A-Za-z0-9]/.test(password)) score++;
 
           let strength = '';
-          let color = '';
+          let className = '';
 
           if (score <= 2) {
             strength = 'Weak';
-            color = '#d32f2f';
+            className = 'weak';
           } else if (score <= 3) {
-            strength = 'Fair';
-            color = '#f57c00';
-          } else if (score <= 4) {
-            strength = 'Good';
-            color = '#1976d2';
+            strength = 'Medium';
+            className = 'medium';
           } else {
             strength = 'Strong';
-            color = '#388e3c';
+            className = 'strong';
           }
 
-          strengthDiv.innerHTML = `
-        <span style="color: ${color}; font-weight: 600;">${strength}</span>
-        ${feedback.length > 0 ? '<br><span style="color: #666; font-size: 11px;">' + feedback.join(', ') + '</span>' : ''}
-      `;
+          strengthDiv.textContent = `Password strength: ${strength}`;
+          strengthDiv.className = `password-strength ${className}`;
         }
 
         function checkPasswordMatch() {
           const password = document.getElementById('registerPassword').value;
-          const confirmPassword = document.getElementById('registerConfirmPassword').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
           const matchDiv = document.getElementById('passwordMatch');
 
           if (!confirmPassword) {
             matchDiv.textContent = '';
+            matchDiv.className = 'password-match';
             return;
           }
 
           if (password === confirmPassword) {
-            matchDiv.innerHTML = '<span style="color: #388e3c;">✓ Passwords match</span>';
+            matchDiv.textContent = '✓ Passwords match';
+            matchDiv.className = 'password-match match';
           } else {
-            matchDiv.innerHTML = '<span style="color: #d32f2f;">✗ Passwords do not match</span>';
+            matchDiv.textContent = '✗ Passwords do not match';
+            matchDiv.className = 'password-match no-match';
           }
         }
 
@@ -6858,6 +6963,10 @@
           document.getElementById('loginForm').addEventListener('submit', handleLogin);
           document.getElementById('registerForm').addEventListener('submit', handleRegister);
           document.getElementById('forgotForm').addEventListener('submit', handleForgotPassword);
+          
+          // Add real-time password validation
+          document.getElementById('registerPassword').addEventListener('input', checkPasswordStrength);
+          document.getElementById('confirmPassword').addEventListener('input', checkPasswordMatch);
         });
 
         // Map validation helper
