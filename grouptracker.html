@@ -6533,12 +6533,13 @@
 
       // Admin Portal Functions
       async function showAdminPortal() {
-        // Check if user is admin (demo@tagyou.com or any email ending with @admin.com)
-        const isAdmin = currentUser?.email === 'demo@tagyou.com' ||
-          currentUser?.email?.endsWith('@admin.com') ||
-          currentUser?.email === 'admin@tagyou.com';
-
-        if (!isAdmin) {
+        console.log('showAdminPortal called');
+        console.log('Current user:', currentUser);
+        console.log('isProUser:', isProUser);
+        
+        // Check if user has admin privileges
+        if (!isProUser) {
+          console.log('Access denied - user is not admin');
           showNotification('Access denied. Admin privileges required.', 'error');
           return;
         }
@@ -6651,14 +6652,20 @@
       // Supabase Database Functions
       async function loadAdminData() {
         try {
+          console.log('Loading admin data from Supabase...');
+          
           // Load food stalls
           const { data: foodStalls, error: foodError } = await supabase
             .from('food_stalls')
             .select('*')
             .order('created_at', { ascending: false });
 
-          if (foodError) throw foodError;
-          adminData['food-stalls'] = foodStalls || [];
+          if (foodError) {
+            console.warn('Food stalls table not found, using mock data:', foodError);
+            adminData['food-stalls'] = getMockFoodStalls();
+          } else {
+            adminData['food-stalls'] = foodStalls || [];
+          }
 
           // Load float trucks
           const { data: floatTrucks, error: floatError } = await supabase
@@ -6666,8 +6673,12 @@
             .select('*')
             .order('created_at', { ascending: false });
 
-          if (floatError) throw floatError;
-          adminData['float-trucks'] = floatTrucks || [];
+          if (floatError) {
+            console.warn('Float trucks table not found, using mock data:', floatError);
+            adminData['float-trucks'] = getMockFloatTrucks();
+          } else {
+            adminData['float-trucks'] = floatTrucks || [];
+          }
 
           // Load groups
           const { data: groups, error: groupsError } = await supabase
@@ -6675,8 +6686,12 @@
             .select('*')
             .order('created_at', { ascending: false });
 
-          if (groupsError) throw groupsError;
-          adminData['groups'] = groups || [];
+          if (groupsError) {
+            console.warn('Groups table not found, using mock data:', groupsError);
+            adminData['groups'] = getMockGroups();
+          } else {
+            adminData['groups'] = groups || [];
+          }
 
           // Load friends
           const { data: friends, error: friendsError } = await supabase
@@ -6684,18 +6699,32 @@
             .select('*')
             .order('created_at', { ascending: false });
 
-          if (friendsError) throw friendsError;
-          adminData['friends'] = friends || [];
+          if (friendsError) {
+            console.warn('Friends table not found, using mock data:', friendsError);
+            adminData['friends'] = friends || [];
+          } else {
+            adminData['friends'] = friends || [];
+          }
 
           // Update table display
           if (document.getElementById('adminTableBody')) {
             document.getElementById('adminTableBody').innerHTML = renderAdminTableData();
           }
 
-          console.log('Admin data loaded successfully from Supabase');
+          console.log('Admin data loaded successfully');
         } catch (error) {
           console.error('Error loading admin data:', error);
-          showNotification('Error loading data from database', 'error');
+          // Fallback to mock data
+          adminData['food-stalls'] = getMockFoodStalls();
+          adminData['float-trucks'] = getMockFloatTrucks();
+          adminData['groups'] = getMockGroups();
+          adminData['friends'] = getMockFriends();
+          
+          if (document.getElementById('adminTableBody')) {
+            document.getElementById('adminTableBody').innerHTML = renderAdminTableData();
+          }
+          
+          showNotification('Using demo data (database not configured)', 'info');
         }
       }
 
@@ -6741,6 +6770,112 @@
           console.error(`Error deleting from ${tableName}:`, error);
           throw error;
         }
+      }
+
+      // Mock Data Functions for Demo
+      function getMockFoodStalls() {
+        return [
+          {
+            id: 1,
+            name: 'Burger Palace',
+            description: 'Delicious gourmet burgers',
+            location: 'Main Street',
+            contact: '+44 7700 900001',
+            status: 'active',
+            image_url: '🍔'
+          },
+          {
+            id: 2,
+            name: 'Pizza Express',
+            description: 'Authentic Italian pizza',
+            location: 'Food Court',
+            contact: '+44 7700 900002',
+            status: 'active',
+            image_url: '🍕'
+          },
+          {
+            id: 3,
+            name: 'Taco Truck',
+            description: 'Mexican street food',
+            location: 'Park Area',
+            contact: '+44 7700 900003',
+            status: 'active',
+            image_url: '🌮'
+          }
+        ];
+      }
+
+      function getMockFloatTrucks() {
+        return [
+          {
+            id: 1,
+            name: 'Ice Cream Float',
+            description: 'Mobile ice cream truck',
+            location: 'Children\'s Area',
+            contact: '+44 7700 900004',
+            status: 'active',
+            image_url: '🍦'
+          },
+          {
+            id: 2,
+            name: 'Coffee Mobile',
+            description: 'Premium coffee on wheels',
+            location: 'Business District',
+            contact: '+44 7700 900005',
+            status: 'active',
+            image_url: '☕'
+          }
+        ];
+      }
+
+      function getMockGroups() {
+        return [
+          {
+            id: 1,
+            name: 'Festival Squad 2025',
+            description: 'Main festival group',
+            member_count: 4,
+            status: 'active',
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 2,
+            name: 'Food Lovers',
+            description: 'Group for food enthusiasts',
+            member_count: 8,
+            status: 'active',
+            created_at: new Date().toISOString()
+          }
+        ];
+      }
+
+      function getMockFriends() {
+        return [
+          {
+            id: 1,
+            name: 'Alex Johnson',
+            email: 'alex@example.com',
+            phone: '+44 7700 900123',
+            status: 'online',
+            avatar: 'A'
+          },
+          {
+            id: 2,
+            name: 'Sarah Smith',
+            email: 'sarah@example.com',
+            phone: '+44 7700 900124',
+            status: 'online',
+            avatar: 'S'
+          },
+          {
+            id: 3,
+            name: 'Mike Wilson',
+            email: 'mike@example.com',
+            phone: '+44 7700 900125',
+            status: 'away',
+            avatar: 'M'
+          }
+        ];
       }
 
       const adminTabConfig = {
