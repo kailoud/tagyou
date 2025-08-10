@@ -3521,10 +3521,13 @@
         }
 
         function checkAuthentication() {
+          console.log('checkAuthentication called');
           const token = localStorage.getItem('authToken');
           const userData = localStorage.getItem('userData');
           const tokenExpiry = localStorage.getItem('tokenExpiry');
           const rememberMe = localStorage.getItem('rememberMe') === 'true';
+
+          console.log('Auth check - token:', !!token, 'userData:', !!userData, 'tokenExpiry:', !!tokenExpiry);
 
           if (token && userData && tokenExpiry) {
             // Check if token is expired
@@ -3537,6 +3540,7 @@
             try {
               currentUser = JSON.parse(userData);
               isAuthenticated = true;
+              console.log('User authenticated, calling authenticateUser');
               authenticateUser();
 
               // Refresh token if it's close to expiring
@@ -3551,6 +3555,7 @@
               logout();
             }
           } else {
+            console.log('No valid auth data, showing auth overlay');
             showAuthOverlay();
           }
         }
@@ -3571,10 +3576,27 @@
         }
 
         function authenticateUser() {
+          console.log('authenticateUser called');
+
           // Hide auth overlay and show app
-          document.getElementById('authOverlay').style.display = 'none';
-          document.getElementById('appContent').classList.add('authenticated');
-          document.getElementById('userProfile').style.display = 'flex';
+          const authOverlay = document.getElementById('authOverlay');
+          const appContent = document.getElementById('appContent');
+          const userProfile = document.getElementById('userProfile');
+
+          if (authOverlay) {
+            authOverlay.style.display = 'none';
+            console.log('Auth overlay hidden');
+          }
+
+          if (appContent) {
+            appContent.classList.add('authenticated');
+            console.log('App content authenticated class added');
+          }
+
+          if (userProfile) {
+            userProfile.style.display = 'flex';
+            console.log('User profile shown');
+          }
 
           // Update user avatar
           updateUserAvatar();
@@ -4097,7 +4119,24 @@
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function () {
+          console.log('DOMContentLoaded - checking authentication');
           checkAuthentication();
+
+          // Temporary: Force show app for testing (remove this later)
+          setTimeout(() => {
+            console.log('Forcing app to show for testing');
+            const appContent = document.getElementById('appContent');
+            if (appContent) {
+              appContent.classList.add('authenticated');
+              console.log('App content forced to show');
+            }
+
+            // Force initialize map
+            if (typeof initializeMap === 'function') {
+              console.log('Forcing map initialization');
+              initializeMap();
+            }
+          }, 2000);
         });
 
         // Map validation helper
