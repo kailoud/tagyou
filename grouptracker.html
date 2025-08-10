@@ -7956,22 +7956,24 @@
         if (locationDisplay) {
           locationDisplay.style.display = 'block';
           
-          // Format accuracy with color coding
+          // Format accuracy with color coding (hidden numbers for privacy)
           const accuracyColor = location.accuracy <= 5 ? '#22c55e' : 
                                location.accuracy <= 10 ? '#eab308' : '#ef4444';
+          const accuracyText = location.accuracy <= 5 ? 'High' : 
+                              location.accuracy <= 10 ? 'Good' : 'Low';
           
-          // Format speed if available
+          // Format speed if available (hidden for privacy)
           const speedText = location.speed ? 
-            ` | ${(location.speed * 3.6).toFixed(1)} km/h` : '';
+            ` | Moving` : '';
           
-          // Format heading if available
+          // Format heading if available (hidden for privacy)
           const headingText = location.heading ? 
-            ` | ${location.heading.toFixed(0)}°` : '';
+            ` | Direction` : '';
           
           locationDisplay.innerHTML = `
             <div class="location-info">
               <span class="location-icon">📍</span>
-              <span class="location-accuracy" style="color: ${accuracyColor}">±${location.accuracy.toFixed(1)}m</span>
+              <span class="location-accuracy" style="color: ${accuracyColor}">${accuracyText}</span>
               <span class="location-details">${speedText}${headingText}</span>
               <span class="location-time">${new Date().toLocaleTimeString()}</span>
             </div>
