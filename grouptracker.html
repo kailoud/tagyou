@@ -608,6 +608,208 @@
       border-color: #ff6b35;
     }
 
+    /* Admin Portal Styles */
+    .admin-portal-content {
+      max-width: 90vw;
+      width: 1200px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .admin-subtitle {
+      color: #6b7280;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .admin-tabs {
+      display: flex;
+      border-bottom: 1px solid #e5e7eb;
+      margin-bottom: 24px;
+      gap: 8px;
+    }
+
+    .admin-tab {
+      padding: 12px 16px;
+      border: none;
+      background: transparent;
+      border-radius: 8px 8px 0 0;
+      cursor: pointer;
+      font-weight: 500;
+      color: #6b7280;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .admin-tab.active {
+      background: #1e40af;
+      color: white;
+    }
+
+    .tab-count {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+    .admin-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      gap: 16px;
+    }
+
+    .admin-search {
+      padding: 8px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      width: 300px;
+      font-size: 14px;
+    }
+
+    .add-btn {
+      background: #1e40af;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.3s ease;
+    }
+
+    .add-btn:hover {
+      background: #1e3a8a;
+    }
+
+    .admin-table-container {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .admin-table th {
+      background: #f9fafb;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .admin-table td {
+      padding: 16px;
+      border-top: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+
+    .admin-table tr:hover {
+      background: #f9fafb;
+    }
+
+    .item-name {
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+
+    .item-category,
+    .item-username {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .item-details {
+      font-size: 14px;
+      color: #374151;
+    }
+
+    .item-details > div {
+      margin-bottom: 4px;
+    }
+
+    .tracking-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      background: #dbeafe;
+      color: #1e40af;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    .status-badge.active {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-badge.inactive {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .edit-btn,
+    .delete-btn {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: background 0.3s ease;
+    }
+
+    .edit-btn:hover {
+      background: #dbeafe;
+    }
+
+    .delete-btn:hover {
+      background: #fef2f2;
+    }
+
+    .no-data {
+      text-align: center;
+      color: #6b7280;
+      padding: 32px;
+    }
+
+    /* Admin portal link styling */
+    .user-menu-item.admin-portal {
+      border-top: 1px solid #e5e7eb;
+      margin-top: 8px;
+      padding-top: 8px;
+    }
+
+    .user-menu-item.admin-portal:hover {
+      background: #eff6ff;
+    }
+
     #map {
       height: 100vh;
       width: 100vw;
@@ -3007,6 +3209,12 @@
               </svg>
               Go Pro - £9.99/3mo
             </div>
+            <div class="user-menu-item admin-portal" onclick="showAdminPortal()" style="color: #1e40af; font-weight: 600; border-top: 1px solid #e5e7eb; margin-top: 8px; padding-top: 8px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              Admin Portal
+            </div>
             <div class="user-menu-item danger" onclick="logout()">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path
@@ -4600,6 +4808,259 @@
             window.location.reload();
           }, 2000);
         }
+
+        // Admin Portal Functions
+        function showAdminPortal() {
+          // Check if user is admin (demo@tagyou.com or any email ending with @admin.com)
+          const isAdmin = currentUser?.email === 'demo@tagyou.com' || 
+                         currentUser?.email?.endsWith('@admin.com') ||
+                         currentUser?.email === 'admin@tagyou.com';
+          
+          if (!isAdmin) {
+            showNotification('Access denied. Admin privileges required.', 'error');
+            return;
+          }
+
+          // Create admin portal modal
+          const adminModal = document.createElement('div');
+          adminModal.className = 'modal-overlay';
+          adminModal.id = 'adminModal';
+          adminModal.innerHTML = `
+            <div class="modal-content admin-portal-content">
+              <div class="modal-header">
+                <h2>🔧 Live Tracker Admin Portal</h2>
+                <button onclick="closeAdminPortal()" class="close-btn">&times;</button>
+              </div>
+              <div class="modal-body">
+                <p class="admin-subtitle">Manage food stalls, food trucks, groups, and friends for your tracking app</p>
+                
+                <!-- Admin Tabs -->
+                <div class="admin-tabs">
+                  <button class="admin-tab active" onclick="switchAdminTab('food-stalls')">
+                    🍔 Food Stalls
+                    <span class="tab-count">${adminData['food-stalls'].length}</span>
+                  </button>
+                  <button class="admin-tab" onclick="switchAdminTab('float-trucks')">
+                    🚚 Float Trucks
+                    <span class="tab-count">${adminData['float-trucks'].length}</span>
+                  </button>
+                  <button class="admin-tab" onclick="switchAdminTab('groups')">
+                    👥 Groups
+                    <span class="tab-count">${adminData['groups'].length}</span>
+                  </button>
+                  <button class="admin-tab" onclick="switchAdminTab('friends')">
+                    👤 Friends
+                    <span class="tab-count">${adminData['friends'].length}</span>
+                  </button>
+                </div>
+
+                <!-- Search and Add -->
+                <div class="admin-controls">
+                  <div class="search-container">
+                    <input type="text" id="adminSearch" placeholder="Search..." class="admin-search">
+                  </div>
+                  <button onclick="showAdminAddForm()" class="add-btn">
+                    ➕ Add ${adminTabConfig[activeAdminTab].title.slice(0, -1)}
+                  </button>
+                </div>
+
+                <!-- Admin Data Table -->
+                <div class="admin-table-container">
+                  <table class="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Details</th>
+                        <th>Contact</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="adminTableBody">
+                      ${renderAdminTableData()}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          document.body.appendChild(adminModal);
+          setTimeout(() => adminModal.classList.add('show'), 10);
+          document.getElementById('userMenu').classList.remove('show');
+        }
+
+        function closeAdminPortal() {
+          const modal = document.getElementById('adminModal');
+          if (modal) {
+            modal.classList.remove('show');
+            setTimeout(() => modal.remove(), 300);
+          }
+        }
+
+        // Admin data and configuration
+        let activeAdminTab = 'food-stalls';
+        const adminData = {
+          'food-stalls': [
+            {
+              id: 1,
+              name: "Mike's Burger Stand",
+              category: "Fast Food",
+              location: "Downtown Plaza",
+              coordinates: { lat: 40.7128, lng: -74.0060 },
+              phone: "+1 (555) 123-4567",
+              email: "mike@burgerstand.com",
+              hours: "10:00 AM - 10:00 PM",
+              rating: 4.5,
+              description: "Best burgers in downtown",
+              status: "active"
+            }
+          ],
+          'float-trucks': [
+            {
+              id: 1,
+              name: "Tropical Paradise Float",
+              category: "Drinks & Smoothies",
+              currentLocation: "Central Park",
+              coordinates: { lat: 40.7850, lng: -73.9680 },
+              phone: "+1 (555) 987-6543",
+              email: "info@tropicalfloat.com",
+              schedule: "Monday-Friday: Various locations",
+              rating: 4.8,
+              description: "Mobile tropical drink experience",
+              status: "active",
+              trackingMethod: "gps",
+              gpsTrackerId: "TRK-001-TROP",
+              driverPhone: "+1 (555) 987-6543",
+              lastUpdate: "2024-08-09T14:30:00Z",
+              isLive: true,
+              estimatedSpeed: 25,
+              nextStop: "Downtown Plaza",
+              estimatedArrival: "15:45"
+            }
+          ],
+          'groups': [
+            {
+              id: 1,
+              name: "Downtown Food Lovers",
+              type: "Food Community",
+              memberCount: 156,
+              description: "Local food enthusiasts sharing reviews and recommendations",
+              admin: "Sarah Johnson",
+              email: "admin@downtownfoodlovers.com",
+              status: "active"
+            }
+          ],
+          'friends': [
+            {
+              id: 1,
+              name: "John Smith",
+              username: "johnsmith123",
+              email: "john@email.com",
+              phone: "+1 (555) 456-7890",
+              location: "New York, NY",
+              joinDate: "2024-01-15",
+              status: "active"
+            }
+          ]
+        };
+
+        const adminTabConfig = {
+          'food-stalls': { title: 'Food Stalls', icon: '🍔' },
+          'float-trucks': { title: 'Float Trucks', icon: '🚚' },
+          'groups': { title: 'Groups', icon: '👥' },
+          'friends': { title: 'Friends', icon: '👤' }
+        };
+
+        function switchAdminTab(tab) {
+          activeAdminTab = tab;
+          
+          // Update tab buttons
+          document.querySelectorAll('.admin-tab').forEach(btn => btn.classList.remove('active'));
+          event.target.classList.add('active');
+          
+          // Update add button text
+          const addBtn = document.querySelector('.add-btn');
+          if (addBtn) {
+            addBtn.textContent = `➕ Add ${adminTabConfig[tab].title.slice(0, -1)}`;
+          }
+          
+          // Update table
+          document.getElementById('adminTableBody').innerHTML = renderAdminTableData();
+        }
+
+        function renderAdminTableData() {
+          const data = adminData[activeAdminTab];
+          const searchTerm = document.getElementById('adminSearch')?.value || '';
+          
+          const filteredData = data.filter(item =>
+            Object.values(item).some(value =>
+              value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+            )
+          );
+
+          if (filteredData.length === 0) {
+            return '<tr><td colspan="5" class="no-data">No data found</td></tr>';
+          }
+
+          return filteredData.map(item => `
+            <tr>
+              <td>
+                <div class="item-name">${item.name}</div>
+                ${item.category ? `<div class="item-category">${item.category}</div>` : ''}
+                ${item.username ? `<div class="item-username">@${item.username}</div>` : ''}
+              </td>
+              <td>
+                <div class="item-details">
+                  ${item.location ? `<div>📍 ${item.location}</div>` : ''}
+                  ${item.currentLocation ? `<div>📍 ${item.currentLocation}</div>` : ''}
+                  ${item.type ? `<div>${item.type}</div>` : ''}
+                  ${item.memberCount ? `<div>👥 ${item.memberCount} members</div>` : ''}
+                  ${item.hours ? `<div>🕐 ${item.hours}</div>` : ''}
+                  ${item.rating ? `<div>⭐ ${item.rating}/5</div>` : ''}
+                  ${item.trackingMethod ? `<div class="tracking-badge">📡 ${item.trackingMethod}</div>` : ''}
+                  ${item.nextStop ? `<div>➡️ Next: ${item.nextStop} (${item.estimatedArrival})</div>` : ''}
+                </div>
+              </td>
+              <td>
+                ${item.email ? `<div>📧 ${item.email}</div>` : ''}
+                ${item.phone ? `<div>📞 ${item.phone}</div>` : ''}
+              </td>
+              <td>
+                <span class="status-badge ${item.status}">${item.status}</span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button onclick="editAdminItem(${item.id})" class="edit-btn">✏️</button>
+                  <button onclick="deleteAdminItem(${item.id})" class="delete-btn">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          `).join('');
+        }
+
+        function editAdminItem(id) {
+          showNotification('Edit functionality coming soon!', 'info');
+        }
+
+        function deleteAdminItem(id) {
+          if (confirm('Are you sure you want to delete this item?')) {
+            adminData[activeAdminTab] = adminData[activeAdminTab].filter(item => item.id !== id);
+            document.getElementById('adminTableBody').innerHTML = renderAdminTableData();
+            showNotification('Item deleted successfully!', 'success');
+          }
+        }
+
+        function showAdminAddForm() {
+          showNotification('Add form functionality coming soon!', 'info');
+        }
+
+        // Add search functionality to admin portal
+        document.addEventListener('input', function(e) {
+          if (e.target.id === 'adminSearch') {
+            document.getElementById('adminTableBody').innerHTML = renderAdminTableData();
+          }
+        });
 
         function logout() {
           localStorage.removeItem('authToken');
