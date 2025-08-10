@@ -7893,12 +7893,12 @@
           updateLocationInGroup();
         }
 
-        // Log high-precision details
-        console.log('📍 High-precision location:', {
-          coords: `${newLocation.lat.toFixed(8)}, ${newLocation.lng.toFixed(8)}`,
-          accuracy: `${newLocation.accuracy.toFixed(1)}m`,
-          heading: newLocation.heading ? `${newLocation.heading.toFixed(1)}°` : 'N/A',
-          speed: newLocation.speed ? `${(newLocation.speed * 3.6).toFixed(1)} km/h` : 'N/A',
+        // Log high-precision details (privacy mode)
+        console.log('📍 Location updated:', {
+          status: 'Active',
+          accuracy: newLocation.accuracy <= 5 ? 'High' : newLocation.accuracy <= 10 ? 'Good' : 'Low',
+          moving: newLocation.speed ? 'Yes' : 'No',
+          direction: newLocation.heading ? 'Available' : 'N/A',
           timestamp: new Date().toLocaleTimeString()
         });
       }
@@ -8634,18 +8634,18 @@
           return;
         }
 
-        // Create comprehensive location data
+        // Create comprehensive location data (privacy mode)
         const locationData = {
-          coordinates: `${currentLocation.lat}, ${currentLocation.lng}`,
+          coordinates: 'Location Available',
           timestamp: new Date().toISOString(),
           user: currentUser?.name || 'Unknown',
           group: currentGroup?.name || 'No group',
-          accuracy: currentLocation.accuracy || 'Unknown'
+          accuracy: currentLocation.accuracy <= 5 ? 'High' : currentLocation.accuracy <= 10 ? 'Good' : 'Low'
         };
 
-        // Create different sharing options
+        // Create different sharing options (privacy mode)
         const locationUrl = `https://maps.google.com/?q=${currentLocation.lat},${currentLocation.lng}`;
-        const locationText = `Emergency Location: ${locationData.coordinates}\nTime: ${new Date().toLocaleString()}\nUser: ${locationData.user}\nGroup: ${locationData.group}`;
+        const locationText = `Emergency Location: Available\nTime: ${new Date().toLocaleString()}\nUser: ${locationData.user}\nGroup: ${locationData.group}`;
 
         // Try Web Share API first
         if (navigator.share) {
@@ -9860,7 +9860,7 @@
         // Update the existing modal content instead of replacing it
         document.getElementById('stallModalTitle').textContent = stall.name;
         document.getElementById('stallOrigin').textContent = stall.origin;
-        document.getElementById('stallLocation').textContent = `Coordinates: ${stall.location.lat}, ${stall.location.lng}`;
+        document.getElementById('stallLocation').textContent = `Location: Available`;
         document.getElementById('stallDescription').textContent = stall.description;
         document.getElementById('stallHours').textContent = stall.hours;
 
