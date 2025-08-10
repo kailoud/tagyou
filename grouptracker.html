@@ -4573,7 +4573,9 @@
           // Force map to show immediately
           console.log('FORCING MAP TO SHOW NOW!');
           setTimeout(() => {
-            initializeMap();
+            if (!window.mapInitialized) {
+              initializeMap();
+            }
           }, 100);
         });
 
