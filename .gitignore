@@ -88,6 +88,9 @@ public
 tmp/
 temp/
 
+# Local backups (don't deploy these)
+backups/
+
 # Logs
 logs
 *.log
