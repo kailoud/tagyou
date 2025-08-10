@@ -26,6 +26,7 @@ CREATE TABLE food_stalls (
     image_url TEXT,
     image TEXT,
     category TEXT,
+    rating DECIMAL(3, 2),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -48,10 +49,10 @@ CREATE POLICY "Admins can manage food stalls" ON food_stalls
     );
 
 -- Insert sample data
-INSERT INTO food_stalls (name, description, location, contact, email, phone, operating_hours, hours, coordinates, coordinates_lat, coordinates_lng, status, image_url, image, category) VALUES
-('Burger Palace', 'Delicious gourmet burgers', 'Main Street', '+44 7700 900001', 'burger@example.com', '+44 7700 900001', '08:00-18:00', '08:00-18:00', '51.5074, -0.1278', 51.5074, -0.1278, 'active', '🍔', '🍔', 'Fast Food'),
-('Pizza Express', 'Authentic Italian pizza', 'Food Court', '+44 7700 900002', 'pizza@example.com', '+44 7700 900002', '10:00-22:00', '10:00-22:00', '51.5070, -0.1270', 51.5070, -0.1270, 'active', '🍕', '🍕', 'Italian'),
-('Taco Truck', 'Mexican street food', 'Park Area', '+44 7700 900003', 'taco@example.com', '+44 7700 900003', '11:00-20:00', '11:00-20:00', '51.5080, -0.1280', 51.5080, -0.1280, 'active', '🌮', '🌮', 'Mexican');
+INSERT INTO food_stalls (name, description, location, contact, email, phone, operating_hours, hours, coordinates, coordinates_lat, coordinates_lng, status, image_url, image, category, rating) VALUES
+('Burger Palace', 'Delicious gourmet burgers', 'Main Street', '+44 7700 900001', 'burger@example.com', '+44 7700 900001', '08:00-18:00', '08:00-18:00', '51.5074, -0.1278', 51.5074, -0.1278, 'active', '🍔', '🍔', 'Fast Food', 4.5),
+('Pizza Express', 'Authentic Italian pizza', 'Food Court', '+44 7700 900002', 'pizza@example.com', '+44 7700 900002', '10:00-22:00', '10:00-22:00', '51.5070, -0.1270', 51.5070, -0.1270, 'active', '🍕', '🍕', 'Italian', 4.2),
+('Taco Truck', 'Mexican street food', 'Park Area', '+44 7700 900003', 'taco@example.com', '+44 7700 900003', '11:00-20:00', '11:00-20:00', '51.5080, -0.1280', 51.5080, -0.1280, 'active', '🌮', '🌮', 'Mexican', 4.8);
 
 -- Verify the table structure
 SELECT column_name, data_type, is_nullable 
