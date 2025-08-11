@@ -80,14 +80,7 @@
             android:exported="false"
             android:foregroundServiceType="location" />
 
-        <!-- Firebase Messaging Service -->
-        <service
-            android:name=".services.TagYouFirebaseMessagingService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
+        <!-- TODO: Add Supabase messaging service when implemented -->
 
     </application>
 
