@@ -3,7 +3,6 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'kotlin-parcelize'
-    id 'com.google.gms.google-services'
 }
 
 android {
@@ -58,14 +57,14 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:21.1.0'
     implementation 'com.google.android.gms:play-services-places:17.0.0'
     
-    // Firebase
-    implementation platform('com.google.firebase:firebase-bom:32.7.1')
-    implementation 'com.google.firebase:firebase-auth-ktx'
-    implementation 'com.google.firebase:firebase-firestore-ktx'
-    implementation 'com.google.firebase:firebase-storage-ktx'
-    implementation 'com.google.firebase:firebase-messaging-ktx'
+    // Supabase
+    implementation 'io.github.jan-tennert.supabase:postgrest-kt:2.4.0'
+    implementation 'io.github.jan-tennert.supabase:realtime-kt:2.4.0'
+    implementation 'io.github.jan-tennert.supabase:storage-kt:2.4.0'
+    implementation 'io.github.jan-tennert.supabase:gotrue-kt:2.4.0'
+    implementation 'io.github.jan-tennert.supabase:supabase-kt:2.4.0'
     
-    // Google Sign-In
+    // Google Sign-In for Supabase
     implementation 'com.google.android.gms:play-services-auth:20.7.0'
     
     // Networking
