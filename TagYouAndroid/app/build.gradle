@@ -57,15 +57,15 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:21.1.0'
     implementation 'com.google.android.gms:play-services-places:17.0.0'
     
-    // Supabase
-    implementation 'io.github.jan-tennert.supabase:postgrest-kt:2.4.0'
-    implementation 'io.github.jan-tennert.supabase:realtime-kt:2.4.0'
-    implementation 'io.github.jan-tennert.supabase:storage-kt:2.4.0'
-    implementation 'io.github.jan-tennert.supabase:gotrue-kt:2.4.0'
-    implementation 'io.github.jan-tennert.supabase:supabase-kt:2.4.0'
+    // Supabase (temporarily disabled for API compatibility)
+    // implementation 'io.github.jan-tennert.supabase:postgrest-kt:2.1.3'
+    // implementation 'io.github.jan-tennert.supabase:realtime-kt:2.1.3'
+    // implementation 'io.github.jan-tennert.supabase:storage-kt:2.1.3'
+    // implementation 'io.github.jan-tennert.supabase:gotrue-kt:2.1.3'
+    // implementation 'io.github.jan-tennert.supabase:supabase-kt:2.1.3'
     
-    // Google Sign-In for Supabase
-    implementation 'com.google.android.gms:play-services-auth:20.7.0'
+    // Google Sign-In for Supabase (temporarily commented out)
+    // implementation 'com.google.android.gms:play-services-auth:20.7.0'
     
     // Networking
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'

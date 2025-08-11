@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.google.firebase.auth.FirebaseAuth
 import com.tagyou.festivaltracker.auth.AuthActivity
 import com.tagyou.festivaltracker.databinding.ActivityMainBinding
 import com.tagyou.festivaltracker.map.MapActivity
@@ -15,37 +14,27 @@ class MainActivity : AppCompatActivity() {
     
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
-    private lateinit var auth: FirebaseAuth
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
-        // Initialize Firebase Auth
-        auth = FirebaseAuth.getInstance()
-        
         // Initialize ViewModel
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         
-        // Check authentication status
-        checkAuthStatus()
+        // For now, show main content directly (no auth check)
+        // TODO: Implement proper authentication check
+        showMainContent()
         
         // Setup UI
         setupUI()
-    }
-    
-    private fun checkAuthStatus() {
-        val currentUser = auth.currentUser
-        if (currentUser == null) {
-            // User not authenticated, go to auth activity
-            startActivity(Intent(this, AuthActivity::class.java))
-            finish()
-        } else {
-            // User is authenticated, show main UI
-            viewModel.setCurrentUser(currentUser)
-            showMainContent()
-        }
+        
+        // Observe user profile
+        observeUserProfile()
+        
+        // Load user profile
+        viewModel.loadCurrentUserProfile()
     }
     
     private fun setupUI() {
@@ -71,20 +60,31 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
-    private fun showMainContent() {
-        binding.authContainer.visibility = View.GONE
-        binding.mainContainer.visibility = View.VISIBLE
-        
-        // Update UI with user info
-        viewModel.currentUser.observe(this) { user ->
-            user?.let {
-                binding.tvWelcome.text = "Welcome, ${it.displayName ?: it.email}"
+    private fun observeUserProfile() {
+        viewModel.userProfile.observe(this) { profile ->
+            profile?.let {
+                binding.tvWelcome.text = "Welcome, ${it.full_name ?: it.email}"
+                
+                // Show admin features if user is admin
+                if (it.is_admin) {
+                    // TODO: Show admin-specific UI elements
+                }
             }
+        }
+        
+        viewModel.isLoading.observe(this) { loading ->
+            // TODO: Show/hide loading indicator
         }
     }
     
+    private fun showMainContent() {
+        binding.authContainer.visibility = View.GONE
+        binding.mainContainer.visibility = View.VISIBLE
+    }
+    
     private fun logout() {
-        auth.signOut()
+        // For now, just navigate to auth activity
+        // TODO: Implement proper Supabase logout
         startActivity(Intent(this, AuthActivity::class.java))
         finish()
     }
@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         // Refresh user data when returning to main activity
-        viewModel.refreshUserData()
+        viewModel.loadCurrentUserProfile()
     }
 }
 

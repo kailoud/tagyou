@@ -3,101 +3,44 @@ package com.tagyou.festivaltracker.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+import com.tagyou.festivaltracker.data.UserProfile
 
 class MainViewModel : ViewModel() {
-    
-    private val auth = FirebaseAuth.getInstance()
-    private val firestore = FirebaseFirestore.getInstance()
-    
-    private val _currentUser = MutableLiveData<FirebaseUser>()
-    val currentUser: LiveData<FirebaseUser> = _currentUser
-    
-    private val _userProfile = MutableLiveData<UserProfile?>()
-    val userProfile: LiveData<UserProfile?> = _userProfile
     
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
     
-    fun setCurrentUser(user: FirebaseUser) {
-        _currentUser.value = user
-        loadUserProfile(user.uid)
-    }
+    private val _userProfile = MutableLiveData<UserProfile?>()
+    val userProfile: LiveData<UserProfile?> = _userProfile
     
-    fun refreshUserData() {
-        _currentUser.value?.let { user ->
-            loadUserProfile(user.uid)
-        }
-    }
+    private val _isAdmin = MutableLiveData<Boolean>()
+    val isAdmin: LiveData<Boolean> = _isAdmin
     
-    private fun loadUserProfile(userId: String) {
+    fun loadCurrentUserProfile() {
         _isLoading.value = true
         
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val document = firestore.collection("user_profiles")
-                    .document(userId)
-                    .get()
-                    .await()
-                
-                if (document.exists()) {
-                    val profile = document.toObject(UserProfile::class.java)
-                    _userProfile.postValue(profile)
-                } else {
-                    // Create default profile if doesn't exist
-                    val defaultProfile = UserProfile(
-                        userId = userId,
-                        email = _currentUser.value?.email ?: "",
-                        displayName = _currentUser.value?.displayName ?: "",
-                        avatarUrl = _currentUser.value?.photoUrl?.toString() ?: "",
-                        isProUser = false,
-                        createdAt = System.currentTimeMillis()
-                    )
-                    _userProfile.postValue(defaultProfile)
-                    
-                    // Save to Firestore
-                    firestore.collection("user_profiles")
-                        .document(userId)
-                        .set(defaultProfile)
-                        .await()
-                }
-            } catch (e: Exception) {
-                // Handle error
-            } finally {
-                _isLoading.postValue(false)
-            }
-        }
+        // For now, create a mock user profile
+        // TODO: Replace with actual Supabase user profile loading
+        val mockProfile = UserProfile(
+            id = "mock-user-id",
+            email = "user@example.com",
+            full_name = "Demo User",
+            role = "user",
+            is_admin = false
+        )
+        
+        _userProfile.value = mockProfile
+        _isAdmin.value = false
+        _isLoading.value = false
     }
     
-    fun updateUserProfile(profile: UserProfile) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                firestore.collection("user_profiles")
-                    .document(profile.userId)
-                    .set(profile)
-                    .await()
-                
-                _userProfile.postValue(profile)
-            } catch (e: Exception) {
-                // Handle error
-            }
-        }
+    fun setUserProfile(profile: UserProfile?) {
+        _userProfile.value = profile
+        _isAdmin.value = profile?.is_admin ?: false
+    }
+    
+    fun setLoading(loading: Boolean) {
+        _isLoading.value = loading
     }
 }
-
-data class UserProfile(
-    val userId: String = "",
-    val email: String = "",
-    val displayName: String = "",
-    val avatarUrl: String = "",
-    val isProUser: Boolean = false,
-    val createdAt: Long = 0,
-    val lastActive: Long = System.currentTimeMillis()
-)
 

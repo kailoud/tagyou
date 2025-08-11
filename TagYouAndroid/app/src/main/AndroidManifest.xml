@@ -47,10 +47,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="YOUR_MAPS_API_KEY" />
 
-        <!-- Firebase Configuration -->
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="tagyou_channel" />
+        <!-- Supabase Configuration -->
+        <!-- Add your Supabase configuration here if needed -->
 
         <!-- Main Activity -->
         <activity

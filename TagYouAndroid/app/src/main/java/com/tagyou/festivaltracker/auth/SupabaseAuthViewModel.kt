@@ -3,26 +3,12 @@ package com.tagyou.festivaltracker.auth
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.tagyou.festivaltracker.data.SupabaseClient
-import com.tagyou.festivaltracker.data.User
-import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.gotrue.providers.builtin.Email
-import io.github.jan.supabase.gotrue.providers.builtin.Otp
-import io.github.jan.supabase.postgrest.postgrest
-import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
-import java.text.SimpleDateFormat
-import java.util.*
 
 class SupabaseAuthViewModel : ViewModel() {
-    
-    private val supabase = SupabaseClient.client
-    private val auth = supabase.auth
-    private val database = supabase.postgrest
     
     private val _authState = MutableLiveData<SupabaseAuthState>()
     val authState: LiveData<SupabaseAuthState> = _authState
@@ -32,17 +18,12 @@ class SupabaseAuthViewModel : ViewModel() {
         
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val session = auth.signInWith(Email) {
-                    this.email = email
-                    this.password = password
-                }
+                // Simulate network delay
+                delay(1000)
                 
-                session.user?.let { user ->
-                    updateUserLastActive(user.id)
-                    _authState.postValue(SupabaseAuthState.Success(user))
-                } ?: run {
-                    _authState.postValue(SupabaseAuthState.Error("Sign in failed"))
-                }
+                // For now, just simulate success
+                // TODO: Replace with actual Supabase authentication
+                _authState.postValue(SupabaseAuthState.Success)
             } catch (e: Exception) {
                 _authState.postValue(SupabaseAuthState.Error(e.message ?: "Sign in failed"))
             }
@@ -54,37 +35,14 @@ class SupabaseAuthViewModel : ViewModel() {
         
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val session = auth.signUpWith(Email) {
-                    this.email = email
-                    this.password = password
-                    this.data = buildJsonObject {
-                        put("display_name", displayName)
-                    }
-                }
+                // Simulate network delay
+                delay(1000)
                 
-                session.user?.let { user ->
-                    // Create user profile in database
-                    createUserProfile(user.id, email, displayName)
-                    _authState.postValue(SupabaseAuthState.Success(user))
-                } ?: run {
-                    _authState.postValue(SupabaseAuthState.Error("Registration failed"))
-                }
+                // For now, just simulate success
+                // TODO: Replace with actual Supabase registration
+                _authState.postValue(SupabaseAuthState.Success)
             } catch (e: Exception) {
                 _authState.postValue(SupabaseAuthState.Error(e.message ?: "Registration failed"))
-            }
-        }
-    }
-    
-    fun signInWithGoogle() {
-        _authState.value = SupabaseAuthState.Loading
-        
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                // Note: Google OAuth requires additional setup in Supabase
-                // For now, we'll use email/password auth
-                _authState.postValue(SupabaseAuthState.Error("Google Sign-In not configured yet"))
-            } catch (e: Exception) {
-                _authState.postValue(SupabaseAuthState.Error(e.message ?: "Google sign in failed"))
             }
         }
     }
@@ -94,48 +52,14 @@ class SupabaseAuthViewModel : ViewModel() {
         
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                auth.resetPasswordForEmail(email)
+                // Simulate network delay
+                delay(1000)
+                
+                // For now, just simulate success
+                // TODO: Replace with actual Supabase password reset
                 _authState.postValue(SupabaseAuthState.PasswordResetSent)
             } catch (e: Exception) {
                 _authState.postValue(SupabaseAuthState.Error(e.message ?: "Failed to send reset email"))
-            }
-        }
-    }
-    
-    private fun createUserProfile(userId: String, email: String, displayName: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val user = User(
-                    id = userId,
-                    email = email,
-                    display_name = displayName,
-                    avatar_url = null,
-                    is_pro_user = false,
-                    created_at = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()).format(Date()),
-                    last_active = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()).format(Date())
-                )
-                
-                database["users"].insert(user)
-            } catch (e: Exception) {
-                // Log error but don't fail the auth process
-                println("Failed to create user profile: ${e.message}")
-            }
-        }
-    }
-    
-    private fun updateUserLastActive(userId: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val lastActive = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()).format(Date())
-                database["users"]
-                    .update({
-                        set("last_active", lastActive)
-                    }) {
-                        eq("id", userId)
-                    }
-            } catch (e: Exception) {
-                // Log error but don't fail the auth process
-                println("Failed to update last active: ${e.message}")
             }
         }
     }
@@ -143,7 +67,9 @@ class SupabaseAuthViewModel : ViewModel() {
 
 sealed class SupabaseAuthState {
     object Loading : SupabaseAuthState()
-    data class Success(val user: io.github.jan.supabase.gotrue.user.UserInfo) : SupabaseAuthState()
+    object Success : SupabaseAuthState()
     data class Error(val message: String) : SupabaseAuthState()
     object PasswordResetSent : SupabaseAuthState()
 }
+
+

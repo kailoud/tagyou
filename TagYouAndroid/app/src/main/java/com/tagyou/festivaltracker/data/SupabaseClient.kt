@@ -1,37 +1,24 @@
 package com.tagyou.festivaltracker.data
 
-import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.gotrue.GoTrue
-import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.realtime.Realtime
-import io.github.jan.supabase.storage.Storage
-
+// Placeholder SupabaseClient for now
+// TODO: Integrate with actual Supabase Kotlin SDK when API is stable
 object SupabaseClient {
     
-    // Replace these with your actual Supabase credentials
-    private const val SUPABASE_URL = "YOUR_SUPABASE_URL"
-    private const val SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY"
+    // Your actual Supabase credentials from the web app
+    const val SUPABASE_URL = "https://ttgsohnskgujbfvopzzi.supabase.co"
+    const val SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0Z3NvaG5za2d1amJmdm9wenppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3NzY1ODksImV4cCI6MjA3MDM1MjU4OX0.dTb_VNMSCBUtu78QRnqVwkOgI9UptuIp7Fu1PTHTyYc"
     
-    val client = createSupabaseClient(
-        supabaseUrl = SUPABASE_URL,
-        supabaseKey = SUPABASE_ANON_KEY
-    ) {
-        install(GoTrue) {
-            // Configure authentication
-        }
-        install(Postgrest) {
-            // Configure database
-        }
-        install(Realtime) {
-            // Configure real-time subscriptions
-        }
-        install(Storage) {
-            // Configure file storage
-        }
+    // Placeholder objects - will be replaced with actual Supabase SDK
+    object auth {
+        fun currentUserOrNull(): Any? = null
+        suspend fun signOut() {}
     }
     
-    val auth = client.gotrue
-    val database = client.postgrest
-    val realtime = client.realtime
-    val storage = client.storage
+    object database {
+        fun get(table: String): Any = Any()
+    }
+    
+    object client {
+        // Placeholder
+    }
 }

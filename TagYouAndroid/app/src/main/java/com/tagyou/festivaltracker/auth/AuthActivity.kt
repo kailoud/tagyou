@@ -6,13 +6,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.tagyou.festivaltracker.MainActivity
 import com.tagyou.festivaltracker.R
 import com.tagyou.festivaltracker.databinding.ActivityAuthBinding
@@ -20,42 +13,21 @@ import com.tagyou.festivaltracker.databinding.ActivityAuthBinding
 class AuthActivity : AppCompatActivity() {
     
     private lateinit var binding: ActivityAuthBinding
-    private lateinit var viewModel: AuthViewModel
-    private lateinit var auth: FirebaseAuth
-    private lateinit var googleSignInClient: GoogleSignInClient
-    
-    companion object {
-        private const val RC_SIGN_IN = 9001
-    }
+    private lateinit var viewModel: SupabaseAuthViewModel
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
-        // Initialize Firebase Auth
-        auth = FirebaseAuth.getInstance()
-        
         // Initialize ViewModel
-        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
-        
-        // Configure Google Sign In
-        configureGoogleSignIn()
+        viewModel = ViewModelProvider(this)[SupabaseAuthViewModel::class.java]
         
         // Setup UI
         setupUI()
         
         // Observe authentication state
         observeAuthState()
-    }
-    
-    private fun configureGoogleSignIn() {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-        
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
     }
     
     private fun setupUI() {
@@ -66,8 +38,10 @@ class AuthActivity : AppCompatActivity() {
         // Setup form submission
         binding.btnSubmit.setOnClickListener { handleFormSubmission() }
         
-        // Setup Google Sign In
-        binding.btnGoogleSignIn.setOnClickListener { signInWithGoogle() }
+        // Setup Google Sign In (temporarily disabled)
+        binding.btnGoogleSignIn.setOnClickListener { 
+            Toast.makeText(this, "Google Sign-In not configured yet", Toast.LENGTH_SHORT).show()
+        }
         
         // Setup forgot password
         binding.btnForgotPassword.setOnClickListener { showForgotPasswordDialog() }
@@ -100,136 +74,95 @@ class AuthActivity : AppCompatActivity() {
         clearForm()
     }
     
-    private fun setupFormValidation() {
-        // Email validation
-        binding.etEmail.addTextChangedListener(object : android.text.TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: android.text.Editable?) {
-                validateEmail()
-            }
-        })
-        
-        // Password validation
-        binding.etPassword.addTextChangedListener(object : android.text.TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: android.text.Editable?) {
-                validatePassword()
-            }
-        })
-        
-        // Confirm password validation (for register)
-        binding.etConfirmPassword.addTextChangedListener(object : android.text.TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: android.text.Editable?) {
-                validateConfirmPassword()
-            }
-        })
-    }
-    
-    private fun validateEmail(): Boolean {
-        val email = binding.etEmail.text.toString()
-        return if (android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            binding.tilEmail.error = null
-            true
-        } else {
-            binding.tilEmail.error = getString(R.string.error_invalid_email)
-            false
-        }
-    }
-    
-    private fun validatePassword(): Boolean {
-        val password = binding.etPassword.text.toString()
-        return if (password.length >= 6) {
-            binding.tilPassword.error = null
-            true
-        } else {
-            binding.tilPassword.error = getString(R.string.error_weak_password)
-            false
-        }
-    }
-    
-    private fun validateConfirmPassword(): Boolean {
-        val password = binding.etPassword.text.toString()
-        val confirmPassword = binding.etConfirmPassword.text.toString()
-        return if (password == confirmPassword) {
-            binding.tilConfirmPassword.error = null
-            true
-        } else {
-            binding.tilConfirmPassword.error = getString(R.string.error_passwords_dont_match)
-            false
-        }
-    }
-    
     private fun handleFormSubmission() {
-        val isLogin = binding.loginForm.visibility == View.VISIBLE
-        
-        if (!validateForm(isLogin)) {
-            return
+        if (binding.btnLoginTab.isSelected) {
+            handleLogin()
+        } else {
+            handleRegister()
         }
-        
-        val email = binding.etEmail.text.toString()
+    }
+    
+    private fun handleLogin() {
+        val email = binding.etEmail.text.toString().trim()
         val password = binding.etPassword.text.toString()
         
-        showLoading(true)
-        
-        if (isLogin) {
+        if (validateLoginForm(email, password)) {
             viewModel.signIn(email, password)
-        } else {
-            val displayName = binding.etDisplayName.text.toString()
+        }
+    }
+    
+    private fun handleRegister() {
+        val email = binding.etEmail.text.toString().trim()
+        val password = binding.etPassword.text.toString()
+        val displayName = binding.etDisplayName.text.toString().trim()
+        
+        if (validateRegisterForm(email, password, displayName)) {
             viewModel.register(email, password, displayName)
         }
     }
     
-    private fun validateForm(isLogin: Boolean): Boolean {
-        val emailValid = validateEmail()
-        val passwordValid = validatePassword()
-        
-        if (isLogin) {
-            return emailValid && passwordValid
-        } else {
-            val confirmPasswordValid = validateConfirmPassword()
-            val displayNameValid = binding.etDisplayName.text.toString().isNotBlank()
-            
-            if (!displayNameValid) {
-                binding.tilDisplayName.error = "Display name is required"
+    private fun validateLoginForm(email: String, password: String): Boolean {
+        if (email.isEmpty()) {
+            binding.etEmail.error = "Email is required"
+            return false
+        }
+        if (password.isEmpty()) {
+            binding.etPassword.error = "Password is required"
+            return false
+        }
+        return true
+    }
+    
+    private fun validateRegisterForm(email: String, password: String, displayName: String): Boolean {
+        if (email.isEmpty()) {
+            binding.etEmail.error = "Email is required"
+            return false
+        }
+        if (password.isEmpty()) {
+            binding.etPassword.error = "Password is required"
+            return false
+        }
+        if (displayName.isEmpty()) {
+            binding.etDisplayName.error = "Display name is required"
+            return false
+        }
+        return true
+    }
+    
+    private fun setupFormValidation() {
+        // Add text change listeners for real-time validation
+        binding.etEmail.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus && binding.etEmail.text.toString().trim().isEmpty()) {
+                binding.etEmail.error = "Email is required"
             }
-            
-            return emailValid && passwordValid && confirmPasswordValid && displayNameValid
+        }
+        
+        binding.etPassword.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus && binding.etPassword.text.toString().isEmpty()) {
+                binding.etPassword.error = "Password is required"
+            }
+        }
+        
+        binding.etDisplayName.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus && binding.etDisplayName.text.toString().trim().isEmpty()) {
+                binding.etDisplayName.error = "Display name is required"
+            }
         }
     }
     
-    private fun signInWithGoogle() {
-        val signInIntent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
-    }
-    
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        
-        if (requestCode == RC_SIGN_IN) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            try {
-                val account = task.getResult(ApiException::class.java)
-                firebaseAuthWithGoogle(account)
-            } catch (e: ApiException) {
-                showLoading(false)
-                Toast.makeText(this, "Google sign in failed: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-    
-    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
-        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-        viewModel.signInWithGoogle(credential)
+    private fun clearForm() {
+        binding.etEmail.text?.clear()
+        binding.etPassword.text?.clear()
+        binding.etDisplayName.text?.clear()
+        binding.etEmail.error = null
+        binding.etPassword.error = null
+        binding.etDisplayName.error = null
     }
     
     private fun showForgotPasswordDialog() {
-        val email = binding.etEmail.text.toString()
-        if (email.isBlank()) {
-            binding.tilEmail.error = "Please enter your email first"
+        val email = binding.etEmail.text.toString().trim()
+        if (email.isEmpty()) {
+            binding.etEmail.error = "Please enter your email first"
             return
         }
         
@@ -239,16 +172,19 @@ class AuthActivity : AppCompatActivity() {
     private fun observeAuthState() {
         viewModel.authState.observe(this) { state ->
             when (state) {
-                is AuthState.Loading -> showLoading(true)
-                is AuthState.Success -> {
+                is SupabaseAuthState.Loading -> {
+                    showLoading(true)
+                }
+                is SupabaseAuthState.Success -> {
                     showLoading(false)
+                    Toast.makeText(this, "Authentication successful!", Toast.LENGTH_SHORT).show()
                     navigateToMain()
                 }
-                is AuthState.Error -> {
+                is SupabaseAuthState.Error -> {
                     showLoading(false)
                     Toast.makeText(this, state.message, Toast.LENGTH_LONG).show()
                 }
-                is AuthState.PasswordResetSent -> {
+                is SupabaseAuthState.PasswordResetSent -> {
                     showLoading(false)
                     Toast.makeText(this, "Password reset email sent", Toast.LENGTH_LONG).show()
                 }
@@ -260,18 +196,6 @@ class AuthActivity : AppCompatActivity() {
         binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
         binding.btnSubmit.isEnabled = !show
         binding.btnGoogleSignIn.isEnabled = !show
-    }
-    
-    private fun clearForm() {
-        binding.etEmail.text?.clear()
-        binding.etPassword.text?.clear()
-        binding.etConfirmPassword.text?.clear()
-        binding.etDisplayName.text?.clear()
-        
-        binding.tilEmail.error = null
-        binding.tilPassword.error = null
-        binding.tilConfirmPassword.error = null
-        binding.tilDisplayName.error = null
     }
     
     private fun navigateToMain() {
