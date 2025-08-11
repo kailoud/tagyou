@@ -243,3 +243,4 @@ data class FloatTruck(
     val imageUrl: String,
     val route: String
 )
+

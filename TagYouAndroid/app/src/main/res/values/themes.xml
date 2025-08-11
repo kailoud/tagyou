@@ -44,11 +44,6 @@
         <item name="colorOnErrorContainer">@color/white</item>
         <item name="colorOutline">@color/text_hint</item>
         <item name="colorOutlineVariant">@color/text_hint</item>
-        <item name="colorScrim">@color/black_70</item>
-        <item name="colorInverseOnSurface">@color/background_primary</item>
-        <item name="colorInversePrimary">@color/primary_light</item>
-        <item name="colorInverseSurface">@color/text_primary</item>
-        <item name="colorSurfaceTint">@color/primary</item>
         <item name="colorSurfaceVariant">@color/background_secondary</item>
         <item name="colorOnSurfaceVariant">@color/text_secondary</item>
         
@@ -77,72 +72,61 @@
     <style name="TextAppearance.TagYou.HeadlineLarge" parent="TextAppearance.Material3.HeadlineLarge">
         <item name="android:textSize">32sp</item>
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:fontFamily">@font/roboto_medium</item>
     </style>
     
     <style name="TextAppearance.TagYou.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
         <item name="android:textSize">28sp</item>
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:fontFamily">@font/roboto_medium</item>
     </style>
     
     <style name="TextAppearance.TagYou.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
         <item name="android:textSize">24sp</item>
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:fontFamily">@font/roboto_medium</item>
     </style>
     
     <style name="TextAppearance.TagYou.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
         <item name="android:textSize">22sp</item>
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:fontFamily">@font/roboto_medium</item>
     </style>
     
     <style name="TextAppearance.TagYou.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:fontFamily">@font/roboto_medium</item>
     </style>
     
     <style name="TextAppearance.TagYou.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:fontFamily">@font/roboto_medium</item>
     </style>
     
     <style name="TextAppearance.TagYou.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:fontFamily">@font/roboto_regular</item>
     </style>
     
     <style name="TextAppearance.TagYou.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:fontFamily">@font/roboto_regular</item>
     </style>
     
     <style name="TextAppearance.TagYou.BodySmall" parent="TextAppearance.Material3.BodySmall">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/text_secondary</item>
-        <item name="android:fontFamily">@font/roboto_regular</item>
     </style>
     
     <style name="TextAppearance.TagYou.LabelLarge" parent="TextAppearance.Material3.LabelLarge">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:fontFamily">@font/roboto_medium</item>
     </style>
     
     <style name="TextAppearance.TagYou.LabelMedium" parent="TextAppearance.Material3.LabelMedium">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:fontFamily">@font/roboto_medium</item>
     </style>
     
     <style name="TextAppearance.TagYou.LabelSmall" parent="TextAppearance.Material3.LabelSmall">
         <item name="android:textSize">11sp</item>
         <item name="android:textColor">@color/text_secondary</item>
-        <item name="android:fontFamily">@font/roboto_medium</item>
     </style>
 </resources>
+

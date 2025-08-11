@@ -19,8 +19,8 @@ class MainViewModel : ViewModel() {
     private val _currentUser = MutableLiveData<FirebaseUser>()
     val currentUser: LiveData<FirebaseUser> = _currentUser
     
-    private val _userProfile = MutableLiveData<UserProfile>()
-    val userProfile: LiveData<UserProfile> = _userProfile
+    private val _userProfile = MutableLiveData<UserProfile?>()
+    val userProfile: LiveData<UserProfile?> = _userProfile
     
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -100,3 +100,4 @@ data class UserProfile(
     val createdAt: Long = 0,
     val lastActive: Long = System.currentTimeMillis()
 )
+

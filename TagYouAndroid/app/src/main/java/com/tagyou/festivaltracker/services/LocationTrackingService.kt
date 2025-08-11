@@ -87,8 +87,8 @@ class LocationTrackingService : Service() {
     }
     
     private fun startLocationUpdates() {
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY)
-            .setIntervalMillis(LOCATION_UPDATE_INTERVAL)
+        val locationRequest = LocationRequest.Builder(LOCATION_UPDATE_INTERVAL)
+            .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
             .setMinUpdateIntervalMillis(LOCATION_FASTEST_INTERVAL)
             .setMaxUpdateDelayMillis(15000L) // 15 seconds max delay
             .build()
@@ -172,3 +172,4 @@ class LocationTrackingService : Service() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 }
+

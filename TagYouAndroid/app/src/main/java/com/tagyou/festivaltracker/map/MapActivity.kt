@@ -266,7 +266,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     
     private fun updateFriendMarkers(friends: List<FriendLocation>) {
         // Remove old markers
-        friendMarkers.values.forEach { it.remove() }
+        friendMarkers.values.forEach { marker: Marker -> marker.remove() }
         friendMarkers.clear()
         
         // Add new markers
@@ -279,8 +279,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
             )
             
-            marker?.tag = friend.userId
-            friendMarkers[friend.userId] = marker
+            marker?.let { safeMarker ->
+                safeMarker.tag = friend.userId
+                friendMarkers[friend.userId] = safeMarker
+            }
         }
     }
     
@@ -368,3 +370,4 @@ data class FriendLocation(
     val longitude: Double,
     val lastUpdated: String
 )
+

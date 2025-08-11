@@ -165,3 +165,4 @@ data class UserProfile(
     val createdAt: Long = 0,
     val lastActive: Long = System.currentTimeMillis()
 )
+
