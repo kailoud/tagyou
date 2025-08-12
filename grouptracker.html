@@ -5097,8 +5097,8 @@
       let locationUpdateInterval;
       let groupCode = 'ABC123';
 
-      // Firebase Configuration
-      let auth, db, storage; // Will be initialized after library loads
+      // Firebase Configuration - Already initialized in firebase-config.js
+      // auth, db, storage are available from window.firebaseAuth, window.firebaseDB, window.firebaseStorage
       let currentGroup = {
         name: 'Festival Squad 2025',
         members: [
@@ -5144,7 +5144,7 @@
       async function checkAuthStatus() {
         try {
           console.log('Checking auth status...'); // Debug log
-          const user = auth.currentUser;
+          const user = window.firebaseAuth.currentUser;
 
           console.log('Auth check result:', { user: !!user }); // Debug log
 
@@ -5235,7 +5235,7 @@
         clearAuthMessages();
 
         try {
-          const userCredential = await auth.signInWithEmailAndPassword(email, password);
+          const userCredential = await window.firebaseAuth.signInWithEmailAndPassword(email, password);
           
           showAuthMessage('Login successful! Redirecting...', 'success');
           setTimeout(() => {
@@ -5284,7 +5284,7 @@
 
         try {
           console.log('Calling Firebase auth.createUserWithEmailAndPassword...'); // Debug log
-          const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+          const userCredential = await window.firebaseAuth.createUserWithEmailAndPassword(email, password);
           
           // Update user profile with display name
           await userCredential.user.updateProfile({
@@ -5295,7 +5295,7 @@
 
           // Create user profile in Firestore
           try {
-            await db.collection('user_profiles').doc(userCredential.user.uid).set({
+            await window.firebaseDB.collection('user_profiles').doc(userCredential.user.uid).set({
               id: userCredential.user.uid,
               email: email,
               full_name: name,
@@ -5325,7 +5325,7 @@
 
           // Check admin status from database
           try {
-            const profileDoc = await db.collection('user_profiles').doc(userCredential.user.uid).get();
+            const profileDoc = await window.firebaseDB.collection('user_profiles').doc(userCredential.user.uid).get();
             
             if (profileDoc.exists) {
               const profileData = profileDoc.data();
@@ -5382,7 +5382,7 @@
         clearAuthMessages();
 
         try {
-          await auth.sendPasswordResetEmail(email);
+          await window.firebaseAuth.sendPasswordResetEmail(email);
 
           showAuthMessage('Password reset email sent! Please check your inbox.', 'success');
 
@@ -5402,14 +5402,14 @@
           console.log('Starting logout process...');
 
           // Check if Firebase auth is initialized
-          if (!auth) {
+          if (!window.firebaseAuth) {
             console.warn('Firebase auth not initialized, performing local logout only');
             // Fallback to local logout
             performLocalLogout();
             return;
           }
 
-          await auth.signOut();
+          await window.firebaseAuth.signOut();
 
           // Clear local storage
           localStorage.removeItem('authToken');
