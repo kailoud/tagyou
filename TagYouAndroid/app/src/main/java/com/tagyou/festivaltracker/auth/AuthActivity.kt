@@ -13,7 +13,7 @@ import com.tagyou.festivaltracker.databinding.ActivityAuthBinding
 class AuthActivity : AppCompatActivity() {
     
     private lateinit var binding: ActivityAuthBinding
-    private lateinit var viewModel: SupabaseAuthViewModel
+    private lateinit var viewModel: FirebaseAuthViewModel
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,7 +21,7 @@ class AuthActivity : AppCompatActivity() {
         setContentView(binding.root)
         
         // Initialize ViewModel
-        viewModel = ViewModelProvider(this)[SupabaseAuthViewModel::class.java]
+        viewModel = ViewModelProvider(this)[FirebaseAuthViewModel::class.java]
         
         // Setup UI
         setupUI()
@@ -172,21 +172,24 @@ class AuthActivity : AppCompatActivity() {
     private fun observeAuthState() {
         viewModel.authState.observe(this) { state ->
             when (state) {
-                is SupabaseAuthState.Loading -> {
+                is FirebaseAuthState.Loading -> {
                     showLoading(true)
                 }
-                is SupabaseAuthState.Success -> {
+                is FirebaseAuthState.Success -> {
                     showLoading(false)
                     Toast.makeText(this, "Authentication successful!", Toast.LENGTH_SHORT).show()
                     navigateToMain()
                 }
-                is SupabaseAuthState.Error -> {
+                is FirebaseAuthState.Error -> {
                     showLoading(false)
                     Toast.makeText(this, state.message, Toast.LENGTH_LONG).show()
                 }
-                is SupabaseAuthState.PasswordResetSent -> {
+                is FirebaseAuthState.PasswordResetSent -> {
                     showLoading(false)
                     Toast.makeText(this, "Password reset email sent", Toast.LENGTH_LONG).show()
+                }
+                is FirebaseAuthState.SignedOut -> {
+                    showLoading(false)
                 }
             }
         }

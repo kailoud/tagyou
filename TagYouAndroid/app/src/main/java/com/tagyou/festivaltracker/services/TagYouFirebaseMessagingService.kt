@@ -7,51 +7,104 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import com.google.firebase.messaging.FirebaseMessagingService
+import com.google.firebase.messaging.RemoteMessage
 import com.tagyou.festivaltracker.R
 import com.tagyou.festivaltracker.map.MapActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
-// Simplified messaging service for now
-// TODO: Implement proper Supabase real-time messaging
-class TagYouFirebaseMessagingService {
+class TagYouFirebaseMessagingService : FirebaseMessagingService() {
     
     companion object {
         private const val CHANNEL_ID = "tagyou_messaging"
-        private const val NOTIFICATION_ID = 1002
+        private const val CHANNEL_NAME = "TagYou Notifications"
+        private const val CHANNEL_DESCRIPTION = "Notifications from TagYou app"
+    }
+    
+    override fun onCreate() {
+        super.onCreate()
+        createNotificationChannel()
+    }
+    
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        super.onMessageReceived(remoteMessage)
         
-        fun createNotificationChannel(context: Context) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(
-                    CHANNEL_ID,
-                    "TagYou Messages",
-                    NotificationManager.IMPORTANCE_HIGH
-                ).apply {
-                    description = "Notifications for friend updates and messages"
-                }
-                
-                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.createNotificationChannel(channel)
+        // Handle notification when app is in foreground
+        remoteMessage.notification?.let { notification ->
+            showNotification(
+                title = notification.title ?: "TagYou",
+                body = notification.body ?: "",
+                data = remoteMessage.data
+            )
+        }
+    }
+    
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+        
+        // Send token to server
+        sendTokenToServer(token)
+    }
+    
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = CHANNEL_DESCRIPTION
+                enableLights(true)
+                enableVibration(true)
+            }
+            
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+    
+    private fun showNotification(title: String, body: String, data: Map<String, String>) {
+        val intent = Intent(this, MapActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            // Add any data extras here
+            data.forEach { (key, value) ->
+                putExtra(key, value)
             }
         }
         
-        fun showNotification(context: Context, title: String, message: String) {
-            val intent = Intent(context, MapActivity::class.java)
-            val pendingIntent = PendingIntent.getActivity(
-                context,
-                0,
-                intent,
-                PendingIntent.FLAG_IMMUTABLE
-            )
-            
-            val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setSmallIcon(R.drawable.ic_group)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
-                .build()
-            
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.notify(NOTIFICATION_ID, notification)
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setSmallIcon(R.drawable.ic_my_location)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .build()
+        
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+    }
+    
+    private fun sendTokenToServer(token: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // TODO: Send token to Firestore for this user
+                // This would typically involve storing the token in the user's profile
+                // so you can send targeted notifications to specific users
+                println("New FCM token: $token")
+            } catch (e: Exception) {
+                // Handle error
+            }
         }
     }
 }

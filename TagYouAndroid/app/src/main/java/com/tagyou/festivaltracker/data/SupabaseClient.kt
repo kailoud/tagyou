@@ -1,24 +1,80 @@
 package com.tagyou.festivaltracker.data
 
-// Placeholder SupabaseClient for now
-// TODO: Integrate with actual Supabase Kotlin SDK when API is stable
-object SupabaseClient {
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.tasks.await
+
+object FirebaseClient {
     
-    // Your actual Supabase credentials from the web app
-    const val SUPABASE_URL = "https://ttgsohnskgujbfvopzzi.supabase.co"
-    const val SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0Z3NvaG5za2d1amJmdm9wenppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3NzY1ODksImV4cCI6MjA3MDM1MjU4OX0.dTb_VNMSCBUtu78QRnqVwkOgI9UptuIp7Fu1PTHTyYc"
+    // Firebase instances
+    val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    val storage: FirebaseStorage = FirebaseStorage.getInstance()
+    val messaging: FirebaseMessaging = FirebaseMessaging.getInstance()
     
-    // Placeholder objects - will be replaced with actual Supabase SDK
-    object auth {
-        fun currentUserOrNull(): Any? = null
-        suspend fun signOut() {}
+    // Collections
+    object Collections {
+        const val USER_PROFILES = "user_profiles"
+        const val USER_LOCATIONS = "user_locations"
+        const val GROUPS = "groups"
+        const val FOOD_STALLS = "food_stalls"
+        const val FLOAT_TRUCKS = "float_trucks"
+        const val GROUP_MEMBERS = "group_members"
     }
     
-    object database {
-        fun get(table: String): Any = Any()
+    // Authentication helpers
+    object Auth {
+        fun getCurrentUser() = auth.currentUser
+        
+        fun isUserLoggedIn() = auth.currentUser != null
+        
+        suspend fun signOut() {
+            auth.signOut()
+        }
+        
+        fun getUserId(): String? = auth.currentUser?.uid
     }
     
-    object client {
-        // Placeholder
+    // Database helpers
+    object Database {
+        fun getUserProfiles() = firestore.collection(Collections.USER_PROFILES)
+        
+        fun getUserLocations() = firestore.collection(Collections.USER_LOCATIONS)
+        
+        fun getGroups() = firestore.collection(Collections.GROUPS)
+        
+        fun getFoodStalls() = firestore.collection(Collections.FOOD_STALLS)
+        
+        fun getFloatTrucks() = firestore.collection(Collections.FLOAT_TRUCKS)
+        
+        fun getGroupMembers() = firestore.collection(Collections.GROUP_MEMBERS)
+        
+        // Helper to get user's location document
+        fun getUserLocationDoc(userId: String) = 
+            firestore.collection(Collections.USER_LOCATIONS).document(userId)
+        
+        // Helper to get user's profile document
+        fun getUserProfileDoc(userId: String) = 
+            firestore.collection(Collections.USER_PROFILES).document(userId)
+    }
+    
+    // Storage helpers
+    object Storage {
+        fun getProfileImagesRef() = storage.reference.child("profile_images")
+        
+        fun getGroupImagesRef() = storage.reference.child("group_images")
+    }
+    
+    // Messaging helpers
+    object Messaging {
+        suspend fun getToken(): String? {
+            return try {
+                messaging.token.await()
+            } catch (e: Exception) {
+                null
+            }
+        }
     }
 }

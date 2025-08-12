@@ -17,11 +17,14 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.tagyou.festivaltracker.R
 import com.tagyou.festivaltracker.map.MapActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -29,6 +32,8 @@ class LocationTrackingService : Service() {
     
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
+    private lateinit var auth: FirebaseAuth
+    private lateinit var firestore: FirebaseFirestore
     
     private val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
     private var lastLocation: Location? = null
@@ -44,6 +49,9 @@ class LocationTrackingService : Service() {
         super.onCreate()
         
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        auth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
+        
         createLocationCallback()
         createNotificationChannel()
     }
@@ -63,7 +71,7 @@ class LocationTrackingService : Service() {
                     // Only update if location has changed significantly
                     if (hasLocationChanged(location)) {
                         lastLocation = location
-                        updateLocationInDatabase(location)
+                        updateLocationInFirestore(location)
                     }
                 }
             }
@@ -96,14 +104,29 @@ class LocationTrackingService : Service() {
         }
     }
     
-    private fun updateLocationInDatabase(location: Location) {
+    private fun updateLocationInFirestore(location: Location) {
+        val currentUser = auth.currentUser ?: return
+        
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // TODO: Implement Supabase location update
-                // For now, just log the location
-                println("Location updated: ${location.latitude}, ${location.longitude}")
+                val locationData = hashMapOf(
+                    "userId" to currentUser.uid,
+                    "displayName" to (currentUser.displayName ?: "Unknown"),
+                    "latitude" to location.latitude,
+                    "longitude" to location.longitude,
+                    "accuracy" to location.accuracy,
+                    "timestamp" to System.currentTimeMillis(),
+                    "lastUpdated" to dateFormat.format(Date())
+                )
+                
+                firestore.collection("user_locations")
+                    .document(currentUser.uid)
+                    .set(locationData)
+                    .await()
+                
             } catch (e: Exception) {
                 // Handle error
+                println("Failed to update location in service: ${e.message}")
             }
         }
     }
