@@ -5053,6 +5053,37 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage-compat.js"></script>
     <script src="firebase-config.js"></script>
     <script>
+      // Define switchAuthTab function immediately for global access
+      window.switchAuthTab = function(tab) {
+        console.log('switchAuthTab called with:', tab);
+        // Update tab buttons
+        document.querySelectorAll('.auth-tab').forEach(btn => btn.classList.remove('active'));
+
+        if (tab === 'login') {
+          document.getElementById('loginTab').classList.add('active');
+        } else if (tab === 'register') {
+          document.getElementById('registerTab').classList.add('active');
+        }
+
+        // Hide all forms
+        document.querySelectorAll('.auth-form').forEach(form => form.style.display = 'none');
+
+        // Show selected form
+        if (tab === 'login') {
+          document.getElementById('loginForm').style.display = 'block';
+        } else if (tab === 'register') {
+          document.getElementById('registerForm').style.display = 'block';
+        } else if (tab === 'forgot') {
+          document.getElementById('forgotForm').style.display = 'block';
+        }
+
+        // Clear messages
+        if (window.clearAuthMessages) {
+          window.clearAuthMessages();
+        }
+      }
+    </script>
+    <script>
       // Supabase Authentication System
       let currentUser = null;
       let isAuthenticated = false;
@@ -5078,55 +5109,36 @@
         ]
       };
 
-      // Authentication Functions - REMOVED
-      // App now works without authentication
-      // Authentication Functions
-      window.switchAuthTab = function(tab) {
-        // Update tab buttons
-        document.querySelectorAll('.auth-tab').forEach(btn => btn.classList.remove('active'));
+      // Authentication Functions - Now globally available
 
-        if (tab === 'login') {
-          document.getElementById('loginTab').classList.add('active');
-        } else if (tab === 'register') {
-          document.getElementById('registerTab').classList.add('active');
-        }
-
-        // Hide all forms
-        document.querySelectorAll('.auth-form').forEach(form => form.style.display = 'none');
-
-        // Show selected form
-        if (tab === 'login') {
-          document.getElementById('loginForm').style.display = 'block';
-        } else if (tab === 'register') {
-          document.getElementById('registerForm').style.display = 'block';
-        } else if (tab === 'forgot') {
-          document.getElementById('forgotForm').style.display = 'block';
-        }
-
-        // Clear messages
-        clearAuthMessages();
-      }
-
-      function clearAuthMessages() {
+      window.clearAuthMessages = function() {
         const messages = document.getElementById('authMessages');
-        messages.innerHTML = '';
-        messages.className = 'auth-messages';
+        if (messages) {
+          messages.innerHTML = '';
+          messages.className = 'auth-messages';
+        }
       }
 
-      function showAuthMessage(message, type = 'error') {
+      window.showAuthMessage = function(message, type = 'error') {
         const messages = document.getElementById('authMessages');
-        messages.innerHTML = message;
-        messages.className = `auth-messages ${type}`;
+        if (messages) {
+          messages.innerHTML = message;
+          messages.className = `auth-messages ${type}`;
+        }
       }
 
-      function showLoading(button) {
-        button.disabled = true;
-        button.innerHTML = 'Loading...';
+      window.showLoading = function(button) {
+        if (button) {
+          button.disabled = true;
+          button.innerHTML = 'Loading...';
+        }
       }
 
-      function hideLoading(button, originalText) {
-        button.disabled = false;
-        button.innerHTML = originalText;
+      window.hideLoading = function(button, originalText) {
+        if (button) {
+          button.disabled = false;
+          button.innerHTML = originalText;
+        }
       }
 
       async function checkAuthStatus() {
