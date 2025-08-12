@@ -7597,59 +7597,41 @@
           fadeAnimation: false,
           zoomAnimation: true,
           markerZoomAnimation: false
-        }).setView([51.5074, -0.1278], 14);
+        }).setView([51.5074, -0.1278], 12);
 
-        // Add fast, reliable tile layer with multiple fallbacks
+        // Optimized tile settings for fast loading
         const tileOptions = {
           attribution: '© OpenStreetMap contributors',
-          maxZoom: 18,
-          minZoom: 3,
+          maxZoom: 16,
+          minZoom: 5,
           tileSize: 256,
-          updateWhenIdle: true,
-          updateWhenZooming: false,
-          keepBuffer: 2,
+          updateWhenIdle: false,
+          updateWhenZooming: true,
+          keepBuffer: 1,
           crossOrigin: true,
           detectRetina: false,
           bounds: null,
           noWrap: true
         };
 
-        // Try multiple fast tile servers for optimal performance
+        // Use fast, modern tile server for optimal performance
         let tileLayer;
         
-        // First try: CartoDB Positron (fastest, clean)
-        try {
-          tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            ...tileOptions,
-            subdomains: 'abcd'
-          }).addTo(map);
-        } catch (e) {
-          console.log('CartoDB failed, trying OSM...');
-          tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            ...tileOptions,
-            subdomains: 'abc'
-          }).addTo(map);
-        }
+        // Primary: OpenStreetMap (fast, reliable, modern)
+        tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          ...tileOptions,
+          subdomains: 'abc'
+        }).addTo(map);
 
-        // Fallback chain for better reliability
+        // Simple fallback for reliability
         tileLayer.on('tileerror', function () {
-          console.log('CartoDB tiles failed, trying OpenStreetMap...');
+          console.log('OSM tiles failed, trying backup...');
           map.removeLayer(tileLayer);
           
-          const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          L.tileLayer('https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png', {
             ...tileOptions,
             subdomains: 'abc'
           }).addTo(map);
-          
-          osmLayer.on('tileerror', function () {
-            console.log('OSM tiles failed, trying Stamen...');
-            map.removeLayer(osmLayer);
-            
-            L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png', {
-              ...tileOptions,
-              subdomains: 'abcd'
-            }).addTo(map);
-          });
         });
 
         // Add tile load success handler and preloading
@@ -7662,23 +7644,14 @@
           console.log('Tile loading started');
         });
 
-        // Add tile loading progress indicator
+        // Simple tile loading indicator
         let tilesLoaded = 0;
-        let tilesTotal = 0;
-        
-        // Reuse existing map container
-        
-        tileLayer.on('loading', function () {
-          tilesTotal++;
-          console.log(`Loading tile ${tilesLoaded + 1}/${tilesTotal}`);
-        });
         
         tileLayer.on('load', function () {
           tilesLoaded++;
-          console.log(`Loaded ${tilesLoaded} tiles`);
           
-          // Fade in map when most tiles are loaded
-          if (tilesLoaded >= 4) {
+          // Fade in map when tiles are loaded
+          if (tilesLoaded >= 2) {
             if (mapContainer) {
               mapContainer.style.opacity = '1';
             }
