@@ -7607,14 +7607,29 @@
           tileSize: 256,
           updateWhenIdle: true,
           updateWhenZooming: false,
-          keepBuffer: 2
+          keepBuffer: 2,
+          crossOrigin: true,
+          detectRetina: false,
+          bounds: null,
+          noWrap: true
         };
 
-        // Try CartoDB Positron (fast, clean, reliable)
-        const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-          ...tileOptions,
-          subdomains: 'abcd'
-        }).addTo(map);
+        // Try multiple fast tile servers for optimal performance
+        let tileLayer;
+        
+        // First try: CartoDB Positron (fastest, clean)
+        try {
+          tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            ...tileOptions,
+            subdomains: 'abcd'
+          }).addTo(map);
+        } catch (e) {
+          console.log('CartoDB failed, trying OSM...');
+          tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            ...tileOptions,
+            subdomains: 'abc'
+          }).addTo(map);
+        }
 
         // Fallback chain for better reliability
         tileLayer.on('tileerror', function () {
@@ -7637,9 +7652,36 @@
           });
         });
 
-        // Add tile load success handler
+        // Add tile load success handler and preloading
         tileLayer.on('tileload', function () {
           console.log('Map tiles loaded successfully');
+        });
+
+        // Preload tiles for better performance
+        tileLayer.on('tileloadstart', function () {
+          console.log('Tile loading started');
+        });
+
+        // Add tile loading progress indicator
+        let tilesLoaded = 0;
+        let tilesTotal = 0;
+        
+        tileLayer.on('loading', function () {
+          tilesTotal++;
+          console.log(`Loading tile ${tilesLoaded + 1}/${tilesTotal}`);
+        });
+        
+        tileLayer.on('load', function () {
+          tilesLoaded++;
+          console.log(`Loaded ${tilesLoaded} tiles`);
+          
+          // Fade in map when most tiles are loaded
+          if (tilesLoaded >= 4) {
+            const mapContainer = document.getElementById('map');
+            if (mapContainer) {
+              mapContainer.style.opacity = '1';
+            }
+          }
         });
 
         // Optimized map refresh with loading indicator
