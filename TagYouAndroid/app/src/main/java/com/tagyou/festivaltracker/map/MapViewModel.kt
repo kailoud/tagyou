@@ -50,8 +50,8 @@ class MapViewModel : ViewModel() {
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
     
-    private val _errorMessage = MutableLiveData<String>()
-    val errorMessage: LiveData<String> = _errorMessage
+    private val _errorMessage = MutableLiveData<String?>()
+    val errorMessage: LiveData<String?> = _errorMessage
     
     private val _friends = MutableLiveData<List<UserLocation>>()
     val friends: LiveData<List<UserLocation>> = _friends
