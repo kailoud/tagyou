@@ -5081,7 +5081,7 @@
       // Authentication Functions - REMOVED
       // App now works without authentication
       // Authentication Functions
-      function switchAuthTab(tab) {
+      window.switchAuthTab = function(tab) {
         // Update tab buttons
         document.querySelectorAll('.auth-tab').forEach(btn => btn.classList.remove('active'));
 
@@ -5294,14 +5294,7 @@
             
             showAuthMessage('Registration successful! Please check your email for verification.', 'success');
             event.target.reset();
-                  return;
-                }
-              } catch (profileError) {
-                console.error('Profile creation error:', profileError);
-              }
-            }
-            throw error;
-          }
+            return;
 
           // For Firebase, we can log in immediately after registration
           showAuthMessage('Account created successfully! Logging you in...', 'success');
