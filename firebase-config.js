@@ -1,11 +1,7 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// Firebase Configuration for Web App
+// This file contains the Firebase configuration for the web version of TagYou
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Firebase configuration object
 const firebaseConfig = {
   apiKey: "AIzaSyDWm3v-1WXxHWDYIzqK1nCjrBeVW-GvG1I",
   authDomain: "tagyouapp-b0d30.firebaseapp.com",
@@ -17,5 +13,14 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+firebase.initializeApp(firebaseConfig);
+
+// Initialize Firebase services
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+// Export for use in other files
+window.firebaseAuth = auth;
+window.firebaseDB = db;
+window.firebaseStorage = storage;
