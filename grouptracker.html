@@ -7666,8 +7666,7 @@
         let tilesLoaded = 0;
         let tilesTotal = 0;
         
-        // Get map container once for reuse
-        const mapContainer = document.getElementById('map');
+        // Reuse existing map container
         
         tileLayer.on('loading', function () {
           tilesTotal++;
