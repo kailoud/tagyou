@@ -5157,9 +5157,9 @@
             };
             isAuthenticated = true;
 
-            // Check admin status from database
+            // Check admin status from database (optional)
             try {
-              const profileDoc = await db.collection('user_profiles').doc(user.uid).get();
+              const profileDoc = await window.firebaseDB.collection('user_profiles').doc(user.uid).get();
               
               if (profileDoc.exists) {
                 const profileData = profileDoc.data();
@@ -5170,7 +5170,7 @@
                 isProUser = user.email.endsWith('@admin.com') || user.email === 'demo@tagyou.com';
               }
             } catch (error) {
-              console.error('Error checking admin status:', error);
+              console.log('Admin status check failed (continuing without admin privileges):', error.message);
               // Fallback to email-based check
               isProUser = user.email.endsWith('@admin.com') || user.email === 'demo@tagyou.com';
             }
@@ -5336,7 +5336,7 @@
               isProUser = email.endsWith('@admin.com') || email === 'demo@tagyou.com';
             }
           } catch (error) {
-            console.error('Error checking admin status:', error);
+            console.log('Admin status check failed (continuing without admin privileges):', error.message);
             // Fallback to email-based check
             isProUser = email.endsWith('@admin.com') || email === 'demo@tagyou.com';
           }
@@ -5617,9 +5617,7 @@
 
         // Initialize Firebase services
         try {
-          auth = window.firebaseAuth;
-          db = window.firebaseDB;
-          storage = window.firebaseStorage;
+          // Use window objects directly instead of reassigning
           console.log('Firebase services initialized successfully');
         } catch (error) {
           console.error('Error initializing Firebase services:', error);
@@ -7625,9 +7623,10 @@
         // Use fastest possible tile server for tracking
         let tileLayer;
         
-        // Primary: Fast OSM server with minimal settings
-        tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          ...tileOptions
+        // Primary: Reliable OSM server for immediate loading
+        tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          ...tileOptions,
+          subdomains: 'abc'
         }).addTo(map);
 
         // Immediate map visibility for tracking
