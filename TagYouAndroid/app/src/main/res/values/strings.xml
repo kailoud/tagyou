@@ -76,7 +76,9 @@
     <string name="show_friends">Show Friends</string>
     <string name="hide_friends">Hide Friends</string>
     <string name="show_food_stalls">Show Food Stalls</string>
+    <string name="hide_food_stalls">Hide Food Stalls</string>
     <string name="show_float_trucks">Show Float Trucks</string>
+    <string name="hide_float_trucks">Hide Float Trucks</string>
     
     <!-- Settings -->
     <string name="notifications">Notifications</string>
