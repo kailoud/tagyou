@@ -8225,6 +8225,13 @@
 
       function updateLocationInGroup() {
         if (currentLocation && isSharingLocation) {
+          // Validate current location coordinates
+          if (!currentLocation.lat || !currentLocation.lng || 
+              isNaN(currentLocation.lat) || isNaN(currentLocation.lng)) {
+            console.warn('Invalid current location coordinates:', currentLocation);
+            return;
+          }
+          
           console.log('Updating location in group:', currentLocation);
 
           // Simulate real-time location sharing
@@ -8257,6 +8264,16 @@
       }
 
       function updateMemberMarker(member) {
+        // Validate coordinates before creating marker
+        if (!member.location || 
+            typeof member.location.lat !== 'number' || 
+            typeof member.location.lng !== 'number' ||
+            isNaN(member.location.lat) || 
+            isNaN(member.location.lng)) {
+          console.warn('Invalid coordinates for member:', member.id, member.location);
+          return;
+        }
+
         // Remove existing marker for this member
         if (window.memberMarkers && window.memberMarkers[member.id]) {
           map.removeLayer(window.memberMarkers[member.id]);
