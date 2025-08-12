@@ -5046,7 +5046,12 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage-compat.js"></script>
+    <script src="firebase-config.js"></script>
     <script>
       // Supabase Authentication System
       let currentUser = null;
@@ -5061,10 +5066,8 @@
       let locationUpdateInterval;
       let groupCode = 'ABC123';
 
-      // Supabase Configuration
-      const SUPABASE_URL = 'https://ttgsohnskgujbfvopzzi.supabase.co'; // Your Supabase URL
-      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0Z3NvaG5za2d1amJmdm9wenppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3NzY1ODksImV4cCI6MjA3MDM1MjU4OX0.dTb_VNMSCBUtu78QRnqVwkOgI9UptuIp7Fu1PTHTyYc'; // Your Supabase anon key
-      let supabase; // Will be initialized after library loads
+      // Firebase Configuration
+      let auth, db, storage; // Will be initialized after library loads
       let currentGroup = {
         name: 'Festival Squad 2025',
         members: [
@@ -5657,12 +5660,14 @@
       function initializeApp() {
         console.log('Initializing app with authentication...');
 
-        // Initialize Supabase client
+        // Initialize Firebase services
         try {
-          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-          console.log('Supabase client initialized successfully');
+          auth = window.firebaseAuth;
+          db = window.firebaseDB;
+          storage = window.firebaseStorage;
+          console.log('Firebase services initialized successfully');
         } catch (error) {
-          console.error('Error initializing Supabase client:', error);
+          console.error('Error initializing Firebase services:', error);
         }
 
         // Show user profile
