@@ -7589,26 +7589,52 @@
 
         console.log('Leaflet is available, initializing map');
 
-        // Initialize map without zoom controls
+        // Initialize map with optimized settings
         map = L.map('map', {
-          zoomControl: false
-        }).setView([51.5074, -0.1278], 16);
+          zoomControl: false,
+          preferCanvas: true,
+          renderer: L.canvas(),
+          fadeAnimation: false,
+          zoomAnimation: true,
+          markerZoomAnimation: false
+        }).setView([51.5074, -0.1278], 14);
 
-        // Add modern colorful tiles with fallback
-        const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors, © Humanitarian OpenStreetMap Team',
-          subdomains: 'abc',
-          maxZoom: 19
+        // Add fast, reliable tile layer with multiple fallbacks
+        const tileOptions = {
+          attribution: '© OpenStreetMap contributors',
+          maxZoom: 18,
+          minZoom: 3,
+          tileSize: 256,
+          updateWhenIdle: true,
+          updateWhenZooming: false,
+          keepBuffer: 2
+        };
+
+        // Try CartoDB Positron (fast, clean, reliable)
+        const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          ...tileOptions,
+          subdomains: 'abcd'
         }).addTo(map);
 
-        // Fallback to default OSM if the colorful tiles fail
+        // Fallback chain for better reliability
         tileLayer.on('tileerror', function () {
-          console.log('Colorful tiles failed, falling back to default OSM');
+          console.log('CartoDB tiles failed, trying OpenStreetMap...');
           map.removeLayer(tileLayer);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
-            maxZoom: 19
+          
+          const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            ...tileOptions,
+            subdomains: 'abc'
           }).addTo(map);
+          
+          osmLayer.on('tileerror', function () {
+            console.log('OSM tiles failed, trying Stamen...');
+            map.removeLayer(osmLayer);
+            
+            L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png', {
+              ...tileOptions,
+              subdomains: 'abcd'
+            }).addTo(map);
+          });
         });
 
         // Add tile load success handler
@@ -7616,13 +7642,25 @@
           console.log('Map tiles loaded successfully');
         });
 
-        // Force map refresh after a short delay
+        // Optimized map refresh with loading indicator
+        const mapContainer = document.getElementById('map');
+        if (mapContainer) {
+          mapContainer.style.opacity = '0.7';
+          mapContainer.style.transition = 'opacity 0.3s ease';
+        }
+
+        // Force map refresh with optimized timing
         setTimeout(() => {
           if (map) {
             map.invalidateSize();
             console.log('Map size invalidated and refreshed');
+            
+            // Fade in the map when ready
+            if (mapContainer) {
+              mapContainer.style.opacity = '1';
+            }
           }
-        }, 1000);
+        }, 500);
 
         // Add user marker with avatar
         const userAvatar = currentUser?.avatar || '👤';
