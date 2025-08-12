@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "YOUR_PROJECT_NUMBER",
-    "project_id": "tagyou-festival-tracker",
-    "storage_bucket": "tagyou-festival-tracker.appspot.com"
+    "project_number": "955342799504",
+    "project_id": "tagyouapp-b0d30",
+    "storage_bucket": "tagyouapp-b0d30.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "YOUR_APP_ID",
+        "mobilesdk_app_id": "1:955342799504:android:3f5993b1465b4cedc04e15",
         "android_client_info": {
           "package_name": "com.tagyou.festivaltracker"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "YOUR_CLIENT_ID",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "YOUR_API_KEY"
+          "current_key": "AIzaSyCEXRzLFUxyV_NFQbJrRYIasmHyr4tAmh0"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "YOUR_CLIENT_ID",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
