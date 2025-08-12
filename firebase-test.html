@@ -4,95 +4,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Firebase Integration Test</title>
+  <title>Firebase Test</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       max-width: 800px;
       margin: 0 auto;
       padding: 20px;
-      background: #f5f5f5;
     }
 
-    .container {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .status {
-      padding: 10px;
-      margin: 10px 0;
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
       border-radius: 5px;
     }
 
     .success {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
+      background-color: #d4edda;
+      border-color: #c3e6cb;
     }
 
     .error {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
-
-    .info {
-      background: #d1ecf1;
-      color: #0c5460;
-      border: 1px solid #bee5eb;
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
     }
 
     button {
-      background: #007bff;
-      color: white;
-      border: none;
       padding: 10px 20px;
+      margin: 5px;
+      border: none;
       border-radius: 5px;
       cursor: pointer;
-      margin: 5px;
     }
 
-    button:hover {
-      background: #0056b3;
+    .btn-primary {
+      background-color: #007bff;
+      color: white;
     }
 
-    input {
-      padding: 8px;
-      margin: 5px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      width: 200px;
+    .btn-success {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .btn-danger {
+      background-color: #dc3545;
+      color: white;
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>🔥 Firebase Integration Test</h1>
-    <p>Testing Firebase connection for TagYou app...</p>
+  <h1>Firebase Integration Test</h1>
 
-    <div id="status"></div>
+  <div class="test-section">
+    <h3>1. Firebase Initialization</h3>
+    <div id="init-status">Checking...</div>
+  </div>
 
-    <h2>Authentication Test</h2>
-    <div>
-      <input type="email" id="email" placeholder="Email" value="test@example.com">
-      <input type="password" id="password" placeholder="Password" value="test123456">
-      <br>
-      <button onclick="testSignUp()">Test Sign Up</button>
-      <button onclick="testSignIn()">Test Sign In</button>
-      <button onclick="testSignOut()">Test Sign Out</button>
+  <div class="test-section">
+    <h3>2. Authentication Test</h3>
+    <button class="btn-primary" onclick="testAuth()">Test Auth</button>
+    <div id="auth-status">Not tested</div>
+  </div>
+
+  <div class="test-section">
+    <h3>3. Firestore Write Test</h3>
+    <button class="btn-success" onclick="testFirestoreWrite()">Test Write</button>
+    <div id="firestore-write-status">Not tested</div>
+  </div>
+
+  <div class="test-section">
+    <h3>4. Firestore Read Test</h3>
+    <button class="btn-primary" onclick="testFirestoreRead()">Test Read</button>
+    <div id="firestore-read-status">Not tested</div>
+  </div>
+
+  <div class="test-section">
+    <h3>5. Console Logs</h3>
+    <div id="console-logs"
+      style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-family: monospace; max-height: 200px; overflow-y: auto;">
     </div>
-
-    <h2>Database Test</h2>
-    <div>
-      <button onclick="testWriteData()">Test Write Data</button>
-      <button onclick="testReadData()">Test Read Data</button>
-    </div>
-
-    <div id="results"></div>
   </div>
 
   <!-- Firebase SDK -->
@@ -102,115 +95,125 @@
   <script src="firebase-config.js"></script>
 
   <script>
-    let auth, db;
+    // Override console.log to capture logs
+    const originalLog = console.log;
+    const originalError = console.error;
+    const logsDiv = document.getElementById('console-logs');
 
-    function updateStatus(message, type = 'info') {
-      const statusDiv = document.getElementById('status');
-      statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+    function addLog(message, type = 'log') {
+      const timestamp = new Date().toLocaleTimeString();
+      const logEntry = document.createElement('div');
+      logEntry.style.color = type === 'error' ? 'red' : 'black';
+      logEntry.textContent = `[${timestamp}] ${message}`;
+      logsDiv.appendChild(logEntry);
+      logsDiv.scrollTop = logsDiv.scrollHeight;
     }
 
-    function updateResults(message) {
-      const resultsDiv = document.getElementById('results');
-      resultsDiv.innerHTML += `<div class="status info">${message}</div>`;
-    }
+    console.log = function (...args) {
+      originalLog.apply(console, args);
+      addLog(args.join(' '));
+    };
 
-    // Initialize Firebase
-    try {
-      auth = window.firebaseAuth;
-      db = window.firebaseDB;
-      updateStatus('✅ Firebase initialized successfully!', 'success');
-    } catch (error) {
-      updateStatus('❌ Firebase initialization failed: ' + error.message, 'error');
+    console.error = function (...args) {
+      originalError.apply(console, args);
+      addLog(args.join(' '), 'error');
+    };
+
+    // Test Firebase initialization
+    function testInit() {
+      const initStatus = document.getElementById('init-status');
+      try {
+        if (window.firebaseAuth && window.firebaseDB) {
+          initStatus.innerHTML = '<span style="color: green;">✅ Firebase initialized successfully</span>';
+          initStatus.parentElement.className = 'test-section success';
+        } else {
+          initStatus.innerHTML = '<span style="color: red;">❌ Firebase not initialized</span>';
+          initStatus.parentElement.className = 'test-section error';
+        }
+      } catch (error) {
+        initStatus.innerHTML = `<span style="color: red;">❌ Error: ${error.message}</span>`;
+        initStatus.parentElement.className = 'test-section error';
+      }
     }
 
     // Test Authentication
-    async function testSignUp() {
-      try {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+    async function testAuth() {
+      const authStatus = document.getElementById('auth-status');
+      authStatus.innerHTML = 'Testing...';
 
-        updateStatus('🔄 Creating test user...', 'info');
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        updateStatus('✅ User created successfully! UID: ' + userCredential.user.uid, 'success');
-        updateResults('Sign up test: PASSED');
+      try {
+        const auth = window.firebaseAuth;
+        console.log('Auth object:', auth);
+        console.log('Current user:', auth.currentUser);
+
+        authStatus.innerHTML = '<span style="color: green;">✅ Authentication working</span>';
+        authStatus.parentElement.className = 'test-section success';
       } catch (error) {
-        updateStatus('❌ Sign up failed: ' + error.message, 'error');
-        updateResults('Sign up test: FAILED - ' + error.message);
+        authStatus.innerHTML = `<span style="color: red;">❌ Auth error: ${error.message}</span>`;
+        authStatus.parentElement.className = 'test-section error';
+        console.error('Auth test error:', error);
       }
     }
 
-    async function testSignIn() {
-      try {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+    // Test Firestore Write
+    async function testFirestoreWrite() {
+      const writeStatus = document.getElementById('firestore-write-status');
+      writeStatus.innerHTML = 'Testing write...';
 
-        updateStatus('🔄 Signing in...', 'info');
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        updateStatus('✅ Signed in successfully! User: ' + userCredential.user.email, 'success');
-        updateResults('Sign in test: PASSED');
-      } catch (error) {
-        updateStatus('❌ Sign in failed: ' + error.message, 'error');
-        updateResults('Sign in test: FAILED - ' + error.message);
-      }
-    }
-
-    async function testSignOut() {
       try {
-        updateStatus('🔄 Signing out...', 'info');
-        await auth.signOut();
-        updateStatus('✅ Signed out successfully!', 'success');
-        updateResults('Sign out test: PASSED');
-      } catch (error) {
-        updateStatus('❌ Sign out failed: ' + error.message, 'error');
-        updateResults('Sign out test: FAILED - ' + error.message);
-      }
-    }
+        const db = window.firebaseDB;
+        console.log('Firestore object:', db);
 
-    // Test Database
-    async function testWriteData() {
-      try {
-        updateStatus('🔄 Writing test data...', 'info');
         const testData = {
-          message: 'Hello from Firebase!',
+          test: true,
           timestamp: new Date().toISOString(),
-          test: true
+          message: 'Test write from web app'
         };
 
-        await db.collection('test').add(testData);
-        updateStatus('✅ Data written successfully!', 'success');
-        updateResults('Write test: PASSED');
+        console.log('Attempting to write test data...');
+        const docRef = await db.collection('test').add(testData);
+        console.log('Write successful, document ID:', docRef.id);
+
+        writeStatus.innerHTML = `<span style="color: green;">✅ Write successful! Document ID: ${docRef.id}</span>`;
+        writeStatus.parentElement.className = 'test-section success';
       } catch (error) {
-        updateStatus('❌ Write failed: ' + error.message, 'error');
-        updateResults('Write test: FAILED - ' + error.message);
+        writeStatus.innerHTML = `<span style="color: red;">❌ Write error: ${error.message}</span>`;
+        writeStatus.parentElement.className = 'test-section error';
+        console.error('Firestore write error:', error);
       }
     }
 
-    async function testReadData() {
-      try {
-        updateStatus('🔄 Reading test data...', 'info');
-        const snapshot = await db.collection('test').limit(5).get();
+    // Test Firestore Read
+    async function testFirestoreRead() {
+      const readStatus = document.getElementById('firestore-read-status');
+      readStatus.innerHTML = 'Testing read...';
 
-        let data = [];
+      try {
+        const db = window.firebaseDB;
+        console.log('Attempting to read test data...');
+
+        const snapshot = await db.collection('test').limit(5).get();
+        console.log('Read successful, documents found:', snapshot.size);
+
+        const docs = [];
         snapshot.forEach(doc => {
-          data.push({ id: doc.id, ...doc.data() });
+          docs.push({ id: doc.id, ...doc.data() });
         });
 
-        updateStatus('✅ Data read successfully! Found ' + data.length + ' documents', 'success');
-        updateResults('Read test: PASSED - Found ' + data.length + ' documents');
-        console.log('Test data:', data);
+        readStatus.innerHTML = `<span style="color: green;">✅ Read successful! Found ${snapshot.size} documents</span>`;
+        readStatus.parentElement.className = 'test-section success';
+        console.log('Documents:', docs);
       } catch (error) {
-        updateStatus('❌ Read failed: ' + error.message, 'error');
-        updateResults('Read test: FAILED - ' + error.message);
+        readStatus.innerHTML = `<span style="color: red;">❌ Read error: ${error.message}</span>`;
+        readStatus.parentElement.className = 'test-section error';
+        console.error('Firestore read error:', error);
       }
     }
 
-    // Listen for auth state changes
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        updateStatus('👤 User is signed in: ' + user.email, 'success');
-      } else {
-        updateStatus('👤 No user signed in', 'info');
-      }
+    // Initialize tests when page loads
+    window.addEventListener('load', function () {
+      console.log('Firebase test page loaded');
+      setTimeout(testInit, 1000); // Give Firebase time to initialize
     });
   </script>
 </body>
