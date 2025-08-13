@@ -961,10 +961,47 @@
 
     /* Admin Portal Styles */
     .admin-portal-content {
-      max-width: 90vw;
-      width: 1200px;
-      max-height: 90vh;
+      max-height: 80vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .admin-portal-content .modal-body {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sticky-admin-header {
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 10;
+      border-bottom: 1px solid #eee;
+      margin: 0 -24px;
+      padding: 0 24px;
+    }
+
+    .sticky-admin-controls {
+      position: sticky;
+      top: 60px;
+      background: white;
+      z-index: 9;
+      border-bottom: 1px solid #eee;
+      margin: 0 -24px;
+      padding: 16px 24px;
+    }
+
+    .admin-table-container {
+      flex: 1;
       overflow-y: auto;
+      margin: 0 -24px;
+      padding: 0 24px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
     }
 
     .admin-subtitle {
@@ -6675,10 +6712,8 @@
                 </div>
               </div>
               <div class="modal-body">
-                <p class="admin-subtitle">Manage food stalls, food trucks, groups, and friends for your tracking app</p>
-                
                 <!-- Admin Tabs -->
-                <div class="admin-tabs">
+                <div class="admin-tabs sticky-admin-header">
                   <button class="admin-tab active" onclick="switchAdminTab('food-stalls')">
                     🍔 Food Stalls
                     <span class="tab-count">${adminData['food-stalls'].length}</span>
@@ -6698,7 +6733,7 @@
                 </div>
 
                 <!-- Search and Add -->
-                <div class="admin-controls">
+                <div class="admin-controls sticky-admin-controls">
                   <div class="search-container">
                     <input type="text" id="adminSearch" placeholder="Search..." class="admin-search">
                   </div>
