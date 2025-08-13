@@ -997,14 +997,14 @@
 
     .admin-table-container {
       flex: 1;
-      overflow-y: auto;
+      overflow-y: scroll;
       overflow-x: auto;
       margin: 0 -24px;
       padding: 0 24px;
       background: white;
       border-radius: 8px;
       border: 1px solid #e5e7eb;
-      min-height: 150px;
+      height: 300px;
     }
 
     .admin-subtitle {
@@ -1090,6 +1090,19 @@
       min-width: 800px;
       border-collapse: collapse;
       margin: 0;
+    }
+
+    .admin-table tbody {
+      display: block;
+      overflow-y: auto;
+      max-height: 250px;
+    }
+
+    .admin-table thead,
+    .admin-table tbody tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
     }
 
     .admin-table th {
