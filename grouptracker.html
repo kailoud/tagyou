@@ -7534,8 +7534,7 @@
 
         console.log('Body and HTML forced to have proper dimensions');
 
-        // Initialize Firebase services first - DISABLED FOR MAP TESTING
-        /*
+        // Initialize Firebase services first
         try {
           auth = window.firebaseAuth;
           db = window.firebaseDB;
@@ -7548,10 +7547,6 @@
           console.error('Error initializing Firebase services:', error);
           showAuthOverlay();
         }
-        */
-        console.log('Firebase services disabled - showing map directly');
-        // Skip authentication to test map
-        showAppContent();
 
         // Add authentication form event listeners
         console.log('Setting up auth event listeners...'); // Debug log
