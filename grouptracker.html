@@ -6639,11 +6639,12 @@
       // Admin Portal Functions
       async function showAdminPortal() {
         console.log('showAdminPortal called');
+        const currentUser = window.firebaseAuth?.currentUser;
         console.log('Current user:', currentUser);
-        console.log('isProUser:', isProUser);
+        console.log('isUserAdmin check:', isUserAdmin(currentUser));
 
         // Check if user has admin privileges
-        if (!isProUser) {
+        if (!currentUser || !isUserAdmin(currentUser)) {
           console.log('Access denied - user is not admin');
           showNotification('Access denied. Admin privileges required.', 'error');
           return;
