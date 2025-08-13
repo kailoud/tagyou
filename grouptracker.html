@@ -5408,6 +5408,11 @@
           // Update Admin Portal visibility
           updateAdminPortalVisibility();
 
+          // Check if user is admin and show notification
+          if (isUserAdmin(userCredential.user)) {
+            showNotification('Welcome, Admin! You have access to the Admin Portal.', 'success');
+          }
+
           // Hide auth overlay and show app
           document.getElementById('authOverlay').style.display = 'none';
           document.getElementById('appContent').classList.add('authenticated');
@@ -5660,11 +5665,25 @@
         }
       }
 
+      // Admin email list - add your admin emails here
+      const ADMIN_EMAILS = [
+        'kailoud639@gmail.com',
+        // Replace with your email
+        // Add more admin emails as needed
+      ];
+
+      // Function to check if user is admin
+      function isUserAdmin(user) {
+        if (!user || !user.email) return false;
+        return ADMIN_EMAILS.includes(user.email.toLowerCase());
+      }
+
       // Function to update Admin Portal visibility
       function updateAdminPortalVisibility() {
         const adminPortalMenuItem = document.getElementById('adminPortalMenuItem');
         if (adminPortalMenuItem) {
-          if (isProUser) {
+          const currentUser = window.firebaseAuth?.currentUser;
+          if (currentUser && isUserAdmin(currentUser)) {
             adminPortalMenuItem.style.display = 'block';
             console.log('Admin Portal: SHOWN (User has admin privileges)');
           } else {
