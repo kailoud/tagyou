@@ -7591,34 +7591,26 @@
 
         console.log('Leaflet is available, initializing map');
 
-        // Initialize map with ultra-fast settings for tracking
+        // Initialize map with standard settings for reliable loading
         map = L.map('map', {
           zoomControl: false,
           preferCanvas: true,
           renderer: L.canvas(),
           fadeAnimation: false,
-          zoomAnimation: false,
-          markerZoomAnimation: false,
-          trackResize: false,
-          boxZoom: false,
-          doubleClickZoom: false,
-          dragging: true,
-          keyboard: false,
-          scrollWheelZoom: false,
-          tap: false,
-          touchZoom: false
-        }).setView([51.5074, -0.1278], 10);
+          zoomAnimation: true,
+          markerZoomAnimation: false
+        }).setView([51.5074, -0.1278], 12);
 
-        // Ultra-fast tile settings for tracking app
+        // Standard tile settings for reliable loading
         const tileOptions = {
-          attribution: '',
-          maxZoom: 14,
-          minZoom: 8,
+          attribution: '© OpenStreetMap contributors',
+          maxZoom: 18,
+          minZoom: 3,
           tileSize: 256,
-          updateWhenIdle: false,
-          updateWhenZooming: false,
-          keepBuffer: 0,
-          crossOrigin: false,
+          updateWhenIdle: true,
+          updateWhenZooming: true,
+          keepBuffer: 2,
+          crossOrigin: true,
           detectRetina: false,
           bounds: null,
           noWrap: true
