@@ -15,6 +15,10 @@
 
     html {
       overflow-x: hidden;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
     }
 
     body {
@@ -23,7 +27,10 @@
       overflow: hidden;
       overflow-x: hidden;
       height: 100vh;
+      width: 100vw;
       position: relative;
+      margin: 0;
+      padding: 0;
     }
 
     /* Authentication Styles */
@@ -1877,6 +1884,27 @@
       height: 100vh;
       width: 100vw;
       z-index: 1;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Ensure Leaflet container is properly positioned */
+    .leaflet-container {
+      width: 100% !important;
+      height: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
     }
 
     .top-bar {
@@ -5054,7 +5082,7 @@
     <script src="firebase-config.js"></script>
     <script>
       // Define switchAuthTab function immediately for global access
-      window.switchAuthTab = function(tab) {
+      window.switchAuthTab = function (tab) {
         console.log('switchAuthTab called with:', tab);
         // Update tab buttons
         document.querySelectorAll('.auth-tab').forEach(btn => btn.classList.remove('active'));
@@ -5111,7 +5139,7 @@
 
       // Authentication Functions - Now globally available
 
-      window.clearAuthMessages = function() {
+      window.clearAuthMessages = function () {
         const messages = document.getElementById('authMessages');
         if (messages) {
           messages.innerHTML = '';
@@ -5119,7 +5147,7 @@
         }
       }
 
-      window.showAuthMessage = function(message, type = 'error') {
+      window.showAuthMessage = function (message, type = 'error') {
         const messages = document.getElementById('authMessages');
         if (messages) {
           messages.innerHTML = message;
@@ -5127,14 +5155,14 @@
         }
       }
 
-      window.showLoading = function(button) {
+      window.showLoading = function (button) {
         if (button) {
           button.disabled = true;
           button.innerHTML = 'Loading...';
         }
       }
 
-      window.hideLoading = function(button, originalText) {
+      window.hideLoading = function (button, originalText) {
         if (button) {
           button.disabled = false;
           button.innerHTML = originalText;
@@ -5160,7 +5188,7 @@
             // Check admin status from database (optional)
             try {
               const profileDoc = await window.firebaseDB.collection('user_profiles').doc(user.uid).get();
-              
+
               if (profileDoc.exists) {
                 const profileData = profileDoc.data();
                 isProUser = profileData.is_admin || profileData.role === 'admin' || profileData.role === 'super_admin';
@@ -5236,7 +5264,7 @@
 
         try {
           const userCredential = await window.firebaseAuth.signInWithEmailAndPassword(email, password);
-          
+
           showAuthMessage('Login successful! Redirecting...', 'success');
           setTimeout(() => {
             checkAuthStatus();
@@ -5285,7 +5313,7 @@
         try {
           console.log('Calling Firebase auth.createUserWithEmailAndPassword...'); // Debug log
           const userCredential = await window.firebaseAuth.createUserWithEmailAndPassword(email, password);
-          
+
           // Update user profile with display name
           await userCredential.user.updateProfile({
             displayName: name
@@ -5303,7 +5331,7 @@
               is_admin: false,
               created_at: new Date().toISOString()
             });
-            
+
             showAuthMessage('Registration successful! Please check your email for verification.', 'success');
             event.target.reset();
             return;
@@ -5326,7 +5354,7 @@
           // Check admin status from database
           try {
             const profileDoc = await window.firebaseDB.collection('user_profiles').doc(userCredential.user.uid).get();
-            
+
             if (profileDoc.exists) {
               const profileData = profileDoc.data();
               isProUser = profileData.is_admin || profileData.role === 'admin' || profileData.role === 'super_admin';
@@ -7564,6 +7592,8 @@
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
             width: 100vw !important;
             height: 100vh !important;
             z-index: 1 !important;
@@ -7571,6 +7601,7 @@
             padding: 0 !important;
             border: none !important;
             overflow: hidden !important;
+            transform: none !important;
           `;
 
         console.log('Map container styled and ready');
@@ -7593,7 +7624,7 @@
 
         // Initialize map with mobile-optimized settings
         const isMobile = window.innerWidth <= 768;
-        
+
         map = L.map('map', {
           zoomControl: false,
           preferCanvas: true,
@@ -7628,7 +7659,7 @@
 
         // Use fastest possible tile server for tracking
         let tileLayer;
-        
+
         // Primary: Reliable OSM server for immediate loading
         tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           ...tileOptions,
@@ -7638,7 +7669,7 @@
         // Immediate map visibility for tracking with full bleed
         if (mapContainer) {
           mapContainer.style.opacity = '1';
-          
+
           // Ensure Leaflet tiles fill the container
           const leafletContainer = mapContainer.querySelector('.leaflet-container');
           if (leafletContainer) {
@@ -7648,6 +7679,11 @@
               margin: 0 !important;
               padding: 0 !important;
               border: none !important;
+              position: absolute !important;
+              top: 0 !important;
+              left: 0 !important;
+              right: 0 !important;
+              bottom: 0 !important;
             `;
           }
         }
@@ -7656,16 +7692,16 @@
         setTimeout(() => {
           if (map) {
             map.invalidateSize();
-            
+
             // Force tile loading to fill the screen
-            map.setView(map.getCenter(), map.getZoom(), {animate: false});
-            
+            map.setView(map.getCenter(), map.getZoom(), { animate: false });
+
             // Mobile-specific optimizations
             if (isMobile) {
               // Reduce tile quality on mobile for faster loading
-              map.setZoom(map.getZoom(), {animate: false});
+              map.setZoom(map.getZoom(), { animate: false });
             }
-            
+
             // Additional refresh to ensure tiles load
             setTimeout(() => {
               if (map) {
@@ -8278,12 +8314,12 @@
       function updateLocationInGroup() {
         if (currentLocation && isSharingLocation) {
           // Validate current location coordinates
-          if (!currentLocation.lat || !currentLocation.lng || 
-              isNaN(currentLocation.lat) || isNaN(currentLocation.lng)) {
+          if (!currentLocation.lat || !currentLocation.lng ||
+            isNaN(currentLocation.lat) || isNaN(currentLocation.lng)) {
             console.warn('Invalid current location coordinates:', currentLocation);
             return;
           }
-          
+
           console.log('Updating location in group:', currentLocation);
 
           // Simulate real-time location sharing
@@ -8317,11 +8353,11 @@
 
       function updateMemberMarker(member) {
         // Validate coordinates before creating marker
-        if (!member.location || 
-            typeof member.location.lat !== 'number' || 
-            typeof member.location.lng !== 'number' ||
-            isNaN(member.location.lat) || 
-            isNaN(member.location.lng)) {
+        if (!member.location ||
+          typeof member.location.lat !== 'number' ||
+          typeof member.location.lng !== 'number' ||
+          isNaN(member.location.lat) ||
+          isNaN(member.location.lng)) {
           console.warn('Invalid coordinates for member:', member.id, member.location);
           return;
         }
