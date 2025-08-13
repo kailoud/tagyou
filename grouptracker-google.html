@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GroupTracker - Modern Google Maps</title>
+
+  <!-- Google Maps Platform - What modern apps actually use -->
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQKQKQKQKQKQKQKQKQKQKQKQKQKQKQKQ&libraries=places,geometry"></script>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    #map {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+    }
+
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-bar {
+      flex: 1;
+      max-width: 300px;
+      height: 40px;
+      background: #f5f5f5;
+      border: none;
+      border-radius: 20px;
+      padding: 0 20px;
+      font-size: 14px;
+      margin-right: 15px;
+    }
+
+    .festival-btn {
+      background: #ff6b35;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #ff6b35;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .floating-controls {
+      position: fixed;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .control-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
+    }
+
+    .control-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .friends-btn {
+      background: #ff4757;
+      color: white;
+    }
+
+    .food-btn {
+      background: #ffa502;
+      color: white;
+    }
+
+    .trucks-btn {
+      background: #5f27cd;
+      color: white;
+    }
+
+    .bottom-controls {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      gap: 15px;
+    }
+
+    .location-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #2ed573;
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .center-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #3742fa;
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 20px;
+      box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .nav-item.active {
+      background: rgba(255, 107, 53, 0.1);
+      color: #ff6b35;
+    }
+
+    .nav-icon {
+      font-size: 24px;
+    }
+
+    .nav-label {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .auth-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-card {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .logo {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid #f0f0f0;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 15px;
+      border: none;
+      background: #f8f9fa;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .auth-tab.active {
+      background: #ff6b35;
+      color: white;
+    }
+
+    .auth-form {
+      display: none;
+    }
+
+    .auth-form.active {
+      display: block;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #f0f0f0;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #ff6b35;
+    }
+
+    .auth-btn {
+      width: 100%;
+      padding: 15px;
+      background: #ff6b35;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .auth-btn:hover {
+      background: #e55a2b;
+    }
+
+    .auth-messages {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .auth-messages.error {
+      background: #ffe6e6;
+      color: #d63031;
+    }
+
+    .auth-messages.success {
+      background: #e6ffe6;
+      color: #00b894;
+    }
+
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #ff6b35;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Custom marker styles */
+    .custom-marker {
+      background: #ff6b35;
+      border: 3px solid white;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+    }
+
+    .custom-marker.friend {
+      background: #2ed573;
+    }
+
+    .custom-marker.food {
+      background: #ffa502;
+    }
+
+    .custom-marker.truck {
+      background: #5f27cd;
+    }
+
+    .custom-marker.pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* Info window styles */
+    .info-window {
+      padding: 10px;
+      text-align: center;
+      min-width: 200px;
+    }
+
+    .info-window h4 {
+      margin: 0 0 5px 0;
+      color: #333;
+    }
+
+    .info-window p {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Authentication Overlay -->
+  <div id="authOverlay" class="auth-overlay">
+    <div class="auth-card">
+      <div class="logo">🎪</div>
+      <div class="title">GroupTracker</div>
+      <div class="subtitle">Real-time group location tracking for events and festivals</div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login')" id="loginTab">Sign In</button>
+        <button class="auth-tab" onclick="switchAuthTab('register')" id="registerTab">Sign Up</button>
+      </div>
+
+      <div id="loginForm" class="auth-form active">
+        <input type="email" id="loginEmail" class="form-input" placeholder="Email" value="demo@tagyou.com">
+        <input type="password" id="loginPassword" class="form-input" placeholder="Password" value="demo123">
+        <button class="auth-btn" onclick="handleLogin()">Sign In</button>
+        <a href="#" onclick="switchAuthTab('forgot')"
+          style="color: #ff6b35; text-decoration: none; font-size: 14px;">Forgot Password?</a>
+      </div>
+
+      <div id="registerForm" class="auth-form">
+        <input type="text" id="registerName" class="form-input" placeholder="Full Name">
+        <input type="email" id="registerEmail" class="form-input" placeholder="Email">
+        <input type="password" id="registerPassword" class="form-input" placeholder="Password">
+        <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm Password">
+        <button class="auth-btn" onclick="handleRegister()">Create Account</button>
+        <a href="#" onclick="switchAuthTab('login')"
+          style="color: #ff6b35; text-decoration: none; font-size: 14px;">Already have an account? Sign In</a>
+      </div>
+
+      <div id="forgotForm" class="auth-form">
+        <input type="email" id="forgotEmail" class="form-input" placeholder="Email">
+        <button class="auth-btn" onclick="handleForgotPassword()">Reset Password</button>
+        <a href="#" onclick="switchAuthTab('login')"
+          style="color: #ff6b35; text-decoration: none; font-size: 14px;">Back to Sign In</a>
+      </div>
+
+      <div id="authMessages" class="auth-messages"></div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="appContent" style="display: none;">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <input type="text" class="search-bar" placeholder="Find group members...">
+      <button class="festival-btn">
+        🎪 UK Festivals ▼
+      </button>
+      <div class="user-avatar" onclick="showProfile()">U</div>
+    </div>
+
+    <!-- Map -->
+    <div id="map"></div>
+
+    <!-- Floating Controls -->
+    <div class="floating-controls">
+      <button class="control-btn friends-btn" onclick="toggleFriends()" title="Friends">👥</button>
+      <button class="control-btn food-btn" onclick="toggleFoodStalls()" title="Food Stalls">🍔</button>
+      <button class="control-btn trucks-btn" onclick="toggleFloatTrucks()" title="Float Trucks">🚛</button>
+    </div>
+
+    <!-- Bottom Controls -->
+    <div class="bottom-controls">
+      <button class="center-btn" onclick="centerOnGroup()" title="Center on Group">🎯</button>
+      <button class="location-btn" onclick="getMyLocation()" title="My Location">📍</button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-item active" onclick="switchTab('group')">
+        <div class="nav-icon">👥</div>
+        <div class="nav-label">Group</div>
+      </div>
+      <div class="nav-item" onclick="switchTab('stalls')">
+        <div class="nav-icon">🍔</div>
+        <div class="nav-label">Find Stalls</div>
+      </div>
+      <div class="nav-item" onclick="switchTab('floats')">
+        <div class="nav-icon">🚛</div>
+        <div class="nav-label">Floats</div>
+      </div>
+      <div class="nav-item" onclick="switchTab('settings')">
+        <div class="nav-icon">⚙️</div>
+        <div class="nav-label">Settings</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Modern Google Maps Platform Implementation
+    let map;
+    let currentUser = null;
+    let isAuthenticated = false;
+    let isProUser = false;
+
+    // Map state
+    let showFriends = true;
+    let showFoodStalls = false;
+    let showFloatTrucks = false;
+    let currentLocation = null;
+
+    // Markers
+    let friendMarkers = new Map();
+    let foodStallMarkers = new Map();
+    let floatTruckMarkers = new Map();
+    let userMarker = null;
+
+    // Initialize modern Google Maps
+    function initializeModernMap() {
+      console.log('Initializing modern Google Maps...');
+
+      // Create map with modern styling
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: 51.5074, lng: -0.1278 }, // London
+        zoom: 12,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+        zoomControl: true,
+        zoomControlOptions: {
+          position: google.maps.ControlPosition.TOP_RIGHT
+        },
+        styles: [
+          {
+            "featureType": "all",
+            "elementType": "geometry.fill",
+            "stylers": [{ "weight": "2.00" }]
+          },
+          {
+            "featureType": "all",
+            "elementType": "geometry.stroke",
+            "stylers": [{ "color": "#9c9c9c" }]
+          },
+          {
+            "featureType": "all",
+            "elementType": "labels.text",
+            "stylers": [{ "visibility": "on" }]
+          },
+          {
+            "featureType": "landscape",
+            "elementType": "all",
+            "stylers": [{ "color": "#f2f2f2" }]
+          },
+          {
+            "featureType": "landscape",
+            "elementType": "geometry.fill",
+            "stylers": [{ "color": "#ffffff" }]
+          },
+          {
+            "featureType": "landscape.man_made",
+            "elementType": "geometry.fill",
+            "stylers": [{ "color": "#ffffff" }]
+          },
+          {
+            "featureType": "poi",
+            "elementType": "all",
+            "stylers": [{ "visibility": "off" }]
+          },
+          {
+            "featureType": "road",
+            "elementType": "all",
+            "stylers": [{ "saturation": -100 }, { "lightness": 45 }]
+          },
+          {
+            "featureType": "road",
+            "elementType": "geometry.fill",
+            "stylers": [{ "color": "#eeeeee" }]
+          },
+          {
+            "featureType": "road",
+            "elementType": "labels.text.fill",
+            "stylers": [{ "color": "#7b7b7b" }]
+          },
+          {
+            "featureType": "road",
+            "elementType": "labels.text.stroke",
+            "stylers": [{ "color": "#ffffff" }]
+          },
+          {
+            "featureType": "road.highway",
+            "elementType": "all",
+            "stylers": [{ "visibility": "simplified" }]
+          },
+          {
+            "featureType": "road.arterial",
+            "elementType": "labels.icon",
+            "stylers": [{ "visibility": "off" }]
+          },
+          {
+            "featureType": "transit",
+            "elementType": "all",
+            "stylers": [{ "visibility": "off" }]
+          },
+          {
+            "featureType": "water",
+            "elementType": "all",
+            "stylers": [{ "color": "#46bcec" }, { "visibility": "on" }]
+          },
+          {
+            "featureType": "water",
+            "elementType": "geometry.fill",
+            "stylers": [{ "color": "#c8d7d4" }]
+          },
+          {
+            "featureType": "water",
+            "elementType": "labels.text.fill",
+            "stylers": [{ "color": "#070707" }]
+          },
+          {
+            "featureType": "water",
+            "elementType": "labels.text.stroke",
+            "stylers": [{ "color": "#ffffff" }]
+          }
+        ]
+      });
+
+      // Add custom markers
+      addCustomMarkers();
+      startLocationTracking();
+
+      console.log('Modern Google Maps loaded successfully');
+    }
+
+    // Create custom marker element
+    function createCustomMarker(content, className = '') {
+      const markerElement = document.createElement('div');
+      markerElement.className = `custom-marker ${className}`;
+      markerElement.innerHTML = content;
+      return markerElement;
+    }
+
+    // Add custom markers with modern styling
+    function addCustomMarkers() {
+      // Add friend markers
+      const friends = [
+        { id: '1', name: 'Alex', lat: 51.5070, lng: -0.1270, avatar: 'A' },
+        { id: '2', name: 'Sarah', lat: 51.5074, lng: -0.1278, avatar: 'S' },
+        { id: '3', name: 'Mike', lat: 51.5080, lng: -0.1280, avatar: 'M' },
+        { id: '4', name: 'Jenny', lat: 51.5068, lng: -0.1275, avatar: 'J' }
+      ];
+
+      friends.forEach(friend => {
+        const markerElement = createCustomMarker(friend.avatar, 'friend pulse');
+
+        const marker = new google.maps.Marker({
+          position: { lat: friend.lat, lng: friend.lng },
+          map: map,
+          icon: {
+            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+              <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="15" cy="15" r="12" fill="#2ed573" stroke="white" stroke-width="3"/>
+                <text x="15" y="20" text-anchor="middle" fill="white" font-size="14" font-weight="bold">${friend.avatar}</text>
+              </svg>
+            `),
+            scaledSize: new google.maps.Size(30, 30),
+            anchor: new google.maps.Point(15, 15)
+          },
+          title: friend.name
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+          content: `
+            <div class="info-window">
+              <h4>${friend.name}</h4>
+              <p>Last seen: 2 min ago</p>
+            </div>
+          `
+        });
+
+        marker.addListener('click', () => {
+          infoWindow.open(map, marker);
+        });
+
+        friendMarkers.set(friend.id, marker);
+      });
+
+      // Add food stall markers
+      const foodStalls = [
+        { id: '1', name: 'Burger Palace', lat: 51.5072, lng: -0.1272, type: '🍔' },
+        { id: '2', name: 'Pizza Corner', lat: 51.5076, lng: -0.1276, type: '🍕' },
+        { id: '3', name: 'Taco Truck', lat: 51.5082, lng: -0.1282, type: '🌮' }
+      ];
+
+      foodStalls.forEach(stall => {
+        const marker = new google.maps.Marker({
+          position: { lat: stall.lat, lng: stall.lng },
+          map: map,
+          icon: {
+            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+              <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="15" cy="15" r="12" fill="#ffa502" stroke="white" stroke-width="3"/>
+                <text x="15" y="20" text-anchor="middle" fill="white" font-size="14" font-weight="bold">${stall.type}</text>
+              </svg>
+            `),
+            scaledSize: new google.maps.Size(30, 30),
+            anchor: new google.maps.Point(15, 15)
+          },
+          title: stall.name,
+          visible: false
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+          content: `
+            <div class="info-window">
+              <h4>${stall.name}</h4>
+              <p>Open now</p>
+            </div>
+          `
+        });
+
+        marker.addListener('click', () => {
+          infoWindow.open(map, marker);
+        });
+
+        foodStallMarkers.set(stall.id, marker);
+      });
+    }
+
+    // Modern location tracking
+    function startLocationTracking() {
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+          (position) => {
+            currentLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+              accuracy: position.coords.accuracy
+            };
+
+            updateUserLocation();
+          },
+          (error) => {
+            console.error('Location error:', error);
+            // Use London as fallback
+            currentLocation = { lat: 51.5074, lng: -0.1278, accuracy: 1000 };
+            updateUserLocation();
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 30000
+          }
+        );
+      }
+    }
+
+    // Update user location with modern animation
+    function updateUserLocation() {
+      if (!currentLocation) return;
+
+      const position = { lat: currentLocation.lat, lng: currentLocation.lng };
+
+      if (!userMarker) {
+        // Create user marker
+        userMarker = new google.maps.Marker({
+          position: position,
+          map: map,
+          icon: {
+            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+              <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="15" cy="15" r="12" fill="#ff6b35" stroke="white" stroke-width="3"/>
+                <text x="15" y="20" text-anchor="middle" fill="white" font-size="14" font-weight="bold">U</text>
+              </svg>
+            `),
+            scaledSize: new google.maps.Size(30, 30),
+            anchor: new google.maps.Point(15, 15)
+          },
+          title: 'Your Location'
+        });
+      } else {
+        // Update existing marker position
+        userMarker.setPosition(position);
+      }
+
+      // Smooth pan to user location
+      map.panTo(position);
+    }
+
+    // Toggle controls
+    function toggleFriends() {
+      showFriends = !showFriends;
+      friendMarkers.forEach(marker => {
+        marker.setVisible(showFriends);
+      });
+    }
+
+    function toggleFoodStalls() {
+      showFoodStalls = !showFoodStalls;
+      foodStallMarkers.forEach(marker => {
+        marker.setVisible(showFoodStalls);
+      });
+    }
+
+    function toggleFloatTrucks() {
+      showFloatTrucks = !showFloatTrucks;
+      floatTruckMarkers.forEach(marker => {
+        marker.setVisible(showFloatTrucks);
+      });
+    }
+
+    function centerOnGroup() {
+      map.panTo({ lat: 51.5074, lng: -0.1278 });
+      map.setZoom(12);
+    }
+
+    function getMyLocation() {
+      if (currentLocation) {
+        updateUserLocation();
+      } else {
+        map.panTo({ lat: 51.5074, lng: -0.1278 });
+        map.setZoom(12);
+      }
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      event.target.closest('.nav-item').classList.add('active');
+
+      // Handle tab switching
+      console.log('Switched to tab:', tab);
+    }
+
+    function showProfile() {
+      console.log('Show profile');
+    }
+
+    // Authentication functions
+    function switchAuthTab(tab) {
+      document.querySelectorAll('.auth-tab').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+
+      if (tab === 'login') {
+        document.getElementById('loginTab').classList.add('active');
+        document.getElementById('loginForm').classList.add('active');
+      } else if (tab === 'register') {
+        document.getElementById('registerTab').classList.add('active');
+        document.getElementById('registerForm').classList.add('active');
+      } else if (tab === 'forgot') {
+        document.getElementById('forgotForm').classList.add('active');
+      }
+
+      clearAuthMessages();
+    }
+
+    function clearAuthMessages() {
+      const messages = document.getElementById('authMessages');
+      messages.innerHTML = '';
+      messages.className = 'auth-messages';
+    }
+
+    function showAuthMessage(message, type = 'error') {
+      const messages = document.getElementById('authMessages');
+      messages.innerHTML = message;
+      messages.className = `auth-messages ${type}`;
+    }
+
+    async function handleLogin() {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      if (!email || !password) {
+        showAuthMessage('Please fill in all fields');
+        return;
+      }
+
+      try {
+        // Simulate login for demo
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        currentUser = { id: '1', email, name: 'Demo User' };
+        isAuthenticated = true;
+
+        document.getElementById('authOverlay').style.display = 'none';
+        document.getElementById('appContent').style.display = 'block';
+
+        initializeModernMap();
+
+        showAuthMessage('Login successful!', 'success');
+      } catch (error) {
+        showAuthMessage(error.message);
+      }
+    }
+
+    async function handleRegister() {
+      const name = document.getElementById('registerName').value;
+      const email = document.getElementById('registerEmail').value;
+      const password = document.getElementById('registerPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (!name || !email || !password || !confirmPassword) {
+        showAuthMessage('Please fill in all fields');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showAuthMessage('Passwords do not match');
+        return;
+      }
+
+      try {
+        // Simulate registration for demo
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        currentUser = { id: '1', email, name };
+        isAuthenticated = true;
+
+        document.getElementById('authOverlay').style.display = 'none';
+        document.getElementById('appContent').style.display = 'block';
+
+        initializeModernMap();
+
+        showAuthMessage('Registration successful!', 'success');
+      } catch (error) {
+        showAuthMessage(error.message);
+      }
+    }
+
+    async function handleForgotPassword() {
+      const email = document.getElementById('forgotEmail').value;
+
+      if (!email) {
+        showAuthMessage('Please enter your email');
+        return;
+      }
+
+      try {
+        // Simulate password reset for demo
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        showAuthMessage('Password reset email sent!', 'success');
+      } catch (error) {
+        showAuthMessage(error.message);
+      }
+    }
+
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('Modern GroupTracker app with Google Maps loaded');
+    });
+  </script>
+</body>
+
+</html>
