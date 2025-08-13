@@ -7591,25 +7591,35 @@
 
         console.log('Leaflet is available, initializing map');
 
-        // Initialize map with standard settings for reliable loading
+        // Initialize map with mobile-optimized settings
+        const isMobile = window.innerWidth <= 768;
+        
         map = L.map('map', {
           zoomControl: false,
           preferCanvas: true,
           renderer: L.canvas(),
           fadeAnimation: false,
-          zoomAnimation: true,
-          markerZoomAnimation: false
-        }).setView([51.5074, -0.1278], 12);
+          zoomAnimation: !isMobile,
+          markerZoomAnimation: false,
+          trackResize: false,
+          boxZoom: false,
+          doubleClickZoom: false,
+          dragging: true,
+          keyboard: false,
+          scrollWheelZoom: !isMobile,
+          tap: !isMobile,
+          touchZoom: true
+        }).setView([51.5074, -0.1278], 11);
 
-        // Standard tile settings for reliable loading
+        // Mobile-optimized tile settings for fast loading
         const tileOptions = {
           attribution: '© OpenStreetMap contributors',
-          maxZoom: 18,
-          minZoom: 3,
+          maxZoom: 16,
+          minZoom: 5,
           tileSize: 256,
-          updateWhenIdle: true,
-          updateWhenZooming: true,
-          keepBuffer: 2,
+          updateWhenIdle: false,
+          updateWhenZooming: false,
+          keepBuffer: 1,
           crossOrigin: true,
           detectRetina: false,
           bounds: null,
@@ -7642,7 +7652,7 @@
           }
         }
 
-        // Immediate map refresh for tracking with full bleed
+        // Mobile-optimized map refresh
         setTimeout(() => {
           if (map) {
             map.invalidateSize();
@@ -7650,15 +7660,21 @@
             // Force tile loading to fill the screen
             map.setView(map.getCenter(), map.getZoom(), {animate: false});
             
+            // Mobile-specific optimizations
+            if (isMobile) {
+              // Reduce tile quality on mobile for faster loading
+              map.setZoom(map.getZoom(), {animate: false});
+            }
+            
             // Additional refresh to ensure tiles load
             setTimeout(() => {
               if (map) {
                 map.invalidateSize();
-                console.log('Map refreshed for full bleed coverage');
+                console.log('Map refreshed for mobile optimization');
               }
-            }, 200);
+            }, 150);
           }
-        }, 100);
+        }, 50);
 
         // Add user marker with avatar
         const userAvatar = currentUser?.avatar || '👤';
