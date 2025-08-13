@@ -6654,7 +6654,7 @@
         showNotification('Loading admin data...', 'info');
 
         try {
-          // Load data from Supabase
+          // Load data from Firebase
           await loadAdminData();
 
           // Create admin portal modal
@@ -6755,61 +6755,70 @@
         'friends': []
       };
 
-      // Supabase Database Functions
+      // Firebase Database Functions
       async function loadAdminData() {
         try {
-          console.log('Loading admin data from Supabase...');
+          console.log('Loading admin data from Firebase...');
+
+          const db = window.firebaseDB;
+          if (!db) {
+            throw new Error('Firebase database not initialized');
+          }
 
           // Load food stalls
-          const { data: foodStalls, error: foodError } = await supabase
-            .from('food_stalls')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-          if (foodError) {
-            console.warn('Food stalls table not found, using mock data:', foodError);
+          try {
+            const foodStallsSnapshot = await db.collection('food_stalls')
+              .orderBy('created_at', 'desc')
+              .get();
+            adminData['food-stalls'] = foodStallsSnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
+          } catch (error) {
+            console.warn('Food stalls collection not found, using mock data:', error);
             adminData['food-stalls'] = getMockFoodStalls();
-          } else {
-            adminData['food-stalls'] = foodStalls || [];
           }
 
           // Load float trucks
-          const { data: floatTrucks, error: floatError } = await supabase
-            .from('float_trucks')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-          if (floatError) {
-            console.warn('Float trucks table not found, using mock data:', floatError);
+          try {
+            const floatTrucksSnapshot = await db.collection('float_trucks')
+              .orderBy('created_at', 'desc')
+              .get();
+            adminData['float-trucks'] = floatTrucksSnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
+          } catch (error) {
+            console.warn('Float trucks collection not found, using mock data:', error);
             adminData['float-trucks'] = getMockFloatTrucks();
-          } else {
-            adminData['float-trucks'] = floatTrucks || [];
           }
 
           // Load groups
-          const { data: groups, error: groupsError } = await supabase
-            .from('groups')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-          if (groupsError) {
-            console.warn('Groups table not found, using mock data:', groupsError);
+          try {
+            const groupsSnapshot = await db.collection('groups')
+              .orderBy('created_at', 'desc')
+              .get();
+            adminData['groups'] = groupsSnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
+          } catch (error) {
+            console.warn('Groups collection not found, using mock data:', error);
             adminData['groups'] = getMockGroups();
-          } else {
-            adminData['groups'] = groups || [];
           }
 
           // Load friends
-          const { data: friends, error: friendsError } = await supabase
-            .from('friends')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-          if (friendsError) {
-            console.warn('Friends table not found, using mock data:', friendsError);
-            adminData['friends'] = friends || [];
-          } else {
-            adminData['friends'] = friends || [];
+          try {
+            const friendsSnapshot = await db.collection('friends')
+              .orderBy('created_at', 'desc')
+              .get();
+            adminData['friends'] = friendsSnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
+          } catch (error) {
+            console.warn('Friends collection not found, using mock data:', error);
+            adminData['friends'] = getMockFriends();
           }
 
           // Update table display
@@ -6834,46 +6843,55 @@
         }
       }
 
-      async function saveToSupabase(tableName, data) {
+      async function saveToFirebase(collectionName, data) {
         try {
-          const { data: result, error } = await supabase
-            .from(tableName)
-            .insert([data]);
+          const db = window.firebaseDB;
+          if (!db) {
+            throw new Error('Firebase database not initialized');
+          }
 
-          if (error) throw error;
-          return result;
+          const docRef = await db.collection(collectionName).add({
+            ...data,
+            created_at: new Date().toISOString()
+          });
+
+          return { id: docRef.id, ...data };
         } catch (error) {
-          console.error(`Error saving to ${tableName}:`, error);
+          console.error(`Error saving to ${collectionName}:`, error);
           throw error;
         }
       }
 
-      async function updateInSupabase(tableName, id, data) {
+      async function updateInFirebase(collectionName, id, data) {
         try {
-          const { data: result, error } = await supabase
-            .from(tableName)
-            .update(data)
-            .eq('id', id);
+          const db = window.firebaseDB;
+          if (!db) {
+            throw new Error('Firebase database not initialized');
+          }
 
-          if (error) throw error;
-          return result;
+          await db.collection(collectionName).doc(id).update({
+            ...data,
+            updated_at: new Date().toISOString()
+          });
+
+          return { id, ...data };
         } catch (error) {
-          console.error(`Error updating ${tableName}:`, error);
+          console.error(`Error updating ${collectionName}:`, error);
           throw error;
         }
       }
 
-      async function deleteFromSupabase(tableName, id) {
+      async function deleteFromFirebase(collectionName, id) {
         try {
-          const { error } = await supabase
-            .from(tableName)
-            .delete()
-            .eq('id', id);
+          const db = window.firebaseDB;
+          if (!db) {
+            throw new Error('Firebase database not initialized');
+          }
 
-          if (error) throw error;
+          await db.collection(collectionName).doc(id).delete();
           return true;
         } catch (error) {
-          console.error(`Error deleting from ${tableName}:`, error);
+          console.error(`Error deleting from ${collectionName}:`, error);
           throw error;
         }
       }
@@ -7083,8 +7101,8 @@
 
             const tableName = tableMap[activeAdminTab];
 
-            // Delete from Supabase
-            await deleteFromSupabase(tableName, id);
+            // Delete from Firebase
+            await deleteFromFirebase(tableName, id);
 
             // Reload data from database
             await loadAdminData();
@@ -7309,11 +7327,11 @@
 
           if (isEditing) {
             // Update existing item in Supabase
-            await updateInSupabase(tableName, id, itemData);
+            await updateInFirebase(tableName, id, itemData);
           } else {
-            // Add new item to Supabase
+            // Add new item to Firebase
             itemData.status = 'active';
-            await saveToSupabase(tableName, itemData);
+            await saveToFirebase(tableName, itemData);
           }
 
           // Reload data from database
