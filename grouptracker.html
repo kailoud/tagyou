@@ -1978,10 +1978,11 @@
     }
 
     .top-location-control {
-      position: absolute;
-      bottom: 120px;
-      left: 16px;
-      z-index: 1000;
+      position: fixed !important;
+      bottom: 120px !important;
+      left: 16px !important;
+      z-index: 1000 !important;
+      display: block !important;
     }
 
     .location-control-btn {
@@ -4602,7 +4603,7 @@
 
     <!-- Location Permission Button -->
     <button class="location-permission-btn" id="locationPermissionBtn" onclick="toggleLocationSharing()"
-      style="position: absolute; bottom: 120px; right: 16px; width: 40px; height: 40px; border: none; border-radius: 8px; background: #ff6b35; color: white; font-size: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+      style="position: fixed !important; bottom: 120px !important; right: 16px !important; width: 40px !important; height: 40px !important; border: none !important; border-radius: 8px !important; background: #ff6b35 !important; color: white !important; font-size: 12px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important; cursor: pointer !important; z-index: 1000 !important; display: flex !important; align-items: center !important; justify-content: center !important; flex-direction: column !important;">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
         <path
           d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
