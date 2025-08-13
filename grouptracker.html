@@ -7559,7 +7559,7 @@
           console.log('Map container already exists');
         }
 
-        // Force it to be visible and sized
+        // Force it to be visible and sized with full bleed
         mapContainer.style.cssText = `
             position: fixed !important;
             top: 0 !important;
@@ -7567,6 +7567,10 @@
             width: 100vw !important;
             height: 100vh !important;
             z-index: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            overflow: hidden !important;
           `;
 
         console.log('Map container styled and ready');
@@ -7629,15 +7633,38 @@
           subdomains: 'abc'
         }).addTo(map);
 
-        // Immediate map visibility for tracking
+        // Immediate map visibility for tracking with full bleed
         if (mapContainer) {
           mapContainer.style.opacity = '1';
+          
+          // Ensure Leaflet tiles fill the container
+          const leafletContainer = mapContainer.querySelector('.leaflet-container');
+          if (leafletContainer) {
+            leafletContainer.style.cssText = `
+              width: 100% !important;
+              height: 100% !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              border: none !important;
+            `;
+          }
         }
 
-        // Immediate map refresh for tracking
+        // Immediate map refresh for tracking with full bleed
         setTimeout(() => {
           if (map) {
             map.invalidateSize();
+            
+            // Force tile loading to fill the screen
+            map.setView(map.getCenter(), map.getZoom(), {animate: false});
+            
+            // Additional refresh to ensure tiles load
+            setTimeout(() => {
+              if (map) {
+                map.invalidateSize();
+                console.log('Map refreshed for full bleed coverage');
+              }
+            }, 200);
           }
         }, 100);
 
