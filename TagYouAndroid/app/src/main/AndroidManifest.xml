@@ -45,7 +45,7 @@
         <!-- Google Maps API Key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBQKQKQKQKQKQKQKQKQKQKQKQKQKQKQKQ" />
+            android:value="AIzaSyDWm3v-1WXxHWDYIzqK1nCjrBeVW-GvG1I" />
 
         <!-- Supabase Configuration -->
         <!-- Add your Supabase configuration here if needed -->

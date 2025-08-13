@@ -1,6 +1,10 @@
 // Firebase Configuration for Web App
 // This file contains the Firebase configuration for the web version of TagYou
 
+// NOTE: For production deployment on Netlify, you can add these as environment variables:
+// FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID, etc.
+// Then use a build script to replace these values during deployment.
+
 // Firebase configuration object
 const firebaseConfig = {
   apiKey: "AIzaSyDWm3v-1WXxHWDYIzqK1nCjrBeVW-GvG1I",
@@ -24,3 +28,6 @@ const storage = firebase.storage();
 window.firebaseAuth = auth;
 window.firebaseDB = db;
 window.firebaseStorage = storage;
+
+// Log configuration status
+console.log('Firebase initialized with project:', firebaseConfig.projectId);
