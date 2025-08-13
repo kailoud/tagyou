@@ -1992,7 +1992,8 @@
       border-radius: 8px;
       background: #4285f4;
       color: white;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 0 15px rgba(66, 133, 244, 0.4), 0 2px 8px rgba(0, 0, 0, 0.15);
+      border: 2px solid rgba(66, 133, 244, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -2629,8 +2630,9 @@
     }
 
     .share-location-fab.sharing {
-      background: #ff5722;
-      animation: pulse 2s infinite;
+      background: #4285f4;
+      box-shadow: 0 0 20px rgba(66, 133, 244, 0.6), 0 4px 12px rgba(0, 0, 0, 0.2);
+      border: 2px solid rgba(66, 133, 244, 0.3);
     }
 
     /* Float Panel Styles */
@@ -8386,9 +8388,10 @@
           shareBtn.classList.add('sharing');
           shareBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
 
-          // Update location permission button to green when active
-          locationPermissionBtn.style.background = '#4caf50';
-          locationPermissionBtn.style.boxShadow = '0 2px 8px rgba(76, 175, 80, 0.3)';
+          // Update location permission button to blue with soft glow when active
+          locationPermissionBtn.style.background = '#4285f4';
+          locationPermissionBtn.style.boxShadow = '0 0 20px rgba(66, 133, 244, 0.6), 0 2px 8px rgba(0, 0, 0, 0.2)';
+          locationPermissionBtn.style.border = '2px solid rgba(66, 133, 244, 0.3)';
 
           startLocationSharing();
         } else {
