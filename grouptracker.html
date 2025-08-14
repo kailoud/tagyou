@@ -9496,86 +9496,49 @@
 
         // Define the carnival parade route coordinates (Notting Hill area)
         // Based on the actual NHC2023 parade route from Google My Maps
-        // Creating a realistic loop route that follows actual streets
+        // Using exact coordinates provided from the real route
         const carnivalRoute = [
-          // Starting from Ladbroke Grove - following the actual parade route
-          [51.5170, -0.2050], // Ladbroke Grove start
-          [51.5172, -0.2045], // Curve towards Westbourne Grove
-          [51.5174, -0.2040],
-          [51.5176, -0.2035], // Westbourne Grove
-          [51.5178, -0.2030],
-          [51.5180, -0.2025], // Curve towards Portobello
-          [51.5182, -0.2020],
-          [51.5184, -0.2015], // Portobello Road
-          [51.5186, -0.2010],
-          [51.5188, -0.2005], // Curve towards Golborne
-          [51.5190, -0.2000],
-          [51.5192, -0.1995], // Golborne Road
-          [51.5194, -0.1990],
-          [51.5196, -0.1985], // Curve towards Harrow Road
-          [51.5198, -0.1980],
-          [51.5200, -0.1975], // Elgin Avenue
-          [51.5202, -0.1970],
-          [51.5204, -0.1965], // Curve towards Maida Vale
-          [51.5206, -0.1960],
-          [51.5208, -0.1955], // Maida Vale
-          [51.5210, -0.1950],
-          [51.5212, -0.1945], // Curve towards Paddington
-          [51.5214, -0.1940],
-          [51.5216, -0.1935], // Paddington area
-          [51.5218, -0.1930],
-          [51.5220, -0.1925], // Curve towards Bayswater
-          [51.5222, -0.1920],
-          [51.5224, -0.1915], // Bayswater
-          [51.5226, -0.1910],
-          [51.5228, -0.1905], // Curve towards Queensway
-          [51.5230, -0.1900],
-          [51.5232, -0.1895], // Queensway
-          [51.5234, -0.1890],
-          [51.5236, -0.1885], // Curve towards Notting Hill Gate
-          [51.5238, -0.1880],
-          [51.5240, -0.1875], // Notting Hill Gate
-          [51.5242, -0.1870],
-          [51.5244, -0.1865], // Curve towards Holland Park
-          [51.5246, -0.1860],
-          [51.5248, -0.1855], // Holland Park
-          [51.5250, -0.1850],
-          [51.5252, -0.1845], // Curve towards Shepherd's Bush
-          [51.5254, -0.1840],
-          [51.5256, -0.1835], // Shepherd's Bush
-          [51.5258, -0.1830],
-          [51.5260, -0.1825], // Curve towards Westway
-          [51.5262, -0.1820],
-          [51.5264, -0.1815], // Westway
-          [51.5266, -0.1810],
-          [51.5268, -0.1805], // Curve back towards Ladbroke Grove
-          [51.5266, -0.1800],
-          [51.5264, -0.1795], // Return route
-          [51.5262, -0.1790],
-          [51.5260, -0.1785], // Back through the area
-          [51.5258, -0.1780],
-          [51.5256, -0.1775], // Continuing the loop
-          [51.5254, -0.1770],
-          [51.5252, -0.1765], // Final approach
-          [51.5250, -0.1760],
-          [51.5248, -0.1755], // Back to starting area
-          [51.5246, -0.1750],
-          [51.5244, -0.1745], // Near Ladbroke Grove
-          [51.5242, -0.1740],
-          [51.5240, -0.1735], // Final curve
-          [51.5238, -0.1730],
-          [51.5236, -0.1725], // Approaching start
-          [51.5234, -0.1720],
-          [51.5232, -0.1715], // Almost back
-          [51.5230, -0.1710],
-          [51.5228, -0.1705], // Final approach to start
-          [51.5226, -0.1700],
-          [51.5224, -0.1695], // Back to Ladbroke Grove
-          [51.5222, -0.1690],
-          [51.5220, -0.1685], // End of parade loop
-          [51.5218, -0.1680],
-          [51.5216, -0.1675], // Final point
-          [51.5214, -0.1670]  // End point - back near start
+          // A. Starting point - Ladbroke Grove
+          [51.512538, -0.206470], // A. Ladbroke Grove
+
+          // B. Continuing along Ladbroke Grove
+          [51.520143, -0.211625], // B. Ladbroke Grove
+
+          // C. Further along Ladbroke Grove
+          [51.526325, -0.215112], // C. Ladbroke Grove
+
+          // D. Turning onto Kensal Rd
+          [51.526234, -0.211620], // D. Kensal Rd
+
+          // E. Continuing on Kensal Rd
+          [51.524214, -0.205375], // E. Kensal Rd
+
+          // F. Turning onto Golbourne Rd
+          [51.523143, -0.206751], // F. Golbourne Rd
+
+          // G. Elkstone Road
+          [51.523059, -0.206407], // G. Elkstone Road
+
+          // H. A4207
+          [51.522147, -0.201387], // H. A4207
+
+          // I. Westbourne Park Road
+          [51.518613, -0.198423], // I. Westbourne Park Road
+
+          // J. Continuing on Westbourne Park Road
+          [51.519079, -0.196369], // J. Westbourne Park Road
+
+          // K. Chepstow Rd
+          [51.515062, -0.195045], // K. Chepstow Rd
+
+          // L. Westbourne Grove
+          [51.514405, -0.200323], // L. Westbourne Grove
+
+          // M. Ladbroke Gardens
+          [51.512588, -0.206464], // M. Ladbroke Gardens
+
+          // Back to A - completing the loop
+          [51.512538, -0.206470]  // A. Ladbroke Grove (end point)
         ];
 
         // Create the parade route polyline with carnival styling
@@ -9618,10 +9581,10 @@
         });
 
         // Add grid overlay for the carnival area
-        // Updated bounds to match the NHC2023 map area
+        // Updated bounds to match the actual NHC2023 route area
         const gridBounds = L.latLngBounds([
-          [51.5160, -0.2070], // Southwest
-          [51.5260, -0.1960]  // Northeast
+          [51.5120, -0.2160], // Southwest (covers the full route)
+          [51.5270, -0.1950]  // Northeast (covers the full route)
         ]);
 
         // Create grid lines
@@ -9629,10 +9592,10 @@
         const gridLines = [];
 
         // Vertical grid lines
-        for (let lng = -0.2070; lng <= -0.1960; lng += gridSpacing) {
+        for (let lng = -0.2160; lng <= -0.1950; lng += gridSpacing) {
           const line = L.polyline([
-            [51.5160, lng],
-            [51.5260, lng]
+            [51.5120, lng],
+            [51.5270, lng]
           ], {
             color: '#FFD700',
             weight: 1,
@@ -9644,10 +9607,10 @@
         }
 
         // Horizontal grid lines
-        for (let lat = 51.5160; lat <= 51.5260; lat += gridSpacing) {
+        for (let lat = 51.5120; lat <= 51.5270; lat += gridSpacing) {
           const line = L.polyline([
-            [lat, -0.2070],
-            [lat, -0.1960]
+            [lat, -0.2160],
+            [lat, -0.1950]
           ], {
             color: '#FFD700',
             weight: 1,
@@ -9664,19 +9627,20 @@
         });
 
         // Add sound system markers based on actual NHC2023 map data
+        // Positioned along the real route coordinates
         const soundSystemLocations = [
-          { name: "DISYA GENERATION", coord: [51.5185, -0.2035], area: "Portobello Road" },
-          { name: "KCC", coord: [51.5200, -0.2020], area: "Elgin Avenue" },
-          { name: "POWIS SQUARE", coord: [51.5215, -0.2005], area: "Bayswater" },
-          { name: "MARK ROSS", coord: [51.5230, -0.1990], area: "Holland Park" },
-          { name: "SOUND SYSTEM 5", coord: [51.5245, -0.1975], area: "White City" },
-          { name: "SOUND SYSTEM 6", coord: [51.5190, -0.2030], area: "Golborne Road" },
-          { name: "SOUND SYSTEM 7", coord: [51.5205, -0.2015], area: "Maida Vale" },
-          { name: "SOUND SYSTEM 8", coord: [51.5220, -0.2000], area: "Queensway" },
-          { name: "SOUND SYSTEM 9", coord: [51.5235, -0.1985], area: "Shepherd's Bush" },
-          { name: "SOUND SYSTEM 10", coord: [51.5175, -0.2041], area: "Westbourne Grove" },
-          { name: "SOUND SYSTEM 11", coord: [51.5195, -0.2011], area: "Golborne Road" },
-          { name: "SOUND SYSTEM 12", coord: [51.5210, -0.1987], area: "Paddington" },
+          { name: "DISYA GENERATION", coord: [51.520143, -0.211625], area: "Ladbroke Grove" },
+          { name: "KCC", coord: [51.526325, -0.215112], area: "Ladbroke Grove" },
+          { name: "POWIS SQUARE", coord: [51.526234, -0.211620], area: "Kensal Rd" },
+          { name: "MARK ROSS", coord: [51.524214, -0.205375], area: "Kensal Rd" },
+          { name: "SOUND SYSTEM 5", coord: [51.523143, -0.206751], area: "Golbourne Rd" },
+          { name: "SOUND SYSTEM 6", coord: [51.523059, -0.206407], area: "Elkstone Road" },
+          { name: "SOUND SYSTEM 7", coord: [51.522147, -0.201387], area: "A4207" },
+          { name: "SOUND SYSTEM 8", coord: [51.518613, -0.198423], area: "Westbourne Park Road" },
+          { name: "SOUND SYSTEM 9", coord: [51.519079, -0.196369], area: "Westbourne Park Road" },
+          { name: "SOUND SYSTEM 10", coord: [51.515062, -0.195045], area: "Chepstow Rd" },
+          { name: "SOUND SYSTEM 11", coord: [51.514405, -0.200323], area: "Westbourne Grove" },
+          { name: "SOUND SYSTEM 12", coord: [51.512588, -0.206464], area: "Ladbroke Gardens" },
         ];
 
         soundSystemLocations.forEach((soundSystem, index) => {
@@ -9699,7 +9663,7 @@
         });
 
         // Add judging zone marker (from the image)
-        const judgingZoneCoord = [51.5200, -0.2020]; // Near Elgin Avenue
+        const judgingZoneCoord = [51.523143, -0.206751]; // Golbourne Rd area
         const judgingZoneMarker = L.marker(judgingZoneCoord, {
           icon: L.divIcon({
             className: 'judging-zone-marker',
@@ -9717,13 +9681,14 @@
         judgingZoneMarker.carnivalRouteData = true;
 
         // Add medical/welfare points (red cross icons from the map)
+        // Positioned along the real route coordinates
         const medicalLocations = [
-          { coord: [51.5175, -0.2041], area: "Westbourne Grove Medical Point" },
-          { coord: [51.5190, -0.2030], area: "Golborne Road Medical Point" },
-          { coord: [51.5205, -0.2015], area: "Maida Vale Medical Point" },
-          { coord: [51.5220, -0.2000], area: "Queensway Medical Point" },
-          { coord: [51.5235, -0.1985], area: "Shepherd's Bush Medical Point" },
-          { coord: [51.5250, -0.1970], area: "White City Medical Point" },
+          { coord: [51.512538, -0.206470], area: "Ladbroke Grove Medical Point" },
+          { coord: [51.520143, -0.211625], area: "Ladbroke Grove Medical Point" },
+          { coord: [51.526325, -0.215112], area: "Ladbroke Grove Medical Point" },
+          { coord: [51.526234, -0.211620], area: "Kensal Rd Medical Point" },
+          { coord: [51.524214, -0.205375], area: "Kensal Rd Medical Point" },
+          { coord: [51.523143, -0.206751], area: "Golbourne Rd Medical Point" },
         ];
 
         medicalLocations.forEach((medical) => {
@@ -9746,7 +9711,7 @@
         });
 
         // Add safety zone (green shield icon from the map)
-        const safetyZoneCoord = [51.5210, -0.1987]; // Near Paddington
+        const safetyZoneCoord = [51.522147, -0.201387]; // A4207 area
         const safetyZoneMarker = L.marker(safetyZoneCoord, {
           icon: L.divIcon({
             className: 'safety-zone-marker',
