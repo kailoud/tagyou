@@ -9544,11 +9544,8 @@
           [51.525289, -0.214583], // A23
           [51.525740, -0.214874], // A24
           [51.525909, -0.215061], // A25
-          [51.526267, -0.215084], // A26
-          [51.526085, -0.215144], // A27
-          [51.526336, -0.215253], // A28
+          [51.526085, -0.215144], // A26
           [51.526336, -0.215253], // A29. Kensal Rd
-          [51.526346, -0.214656], // A30
 
           // A3. End of Ladbroke Grove
           [51.526325, -0.215112], // A3. Ladbroke Grove
@@ -9599,6 +9596,9 @@
           [51.522409, -0.202589], // D15
           [51.522330, -0.202250], // D16
           [51.522233, -0.201823], // D17
+
+          // E1. A4207
+          [51.50501401206085, -0.22352066231106454], // E1. A4207
 
           // E. A4207
           [51.522147, -0.201387], // E. A4207
@@ -9653,25 +9653,31 @@
 
           // Create popup with coordinate information
           let pointLabel = '';
-          if (index < 30) {
+          if (index < 26) {
             pointLabel = `A${index + 1}`;
-          } else if (index < 44) {
-            pointLabel = `B${index - 29}`;
-          } else if (index < 54) {
-            pointLabel = `C${index - 43}`;
-          } else if (index < 71) {
-            pointLabel = `D${index - 53}`;
-          } else if (index === 71) {
+          } else if (index === 26) {
+            pointLabel = 'A29';
+          } else if (index === 27) {
+            pointLabel = 'A3';
+          } else if (index < 42) {
+            pointLabel = `B${index - 27}`;
+          } else if (index < 52) {
+            pointLabel = `C${index - 41}`;
+          } else if (index < 69) {
+            pointLabel = `D${index - 51}`;
+          } else if (index === 69) {
+            pointLabel = 'E1';
+          } else if (index === 70) {
             pointLabel = 'E';
-          } else if (index === 72) {
+          } else if (index === 71) {
             pointLabel = 'F';
-          } else if (index === 73) {
+          } else if (index === 72) {
             pointLabel = 'G';
-          } else if (index === 74) {
+          } else if (index === 73) {
             pointLabel = 'H';
-          } else if (index === 75) {
+          } else if (index === 74) {
             pointLabel = 'I';
-          } else if (index === 76) {
+          } else if (index === 75) {
             pointLabel = 'J';
           }
 
