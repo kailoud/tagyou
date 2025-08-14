@@ -9523,9 +9523,8 @@
           [51.513412, -0.207095], // A2
           [51.514257, -0.207705], // A4
           [51.515175, -0.208372], // A5
-          [51.516105, -0.209048], // A6
+          [51.516227, -0.209131], // A6
           [51.516945, -0.209692], // A7
-          [51.516462, -0.209317], // A7
           [51.517616, -0.210155], // A8
           [51.517915, -0.210328], // A9
           [51.518306, -0.210546], // A10
@@ -9596,12 +9595,16 @@
           [51.522409, -0.202589], // D15
           [51.522330, -0.202250], // D16
           [51.522233, -0.201823], // D17
+          [51.522189, -0.201602], // D18
+          [51.522114, -0.201366], // D19
 
-          // E1. A4207
-          [51.50501401206085, -0.22352066231106454], // E1. A4207
-
-          // E. A4207
-          [51.522147, -0.201387], // E. A4207
+          // E1-E6. Following the exact road curves along A4207
+          [51.521849, -0.201236], // E1
+          [51.521627, -0.201093], // E2
+          [51.521353, -0.200893], // E3
+          [51.521025, -0.200637], // E4
+          [51.520742, -0.200437], // E5
+          [51.518595, -0.198448], // E6
 
           // F. Westbourne Park Road
           [51.518613, -0.198423], // F. Westbourne Park Road
@@ -9653,8 +9656,10 @@
 
           // Create popup with coordinate information
           let pointLabel = '';
-          if (index < 26) {
+          if (index < 25) {
             pointLabel = `A${index + 1}`;
+          } else if (index === 25) {
+            pointLabel = 'A26';
           } else if (index === 26) {
             pointLabel = 'A29';
           } else if (index === 27) {
@@ -9663,21 +9668,19 @@
             pointLabel = `B${index - 27}`;
           } else if (index < 52) {
             pointLabel = `C${index - 41}`;
-          } else if (index < 69) {
+          } else if (index < 71) {
             pointLabel = `D${index - 51}`;
-          } else if (index === 69) {
-            pointLabel = 'E1';
-          } else if (index === 70) {
-            pointLabel = 'E';
-          } else if (index === 71) {
+          } else if (index < 77) {
+            pointLabel = `E${index - 70}`;
+          } else if (index === 77) {
             pointLabel = 'F';
-          } else if (index === 72) {
+          } else if (index === 78) {
             pointLabel = 'G';
-          } else if (index === 73) {
+          } else if (index === 79) {
             pointLabel = 'H';
-          } else if (index === 74) {
+          } else if (index === 80) {
             pointLabel = 'I';
-          } else if (index === 75) {
+          } else if (index === 81) {
             pointLabel = 'J';
           }
 
