@@ -1553,6 +1553,8 @@
       .admin-tabs {
         flex-wrap: wrap;
         gap: 4px;
+        padding: 8px;
+        margin-bottom: 0;
       }
 
       .admin-tab {
@@ -1564,8 +1566,10 @@
 
       .admin-controls {
         flex-direction: column;
-        gap: 12px;
+        gap: 8px;
         align-items: stretch;
+        padding: 8px;
+        margin-bottom: 0;
       }
 
       .admin-search {
@@ -1580,10 +1584,16 @@
       .admin-table-container {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        height: calc(100vh - 180px);
+        display: flex;
+        flex-direction: column;
+        flex: 1;
       }
 
       .admin-table {
         min-width: 600px;
+        flex: 1;
+        height: 100%;
       }
 
       .admin-table th,
@@ -1667,6 +1677,13 @@
         max-height: 100vh;
         height: 100vh;
         border-radius: 0;
+      }
+
+      .modal-body {
+        height: calc(100vh - 80px);
+        padding: 0;
+        display: flex;
+        flex-direction: column;
       }
 
       .modal-header h2 {
