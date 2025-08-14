@@ -9639,59 +9639,7 @@
         // Store reference for removal
         routeLine.carnivalRouteData = true;
 
-        // Add coordinate markers at every point along the route
-        carnivalRoute.forEach((coord, index) => {
-          const isStart = index === 0;
-          const isEnd = index === carnivalRoute.length - 1;
-
-          // Create marker for each coordinate point
-          const marker = L.marker(coord, {
-            icon: L.divIcon({
-              className: 'coordinate-marker',
-              html: isStart ? '🎭' : isEnd ? '🏁' : '',
-              iconSize: [20, 20],
-              iconAnchor: [10, 10]
-            })
-          }).addTo(map);
-
-          // Create popup with coordinate information
-          let pointLabel = '';
-          if (index < 25) {
-            pointLabel = `A${index + 1}`;
-          } else if (index === 25) {
-            pointLabel = 'A26';
-          } else if (index === 26) {
-            pointLabel = 'A29';
-          } else if (index === 27) {
-            pointLabel = 'A3';
-          } else if (index < 42) {
-            pointLabel = `B${index - 27}`;
-          } else if (index < 52) {
-            pointLabel = `C${index - 41}`;
-          } else if (index < 71) {
-            pointLabel = `D${index - 51}`;
-          } else if (index < 77) {
-            pointLabel = `E${index - 70}`;
-          } else if (index === 77) {
-            pointLabel = 'F';
-          } else if (index === 78) {
-            pointLabel = 'G';
-          } else if (index === 79) {
-            pointLabel = 'H';
-          } else if (index === 80) {
-            pointLabel = 'I';
-          } else if (index === 81) {
-            pointLabel = 'J';
-          }
-
-          marker.bindPopup(`
-            <b>Point ${pointLabel}</b><br>
-            <small>Coordinate: ${coord[0].toFixed(6)}, ${coord[1].toFixed(6)}</small><br>
-            <small>Index: ${index + 1}</small><br>
-            <small>Notting Hill Carnival Route</small>
-          `);
-          marker.carnivalRouteData = true;
-        });
+        // Coordinate markers are now invisible - only the route line is visible
 
         // Add grid overlay for the carnival area
         // Updated bounds to match the actual NHC2023 route area
