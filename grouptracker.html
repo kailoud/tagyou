@@ -4072,6 +4072,32 @@
       transform: scale(1.2);
     }
 
+    /* Sound System Marker Styles */
+    .sound-system-marker {
+      background: transparent;
+      border: none;
+      font-size: 22px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      transition: transform 0.2s ease;
+    }
+
+    .sound-system-marker:hover {
+      transform: scale(1.2);
+    }
+
+    /* Judging Zone Marker Styles */
+    .judging-zone-marker {
+      background: transparent;
+      border: none;
+      font-size: 28px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      transition: transform 0.2s ease;
+    }
+
+    .judging-zone-marker:hover {
+      transform: scale(1.2);
+    }
+
     /* Carnival route polyline styling */
     .leaflet-interactive.carnival-route {
       cursor: pointer;
@@ -9443,30 +9469,33 @@
         removeCarnivalFloatRoute();
 
         // Define the carnival parade route coordinates (Notting Hill area)
+        // Based on the actual NHC2023 parade route from Google My Maps
         const carnivalRoute = [
           [51.5170, -0.2050], // Starting point - Ladbroke Grove
-          [51.5175, -0.2040], // Westbourne Grove
-          [51.5180, -0.2030], // Portobello Road
-          [51.5185, -0.2020], // Kensal Road
-          [51.5190, -0.2010], // Golborne Road
-          [51.5195, -0.2000], // Harrow Road
-          [51.5200, -0.1990], // Elgin Avenue
-          [51.5205, -0.1980], // Maida Vale
-          [51.5210, -0.1970], // Paddington
-          [51.5215, -0.1960], // Bayswater
-          [51.5220, -0.1950], // Queensway
-          [51.5225, -0.1940], // Notting Hill Gate
-          [51.5230, -0.1930], // Holland Park
-          [51.5235, -0.1920], // Shepherd's Bush
-          [51.5240, -0.1910]  // End point - White City
+          [51.5175, -0.2045], // Westbourne Grove
+          [51.5180, -0.2040], // Portobello Road
+          [51.5185, -0.2035], // Kensal Road
+          [51.5190, -0.2030], // Golborne Road
+          [51.5195, -0.2025], // Harrow Road
+          [51.5200, -0.2020], // Elgin Avenue
+          [51.5205, -0.2015], // Maida Vale
+          [51.5210, -0.2010], // Paddington
+          [51.5215, -0.2005], // Bayswater
+          [51.5220, -0.2000], // Queensway
+          [51.5225, -0.1995], // Notting Hill Gate
+          [51.5230, -0.1990], // Holland Park
+          [51.5235, -0.1985], // Shepherd's Bush
+          [51.5240, -0.1980], // Westway
+          [51.5245, -0.1975], // White City
+          [51.5250, -0.1970]  // End point - White City
         ];
 
         // Create the parade route polyline with carnival styling
+        // Match the orange-red route line from the NHC2023 map
         const routeLine = L.polyline(carnivalRoute, {
-          color: '#FF6B35',
-          weight: 8,
-          opacity: 0.8,
-          dashArray: '20, 10',
+          color: '#FF4500', // Orange-red color to match the image
+          weight: 10, // Thicker line to match the prominent route
+          opacity: 0.9,
           lineCap: 'round',
           lineJoin: 'round'
         }).addTo(map);
@@ -9500,9 +9529,10 @@
         });
 
         // Add grid overlay for the carnival area
+        // Updated bounds to match the NHC2023 map area
         const gridBounds = L.latLngBounds([
-          [51.5160, -0.2060], // Southwest
-          [51.5250, -0.1920]  // Northeast
+          [51.5160, -0.2070], // Southwest
+          [51.5260, -0.1960]  // Northeast
         ]);
 
         // Create grid lines
@@ -9510,10 +9540,10 @@
         const gridLines = [];
 
         // Vertical grid lines
-        for (let lng = -0.2060; lng <= -0.1920; lng += gridSpacing) {
+        for (let lng = -0.2070; lng <= -0.1960; lng += gridSpacing) {
           const line = L.polyline([
             [51.5160, lng],
-            [51.5250, lng]
+            [51.5260, lng]
           ], {
             color: '#FFD700',
             weight: 1,
@@ -9525,10 +9555,10 @@
         }
 
         // Horizontal grid lines
-        for (let lat = 51.5160; lat <= 51.5250; lat += gridSpacing) {
+        for (let lat = 51.5160; lat <= 51.5260; lat += gridSpacing) {
           const line = L.polyline([
-            [lat, -0.2060],
-            [lat, -0.1920]
+            [lat, -0.2070],
+            [lat, -0.1960]
           ], {
             color: '#FFD700',
             weight: 1,
@@ -9543,6 +9573,55 @@
         gridLines.forEach(line => {
           line.carnivalRouteData = true;
         });
+
+        // Add sound system markers (yellow icons from the image)
+        const soundSystemLocations = [
+          [51.5185, -0.2035], // Portobello Road sound system
+          [51.5200, -0.2020], // Elgin Avenue sound system
+          [51.5215, -0.2005], // Bayswater sound system
+          [51.5230, -0.1990], // Holland Park sound system
+          [51.5245, -0.1975], // White City sound system
+          [51.5190, -0.2030], // Golborne Road sound system
+          [51.5205, -0.2015], // Maida Vale sound system
+          [51.5220, -0.2000], // Queensway sound system
+          [51.5235, -0.1985], // Shepherd's Bush sound system
+        ];
+
+        soundSystemLocations.forEach((coord, index) => {
+          const marker = L.marker(coord, {
+            icon: L.divIcon({
+              className: 'sound-system-marker',
+              html: '🔊', // Speaker icon for sound systems
+              iconSize: [25, 25],
+              iconAnchor: [12, 12]
+            })
+          }).addTo(map);
+
+          marker.bindPopup(`
+            <b>Sound System ${index + 1}</b><br>
+            <small>Notting Hill Carnival 2023</small><br>
+            <small>Live music and entertainment</small>
+          `);
+          marker.carnivalRouteData = true;
+        });
+
+        // Add judging zone marker (from the image)
+        const judgingZoneCoord = [51.5200, -0.2020]; // Near Elgin Avenue
+        const judgingZoneMarker = L.marker(judgingZoneCoord, {
+          icon: L.divIcon({
+            className: 'judging-zone-marker',
+            html: '🏆', // Trophy icon for judging zone
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+          })
+        }).addTo(map);
+
+        judgingZoneMarker.bindPopup(`
+          <b>JUDGING ZONE</b><br>
+          <small>Notting Hill Carnival 2023</small><br>
+          <small>Parade judging and awards</small>
+        `);
+        judgingZoneMarker.carnivalRouteData = true;
 
         // Fit map to show the entire carnival route
         map.fitBounds(gridBounds, { padding: [20, 20] });
