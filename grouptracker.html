@@ -9496,98 +9496,82 @@
 
         // Define the carnival parade route coordinates (Notting Hill area)
         // Based on the actual NHC2023 parade route from Google My Maps
-        // Using exact coordinates with intermediate points to follow roads
+        // Using exact coordinates that follow the actual road path (blue line)
         const carnivalRoute = [
-          // A. Starting point - Ladbroke Grove
-          [51.512538, -0.206470], // A. Ladbroke Grove
+          // A1. Starting point - Ladbroke Grove
+          [51.512565, -0.206491], // A1. Ladbroke Grove
 
-          // Intermediate points along Ladbroke Grove to B - following exact road curves
-          [51.5130, -0.2070], // Following Ladbroke Grove curve
-          [51.5138, -0.2080], // Following Ladbroke Grove curve
-          [51.5146, -0.2090], // Following Ladbroke Grove curve
-          [51.5154, -0.2100], // Following Ladbroke Grove curve
-          [51.5162, -0.2108], // Following Ladbroke Grove curve
-          [51.5170, -0.2112], // Following Ladbroke Grove curve
-          [51.5178, -0.2114], // Following Ladbroke Grove curve
-          [51.5186, -0.2115], // Following Ladbroke Grove curve
-          [51.5194, -0.2116], // Following Ladbroke Grove curve
+          // A2-A26. Following the exact road curves along Ladbroke Grove
+          [51.513412, -0.207095], // A2
+          [51.514257, -0.207705], // A4
+          [51.515175, -0.208372], // A5
+          [51.516105, -0.209048], // A6
+          [51.516462, -0.209317], // A7
+          [51.517616, -0.210155], // A8
+          [51.517915, -0.210328], // A9
+          [51.518306, -0.210546], // A10
+          [51.518959, -0.210919], // A11
+          [51.519609, -0.211299], // A12
+          [51.520169, -0.211619], // A13
+          [51.520670, -0.211909], // A14
+          [51.521160, -0.212196], // A15
+          [51.521639, -0.212464], // A16
+          [51.522116, -0.212742], // A17
+          [51.522353, -0.212883], // A18
+          [51.522966, -0.213237], // A19
+          [51.523684, -0.213660], // A20
+          [51.524082, -0.213921], // A21
+          [51.524327, -0.213996], // A22
+          [51.525289, -0.214583], // A23
+          [51.525740, -0.214874], // A24
+          [51.525909, -0.215061], // A25
+          [51.526267, -0.215084], // A26
 
-          // B. Continuing along Ladbroke Grove
-          [51.520143, -0.211625], // B. Ladbroke Grove
+          // A3. End of Ladbroke Grove
+          [51.526325, -0.215112], // A3. Ladbroke Grove
 
-          // Intermediate points along Ladbroke Grove to C - following exact road curves
-          [51.5208, -0.2120], // Following Ladbroke Grove curve
-          [51.5216, -0.2128], // Following Ladbroke Grove curve
-          [51.5224, -0.2136], // Following Ladbroke Grove curve
-          [51.5232, -0.2142], // Following Ladbroke Grove curve
-          [51.5240, -0.2146], // Following Ladbroke Grove curve
-          [51.5248, -0.2149], // Following Ladbroke Grove curve
-          [51.5256, -0.2150], // Following Ladbroke Grove curve
+          // B1-B14. Following the exact road curves along Kensal Rd
+          [51.526310, -0.213861], // B1. Kensal Rd
+          [51.526270, -0.212296], // B2
+          [51.526242, -0.211541], // B3
+          [51.526186, -0.210546], // B4
+          [51.526127, -0.209911], // B5
+          [51.526004, -0.209122], // B6
+          [51.525930, -0.208710], // B7
+          [51.525820, -0.208111], // B8
+          [51.525691, -0.207379], // B9
+          [51.525598, -0.206951], // B10
+          [51.525475, -0.206583], // B11
+          [51.525399, -0.206423], // B12
+          [51.525235, -0.206137], // B13
+          [51.524480, -0.205508], // B14
 
-          // C. Further along Ladbroke Grove
-          [51.526325, -0.215112], // C. Ladbroke Grove
+          // C1. Golbourne Rd
+          [51.524295, -0.205380], // C1. Golbourne Rd
 
-          // D. Turning onto Kensal Rd
-          [51.526234, -0.211620], // D. Kensal Rd
+          // D. Elkstone Road
+          [51.523059, -0.206407], // D. Elkstone Road
 
-          // Intermediate points along Kensal Rd to E - following exact road curves
-          [51.5260, -0.2130], // Following Kensal Rd curve
-          [51.5258, -0.2115], // Following Kensal Rd curve
-          [51.5256, -0.2100], // Following Kensal Rd curve
-          [51.5254, -0.2088], // Following Kensal Rd curve
-          [51.5252, -0.2075], // Following Kensal Rd curve
-          [51.5250, -0.2065], // Following Kensal Rd curve
+          // E. A4207
+          [51.522147, -0.201387], // E. A4207
 
-          // E. Continuing on Kensal Rd
-          [51.524214, -0.205375], // E. Kensal Rd
+          // F. Westbourne Park Road
+          [51.518613, -0.198423], // F. Westbourne Park Road
 
-          // F. Turning onto Golbourne Rd
-          [51.523143, -0.206751], // F. Golbourne Rd
+          // G. Continuing on Westbourne Park Road
+          [51.519079, -0.196369], // G. Westbourne Park Road
 
-          // G. Elkstone Road
-          [51.523059, -0.206407], // G. Elkstone Road
+          // H. Chepstow Rd
+          [51.515062, -0.195045], // H. Chepstow Rd
 
-          // Intermediate points along A4207 to H
-          [51.5228, -0.2045], // Following A4207 curve
-          [51.5225, -0.2030], // Following A4207 curve
+          // I. Westbourne Grove
+          [51.514405, -0.200323], // I. Westbourne Grove
 
-          // H. A4207
-          [51.522147, -0.201387], // H. A4207
+          // J. Ladbroke Gardens
+          [51.512588, -0.206464], // J. Ladbroke Gardens
 
-          // Intermediate points along Westbourne Park Road to I
-          [51.5215, -0.2005], // Following Westbourne Park Road curve
-          [51.5205, -0.1995], // Following Westbourne Park Road curve
-          [51.5195, -0.1988], // Following Westbourne Park Road curve
-
-          // I. Westbourne Park Road
-          [51.518613, -0.198423], // I. Westbourne Park Road
-
-          // J. Continuing on Westbourne Park Road
-          [51.519079, -0.196369], // J. Westbourne Park Road
-
-          // Intermediate points along Chepstow Rd to K
-          [51.5175, -0.1960], // Following Chepstow Rd curve
-          [51.5165, -0.1955], // Following Chepstow Rd curve
-
-          // K. Chepstow Rd
-          [51.515062, -0.195045], // K. Chepstow Rd
-
-          // Intermediate points along Westbourne Grove to L
-          [51.5148, -0.1970], // Following Westbourne Grove curve
-          [51.5146, -0.1985], // Following Westbourne Grove curve
-
-          // L. Westbourne Grove
-          [51.514405, -0.200323], // L. Westbourne Grove
-
-          // Intermediate points along Ladbroke Gardens to M
-          [51.5135, -0.2025], // Following Ladbroke Gardens curve
-          [51.5130, -0.2045], // Following Ladbroke Gardens curve
-
-          // M. Ladbroke Gardens
-          [51.512588, -0.206464], // M. Ladbroke Gardens
-
-          // Back to A - completing the loop
-          [51.512538, -0.206470]  // A. Ladbroke Grove (end point)
+          // Back to A1 - completing the loop
+          [51.512565, -0.206491]  // A1. Ladbroke Grove (end point)
         ];
 
         // Create the parade route polyline with carnival styling
