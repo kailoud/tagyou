@@ -3967,6 +3967,35 @@
       filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
     }
 
+    .artist-image-carousel .main-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+
+    .artist-image-carousel .image-thumbnails {
+      display: flex;
+      gap: 4px;
+      margin-top: 8px;
+    }
+
+    .artist-image-carousel .thumbnail {
+      width: 60px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .artist-image-carousel .thumbnail:hover {
+      border-color: #8b5cf6;
+      transform: scale(1.05);
+    }
+
     .artists-schedule {
       margin-bottom: 24px;
     }
@@ -8751,6 +8780,14 @@
             // Reset carousel for next use
             carouselImages = [];
             selectedImageIndex = 0;
+
+            // Refresh artist data in panel if artists button is active
+            if (artistsBtn && artistsBtn.classList.contains('active')) {
+              setTimeout(() => {
+                loadArtistsData();
+                updateArtistCategoriesFromAdminData();
+              }, 500);
+            }
           } else if (key === 'image' && value instanceof File) {
             // Handle file upload to Firebase Storage
             uploadImageToFirebase(value, actualId, isEditing, itemData);
@@ -11703,7 +11740,7 @@
             stage: artist.stage_name,
             performance_time: artist.performance_time,
             description: artist.description,
-            images: artist.image ? [artist.image] : ['🎵', '🥁', '🎤'],
+            images: artist.images && Array.isArray(artist.images) ? artist.images : (artist.image ? [artist.image] : ['🎵', '🥁', '🎤']),
             contact: artist.contact_person,
             phone: artist.phone,
             email: artist.email,
@@ -11757,32 +11794,75 @@
           </div>
           <div class="artist-description">${artist.description}</div>
           <div class="artist-image-carousel" id="artistCarousel${artist.id}">
-            ${artist.images.map((img, imgIndex) => {
-            // Check if image is a data URL (uploaded image) or emoji
-            if (img.startsWith('data:image/')) {
-              return `<img src="${img}" alt="${artist.name} ${imgIndex + 1}" style="display: ${imgIndex === 0 ? 'block' : 'none'}; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
-            } else {
-              // Create professional SVG placeholder for emoji
-              return `<img src="data:image/svg+xml;base64,${btoa(`<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
-                 <defs>
-                   <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                     <stop offset="0%" style="stop-color:#f8f9fa;stop-opacity:1" />
-                     <stop offset="100%" style="stop-color:#e9ecef;stop-opacity:1" />
-                   </linearGradient>
-                   <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-                     <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.1"/>
-                   </filter>
-                 </defs>
-                 <rect width="400" height="300" fill="url(#grad1)" rx="16"/>
-                 <circle cx="200" cy="120" r="60" fill="rgba(139, 92, 246, 0.1)" stroke="rgba(139, 92, 246, 0.3)" stroke-width="2"/>
-                 <text x="200" y="130" font-size="64" text-anchor="middle" dy=".3em" fill="#8b5cf6" font-family="Arial, sans-serif" font-weight="bold" filter="url(#shadow)">${img}</text>
-                 <text x="200" y="200" font-size="16" text-anchor="middle" fill="#6c757d" font-family="Arial, sans-serif">${artist.name}</text>
-                 <text x="200" y="220" font-size="14" text-anchor="middle" fill="#8b5cf6" font-family="Arial, sans-serif" font-weight="500">${artist.type}</text>
-               </svg>`)}" 
-               alt="${artist.name} ${imgIndex + 1}" 
-               style="display: ${imgIndex === 0 ? 'block' : 'none'}; width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">`;
-            }
-          }).join('')}
+            ${(() => {
+              // Handle carousel images display
+              if (artist.images && artist.images.length > 0) {
+                const mainImage = artist.images[0];
+                const thumbnails = artist.images.slice(1, 4); // Show up to 3 additional thumbnails
+
+                let mainImageHtml = '';
+                if (mainImage.startsWith('data:image/') || mainImage.startsWith('http')) {
+                  // Real uploaded image
+                  mainImageHtml = `<img src="${mainImage}" alt="${artist.name}" class="main-image">`;
+                } else {
+                  // Emoji placeholder
+                  mainImageHtml = `<img src="data:image/svg+xml;base64,${btoa(`<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#f8f9fa;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#e9ecef;stop-opacity:1" />
+                      </linearGradient>
+                      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.1"/>
+                      </filter>
+                    </defs>
+                    <rect width="400" height="300" fill="url(#grad1)" rx="16"/>
+                    <circle cx="200" cy="120" r="60" fill="rgba(139, 92, 246, 0.1)" stroke="rgba(139, 92, 246, 0.3)" stroke-width="2"/>
+                    <text x="200" y="130" font-size="64" text-anchor="middle" dy=".3em" fill="#8b5cf6" font-family="Arial, sans-serif" font-weight="bold" filter="url(#shadow)">${mainImage}</text>
+                    <text x="200" y="200" font-size="16" text-anchor="middle" fill="#6c757d" font-family="Arial, sans-serif">${artist.name}</text>
+                                    <text x="200" y="220" font-size="14" text-anchor="middle" fill="#8b5cf6" font-family="Arial, sans-serif" font-weight="500">${artist.type}</text>
+                 </svg>`)}" alt="${artist.name}" class="main-image">`;
+                }
+
+                let thumbnailsHtml = '';
+                if (thumbnails.length > 0) {
+                  thumbnailsHtml = `
+                    <div class="image-thumbnails">
+                      ${thumbnails.map(img => {
+                    if (img.startsWith('data:image/') || img.startsWith('http')) {
+                      return `<img src="${img}" alt="Thumbnail" class="thumbnail">`;
+                    } else {
+                      return `<img src="data:image/svg+xml;base64,${btoa(`<svg width="60" height="40" viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="60" height="40" fill="#f8f9fa" rx="4"/>
+                            <text x="30" y="25" font-size="16" text-anchor="middle" fill="#8b5cf6">${img}</text>
+                          </svg>`)}" alt="Thumbnail" class="thumbnail">`;
+                    }
+                  }).join('')}
+                    </div>
+                  `;
+                }
+
+                return mainImageHtml + thumbnailsHtml;
+              } else {
+                // Fallback to emoji placeholder
+                return `<img src="data:image/svg+xml;base64,${btoa(`<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#f8f9fa;stop-opacity:1" />
+                      <stop offset="100%" style="stop-color:#e9ecef;stop-opacity:1" />
+                    </linearGradient>
+                    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.1"/>
+                    </filter>
+                  </defs>
+                  <rect width="400" height="300" fill="url(#grad1)" rx="16"/>
+                  <circle cx="200" cy="120" r="60" fill="rgba(139, 92, 246, 0.1)" stroke="rgba(139, 92, 246, 0.3)" stroke-width="2"/>
+                  <text x="200" y="130" font-size="64" text-anchor="middle" dy=".3em" fill="#8b5cf6" font-family="Arial, sans-serif" font-weight="bold" filter="url(#shadow)">🎵</text>
+                  <text x="200" y="200" font-size="16" text-anchor="middle" fill="#6c757d" font-family="Arial, sans-serif">${artist.name}</text>
+                  <text x="200" y="220" font-size="14" text-anchor="middle" fill="#8b5cf6" font-family="Arial, sans-serif" font-weight="500">${artist.type}</text>
+                </svg>`)}" alt="${artist.name}" class="main-image">`;
+              }
+            })()}
           </div>
           <div class="artist-details">
             <span class="artist-detail">⏰ ${artist.performance_time}</span>
