@@ -8191,7 +8191,9 @@
                 <h2>🔧 Admin Portal</h2>
                 <div class="header-actions">
                   <button onclick="testFirebaseConnection()" class="test-btn" title="Test Firebase Connection">🧪</button>
-                  <button onclick="forceProcessBatchOperations()" class="test-btn" title="Process Pending Operations">🔄</button>
+                  <button onclick="forceRefreshAdminData()" class="test-btn" title="Force Refresh Data">🔄</button>
+                  <button onclick="debugDataDiscrepancy()" class="test-btn" title="Debug Data Discrepancy">🔍</button>
+                  <button onclick="forceProcessBatchOperations()" class="test-btn" title="Process Pending Operations">⚡</button>
                   <button onclick="cleanupOrphanedDocuments()" class="test-btn" title="Cleanup Orphaned Documents">🧹</button>
                   <button onclick="cleanupMockData()" class="test-btn" title="Cleanup Mock Data">🎭</button>
                   <button onclick="toggleAdminPortalSize()" class="expand-btn" title="Expand/Minimize">
@@ -8512,19 +8514,27 @@
           throw new Error('Firebase database not initialized');
         }
 
-        // Load food stalls - OPTIMIZED: Only load active items, limit to 50
+        // Load food stalls - TEMPORARILY LOAD ALL ITEMS FOR DEBUGGING
         try {
+          console.log('Loading food stalls from Firebase...');
           const foodStallsSnapshot = await db.collection('food_stalls')
-            .where('status', 'in', ['active', 'confirmed'])
             .orderBy('created_at', 'desc')
-            .limit(50)
+            .limit(100) // Increased limit for debugging
             .get();
-          adminData['food-stalls'] = foodStallsSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
+
+          console.log(`Found ${foodStallsSnapshot.docs.length} total food stalls in Firebase`);
+
+          adminData['food-stalls'] = foodStallsSnapshot.docs.map(doc => {
+            const data = doc.data();
+            console.log(`Food stall ${doc.id}:`, { name: data.name, status: data.status });
+            return {
+              id: doc.id,
+              ...data
+            };
+          });
+
           logFirebaseUsage('reads', foodStallsSnapshot.docs.length);
-          console.log(`Loaded ${adminData['food-stalls'].length} active food stalls`);
+          console.log(`Loaded ${adminData['food-stalls'].length} food stalls (all statuses)`);
         } catch (error) {
           console.warn('Food stalls collection not found:', error);
           adminData['food-stalls'] = [];
@@ -8576,15 +8586,19 @@
           adminData['friends'] = [];
         }
 
-        // Load artists - OPTIMIZED: Only load active items, limit to 50
+        // Load artists - TEMPORARILY LOAD ALL ITEMS FOR DEBUGGING
         try {
+          console.log('Loading artists from Firebase...');
           const artistsSnapshot = await db.collection('artists')
-            .where('status', 'in', ['active', 'confirmed'])
             .orderBy('created_at', 'desc')
-            .limit(50)
+            .limit(100) // Increased limit for debugging
             .get();
+
+          console.log(`Found ${artistsSnapshot.docs.length} total artists in Firebase`);
+
           adminData['artists'] = artistsSnapshot.docs.map(doc => {
             const data = doc.data();
+            console.log(`Artist ${doc.id}:`, { name: data.name, status: data.status });
             // Set default status locally only (don't update Firebase here for performance)
             if (!data.status) {
               data.status = 'active';
@@ -8595,7 +8609,7 @@
             };
           });
           logFirebaseUsage('reads', artistsSnapshot.docs.length);
-          console.log(`Loaded ${adminData['artists'].length} active artists`);
+          console.log(`Loaded ${adminData['artists'].length} artists (all statuses)`);
         } catch (error) {
           console.warn('Artists collection not found:', error);
           adminData['artists'] = [];
@@ -14482,6 +14496,39 @@
       }
     }
 
+    // Force refresh admin data (bypass cache)
+    async function forceRefreshAdminData() {
+      console.log('🔄 Force refreshing admin data...');
+
+      // Reset cache timestamp to force reload
+      lastDataLoad = 0;
+
+      // Clear current admin data
+      adminData = {
+        'food-stalls': [],
+        'float-trucks': [],
+        'float-routes': [],
+        'groups': [],
+        'friends': [],
+        'artists': []
+      };
+
+      // Reload data from Firebase
+      await loadAdminData();
+
+      // Update the admin portal display
+      const tableBody = document.getElementById('adminTableBody');
+      if (tableBody) {
+        tableBody.innerHTML = renderAdminTableData();
+      }
+
+      // Update tab counts
+      updateAdminTabCounts();
+
+      console.log('✅ Admin data force refreshed');
+      showNotification('Admin data refreshed from Firebase', 'success');
+    }
+
     // Force process any pending batch operations
     async function forceProcessBatchOperations() {
       if (pendingBatchOperations.length > 0) {
@@ -14491,6 +14538,65 @@
       } else {
         console.log('ℹ️ No pending batch operations');
       }
+    }
+
+    // Debug data discrepancy between Firebase and Admin Portal
+    async function debugDataDiscrepancy() {
+      console.log('🔍 DEBUGGING DATA DISCREPANCY...');
+
+      const db = window.firebaseDB;
+      if (!db) {
+        console.error('Firebase DB not initialized!');
+        return;
+      }
+
+      // Check each collection
+      const collections = ['food_stalls', 'float_trucks', 'artists'];
+
+      for (const collectionName of collections) {
+        console.log(`\n📊 Checking ${collectionName} collection:`);
+
+        try {
+          // Get all documents from Firebase
+          const snapshot = await db.collection(collectionName).get();
+          console.log(`Firebase ${collectionName}: ${snapshot.docs.length} documents`);
+
+          // Show each document
+          snapshot.docs.forEach(doc => {
+            const data = doc.data();
+            console.log(`  - ${doc.id}: ${data.name || data.stall_name || 'No name'} (status: ${data.status || 'No status'})`);
+          });
+
+          // Check admin data
+          const adminTabKey = collectionName === 'food_stalls' ? 'food-stalls' :
+            collectionName === 'float_trucks' ? 'float-trucks' : 'artists';
+          console.log(`Admin Portal ${adminTabKey}: ${adminData[adminTabKey].length} items`);
+
+          // Show each admin item
+          adminData[adminTabKey].forEach(item => {
+            console.log(`  - ${item.id}: ${item.name || item.stall_name || 'No name'} (status: ${item.status || 'No status'})`);
+          });
+
+          // Find missing items
+          const firebaseIds = new Set(snapshot.docs.map(doc => doc.id));
+          const adminIds = new Set(adminData[adminTabKey].map(item => item.id));
+
+          const missingInAdmin = [...firebaseIds].filter(id => !adminIds.has(id));
+          const missingInFirebase = [...adminIds].filter(id => !firebaseIds.has(id));
+
+          if (missingInAdmin.length > 0) {
+            console.log(`❌ Missing in Admin Portal: ${missingInAdmin.join(', ')}`);
+          }
+          if (missingInFirebase.length > 0) {
+            console.log(`❌ Missing in Firebase: ${missingInFirebase.join(', ')}`);
+          }
+
+        } catch (error) {
+          console.error(`Error checking ${collectionName}:`, error);
+        }
+      }
+
+      console.log('\n🔍 DATA DISCREPANCY DEBUG COMPLETE');
     }
 
     // Clean up mock data from admin data
