@@ -6206,7 +6206,7 @@
         <div class="tab active" onclick="switchTab('members')">Group</div>
         <div class="tab" onclick="switchTab('find-stalls')">Find Stalls</div>
         <div class="tab" onclick="switchTab('float')">Floats</div>
-        <div class="tab" onclick="switchTab('artists')">Artists</div>
+        <div class="tab" onclick="toggleArtistsFromTab()">Artists</div>
         <div class="tab" onclick="switchTab('settings')">Settings</div>
 
       </div>
@@ -6432,67 +6432,11 @@
     </div>
 
     <div class="panel-content" id="artists-content">
-      <!-- Artists Header -->
-      <div class="artists-header">
-        <div class="artists-title">
-          <h3>🎵 Artists & Bands</h3>
-          <p>Live music & entertainment schedule</p>
-        </div>
-        <div class="artists-controls">
-          <button class="artists-control-btn" onclick="toggleArtistsAutoScroll()" id="artistsAutoScrollBtn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-            </svg>
-            Auto
-          </button>
-          <button class="artists-control-btn" onclick="refreshArtistsData()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
-            </svg>
-            Refresh
-          </button>
-        </div>
-      </div>
-
-      <!-- Artists Feed -->
-      <div class="artists-feed">
-        <h4>🎤 Live Artists Feed</h4>
-        <div class="artists-cards" id="artistsCards">
-          <!-- Artist cards will be dynamically generated -->
-          <div class="empty-state" id="artistsEmptyState" style="display: none;">
-            <div class="empty-icon">🎵</div>
-            <h3>No Artists Available</h3>
-            <p>Artists and bands will appear here when they are added to the festival.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Artists Schedule -->
-      <div class="artists-schedule">
-        <h4>⏰ Performance Schedule</h4>
-        <div class="artists-schedule-timeline" id="artistsScheduleTimeline">
-          <!-- Schedule items will be dynamically generated -->
-          <div class="empty-state" id="scheduleEmptyState" style="display: none;">
-            <div class="empty-icon">⏰</div>
-            <h3>No Schedule Available</h3>
-            <p>Performance schedule will appear here when events are scheduled.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Artists Categories -->
-      <div class="artists-categories">
-        <h4>🎨 Artist Categories</h4>
-        <div class="artists-category-tags">
-          <span class="artists-category-tag active" onclick="filterArtists('all')">All</span>
-          <span class="artists-category-tag" onclick="filterArtists('Live Band')">Live Bands</span>
-          <span class="artists-category-tag" onclick="filterArtists('DJ')">DJs</span>
-          <span class="artists-category-tag" onclick="filterArtists('Solo Artist')">Solo Artists</span>
-          <span class="artists-category-tag" onclick="filterArtists('Dance Group')">Dance Groups</span>
-          <span class="artists-category-tag" onclick="filterArtists('Sound System')">Sound Systems</span>
-        </div>
+      <!-- Artists content removed - now handled by map markers only -->
+      <div class="empty-state">
+        <div class="empty-icon">🎵</div>
+        <h3>Artists & Bands</h3>
+        <p>Artists are now displayed as markers on the map. Click the Artists button to toggle markers.</p>
       </div>
     </div>
 
@@ -13388,20 +13332,9 @@
     }
 
     function showArtistsPanel() {
-      switchTab('artists');
-
-      // Refresh categories when artists panel is opened
-      setTimeout(() => {
-        // First try to load from admin data
-        updateArtistCategoriesFromAdminData();
-
-        // If no categories were created, create default ones
-        const categoryTagsContainer = document.querySelector('.artists-category-tags');
-        if (categoryTagsContainer && categoryTagsContainer.children.length <= 1) {
-          console.log('No categories found, creating default categories');
-          updateArtistCategories([]); // Pass empty array to show default categories
-        }
-      }, 100);
+      // Don't open panel - just toggle artists markers
+      console.log('showArtistsPanel called - toggling markers instead of opening panel');
+      toggleArtists();
     }
 
     function showArtistDetails(artistId) {
@@ -14482,6 +14415,17 @@
         `;
         showNotification('Auto-scroll disabled for artists', 'info');
       }
+    }
+
+    // Function to handle Artists tab click without opening panel
+    function toggleArtistsFromTab() {
+      console.log('Artists tab clicked - toggling artists markers only');
+
+      // Call the main toggleArtists function
+      toggleArtists();
+
+      // Don't open the panel - just toggle the markers
+      showNotification('Artists markers toggled on map');
     }
 
     // Test function to manually switch to Artists tab
