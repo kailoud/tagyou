@@ -8790,6 +8790,11 @@
             }
           }, 100);
         }
+
+        // Apply any pending coordinates after form is shown
+        setTimeout(() => {
+          applyPendingCoordinates();
+        }, 150);
       }
 
       function closeAdminForm() {
@@ -12479,6 +12484,14 @@
       function confirmCoordinates(fieldName, coordsString, lat, lng) {
         console.log('Confirming coordinates:', coordsString);
 
+        // Store coordinates temporarily
+        pendingCoordinates = {
+          fieldName: fieldName,
+          coordsString: coordsString,
+          lat: lat,
+          lng: lng
+        };
+
         // Remove temporary marker
         map.eachLayer(layer => {
           if (layer._icon && layer._icon.className.includes('temp-coordinate-marker')) {
@@ -12492,18 +12505,45 @@
         // Reopen form and fill coordinates
         setTimeout(() => {
           reopenAdminModal();
+          applyPendingCoordinates();
+        }, 500);
+      }
 
-          const coordInput = document.querySelector(`input[name="${fieldName}"]`);
+      function applyPendingCoordinates() {
+        if (!pendingCoordinates) return;
+
+        // Wait for form to be ready
+        setTimeout(() => {
+          const { fieldName, coordsString } = pendingCoordinates;
+
+          // Try multiple selectors to find the coordinates input
+          const coordInput = document.querySelector(`input[name="${fieldName}"]`) ||
+            document.querySelector('.coordinates-input-group input') ||
+            document.querySelector('input[placeholder*="51.522592"]') ||
+            document.querySelector('input[placeholder*="latitude"]');
+
+          console.log('Looking for coordinates input:', fieldName);
+          console.log('Found input:', coordInput);
+
           if (coordInput) {
             coordInput.value = coordsString;
+            console.log('Coordinates set to input:', coordsString);
             showNotification(`Coordinates confirmed and saved: ${coordsString}`, 'success');
+            pendingCoordinates = null; // Clear pending coordinates
+          } else {
+            console.error('Coordinates input not found for field:', fieldName);
+            console.log('Available inputs:', Array.from(document.querySelectorAll('input')).map(i => ({ name: i.name, placeholder: i.placeholder })));
+            showNotification('Could not find coordinates field. Please enter manually.', 'error');
           }
-        }, 500);
+        }, 300);
       }
 
       // Carousel Image Management Functions
       let carouselImages = [];
       let selectedImageIndex = 0;
+
+      // Temporary coordinates storage
+      let pendingCoordinates = null;
 
       function selectCarouselImage(index) {
         console.log('Selecting carousel image:', index);
