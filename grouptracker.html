@@ -11425,7 +11425,7 @@
           stallsTab.click();
         }
 
-        showNotification(`🎪 Carnival loaded! • Click 📍 to find your location`);
+        showNotification(`🎪 Carnival loaded! • Click ⭐ to find your location`);
       } else {
         console.log(`Selected festival: ${festivalName}`);
         showNotification(`Selected: ${festivalName}`);
@@ -11451,40 +11451,65 @@
     }
 
     function showNotification(message) {
-      // Create a simple notification
+      // Create a pop-up notification
       const notification = document.createElement('div');
       notification.style.cssText = `
         position: fixed;
         top: 20px;
-        right: 20px;
+        left: 50%;
+        transform: translateX(-50%);
         background: #4caf50;
         color: white;
-        padding: 12px 20px;
+        padding: 12px 24px;
         border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
         z-index: 10000;
         font-size: 14px;
         font-weight: 500;
-        animation: slideIn 0.3s ease;
+        animation: popIn 0.3s ease;
+        max-width: 90%;
+        text-align: center;
+        white-space: nowrap;
       `;
       notification.textContent = message;
 
       // Add animation CSS
       const style = document.createElement('style');
       style.textContent = `
-        @keyframes slideIn {
-          from { transform: translateX(100%); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
+        @keyframes popIn {
+          from { 
+            transform: translateX(-50%) translateY(-20px); 
+            opacity: 0; 
+          }
+          to { 
+            transform: translateX(-50%) translateY(0); 
+            opacity: 1; 
+          }
+        }
+        @keyframes popOut {
+          from { 
+            transform: translateX(-50%) translateY(0); 
+            opacity: 1; 
+          }
+          to { 
+            transform: translateX(-50%) translateY(-20px); 
+            opacity: 0; 
+          }
         }
       `;
       document.head.appendChild(style);
 
       document.body.appendChild(notification);
 
-      // Remove after 3 seconds
+      // Remove after 5 seconds with fade out animation
       setTimeout(() => {
-        notification.remove();
-      }, 3000);
+        notification.style.animation = 'popOut 0.3s ease';
+        setTimeout(() => {
+          if (notification.parentElement) {
+            notification.remove();
+          }
+        }, 300);
+      }, 5000);
     }
 
     // Close festival dropdown when clicking outside
@@ -13454,7 +13479,7 @@
         window.mainFloatRoute.push(startMarker);
         window.mainFloatRoute.push(endMarker);
 
-        showNotification(`🎪 Carnival route displayed • Click 📍 to go to your location`, 'success');
+        showNotification(`🎪 Carnival route displayed • Click ⭐ to go to your location`, 'success');
       } catch (error) {
         console.error('Error displaying main float route:', error);
         showNotification('Error displaying main route. Check coordinate format.', 'error');
@@ -13505,7 +13530,7 @@
             console.log('Map centered on carnival area');
           }, 500);
 
-          showNotification('🎪 Carnival route displayed • Click 📍 to go to your location', 'success');
+          showNotification('🎪 Carnival route displayed • Click ⭐ to go to your location', 'success');
         } else {
           console.log('No main route found in Firebase, creating default route...');
           // Create and display default route
@@ -13617,7 +13642,7 @@
             console.log('Map centered on carnival area (fallback)');
           }, 500);
 
-          showNotification('🎪 Carnival route displayed • Click 📍 to go to your location', 'success');
+          showNotification('🎪 Carnival route displayed • Click ⭐ to go to your location', 'success');
         }
       } else {
         // Hide main parade route
