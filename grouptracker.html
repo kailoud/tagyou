@@ -12279,6 +12279,129 @@
         addArtistMarkers();
       }
 
+      // Function to manually add a pin to the map
+      function addManualPin(coordinates, name = 'Manual Pin') {
+        console.log('=== Adding Manual Pin ===');
+        console.log('Coordinates:', coordinates);
+        console.log('Name:', name);
+
+        try {
+          // Parse coordinates
+          const [lat, lng] = coordinates.split(',').map(coord => parseFloat(coord.trim()));
+
+          if (isNaN(lat) || isNaN(lng)) {
+            console.error('Invalid coordinates format:', coordinates);
+            showNotification('Invalid coordinates format. Use: lat, lng', 'error');
+            return;
+          }
+
+          console.log('Parsed coordinates:', { lat, lng });
+
+          // Create marker
+          const marker = L.marker([lat, lng], {
+            icon: L.divIcon({
+              className: 'manual-pin-marker',
+              html: '📍',
+              iconSize: [36, 36],
+              iconAnchor: [18, 18]
+            })
+          }).addTo(map);
+
+          // Add popup
+          const popupContent = `
+            <div style="text-align: center; padding: 8px;">
+              <strong>${name}</strong><br>
+              <small>${coordinates}</small><br>
+              <button onclick="centerMapOnPin(${lat}, ${lng})" 
+                      style="margin-top: 8px; padding: 4px 8px; background: #8b5cf6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                Center Map
+              </button>
+            </div>
+          `;
+
+          marker.bindPopup(popupContent);
+
+          // Center map on pin
+          map.setView([lat, lng], 16);
+
+          console.log('Manual pin added successfully');
+          showNotification(`Pin added at ${coordinates}`, 'success');
+
+        } catch (error) {
+          console.error('Error adding manual pin:', error);
+          showNotification('Error adding pin: ' + error.message, 'error');
+        }
+      }
+
+      // Function to center map on specific coordinates
+      function centerMapOnPin(lat, lng) {
+        console.log('Centering map on:', lat, lng);
+        map.setView([lat, lng], 16);
+        showNotification('Map centered on pin', 'success');
+      }
+
+      // Function to test pin functionality
+      function testPinFunctionality() {
+        console.log('=== Testing Pin Functionality ===');
+
+        // Test with the coordinates from your form
+        const testCoords = '51.521977, -0.210971';
+        console.log('Testing with coordinates:', testCoords);
+
+        // Add manual pin
+        addManualPin(testCoords, 'Test Artist Pin');
+
+        // Check if artists button is active
+        const artistsBtn = document.querySelector('.artists-btn');
+        if (artistsBtn && artistsBtn.classList.contains('active')) {
+          console.log('Artists button is active, checking artist markers...');
+          removeArtistMarkers();
+          addArtistMarkers();
+        } else {
+          console.log('Artists button is not active');
+        }
+      }
+
+      // Function to force add artist pin for testing
+      async function forceAddArtistPin() {
+        console.log('=== Force Adding Artist Pin ===');
+
+        try {
+          // First, let's check if we have any artist data
+          await loadAdminData();
+
+          if (window.adminData?.artists && window.adminData.artists.length > 0) {
+            console.log('Found artists in admin data:', window.adminData.artists.length);
+
+            // Get the first artist with coordinates
+            const artistWithCoords = window.adminData.artists.find(artist => artist.coordinates);
+
+            if (artistWithCoords) {
+              console.log('Artist with coordinates found:', artistWithCoords);
+              addManualPin(artistWithCoords.coordinates, artistWithCoords.name);
+            } else {
+              console.log('No artists with coordinates found');
+              // Add a test pin anyway
+              addManualPin('51.521977, -0.210971', 'Test Artist (No Data)');
+            }
+          } else {
+            console.log('No artists in admin data, adding test pin');
+            addManualPin('51.521977, -0.210971', 'Test Artist (No Data)');
+          }
+
+          // Also try to add artist markers
+          const artistsBtn = document.querySelector('.artists-btn');
+          if (artistsBtn) {
+            console.log('Activating artists button...');
+            artistsBtn.click(); // This will activate the artists button and add markers
+          }
+
+        } catch (error) {
+          console.error('Error in forceAddArtistPin:', error);
+          showNotification('Error: ' + error.message, 'error');
+        }
+      }
+
       // Function to fix artist data issues
       async function fixArtistData() {
         console.log('=== Fix Artist Data ===');
