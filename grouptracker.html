@@ -3148,6 +3148,25 @@
       cursor: crosshair !important;
     }
 
+    /* Force cursor override for pin mode */
+    .pin-cursor * {
+      cursor: crosshair !important;
+    }
+
+    .pin-cursor .leaflet-container,
+    .pin-cursor .leaflet-container * {
+      cursor: crosshair !important;
+    }
+
+    /* Ensure map elements get the cursor */
+    .leaflet-container.pin-mode {
+      cursor: crosshair !important;
+    }
+
+    .leaflet-container.pin-mode * {
+      cursor: crosshair !important;
+    }
+
     .member-item {
       padding: 16px 0;
       border-bottom: 1px solid #eee;
@@ -12947,8 +12966,28 @@
         });
 
         // Change cursor to pin
+        console.log('Changing cursor to pin mode...');
+
+        // Apply cursor changes with multiple methods for better compatibility
         document.body.classList.add('pin-cursor');
-        map.getContainer().classList.add('map-pin-mode');
+        document.body.style.cursor = 'crosshair';
+
+        if (map && map.getContainer()) {
+          const mapContainer = map.getContainer();
+          mapContainer.classList.add('map-pin-mode', 'pin-mode');
+          mapContainer.style.cursor = 'crosshair';
+          console.log('Map container cursor changed');
+        } else {
+          console.warn('Map container not found');
+        }
+
+        // Force cursor change on all map elements
+        const mapElements = document.querySelectorAll('.leaflet-container, .leaflet-container *');
+        mapElements.forEach(el => {
+          el.style.cursor = 'crosshair';
+        });
+
+        console.log('Cursor change applied');
 
         // Add visual indicator
         showNotification('Click on the map to place pin', 'info');
@@ -12958,8 +12997,26 @@
         console.log('Reopening admin modal');
 
         // Restore normal cursor
+        console.log('Restoring normal cursor...');
+
+        // Remove cursor classes and styles
         document.body.classList.remove('pin-cursor');
-        map.getContainer().classList.remove('map-pin-mode');
+        document.body.style.cursor = 'default';
+
+        if (map && map.getContainer()) {
+          const mapContainer = map.getContainer();
+          mapContainer.classList.remove('map-pin-mode', 'pin-mode');
+          mapContainer.style.cursor = 'grab';
+          console.log('Map container cursor restored');
+        }
+
+        // Restore cursor on all map elements
+        const mapElements = document.querySelectorAll('.leaflet-container, .leaflet-container *');
+        mapElements.forEach(el => {
+          el.style.cursor = '';
+        });
+
+        console.log('Normal cursor restored');
 
         // Try to reopen the most recently used modal
         const formModal = document.getElementById('adminFormModal');
