@@ -8111,6 +8111,14 @@
         document.body.appendChild(adminModal);
         setTimeout(() => adminModal.classList.add('show'), 10);
         document.getElementById('userMenu').classList.remove('show');
+
+        // Hide loading indicator after modal is shown
+        setTimeout(() => {
+          const loadingIndicator = document.getElementById('adminLoadingIndicator');
+          if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+          }
+        }, 100);
       } catch (error) {
         console.error('Error loading admin portal:', error);
         showNotification('Error loading admin data from database', 'error');
@@ -8160,12 +8168,15 @@
 
     // Load admin data on page load
     document.addEventListener('DOMContentLoaded', function () {
-      loadAdminData();
-
-      // Initialize artist categories after a short delay
-      setTimeout(() => {
-        updateArtistCategoriesFromAdminData();
-      }, 500);
+      // Load admin data first
+      loadAdminData().then(() => {
+        // Initialize artist categories after admin data is loaded
+        setTimeout(() => {
+          updateArtistCategoriesFromAdminData();
+        }, 100);
+      }).catch(error => {
+        console.error('Error loading admin data on page load:', error);
+      });
     });
 
     // Firebase Database Functions
@@ -8301,6 +8312,12 @@
 
         if (document.getElementById('adminTableBody')) {
           document.getElementById('adminTableBody').innerHTML = renderAdminTableData();
+        }
+
+        // Hide loading indicator in error case
+        const loadingIndicator = document.getElementById('adminLoadingIndicator');
+        if (loadingIndicator) {
+          loadingIndicator.style.display = 'none';
         }
 
         showNotification('Database connection failed. Please check your Firebase configuration.', 'error');
@@ -12030,9 +12047,9 @@
       let artists = [];
 
       if (window.adminData && window.adminData.artists && window.adminData.artists.length > 0) {
-        // Use admin data - show all artists if no confirmed ones exist
-        const confirmedArtists = window.adminData.artists.filter(artist => artist.status === 'confirmed');
-        const artistsToShow = confirmedArtists.length > 0 ? confirmedArtists : window.adminData.artists;
+        // Use admin data - show all artists if no confirmed/active ones exist
+        const activeArtists = window.adminData.artists.filter(artist => artist.status === 'confirmed' || artist.status === 'active');
+        const artistsToShow = activeArtists.length > 0 ? activeArtists : window.adminData.artists;
 
         artists = artistsToShow.map(artist => ({
           id: artist.id,
@@ -12240,12 +12257,12 @@
       }
 
       console.log('Admin data available, all artists:', window.adminData.artists);
-      const artists = window.adminData.artists.filter(artist => artist.status === 'confirmed');
+      const artists = window.adminData.artists.filter(artist => artist.status === 'confirmed' || artist.status === 'active');
       console.log('Filtered artists for categories:', artists);
 
-      // If no confirmed artists, show all artists for debugging
+      // If no confirmed/active artists, show all artists for debugging
       if (artists.length === 0 && window.adminData.artists.length > 0) {
-        console.log('No confirmed artists found, showing all artists for debugging');
+        console.log('No confirmed/active artists found, showing all artists for debugging');
         updateArtistCategories(window.adminData.artists);
       } else {
         updateArtistCategories(artists);
@@ -12264,7 +12281,7 @@
       if (window.adminData && window.adminData.artists && window.adminData.artists.length > 0) {
         // Use admin data
         schedule = window.adminData.artists
-          .filter(artist => artist.status === 'confirmed' && artist.performance_time)
+          .filter(artist => (artist.status === 'confirmed' || artist.status === 'active') && artist.performance_time)
           .map(artist => ({
             time: artist.performance_time,
             title: artist.name,
