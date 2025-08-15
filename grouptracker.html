@@ -8576,7 +8576,7 @@
               route_coordinates: JSON.stringify([
                 { "lat": 51.512565, "lng": -0.206491 }, // A1 - Ladbroke Grove
                 { "lat": 51.513412, "lng": -0.207095 }, // A2
-                { "lat": 51.526325, "lng": -0.215112 }, // A3
+                { "lat": 51.513841, "lng": -0.207417 }, // A3
                 { "lat": 51.514257, "lng": -0.207705 }, // A4
                 { "lat": 51.515175, "lng": -0.208372 }, // A5
                 { "lat": 51.516227, "lng": -0.209131 }, // A6
@@ -13352,11 +13352,11 @@
         // Parse route coordinates
         const coordinates = JSON.parse(routeData.route_coordinates);
 
-        // Create polyline for the main display route with light orange color
+        // Create polyline for the main display route with darker orange color
         const mainRoutePolyline = L.polyline(coordinates, {
-          color: '#ffb366', // Light orange color
+          color: '#ff8c00', // Darker orange color
           weight: 6,
-          opacity: 0.7,
+          opacity: 0.8,
           dashArray: '10, 5' // Dashed line for main route
         }).addTo(map);
 
