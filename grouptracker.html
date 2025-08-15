@@ -1792,6 +1792,22 @@
       gap: 8px;
     }
 
+    .test-btn {
+      background: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 8px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-right: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .test-btn:hover {
+      background: #1976D2;
+    }
+
     .expand-btn {
       background: transparent;
       border: none;
@@ -8159,6 +8175,7 @@
               <div class="modal-header">
                 <h2>🔧 Admin Portal</h2>
                 <div class="header-actions">
+                  <button onclick="testFirebaseConnection()" class="test-btn" title="Test Firebase Connection">🧪</button>
                   <button onclick="toggleAdminPortalSize()" class="expand-btn" title="Expand/Minimize">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
@@ -8448,10 +8465,20 @@
       });
     });
 
-    // Firebase Database Functions
+    // Firebase Database Functions - OPTIMIZED FOR COST REDUCTION
+    let lastDataLoad = 0;
+    const DATA_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
+
     async function loadAdminData() {
       try {
         console.log('Loading admin data from Firebase...');
+
+        // Check if we can use cached data
+        const now = Date.now();
+        if (now - lastDataLoad < DATA_CACHE_DURATION && Object.keys(adminData).length > 0) {
+          console.log('Using cached admin data (cache valid for 5 minutes)');
+          return;
+        }
 
         // Show loading indicator
         const loadingIndicator = document.getElementById('adminLoadingIndicator');
@@ -8464,29 +8491,37 @@
           throw new Error('Firebase database not initialized');
         }
 
-        // Load food stalls
+        // Load food stalls - OPTIMIZED: Only load active items, limit to 50
         try {
           const foodStallsSnapshot = await db.collection('food_stalls')
+            .where('status', 'in', ['active', 'confirmed'])
             .orderBy('created_at', 'desc')
+            .limit(50)
             .get();
           adminData['food-stalls'] = foodStallsSnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
           }));
+          logFirebaseUsage('reads', foodStallsSnapshot.docs.length);
+          console.log(`Loaded ${adminData['food-stalls'].length} active food stalls`);
         } catch (error) {
           console.warn('Food stalls collection not found:', error);
           adminData['food-stalls'] = [];
         }
 
-        // Load float trucks
+        // Load float trucks - OPTIMIZED: Only load active items, limit to 50
         try {
           const floatTrucksSnapshot = await db.collection('float_trucks')
+            .where('status', 'in', ['active', 'confirmed'])
             .orderBy('created_at', 'desc')
+            .limit(50)
             .get();
           adminData['float-trucks'] = floatTrucksSnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
           }));
+          logFirebaseUsage('reads', floatTrucksSnapshot.docs.length);
+          console.log(`Loaded ${adminData['float-trucks'].length} active float trucks`);
         } catch (error) {
           console.warn('Float trucks collection not found:', error);
           adminData['float-trucks'] = [];
@@ -8520,10 +8555,12 @@
           adminData['friends'] = [];
         }
 
-        // Load artists
+        // Load artists - OPTIMIZED: Only load active items, limit to 50
         try {
           const artistsSnapshot = await db.collection('artists')
+            .where('status', 'in', ['active', 'confirmed'])
             .orderBy('created_at', 'desc')
+            .limit(50)
             .get();
           adminData['artists'] = artistsSnapshot.docs.map(doc => {
             const data = doc.data();
@@ -8536,7 +8573,8 @@
               ...data
             };
           });
-          console.log('Loaded artists:', adminData['artists'].length);
+          logFirebaseUsage('reads', artistsSnapshot.docs.length);
+          console.log(`Loaded ${adminData['artists'].length} active artists`);
         } catch (error) {
           console.warn('Artists collection not found:', error);
           adminData['artists'] = [];
@@ -8701,7 +8739,9 @@
           }, 100);
         }
 
-        console.log('Admin data loaded successfully');
+        // Update cache timestamp
+        lastDataLoad = Date.now();
+        console.log('Admin data loaded successfully and cached');
 
         // Initialize user data with admin data (first time)
         if (Object.values(userData).every(arr => arr.length === 0)) {
@@ -8753,15 +8793,27 @@
           throw new Error('Firebase database not initialized');
         }
 
-        console.log(`Saving to collection: ${collectionName}`, data);
+        // OPTIMIZATION: Remove unnecessary fields to reduce storage
+        const optimizedData = { ...data };
 
-        const docRef = await db.collection(collectionName).add({
-          ...data,
-          created_at: new Date().toISOString()
+        // Remove empty or null fields
+        Object.keys(optimizedData).forEach(key => {
+          if (optimizedData[key] === null || optimizedData[key] === undefined || optimizedData[key] === '') {
+            delete optimizedData[key];
+          }
         });
 
+        console.log(`Saving to collection: ${collectionName}`, optimizedData);
+
+        const docRef = await db.collection(collectionName).add({
+          ...optimizedData,
+          created_at: new Date().toISOString(),
+          status: optimizedData.status || 'active' // Ensure status is set
+        });
+
+        logFirebaseUsage('writes', 1);
         console.log(`Successfully saved to ${collectionName} with ID: ${docRef.id}`);
-        return { id: docRef.id, ...data };
+        return { id: docRef.id, ...optimizedData };
       } catch (error) {
         console.error(`Error saving to ${collectionName}:`, error);
         throw error;
@@ -8790,11 +8842,50 @@
           updated_at: new Date().toISOString()
         });
 
+        logFirebaseUsage('writes', 1);
         console.log(`Successfully updated document ${id} in ${collectionName}`);
         return { id, ...data };
       } catch (error) {
         console.error(`Error updating ${collectionName}:`, error);
         throw error;
+      }
+    }
+
+    // OPTIMIZATION: Batch operations to reduce Firebase costs
+    let pendingBatchOperations = [];
+    const BATCH_SIZE_LIMIT = 500; // Firestore batch limit
+
+    async function processBatchOperations() {
+      if (pendingBatchOperations.length === 0) return;
+
+      try {
+        const db = window.firebaseDB;
+        if (!db) {
+          throw new Error('Firebase database not initialized');
+        }
+
+        const batch = db.batch();
+        const operations = pendingBatchOperations.splice(0, BATCH_SIZE_LIMIT);
+
+        operations.forEach(op => {
+          if (op.type === 'delete') {
+            batch.delete(db.collection(op.collection).doc(op.id));
+          } else if (op.type === 'update') {
+            batch.update(db.collection(op.collection).doc(op.id), op.data);
+          }
+        });
+
+        await batch.commit();
+        console.log(`Processed ${operations.length} batch operations`);
+
+        // Process remaining operations if any
+        if (pendingBatchOperations.length > 0) {
+          setTimeout(processBatchOperations, 100);
+        }
+      } catch (error) {
+        console.error('Batch operation failed:', error);
+        // Restore operations to queue
+        pendingBatchOperations.unshift(...operations);
       }
     }
 
@@ -8805,12 +8896,50 @@
           throw new Error('Firebase database not initialized');
         }
 
-        await db.collection(collectionName).doc(id).delete();
+        // OPTIMIZATION: Add to batch for better performance
+        pendingBatchOperations.push({
+          type: 'delete',
+          collection: collectionName,
+          id: id
+        });
+
+        logFirebaseUsage('deletes', 1);
+
+        // Process batch if it's getting large
+        if (pendingBatchOperations.length >= 10) {
+          processBatchOperations();
+        }
+
         return true;
       } catch (error) {
         console.error(`Error deleting from ${collectionName}:`, error);
         throw error;
       }
+    }
+
+    // OPTIMIZATION: Image compression to reduce storage costs
+    async function compressImage(file, maxWidth = 800, quality = 0.8) {
+      return new Promise((resolve) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+
+        img.onload = () => {
+          // Calculate new dimensions
+          const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
+          const newWidth = img.width * ratio;
+          const newHeight = img.height * ratio;
+
+          canvas.width = newWidth;
+          canvas.height = newHeight;
+
+          // Draw and compress
+          ctx.drawImage(img, 0, 0, newWidth, newHeight);
+          canvas.toBlob(resolve, 'image/jpeg', quality);
+        };
+
+        img.src = URL.createObjectURL(file);
+      });
     }
 
     async function uploadImageToFirebase(file, id, isEditing, itemData) {
@@ -8822,13 +8951,21 @@
           throw new Error('Firebase Storage not initialized');
         }
 
+        // OPTIMIZATION: Compress image before upload
+        console.log('Compressing image to reduce storage costs...');
+        const compressedBlob = await compressImage(file);
+        const compressedFile = new File([compressedBlob], file.name, { type: 'image/jpeg' });
+
+        console.log(`Image compressed: ${file.size} → ${compressedFile.size} bytes (${Math.round((1 - compressedFile.size / file.size) * 100)}% reduction)`);
+        logFirebaseUsage('storage', 0, compressedFile.size);
+
         // Create unique filename
         const timestamp = Date.now();
         const fileName = `artists/${id || 'new'}_${timestamp}_${file.name}`;
         const storageRef = storage.ref().child(fileName);
 
-        // Upload file
-        const snapshot = await storageRef.put(file);
+        // Upload compressed file
+        const snapshot = await storageRef.put(compressedFile);
         console.log('Image uploaded successfully:', fileName);
 
         // Get download URL
@@ -14115,43 +14252,20 @@
         }));
       }
 
-      // If no data available, add some sample data for testing
+      // If no data available, show empty state
       if (stallsData.length === 0) {
-        console.log('No stalls data found, adding sample data for testing...');
-        stallsData = [
-          {
-            id: 'sample1',
-            name: 'Caribbean Delights',
-            origin: 'Jamaica',
-            description: 'Authentic Caribbean cuisine',
-            image: '🍗',
-            rating: 4.5,
-            priceRange: '££',
-            categories: ['Caribbean', 'Jerk Chicken', 'Rice & Peas'],
-            location: { lat: 51.522592, lng: -0.202544 },
-            menu: ['Jerk Chicken', 'Rice & Peas', 'Plantains'],
-            hours: '10:00 AM - 8:00 PM',
-            contact: 'N/A'
-          },
-          {
-            id: 'sample2',
-            name: 'Street Food Express',
-            origin: 'UK',
-            description: 'Quick and delicious street food',
-            image: '🌭',
-            rating: 4.2,
-            priceRange: '£',
-            categories: ['Street Food', 'Burgers', 'Hot Dogs'],
-            location: { lat: 51.521977, lng: -0.210971 },
-            menu: ['Burgers', 'Hot Dogs', 'Chips'],
-            hours: '11:00 AM - 9:00 PM',
-            contact: 'N/A'
-          }
-        ];
+        console.log('No stalls data found in Firebase - showing empty state');
+        stallsData = [];
       }
 
       // Initialize filtered stalls
       filteredStalls = stallsData;
+
+      // Test Firebase connectivity first
+      testFirebaseConnection().then(() => {
+        // Debug Firebase collections
+        debugFirebaseCollections();
+      });
 
       // Remove all demo data - only show admin data
       console.log('Stalls data loaded, calling renderStalls...');
@@ -14159,6 +14273,153 @@
       console.log('Filtered stalls:', filteredStalls);
       renderStalls();
       console.log('=== loadStallsData completed ===');
+    }
+
+    // COST MONITORING: Track Firebase usage for cost optimization
+    let firebaseUsage = {
+      reads: 0,
+      writes: 0,
+      deletes: 0,
+      storage: 0
+    };
+
+    function logFirebaseUsage(operation, count = 1, bytes = 0) {
+      firebaseUsage[operation] += count;
+      firebaseUsage.storage += bytes;
+
+      console.log(`📊 Firebase Usage: ${operation} +${count} (Total: ${firebaseUsage[operation]})`);
+
+      // Estimate costs (rough calculation)
+      const estimatedCost = (
+        (firebaseUsage.reads * 0.0000006) + // $0.06 per 100K reads
+        (firebaseUsage.writes * 0.0000018) + // $0.18 per 100K writes
+        (firebaseUsage.deletes * 0.0000018) + // $0.18 per 100K deletes
+        (firebaseUsage.storage * 0.000000018) // $0.018 per GB
+      );
+
+      if (firebaseUsage.reads % 100 === 0 || firebaseUsage.writes % 100 === 0) {
+        console.log(`💰 Estimated Firebase Cost: $${estimatedCost.toFixed(4)}`);
+      }
+    }
+
+    // Test Firebase connectivity and data operations
+    async function testFirebaseConnection() {
+      try {
+        console.log('🧪 TESTING FIREBASE CONNECTIVITY...');
+
+        const db = window.firebaseDB;
+        if (!db) {
+          console.error('❌ Firebase DB not initialized!');
+          return false;
+        }
+
+        console.log('✅ Firebase DB initialized');
+
+        // Test write operation
+        const testData = {
+          test_field: 'Firebase connection test',
+          timestamp: new Date().toISOString()
+        };
+
+        console.log('📝 Testing write operation...');
+        const testDoc = await db.collection('test_connection').add(testData);
+        console.log('✅ Write test successful, document ID:', testDoc.id);
+
+        // Test read operation
+        console.log('📖 Testing read operation...');
+        const testRead = await testDoc.get();
+        console.log('✅ Read test successful:', testRead.data());
+
+        // Clean up test document
+        console.log('🧹 Cleaning up test document...');
+        await testDoc.delete();
+        console.log('✅ Test document deleted');
+
+        console.log('🎉 FIREBASE CONNECTION TEST PASSED!');
+
+        // Show cost summary
+        const estimatedCost = (
+          (firebaseUsage.reads * 0.0000006) +
+          (firebaseUsage.writes * 0.0000018) +
+          (firebaseUsage.deletes * 0.0000018) +
+          (firebaseUsage.storage * 0.000000018)
+        );
+
+        console.log('📊 COST SUMMARY:');
+        console.log(`   Reads: ${firebaseUsage.reads} ($${(firebaseUsage.reads * 0.0000006).toFixed(4)})`);
+        console.log(`   Writes: ${firebaseUsage.writes} ($${(firebaseUsage.writes * 0.0000018).toFixed(4)})`);
+        console.log(`   Deletes: ${firebaseUsage.deletes} ($${(firebaseUsage.deletes * 0.0000018).toFixed(4)})`);
+        console.log(`   Storage: ${(firebaseUsage.storage / 1024 / 1024).toFixed(2)} MB ($${(firebaseUsage.storage * 0.000000018).toFixed(4)})`);
+        console.log(`   TOTAL ESTIMATED: $${estimatedCost.toFixed(4)}`);
+
+        return true;
+
+      } catch (error) {
+        console.error('❌ FIREBASE CONNECTION TEST FAILED:', error);
+        return false;
+      }
+    }
+
+    // Debug function to check Firebase collections
+    async function debugFirebaseCollections() {
+      try {
+        console.log('🔍 DEBUGGING FIREBASE COLLECTIONS...');
+        console.log('Firebase DB available:', !!window.firebaseDB);
+
+        if (window.firebaseDB) {
+          // Check food_stalls collection
+          try {
+            const foodStallsSnapshot = await window.firebaseDB.collection('food_stalls').get();
+            console.log('📊 Food Stalls Collection:', {
+              exists: !foodStallsSnapshot.empty,
+              count: foodStallsSnapshot.size,
+              docs: foodStallsSnapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }))
+            });
+          } catch (error) {
+            console.log('❌ Food Stalls Collection Error:', error.message);
+          }
+
+          // Check float_trucks collection
+          try {
+            const floatTrucksSnapshot = await window.firebaseDB.collection('float_trucks').get();
+            console.log('🚛 Float Trucks Collection:', {
+              exists: !floatTrucksSnapshot.empty,
+              count: floatTrucksSnapshot.size,
+              docs: floatTrucksSnapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }))
+            });
+          } catch (error) {
+            console.log('❌ Float Trucks Collection Error:', error.message);
+          }
+
+          // Check artists collection
+          try {
+            const artistsSnapshot = await window.firebaseDB.collection('artists').get();
+            console.log('🎵 Artists Collection:', {
+              exists: !artistsSnapshot.empty,
+              count: artistsSnapshot.size,
+              docs: artistsSnapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }))
+            });
+          } catch (error) {
+            console.log('❌ Artists Collection Error:', error.message);
+          }
+
+          // Check float_routes collection
+          try {
+            const floatRoutesSnapshot = await window.firebaseDB.collection('float_routes').get();
+            console.log('🗺️ Float Routes Collection:', {
+              exists: !floatRoutesSnapshot.empty,
+              count: floatRoutesSnapshot.size,
+              docs: floatRoutesSnapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }))
+            });
+          } catch (error) {
+            console.log('❌ Float Routes Collection Error:', error.message);
+          }
+        }
+
+        console.log('🔍 DEBUG COMPLETE');
+      } catch (error) {
+        console.error('Debug function error:', error);
+      }
     }
 
     function renderStalls() {
