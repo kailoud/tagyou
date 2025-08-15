@@ -6206,7 +6206,7 @@
         <div class="tab active" onclick="switchTab('members')">Group</div>
         <div class="tab" onclick="switchTab('find-stalls')">Find Stalls</div>
         <div class="tab" onclick="switchTab('float')">Floats</div>
-        <div class="tab" onclick="toggleArtistsFromTab()">Artists</div>
+        <div class="tab" onclick="switchTab('artists')">Artists</div>
         <div class="tab" onclick="switchTab('settings')">Settings</div>
 
       </div>
@@ -10920,21 +10920,32 @@
 
         // Special handling for artists tab
         if (tabName === 'artists') {
-          console.log('Artists tab activated, refreshing data...');
-          // Refresh admin data and categories when artists tab is opened
-          loadAdminData().then(() => {
-            console.log('Admin data loaded, now loading artists data...');
-            loadArtistsData();
-            loadArtistsSchedule();
-            updateArtistCategoriesFromAdminData();
+          console.log('Artists tab activated, opening panel and adding markers...');
 
-            // Force a small delay to ensure content is rendered
-            setTimeout(() => {
-              console.log('Artists content should now be visible');
-              const artistsContent = document.getElementById('artists-content');
-              console.log('Artists content element:', artistsContent);
-              console.log('Artists content active class:', artistsContent?.classList.contains('active'));
-            }, 500);
+          // Ensure panel is open
+          const panel = document.getElementById('bottomPanel');
+          if (!panel.classList.contains('expanded')) {
+            panel.classList.add('expanded');
+            document.body.classList.add('panel-expanded');
+          }
+
+          // Activate artists button
+          const artistsBtn = document.querySelector('.artists-btn');
+          if (!artistsBtn.classList.contains('active')) {
+            artistsBtn.classList.add('active');
+          }
+
+          // Add artist markers to map
+          addArtistMarkers();
+
+          // Update search placeholder
+          const searchInput = document.getElementById('searchInput');
+          searchInput.placeholder = 'Find artist or band...';
+          searchInput.value = '';
+
+          // Load admin data for markers
+          loadAdminData().then(() => {
+            console.log('Admin data loaded for artists');
           }).catch(error => {
             console.error('Error loading admin data for artists tab:', error);
           });
@@ -12043,31 +12054,47 @@
       console.log('toggleArtists called');
 
       const artistsBtn = document.querySelector('.artists-btn');
-      const searchInput = document.getElementById('searchInput');
+      const panel = document.getElementById('bottomPanel');
+      const isPanelOpen = panel.classList.contains('expanded');
+
+      console.log('Panel open:', isPanelOpen);
 
       // Toggle artists button state (ON/OFF effect)
       const artistsActive = artistsBtn.classList.toggle('active');
       console.log('Artists active:', artistsActive);
 
+      const searchInput = document.getElementById('searchInput');
+
       if (artistsActive) {
-        console.log('Activating artists markers on map');
+        console.log('Activating artists panel');
 
         // Update search placeholder
         searchInput.placeholder = 'Find artist or band...';
         // Clear search input
         searchInput.value = '';
 
+        // Always ensure panel is open when artists are activated
+        if (!isPanelOpen) {
+          console.log('Opening panel to show artists information');
+          panel.classList.add('expanded');
+          document.body.classList.add('panel-expanded');
+        }
+
+        // Switch to artists tab to show artists information
+        console.log('Calling switchTab with artists');
+        switchTab('artists');
+
         // Add artist markers to map
         addArtistMarkers();
 
-        // Ensure admin data is loaded for markers
+        // Ensure admin data is loaded
         loadAdminData().then(() => {
-          console.log('Admin data loaded for artist markers');
+          console.log('Admin data loaded for artists');
         });
 
-        showNotification('Artists & bands markers displayed on map');
+        showNotification('Artists & bands panel opened');
       } else {
-        console.log('Deactivating artists markers');
+        console.log('Deactivating artists panel');
 
         // Reset search placeholder to default
         searchInput.value = '';
@@ -12076,7 +12103,14 @@
         // Remove artist markers from map
         removeArtistMarkers();
 
-        showNotification('Artists & bands markers hidden from map');
+        // If no other features are active, close the panel
+        const hasActiveFeatures = document.querySelector('.food-stalls-btn').classList.contains('active') ||
+          document.querySelector('.truck-floats-btn').classList.contains('active');
+        if (!hasActiveFeatures && isPanelOpen) {
+          console.log('No active features, closing panel');
+          panel.classList.remove('expanded');
+          document.body.classList.remove('panel-expanded');
+        }
       }
     }
 
@@ -14417,15 +14451,30 @@
       }
     }
 
-    // Function to handle Artists tab click without opening panel
+    // Function to handle Artists tab click - opens panel
     function toggleArtistsFromTab() {
-      console.log('Artists tab clicked - toggling artists markers only');
+      console.log('Artists tab clicked - opening artists panel');
 
-      // Call the main toggleArtists function
-      toggleArtists();
+      // Ensure panel is open
+      const panel = document.getElementById('bottomPanel');
+      if (!panel.classList.contains('expanded')) {
+        panel.classList.add('expanded');
+        document.body.classList.add('panel-expanded');
+      }
 
-      // Don't open the panel - just toggle the markers
-      showNotification('Artists markers toggled on map');
+      // Switch to artists tab
+      switchTab('artists');
+
+      // Activate artists button if not already active
+      const artistsBtn = document.querySelector('.artists-btn');
+      if (!artistsBtn.classList.contains('active')) {
+        artistsBtn.classList.add('active');
+      }
+
+      // Add artist markers to map
+      addArtistMarkers();
+
+      showNotification('Artists & bands panel opened');
     }
 
     // Test function to manually switch to Artists tab
