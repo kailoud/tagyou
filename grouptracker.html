@@ -12099,72 +12099,40 @@
       console.log('toggleArtists called');
 
       const artistsBtn = document.querySelector('.artists-btn');
-      const panel = document.getElementById('bottomPanel');
-      const isPanelOpen = panel.classList.contains('expanded');
-
-      console.log('Panel open:', isPanelOpen);
+      const searchInput = document.getElementById('searchInput');
 
       // Toggle artists button state (ON/OFF effect)
       const artistsActive = artistsBtn.classList.toggle('active');
       console.log('Artists active:', artistsActive);
 
-      const searchInput = document.getElementById('searchInput');
-
       if (artistsActive) {
-        console.log('Activating artists panel');
+        console.log('Activating artists markers on map');
 
         // Update search placeholder
         searchInput.placeholder = 'Find artist or band...';
         // Clear search input
         searchInput.value = '';
 
-        // Always ensure panel is open when artists are activated
-        if (!isPanelOpen) {
-          console.log('Opening panel to show artists information');
-          panel.classList.add('expanded');
-          document.body.classList.add('panel-expanded');
-        }
+        // Add artist markers to map
+        addArtistMarkers();
 
-        // Switch to artists-content tab to show artists information
-        console.log('Calling switchTab with artists');
-        switchTab('artists');
-
-        // Ensure admin data is loaded and categories are updated
+        // Ensure admin data is loaded for markers
         loadAdminData().then(() => {
-          loadArtistsData();
-          loadArtistsSchedule();
-
-          // Force update categories after data is loaded
-          setTimeout(() => {
-            updateArtistCategoriesFromAdminData();
-          }, 300);
+          console.log('Admin data loaded for artist markers');
         });
 
-        // Ensure panel is properly positioned and scrollable
-        setTimeout(() => {
-          const artistsContent = document.getElementById('artists-content');
-          if (artistsContent) {
-            artistsContent.scrollTop = 0; // Reset scroll position
-            console.log('Artists content scroll position reset');
-          }
-        }, 100);
-
-        showNotification('Artists & bands panel opened');
+        showNotification('Artists & bands markers displayed on map');
       } else {
-        console.log('Deactivating artists panel');
+        console.log('Deactivating artists markers');
 
         // Reset search placeholder to default
         searchInput.value = '';
         searchInput.placeholder = 'Find group member by phone...';
 
-        // If no other features are active, close the panel
-        const hasActiveFeatures = document.querySelector('.food-stalls-btn').classList.contains('active') ||
-          document.querySelector('.truck-floats-btn').classList.contains('active');
-        if (!hasActiveFeatures && isPanelOpen) {
-          console.log('No active features, closing panel');
-          panel.classList.remove('expanded');
-          document.body.classList.remove('panel-expanded');
-        }
+        // Remove artist markers from map
+        removeArtistMarkers();
+
+        showNotification('Artists & bands markers hidden from map');
       }
     }
 
