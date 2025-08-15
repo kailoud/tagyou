@@ -5053,7 +5053,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
+      position: absolute !important;
+      transform: translate(-50%, -50%) !important;
+      z-index: 1000 !important;
       animation: artistPulse 2s infinite;
     }
 
@@ -5093,11 +5095,11 @@
 
       0%,
       100% {
-        transform: scale(1);
+        transform: translate(-50%, -50%) scale(1);
       }
 
       50% {
-        transform: scale(1.05);
+        transform: translate(-50%, -50%) scale(1.05);
       }
     }
 
@@ -5127,23 +5129,35 @@
 
     @keyframes artistHighlight {
       0% {
-        transform: scale(1);
+        transform: translate(-50%, -50%) scale(1);
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
       }
 
       50% {
-        transform: scale(1.02);
+        transform: translate(-50%, -50%) scale(1.02);
         box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
       }
 
       100% {
-        transform: scale(1);
+        transform: translate(-50%, -50%) scale(1);
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
       }
     }
 
+    /* Ensure markers don't move with zoom */
+    .leaflet-marker-icon.artist-marker {
+      position: absolute !important;
+      transform: translate(-50%, -50%) !important;
+      z-index: 1000 !important;
+    }
+
+    /* Force marker positioning */
+    .leaflet-marker-icon {
+      position: absolute !important;
+    }
+
     .artist-marker:hover {
-      transform: scale(1.2);
+      transform: translate(-50%, -50%) scale(1.2);
       background: #7c3aed;
     }
 
@@ -11132,13 +11146,32 @@
               return icons[type] || '🎵';
             };
 
+            // Create a more stable marker with fixed positioning
             const marker = L.marker([artist.lat, artist.lng], {
               icon: L.divIcon({
                 className: 'artist-marker',
-                html: getArtistIcon(artist.type),
+                html: `<div style="
+                  width: 36px; 
+                  height: 36px; 
+                  background: linear-gradient(135deg, #f97316, #ea580c);
+                  border: 3px solid #8b5cf6;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 18px;
+                  color: white;
+                  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+                  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+                  position: absolute;
+                  transform: translate(-50%, -50%);
+                  z-index: 1000;
+                ">${getArtistIcon(artist.type)}</div>`,
                 iconSize: [36, 36],
-                iconAnchor: [18, 18]
-              })
+                iconAnchor: [18, 18], // Center of the icon
+                popupAnchor: [0, -18] // Popup appears above the icon
+              }),
+              zIndexOffset: 1000 // Ensure markers stay on top
             }).addTo(map);
 
             // Create rich popup content
