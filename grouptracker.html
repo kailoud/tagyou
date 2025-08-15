@@ -7418,6 +7418,9 @@
                 loadArtistsData();
                 loadArtistsSchedule();
               }
+
+              // Update categories
+              updateArtistCategoriesFromAdminData();
             }
           }, 300);
         }
@@ -8207,6 +8210,9 @@
               loadArtistsData();
               loadArtistsSchedule();
             }
+
+            // Update categories in the panel
+            updateArtistCategoriesFromAdminData();
           }
 
           // Close form
@@ -11064,6 +11070,69 @@
 
         console.log('Artists data loaded successfully');
         console.log('=== loadArtistsData completed ===');
+
+        // Update artist categories based on loaded data
+        updateArtistCategories(artists);
+      }
+
+      function updateArtistCategories(artists) {
+        console.log('=== updateArtistCategories called ===');
+
+        const categoryTagsContainer = document.querySelector('.artists-category-tags');
+        if (!categoryTagsContainer) {
+          console.warn('Category tags container not found');
+          return;
+        }
+
+        // Get unique artist types from the data with counts
+        const typeCounts = {};
+        artists.forEach(artist => {
+          if (artist.type) {
+            typeCounts[artist.type] = (typeCounts[artist.type] || 0) + 1;
+          }
+        });
+
+        const uniqueTypes = Object.keys(typeCounts);
+
+        // Create category tags dynamically with counts
+        let categoryTagsHTML = `<span class="artists-category-tag active" onclick="filterArtists('all')">All (${artists.length})</span>`;
+
+        uniqueTypes.forEach(type => {
+          const displayName = getCategoryDisplayName(type);
+          const count = typeCounts[type];
+          categoryTagsHTML += `<span class="artists-category-tag" onclick="filterArtists('${type}')">${displayName} (${count})</span>`;
+        });
+
+        // Update the container
+        categoryTagsContainer.innerHTML = categoryTagsHTML;
+
+        console.log('Updated artist categories:', uniqueTypes);
+      }
+
+      function getCategoryDisplayName(type) {
+        const displayNames = {
+          'Live Band': 'Live Bands',
+          'DJ': 'DJs',
+          'Solo Artist': 'Solo Artists',
+          'Dance Group': 'Dance Groups',
+          'Street Performer': 'Street Performers',
+          'Sound System': 'Sound Systems',
+          'Other': 'Other'
+        };
+
+        return displayNames[type] || type;
+      }
+
+      function updateArtistCategoriesFromAdminData() {
+        console.log('=== updateArtistCategoriesFromAdminData called ===');
+
+        if (!window.adminData || !window.adminData.artists) {
+          console.warn('Admin data not available');
+          return;
+        }
+
+        const artists = window.adminData.artists.filter(artist => artist.status === 'confirmed');
+        updateArtistCategories(artists);
       }
 
       function loadArtistsSchedule() {
@@ -11127,24 +11196,44 @@
       }
 
       function filterArtists(category) {
+        console.log('=== filterArtists called with category:', category);
+
         const categoryTags = document.querySelectorAll('.artists-category-tag');
         const artistCards = document.querySelectorAll('.artist-card');
 
+        // Update active category tag
         categoryTags.forEach(tag => tag.classList.remove('active'));
         event.target.classList.add('active');
 
+        // Filter artist cards
         artistCards.forEach(card => {
-          const artistType = card.querySelector('.artist-detail').textContent.split(' ')[1];
+          const artistTypeElement = card.querySelector('.artist-detail');
+          if (!artistTypeElement) {
+            console.warn('Artist type element not found in card');
+            return;
+          }
+
+          // Extract type from "🎵 Live Band" format
+          const artistType = artistTypeElement.textContent.replace('🎵 ', '').trim();
+          console.log('Card artist type:', artistType, 'Filter category:', category);
+
           if (category === 'all' || artistType === category) {
             card.style.display = 'block';
           } else {
             card.style.display = 'none';
           }
         });
+
+        console.log('=== filterArtists completed ===');
       }
 
       function showArtistsPanel() {
         switchTab('artists');
+
+        // Refresh categories when artists panel is opened
+        setTimeout(() => {
+          updateArtistCategoriesFromAdminData();
+        }, 100);
       }
 
 
