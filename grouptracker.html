@@ -8176,6 +8176,8 @@
                 <h2>🔧 Admin Portal</h2>
                 <div class="header-actions">
                   <button onclick="testFirebaseConnection()" class="test-btn" title="Test Firebase Connection">🧪</button>
+                  <button onclick="forceProcessBatchOperations()" class="test-btn" title="Process Pending Operations">🔄</button>
+                  <button onclick="cleanupOrphanedDocuments()" class="test-btn" title="Cleanup Orphaned Documents">🧹</button>
                   <button onclick="toggleAdminPortalSize()" class="expand-btn" title="Expand/Minimize">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
@@ -8896,19 +8898,22 @@
           throw new Error('Firebase database not initialized');
         }
 
-        // OPTIMIZATION: Add to batch for better performance
-        pendingBatchOperations.push({
-          type: 'delete',
-          collection: collectionName,
-          id: id
-        });
+        console.log(`Deleting document ${id} from collection ${collectionName}`);
+
+        // Check if document exists before deleting
+        const docRef = db.collection(collectionName).doc(id);
+        const doc = await docRef.get();
+
+        if (!doc.exists) {
+          console.warn(`Document with ID ${id} does not exist in collection ${collectionName}. Nothing to delete.`);
+          return true;
+        }
+
+        // Delete immediately for single operations
+        await docRef.delete();
 
         logFirebaseUsage('deletes', 1);
-
-        // Process batch if it's getting large
-        if (pendingBatchOperations.length >= 10) {
-          processBatchOperations();
-        }
+        console.log(`Successfully deleted document ${id} from ${collectionName}`);
 
         return true;
       } catch (error) {
@@ -14299,6 +14304,99 @@
 
       if (firebaseUsage.reads % 100 === 0 || firebaseUsage.writes % 100 === 0) {
         console.log(`💰 Estimated Firebase Cost: $${estimatedCost.toFixed(4)}`);
+      }
+    }
+
+    // Force process any pending batch operations
+    async function forceProcessBatchOperations() {
+      if (pendingBatchOperations.length > 0) {
+        console.log(`🔄 Processing ${pendingBatchOperations.length} pending batch operations...`);
+        await processBatchOperations();
+        console.log('✅ Batch operations processed');
+      } else {
+        console.log('ℹ️ No pending batch operations');
+      }
+    }
+
+    // Clean up orphaned documents (documents in Firebase but not in Admin Portal)
+    async function cleanupOrphanedDocuments() {
+      try {
+        console.log('🧹 Starting cleanup of orphaned documents...');
+
+        const db = window.firebaseDB;
+        if (!db) {
+          throw new Error('Firebase database not initialized');
+        }
+
+        // Get all documents from Firebase
+        const foodStallsSnapshot = await db.collection('food_stalls').get();
+        const floatTrucksSnapshot = await db.collection('float_trucks').get();
+        const artistsSnapshot = await db.collection('artists').get();
+
+        console.log(`📊 Found in Firebase:`);
+        console.log(`   Food Stalls: ${foodStallsSnapshot.size}`);
+        console.log(`   Float Trucks: ${floatTrucksSnapshot.size}`);
+        console.log(`   Artists: ${artistsSnapshot.size}`);
+
+        console.log(`📊 Found in Admin Portal:`);
+        console.log(`   Food Stalls: ${adminData['food-stalls'].length}`);
+        console.log(`   Float Trucks: ${adminData['float-trucks'].length}`);
+        console.log(`   Artists: ${adminData['artists'].length}`);
+
+        // Check for orphaned food stalls
+        const adminFoodStallIds = new Set(adminData['food-stalls'].map(item => item.id));
+        const orphanedFoodStalls = foodStallsSnapshot.docs.filter(doc => !adminFoodStallIds.has(doc.id));
+
+        if (orphanedFoodStalls.length > 0) {
+          console.log(`🗑️ Found ${orphanedFoodStalls.length} orphaned food stalls:`, orphanedFoodStalls.map(doc => doc.id));
+
+          if (confirm(`Found ${orphanedFoodStalls.length} orphaned food stalls. Delete them?`)) {
+            for (const doc of orphanedFoodStalls) {
+              await doc.ref.delete();
+              console.log(`✅ Deleted orphaned food stall: ${doc.id}`);
+            }
+          }
+        }
+
+        // Check for orphaned float trucks
+        const adminFloatTruckIds = new Set(adminData['float-trucks'].map(item => item.id));
+        const orphanedFloatTrucks = floatTrucksSnapshot.docs.filter(doc => !adminFloatTruckIds.has(doc.id));
+
+        if (orphanedFloatTrucks.length > 0) {
+          console.log(`🗑️ Found ${orphanedFloatTrucks.length} orphaned float trucks:`, orphanedFloatTrucks.map(doc => doc.id));
+
+          if (confirm(`Found ${orphanedFloatTrucks.length} orphaned float trucks. Delete them?`)) {
+            for (const doc of orphanedFloatTrucks) {
+              await doc.ref.delete();
+              console.log(`✅ Deleted orphaned float truck: ${doc.id}`);
+            }
+          }
+        }
+
+        // Check for orphaned artists
+        const adminArtistIds = new Set(adminData['artists'].map(item => item.id));
+        const orphanedArtists = artistsSnapshot.docs.filter(doc => !adminArtistIds.has(doc.id));
+
+        if (orphanedArtists.length > 0) {
+          console.log(`🗑️ Found ${orphanedArtists.length} orphaned artists:`, orphanedArtists.map(doc => doc.id));
+
+          if (confirm(`Found ${orphanedArtists.length} orphaned artists. Delete them?`)) {
+            for (const doc of orphanedArtists) {
+              await doc.ref.delete();
+              console.log(`✅ Deleted orphaned artist: ${doc.id}`);
+            }
+          }
+        }
+
+        console.log('✅ Cleanup completed');
+        showNotification('Cleanup completed!', 'success');
+
+        // Reload admin data to reflect changes
+        await loadAdminData();
+
+      } catch (error) {
+        console.error('Error during cleanup:', error);
+        showNotification('Error during cleanup: ' + error.message, 'error');
       }
     }
 
