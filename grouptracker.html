@@ -8201,6 +8201,13 @@
             document.getElementById('adminTableBody').innerHTML = renderAdminTableData();
           }
 
+          // Update map markers for artists if artists button is active
+          if (artistsBtn && artistsBtn.classList.contains('active')) {
+            console.log('Artists button is active, updating map markers...');
+            removeArtistMarkers();
+            addArtistMarkers();
+          }
+
           console.log('Admin data loaded successfully');
           return adminData; // Return the loaded data
         } catch (error) {
@@ -11176,6 +11183,9 @@
           const confirmedArtists = window.adminData.artists.filter(artist => artist.status === 'confirmed');
           const artistsToShow = confirmedArtists.length > 0 ? confirmedArtists : window.adminData.artists;
 
+          console.log('Artists to show:', artistsToShow);
+          console.log('Artists with coordinates:', artistsToShow.filter(artist => artist.coordinates));
+
           artists = artistsToShow.filter(artist => artist.coordinates).map(artist => {
             console.log('Processing artist:', artist.name, 'with coordinates:', artist.coordinates);
 
@@ -12382,6 +12392,32 @@
 
       // Coordinates functionality removed - manual entry only
 
+      // Debug function to check artist data and markers
+      function debugArtistMarkers() {
+        console.log('=== Debug Artist Markers ===');
+        console.log('Admin data available:', !!window.adminData);
+        console.log('Artists in admin data:', window.adminData?.artists?.length || 0);
+
+        if (window.adminData?.artists) {
+          window.adminData.artists.forEach((artist, index) => {
+            console.log(`Artist ${index + 1}:`, {
+              name: artist.name,
+              status: artist.status,
+              coordinates: artist.coordinates,
+              hasCoordinates: !!artist.coordinates
+            });
+          });
+        }
+
+        console.log('Artists button active:', document.querySelector('.artists-btn')?.classList.contains('active'));
+        console.log('Current map markers:', map._layers);
+
+        // Try to add markers manually
+        console.log('Attempting to add markers manually...');
+        removeArtistMarkers();
+        addArtistMarkers();
+      }
+
       // Carousel Image Management Functions
       let carouselImages = [];
       let selectedImageIndex = 0;
@@ -12835,12 +12871,13 @@
           console.log('Admin data reloaded, updating artists...');
           console.log('All artists in admin data:', window.adminData.artists);
 
-          // Debug: Check each artist's status
+          // Debug: Check each artist's status and coordinates
           window.adminData.artists.forEach((artist, index) => {
             console.log(`Artist ${index + 1}:`, {
               name: artist.name,
               type: artist.type,
               status: artist.status,
+              coordinates: artist.coordinates,
               id: artist.id
             });
           });
@@ -12848,6 +12885,14 @@
           loadArtistsData();
           loadArtistsSchedule();
           updateArtistCategoriesFromAdminData();
+
+          // Force update map markers
+          if (artistsBtn && artistsBtn.classList.contains('active')) {
+            console.log('Artists button is active, refreshing map markers...');
+            removeArtistMarkers();
+            addArtistMarkers();
+          }
+
           showNotification('Artists data refreshed!', 'success');
         }).catch(error => {
           console.error('Error refreshing artists data:', error);
