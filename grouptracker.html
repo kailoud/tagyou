@@ -7868,13 +7868,23 @@
       }
 
       function editAdminItem(id) {
+        console.log('editAdminItem called with id:', id, 'activeAdminTab:', activeAdminTab);
+        console.log('adminData:', adminData);
+
         const item = adminData[activeAdminTab].find(item => item.id === id);
+        console.log('Found item:', item);
+
         if (item) {
           showAdminForm(item, true);
+        } else {
+          console.error('Item not found for editing');
+          showNotification('Item not found for editing', 'error');
         }
       }
 
       async function deleteAdminItem(id) {
+        console.log('deleteAdminItem called with id:', id, 'activeAdminTab:', activeAdminTab);
+
         if (confirm('Are you sure you want to delete this item?')) {
           try {
             // Map table names
@@ -7891,13 +7901,30 @@
               throw new Error(`Unknown collection for tab: ${activeAdminTab}`);
             }
 
-            const tableName = tableMap[activeAdminTab];
-
             // Delete from Firebase
-            await deleteFromFirebase(tableName, id);
+            await deleteFromFirebase(collectionName, id);
 
             // Reload data from database
             await loadAdminData();
+
+            // Refresh map markers if artists were deleted
+            if (activeAdminTab === 'artists') {
+              // Remove existing artist markers
+              removeArtistMarkers();
+
+              // Add updated artist markers if artists button is active
+              const artistsBtn = document.querySelector('.artists-btn');
+              if (artistsBtn && artistsBtn.classList.contains('active')) {
+                addArtistMarkers();
+              }
+
+              // Refresh artists panel if it's open
+              const artistsContent = document.getElementById('artists-content');
+              if (artistsContent && artistsContent.classList.contains('active')) {
+                loadArtistsData();
+                loadArtistsSchedule();
+              }
+            }
 
             showNotification('Item deleted successfully!', 'success');
           } catch (error) {
@@ -8028,9 +8055,15 @@
       }
 
       function renderAdminFormField(field, value) {
-        const fieldValue = field.key === 'coordinates' && value && typeof value === 'object'
-          ? `${value.lat}, ${value.lng}`
-          : value || '';
+        let fieldValue = value || '';
+
+        if (field.key === 'coordinates') {
+          if (value && typeof value === 'object') {
+            fieldValue = `${value.lat}, ${value.lng}`;
+          } else if (typeof value === 'string') {
+            fieldValue = value;
+          }
+        }
 
         const fieldClass = field.type === 'textarea' ? 'form-field full-width' : 'form-field';
 
@@ -8099,8 +8132,8 @@
         for (let [key, value] of formData.entries()) {
           if (key === 'coordinates') {
             const [lat, lng] = value.split(',').map(v => parseFloat(v.trim()));
-            itemData[key] = { lat: lat || 0, lng: lng || 0 };
-          } else if (key === 'memberCount' || key === 'rating') {
+            itemData[key] = `${lat || 0}, ${lng || 0}`; // Store as string for consistency
+          } else if (key === 'memberCount' || key === 'rating' || key === 'duration') {
             itemData[key] = parseFloat(value) || 0;
           } else if (key === 'image' && value instanceof File) {
             // Handle file upload - convert to data URL
