@@ -8651,7 +8651,7 @@
           `).join('');
       }
 
-      function editAdminItem(id) {
+      async function editAdminItem(id) {
         console.log('editAdminItem called with id:', id, 'activeAdminTab:', activeAdminTab);
         console.log('adminData:', adminData);
 
@@ -8660,6 +8660,36 @@
         console.log('Found item:', item);
 
         if (item) {
+          // Validate that the item exists in Firebase before editing
+          try {
+            const tableMap = {
+              'food-stalls': 'food_stalls',
+              'float-trucks': 'float_trucks',
+              'groups': 'groups',
+              'friends': 'friends',
+              'artists': 'artists'
+            };
+
+            const collectionName = tableMap[activeAdminTab];
+            if (collectionName) {
+              const db = window.firebaseDB;
+              if (db) {
+                const docRef = db.collection(collectionName).doc(String(id));
+                const doc = await docRef.get();
+
+                if (!doc.exists) {
+                  console.warn(`Document ${id} does not exist in Firebase, but exists in local data. This might be mock data.`);
+                  showNotification('This item appears to be demo data. Creating a new item instead.', 'warning');
+                  showAdminForm(null, false); // Show add form instead
+                  return;
+                }
+              }
+            }
+          } catch (error) {
+            console.warn('Error validating document existence:', error);
+            // Continue with edit anyway
+          }
+
           showAdminForm(item, true);
         } else {
           console.error('Item not found for editing');
@@ -12407,6 +12437,26 @@
 
       // Coordinates functionality removed - manual entry only
 
+      function locateFormCoordinates() {
+        const coordInput = document.querySelector('input[name="coordinates"]');
+        if (!coordInput || !coordInput.value.trim()) {
+          showNotification('No coordinates in form to locate', 'error');
+          return;
+        }
+
+        const coords = coordInput.value.trim();
+        const [lat, lng] = coords.split(',').map(coord => parseFloat(coord.trim()));
+
+        if (isNaN(lat) || isNaN(lng)) {
+          showNotification('Invalid coordinates in form', 'error');
+          return;
+        }
+
+        // Center map on coordinates
+        map.setView([lat, lng], 16);
+        showNotification(`Map centered on coordinates: ${coords}`, 'success');
+      }
+
       // Debug function to check artist data and markers
       function debugArtistMarkers() {
         console.log('=== Debug Artist Markers ===');
@@ -12472,6 +12522,64 @@
           }
         } catch (error) {
           console.error('Error fixing artist data:', error);
+        }
+      }
+
+      // Function to convert mock data to real Firebase documents
+      async function convertMockDataToFirebase() {
+        console.log('=== Convert Mock Data to Firebase ===');
+
+        try {
+          // Reload admin data to get current state
+          await loadAdminData();
+
+          if (window.adminData?.artists) {
+            console.log('Converting mock artists to Firebase documents...');
+
+            for (const artist of window.adminData.artists) {
+              // Check if this is mock data (has numeric ID like 1, 2, 3)
+              if (typeof artist.id === 'number' || (typeof artist.id === 'string' && /^\d+$/.test(artist.id))) {
+                console.log(`Converting mock artist: ${artist.name} (ID: ${artist.id})`);
+
+                // Create new document in Firebase
+                const newArtistData = {
+                  name: artist.name,
+                  type: artist.type || 'Live Band',
+                  genre: artist.genre || 'Reggae',
+                  stage_name: artist.stage_name || 'Main Stage',
+                  coordinates: artist.coordinates || '51.522592, -0.202544',
+                  performance_time: artist.performance_time || '14:00 - 16:00',
+                  duration: artist.duration || 120,
+                  contact_person: artist.contact_person || 'Contact Person',
+                  phone: artist.phone || '+44 7700 900000',
+                  email: artist.email || 'artist@example.com',
+                  social_media: artist.social_media || '',
+                  description: artist.description || 'Artist description',
+                  status: 'confirmed',
+                  created_at: new Date().toISOString()
+                };
+
+                // Save to Firebase
+                await saveToFirebase('artists', newArtistData);
+                console.log(`Created new Firebase document for: ${artist.name}`);
+              }
+            }
+
+            // Reload data after conversion
+            await loadAdminData();
+            console.log('Mock data conversion completed');
+
+            // Update map markers
+            if (document.querySelector('.artists-btn')?.classList.contains('active')) {
+              removeArtistMarkers();
+              addArtistMarkers();
+            }
+
+            showNotification('Mock data converted to Firebase documents!', 'success');
+          }
+        } catch (error) {
+          console.error('Error converting mock data:', error);
+          showNotification('Error converting mock data: ' + error.message, 'error');
         }
       }
 
