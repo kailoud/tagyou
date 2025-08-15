@@ -5689,11 +5689,11 @@
       <form id="loginForm" class="auth-form">
         <div class="form-group">
           <label for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" required>
+          <input type="email" id="loginEmail" value="demo@tagyou.com" required>
         </div>
         <div class="form-group">
           <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" required>
+          <input type="password" id="loginPassword" value="demo123" required>
         </div>
         <button type="submit" class="auth-btn">Sign In</button>
         <div class="auth-links">
@@ -6508,7 +6508,10 @@
     async function checkAuthStatus() {
       try {
         console.log('Checking auth status...'); // Debug log
+        console.log('Firebase Auth available:', !!window.firebaseAuth);
+
         const user = window.firebaseAuth.currentUser;
+        console.log('Current user:', user);
 
         console.log('Auth check result:', { user: !!user }); // Debug log
 
@@ -6520,6 +6523,7 @@
             name: user.displayName || user.email.split('@')[0]
           };
           isAuthenticated = true;
+          console.log('User authenticated successfully:', currentUser);
 
           // Check admin status from database (optional)
           try {
@@ -6592,6 +6596,8 @@
       const password = document.getElementById('loginPassword').value;
       const button = event.target.querySelector('button[type="submit"]');
 
+      console.log('Login attempt:', { email, password: password ? '***' : 'empty' });
+
       // Validate inputs
       if (!email || !password) {
         showAuthMessage('Please fill in all fields');
@@ -6607,7 +6613,11 @@
       clearAuthMessages();
 
       try {
+        console.log('Attempting Firebase sign in...');
+        console.log('Firebase Auth available:', !!window.firebaseAuth);
+
         const userCredential = await window.firebaseAuth.signInWithEmailAndPassword(email, password);
+        console.log('Login successful:', userCredential);
 
         showAuthMessage('Login successful! Redirecting...', 'success');
         setTimeout(() => {
@@ -6616,6 +6626,8 @@
 
       } catch (error) {
         console.error('Login error:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
         showAuthMessage(error.message);
       } finally {
         hideLoading(button, 'Sign In');
@@ -9309,6 +9321,11 @@
 
       // Initialize Firebase services first
       try {
+        console.log('Checking Firebase services availability...');
+        console.log('window.firebaseAuth:', !!window.firebaseAuth);
+        console.log('window.firebaseDB:', !!window.firebaseDB);
+        console.log('window.firebaseStorage:', !!window.firebaseStorage);
+
         auth = window.firebaseAuth;
         db = window.firebaseDB;
         storage = window.firebaseStorage;
@@ -9348,7 +9365,51 @@
       // Add real-time password validation
       document.getElementById('registerPassword').addEventListener('input', checkPasswordStrength);
       document.getElementById('confirmPassword').addEventListener('input', checkPasswordMatch);
+
+      // Create test account if it doesn't exist
+      createTestAccount();
     });
+
+    // Create test account for demo purposes
+    async function createTestAccount() {
+      try {
+        console.log('Creating test account...');
+        const testEmail = 'demo@tagyou.com';
+        const testPassword = 'demo123';
+
+        // Try to sign in with test credentials
+        try {
+          const userCredential = await window.firebaseAuth.signInWithEmailAndPassword(testEmail, testPassword);
+          console.log('Test account already exists and login successful');
+          // Sign out immediately to not interfere with normal flow
+          await window.firebaseAuth.signOut();
+        } catch (error) {
+          if (error.code === 'auth/user-not-found') {
+            console.log('Test account not found, creating...');
+            // Create the test account
+            const userCredential = await window.firebaseAuth.createUserWithEmailAndPassword(testEmail, testPassword);
+
+            // Create user profile
+            await window.firebaseDB.collection('user_profiles').doc(userCredential.user.uid).set({
+              id: userCredential.user.uid,
+              email: testEmail,
+              full_name: 'Demo User',
+              role: 'admin',
+              is_admin: true,
+              created_at: new Date().toISOString()
+            });
+
+            console.log('Test account created successfully');
+            // Sign out immediately
+            await window.firebaseAuth.signOut();
+          } else {
+            console.log('Test account exists but login failed:', error.message);
+          }
+        }
+      } catch (error) {
+        console.error('Error creating test account:', error);
+      }
+    }
 
     // Map validation helper
     function validateMapAndCoordinates(coordinates, context = '') {
@@ -13030,167 +13091,6 @@
       renderStalls();
       console.log('=== loadStallsData completed ===');
     }
-    name: "Trini Taste Paradise",
-      origin: "Trinidad",
-        description: "Fresh doubles, roti, and curry dishes made with love and tradition",
-          image: "🥙",
-            rating: 4.8,
-              priceRange: "£",
-                categories: ["Caribbean", "Trinidad", "Doubles", "Roti"],
-                  location: { lat: 51.5190, lng: -0.2040 },
-    menu: ["Doubles", "Roti", "Curry Chicken", "Dhal Puri", "Pholourie"],
-      hours: "10:00 AM - 10:00 PM",
-        contact: "+44 20 7123 4568"
-          },
-    {
-      id: 3,
-        name: "Guyana Gold",
-          origin: "Guyana",
-            description: "Traditional pepperpot, metemgee, and cassava bread. Rich flavors!",
-              image: "🍲",
-                rating: 4.7,
-                  priceRange: "££",
-                    categories: ["Caribbean", "Guyana", "Pepperpot", "Traditional"],
-                      location: { lat: 51.5170, lng: -0.2060 },
-      menu: ["Pepperpot", "Metemgee", "Cassava Bread", "Cook-up Rice", "Black Cake"],
-        hours: "11:30 AM - 10:30 PM",
-          contact: "+44 20 7123 4569"
-    },
-    {
-      id: 4,
-        name: "Barbados Beach Bites",
-          origin: "Barbados",
-            description: "Flying fish sandwiches, cou-cou, and Bajan fish cakes",
-              image: "🐟",
-                rating: 4.6,
-                  priceRange: "££",
-                    categories: ["Caribbean", "Barbados", "Seafood", "Flying Fish"],
-                      location: { lat: 51.5160, lng: -0.2070 },
-      menu: ["Flying Fish", "Cou-cou", "Fish Cakes", "Bajan Macaroni", "Sweet Bread"],
-        hours: "12:00 PM - 11:00 PM",
-          contact: "+44 20 7123 4570"
-    },
-    {
-      id: 5,
-        name: "Grenada Spice Island",
-          origin: "Grenada",
-            description: "Nutmeg-infused dishes, oil down, and callaloo soup",
-              image: "🌶️",
-                rating: 4.5,
-                  priceRange: "££",
-                    categories: ["Caribbean", "Grenada", "Spices", "Nutmeg"],
-                      location: { lat: 51.5150, lng: -0.2080 },
-      menu: ["Oil Down", "Callaloo", "Nutmeg Ice Cream", "Lambi", "Bake & Shark"],
-        hours: "11:00 AM - 10:00 PM",
-          contact: "+44 20 7123 4571"
-    },
-    {
-      id: 6,
-        name: "St. Lucia Creole Kitchen",
-          origin: "St. Lucia",
-            description: "Green fig and saltfish, bouyon, and accra fritters",
-              image: "🍌",
-                rating: 4.4,
-                  priceRange: "£",
-                    categories: ["Caribbean", "St. Lucia", "Creole", "Saltfish"],
-                      location: { lat: 51.5140, lng: -0.2090 },
-      menu: ["Green Fig & Saltfish", "Bouyon", "Accra", "Breadfruit", "Cocoa Tea"],
-        hours: "10:30 AM - 9:30 PM",
-          contact: "+44 20 7123 4572"
-    },
-    {
-      id: 7,
-        name: "Dominica Nature's Bounty",
-          origin: "Dominica",
-            description: "Mountain chicken, crab backs, and fresh fruit juices",
-              image: "🦀",
-                rating: 4.3,
-                  priceRange: "£££",
-                    categories: ["Caribbean", "Dominica", "Wildlife", "Seafood"],
-                      location: { lat: 51.5130, lng: -0.2100 },
-      menu: ["Mountain Chicken", "Crab Backs", "Fresh Juices", "Sancoche", "Bouyon"],
-        hours: "11:00 AM - 10:00 PM",
-          contact: "+44 20 7123 4573"
-    },
-    {
-      id: 8,
-        name: "Antigua & Barbuda Seafood",
-          origin: "Antigua",
-            description: "Conch fritters, ducana, and fresh seafood platters",
-              image: "🦪",
-                rating: 4.6,
-                  priceRange: "£££",
-                    categories: ["Caribbean", "Antigua", "Seafood", "Conch"],
-                      location: { lat: 51.5120, lng: -0.2110 },
-      menu: ["Conch Fritters", "Ducana", "Seafood Platter", "Fungee", "Pepperpot"],
-        hours: "12:00 PM - 11:00 PM",
-          contact: "+44 20 7123 4574"
-    },
-    {
-      id: 9,
-        name: "St. Kitts & Nevis Heritage",
-          origin: "St. Kitts",
-            description: "Goat water stew, conkie, and sugar cake",
-              image: "🍖",
-                rating: 4.4,
-                  priceRange: "££",
-                    categories: ["Caribbean", "St. Kitts", "Heritage", "Goat Water"],
-                      location: { lat: 51.5110, lng: -0.2120 },
-      menu: ["Goat Water", "Conkie", "Sugar Cake", "Saltfish", "Breadfruit"],
-        hours: "11:00 AM - 10:00 PM",
-          contact: "+44 20 7123 4575"
-    },
-    {
-      id: 10,
-        name: "St. Vincent Spice Garden",
-          origin: "St. Vincent",
-            description: "Roasted breadfruit, callaloo, and arrowroot biscuits",
-              image: "🌿",
-                rating: 4.2,
-                  priceRange: "£",
-                    categories: ["Caribbean", "St. Vincent", "Spices", "Breadfruit"],
-                      location: { lat: 51.5100, lng: -0.2130 },
-      menu: ["Roasted Breadfruit", "Callaloo", "Arrowroot Biscuits", "Dumplings", "Fish Broth"],
-        hours: "10:00 AM - 9:00 PM",
-          contact: "+44 20 7123 4576"
-    },
-    {
-      id: 11,
-        name: "Haitian Creole Delights",
-          origin: "Haiti",
-            description: "Griot, rice and beans, and pikliz. Spicy and flavorful!",
-              image: "🍚",
-                rating: 4.7,
-                  priceRange: "££",
-                    categories: ["Caribbean", "Haiti", "Creole", "Griot"],
-                      location: { lat: 51.5090, lng: -0.2140 },
-      menu: ["Griot", "Rice & Beans", "Pikliz", "Tasso", "Diri ak Pwa"],
-        hours: "11:00 AM - 10:00 PM",
-          contact: "+44 20 7123 4577"
-    },
-    {
-      id: 12,
-        name: "Cuban Havana Nights",
-          origin: "Cuba",
-            description: "Ropa vieja, black beans, and Cuban sandwiches",
-              image: "🥪",
-                rating: 4.5,
-                  priceRange: "££",
-                    categories: ["Caribbean", "Cuba", "Havana", "Ropa Vieja"],
-                      location: { lat: 51.5080, lng: -0.2150 },
-      menu: ["Ropa Vieja", "Black Beans", "Cuban Sandwich", "Tostones", "Café Cubano"],
-        hours: "12:00 PM - 10:00 PM",
-          contact: "+44 20 7123 4578"
-    }
-        ];
-
-    filteredStalls = [...stallsData];
-    console.log('Stalls data loaded, calling renderStalls...');
-    console.log('Stalls data:', stallsData);
-    console.log('Filtered stalls:', filteredStalls);
-    renderStalls();
-    console.log('=== loadStallsData completed ===');
-      }
 
     function renderStalls() {
       console.log('=== renderStalls called ===');
