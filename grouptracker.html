@@ -7524,16 +7524,23 @@
 
       async function saveToFirebase(collectionName, data) {
         try {
+          if (!collectionName || collectionName.trim() === '') {
+            throw new Error('Collection name is required');
+          }
+
           const db = window.firebaseDB;
           if (!db) {
             throw new Error('Firebase database not initialized');
           }
+
+          console.log(`Saving to collection: ${collectionName}`, data);
 
           const docRef = await db.collection(collectionName).add({
             ...data,
             created_at: new Date().toISOString()
           });
 
+          console.log(`Successfully saved to ${collectionName} with ID: ${docRef.id}`);
           return { id: docRef.id, ...data };
         } catch (error) {
           console.error(`Error saving to ${collectionName}:`, error);
@@ -7857,6 +7864,11 @@
               'artists': 'artists'
             };
 
+            const collectionName = tableMap[activeAdminTab];
+            if (!collectionName) {
+              throw new Error(`Unknown collection for tab: ${activeAdminTab}`);
+            }
+
             const tableName = tableMap[activeAdminTab];
 
             // Delete from Firebase
@@ -8089,15 +8101,23 @@
 
       async function completeSave(itemData, id, isEditing) {
         try {
+          console.log('completeSave called with:', { itemData, id, isEditing, activeAdminTab });
+
           // Map table names
           const tableMap = {
             'food-stalls': 'food_stalls',
             'float-trucks': 'float_trucks',
             'groups': 'groups',
-            'friends': 'friends'
+            'friends': 'friends',
+            'artists': 'artists'
           };
 
           const tableName = tableMap[activeAdminTab];
+          console.log('Table name resolved:', tableName);
+
+          if (!tableName) {
+            throw new Error(`Unknown table for tab: ${activeAdminTab}`);
+          }
 
           if (isEditing) {
             // Update existing item in Supabase
