@@ -6074,7 +6074,8 @@
         </svg>
       </button>
 
-      <button class="control-btn artists-btn" onclick="toggleArtists()" title="Artists & Bands">
+      <button class="control-btn artists-btn" onclick="console.log('Artists button clicked'); toggleArtists();"
+        title="Artists & Bands">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
         </svg>
@@ -11844,13 +11845,24 @@
         document.querySelector('.food-stalls-btn').classList.remove('active');
         document.querySelector('.truck-floats-btn').classList.remove('active');
 
-        // If panel is closed, open it to show the artists information
+        // Always ensure panel is open when artists are activated
         if (!isPanelOpen) {
           console.log('Opening panel to show artists information');
           panel.classList.add('expanded');
           document.body.classList.add('panel-expanded');
+
+          // Force the panel to be visible with a small delay
+          setTimeout(() => {
+            if (!panel.classList.contains('expanded')) {
+              console.log('Panel not expanded, forcing it open');
+              panel.classList.add('expanded');
+              document.body.classList.add('panel-expanded');
+            }
+          }, 100);
         }
+
         // Switch to artists-content tab to show artists information
+        console.log('Calling switchTab with artists');
         switchTab('artists');
 
         // Ensure admin data is loaded and categories are updated
