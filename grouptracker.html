@@ -2437,6 +2437,14 @@
       background: #7b1fa2;
     }
 
+    .artists-btn {
+      background: #8b5cf6;
+    }
+
+    .artists-btn:hover {
+      background: #7c3aed;
+    }
+
 
 
     /* Active state styles */
@@ -2453,6 +2461,11 @@
     .truck-floats-btn.active {
       background: #7b1fa2;
       box-shadow: 0 4px 16px rgba(156, 39, 176, 0.4);
+    }
+
+    .artists-btn.active {
+      background: #7c3aed;
+      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
     }
 
 
@@ -3461,6 +3474,284 @@
       background: #ff6b35;
       color: white;
       border-color: #ff6b35;
+    }
+
+    /* Artists Panel Styles */
+    .artists-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .artists-title h3 {
+      margin: 0 0 4px 0;
+      color: #8b5cf6;
+      font-size: 18px;
+    }
+
+    .artists-title p {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .artists-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .artists-control-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #f5f5f5;
+      color: #666;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .artists-control-btn:hover {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .artists-control-btn.active {
+      background: #8b5cf6;
+      color: white;
+    }
+
+    .artists-feed {
+      margin-bottom: 24px;
+    }
+
+    .artists-feed h4 {
+      margin: 0 0 16px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .artists-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .artist-card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #8b5cf6;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .artist-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .artist-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .artist-name {
+      font-weight: 600;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .artist-status {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .artist-status.live {
+      background: #e8f5e8;
+      color: #2e7d32;
+    }
+
+    .artist-status.upcoming {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .artist-status.completed {
+      background: #f3e5f5;
+      color: #7b1fa2;
+    }
+
+    .artist-details {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .artist-detail {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .artist-description {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    .artist-image-carousel {
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8b5cf6;
+      font-size: 24px;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .artist-image-carousel img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .artist-image-carousel::after {
+      content: '🎵';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 32px;
+      opacity: 0.7;
+    }
+
+    .artists-schedule {
+      margin-bottom: 24px;
+    }
+
+    .artists-schedule h4 {
+      margin: 0 0 16px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .artists-schedule-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .artists-schedule-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 3px solid #8b5cf6;
+    }
+
+    .artists-schedule-time {
+      background: #8b5cf6;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .artists-schedule-info h5 {
+      margin: 0 0 4px 0;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .artists-schedule-info p {
+      margin: 0;
+      color: #666;
+      font-size: 12px;
+    }
+
+    .artists-categories {
+      margin-bottom: 24px;
+    }
+
+    .artists-categories h4 {
+      margin: 0 0 16px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .artists-category-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .artists-category-tag {
+      padding: 6px 12px;
+      background: #f0f0f0;
+      color: #666;
+      border-radius: 16px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+    }
+
+    .artists-category-tag:hover {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .artists-category-tag.active {
+      background: #8b5cf6;
+      color: white;
+      border-color: #8b5cf6;
+    }
+
+    /* Custom scrollbar for artists cards */
+    .artists-cards::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .artists-cards::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    .artists-cards::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+
+    .artists-cards::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
     }
 
     /* Custom scrollbar for food stalls cards */
@@ -4888,6 +5179,12 @@
         </svg>
       </button>
 
+      <button class="control-btn artists-btn" onclick="toggleArtists()" title="Artists & Bands">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+        </svg>
+      </button>
+
 
 
     </div>
@@ -4926,6 +5223,7 @@
         <div class="tab active" onclick="switchTab('members')">Group</div>
         <div class="tab" onclick="switchTab('find-stalls')">Find Stalls</div>
         <div class="tab" onclick="switchTab('float')">Floats</div>
+        <div class="tab" onclick="switchTab('artists')">Artists</div>
         <div class="tab" onclick="switchTab('settings')">Settings</div>
       </div>
 
@@ -5220,6 +5518,61 @@
             <span class="category-tag" onclick="filterFloats('fantasy')">Fantasy</span>
             <span class="category-tag" onclick="filterFloats('historical')">Historical</span>
             <span class="category-tag" onclick="filterFloats('modern')">Modern</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-content" id="artists-content">
+        <!-- Artists Header -->
+        <div class="artists-header">
+          <div class="artists-title">
+            <h3>🎵 Artists & Bands</h3>
+            <p>Live music & entertainment schedule</p>
+          </div>
+          <div class="artists-controls">
+            <button class="artists-control-btn" onclick="toggleArtistsAutoScroll()" id="artistsAutoScrollBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+              </svg>
+              Auto
+            </button>
+            <button class="artists-control-btn" onclick="refreshArtistsData()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+              </svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Artists Feed -->
+        <div class="artists-feed">
+          <h4>🎤 Live Artists Feed</h4>
+          <div class="artists-cards" id="artistsCards">
+            <!-- Artist cards will be dynamically generated -->
+          </div>
+        </div>
+
+        <!-- Artists Schedule -->
+        <div class="artists-schedule">
+          <h4>⏰ Performance Schedule</h4>
+          <div class="artists-schedule-timeline" id="artistsScheduleTimeline">
+            <!-- Schedule items will be dynamically generated -->
+          </div>
+        </div>
+
+        <!-- Artists Categories -->
+        <div class="artists-categories">
+          <h4>🎨 Artist Categories</h4>
+          <div class="artists-category-tags">
+            <span class="artists-category-tag active" onclick="filterArtists('all')">All</span>
+            <span class="artists-category-tag" onclick="filterArtists('Live Band')">Live Bands</span>
+            <span class="artists-category-tag" onclick="filterArtists('DJ')">DJs</span>
+            <span class="artists-category-tag" onclick="filterArtists('Solo Artist')">Solo Artists</span>
+            <span class="artists-category-tag" onclick="filterArtists('Dance Group')">Dance Groups</span>
+            <span class="artists-category-tag" onclick="filterArtists('Sound System')">Sound Systems</span>
           </div>
         </div>
       </div>
@@ -9614,6 +9967,68 @@
         }
       }
 
+      function toggleArtists() {
+        console.log('toggleArtists called');
+
+        const artistsBtn = document.querySelector('.artists-btn');
+        const panel = document.getElementById('bottomPanel');
+        const isPanelOpen = panel.classList.contains('expanded');
+
+        console.log('Panel open:', isPanelOpen);
+
+        // Toggle artists visibility on map
+        const artistsVisible = artistsBtn.classList.toggle('active');
+        console.log('Artists visible:', artistsVisible);
+
+        const searchInput = document.getElementById('searchInput');
+
+        if (artistsVisible) {
+          console.log('Activating artists');
+
+          // Add artist markers on map
+          addArtistMarkers();
+          showNotification('Artists & bands displayed on map');
+          // Update search placeholder
+          searchInput.placeholder = 'Find artist or band...';
+          // Clear search input
+          searchInput.value = '';
+
+          // Deactivate other buttons
+          document.querySelector('.food-stalls-btn').classList.remove('active');
+          document.querySelector('.truck-floats-btn').classList.remove('active');
+
+          // If panel is closed, open it to show the artists information
+          if (!isPanelOpen) {
+            console.log('Opening panel to show artists information');
+            panel.classList.add('expanded');
+            document.body.classList.add('panel-expanded');
+          }
+          // Switch to artists-content tab to show artists information
+          switchTab('artists');
+          loadArtistsData();
+          loadArtistsSchedule();
+        } else {
+          console.log('Deactivating artists');
+
+          // Remove artist markers from map
+          removeArtistMarkers();
+          showNotification('Artists & bands hidden from map');
+          // Reset search placeholder to default
+          searchInput.value = '';
+          // Reset search placeholder to default
+          searchInput.placeholder = 'Find group member by phone...';
+
+          // If no other features are active, close the panel
+          const hasActiveFeatures = document.querySelector('.food-stalls-btn').classList.contains('active') ||
+            document.querySelector('.truck-floats-btn').classList.contains('active');
+          if (!hasActiveFeatures && isPanelOpen) {
+            console.log('No active features, closing panel');
+            panel.classList.remove('expanded');
+            document.body.classList.remove('panel-expanded');
+          }
+        }
+      }
+
       // Helper functions for markers
       function addFoodStallMarkers() {
         // Sample food stall locations - you can customize these
@@ -9698,6 +10113,51 @@
         // Remove all truck float markers
         map.eachLayer(layer => {
           if (layer.truckFloatData) {
+            map.removeLayer(layer);
+          }
+        });
+      }
+
+      function addArtistMarkers() {
+        // Sample artist locations - you can customize these
+        const artists = [
+          { lat: 51.522592, lng: -0.202544, name: 'Reggae Vibes Band', type: 'Live Band', stage: 'Main Stage' },
+          { lat: 51.516226, lng: -0.201240, name: 'DJ Calypso Queen', type: 'DJ', stage: 'Dance Arena' },
+          { lat: 51.524981, lng: -0.209562, name: 'Steel Pan Collective', type: 'Live Band', stage: 'Cultural Corner' }
+        ];
+
+        artists.forEach(artist => {
+          try {
+            // Validate coordinates before creating marker
+            if (isNaN(artist.lat) || isNaN(artist.lng)) {
+              console.error('Invalid coordinates for artist:', artist.name, artist);
+              return;
+            }
+
+            const marker = L.marker([artist.lat, artist.lng], {
+              icon: L.divIcon({
+                className: 'artist-marker',
+                html: '🎵',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+              })
+            }).addTo(map);
+
+            marker.bindPopup(`<b>${artist.name}</b><br>${artist.type}<br>${artist.stage}`);
+            marker.artistData = artist;
+          } catch (error) {
+            console.error('Error creating artist marker:', error);
+          }
+        });
+
+        // Show artists panel content
+        showArtistsPanel();
+      }
+
+      function removeArtistMarkers() {
+        // Remove all artist markers
+        map.eachLayer(layer => {
+          if (layer.artistData) {
             map.removeLayer(layer);
           }
         });
@@ -10358,11 +10818,13 @@
         document.querySelector('.find-stalls-btn').classList.remove('active');
         document.querySelector('.truck-floats-btn').classList.remove('active');
         document.querySelector('.food-stalls-btn').classList.remove('active');
+        document.querySelector('.artists-btn').classList.remove('active');
         findStallsActive = false;
 
         // Also remove map markers when resetting
         removeFoodStallMarkers();
         removeTruckFloatMarkers();
+        removeArtistMarkers();
 
         // Reset search placeholder
         const searchInput = document.getElementById('searchInput');
@@ -10370,6 +10832,139 @@
           searchInput.placeholder = 'Find group member by phone...';
           searchInput.value = '';
         }
+      }
+
+      function loadArtistsData() {
+        console.log('=== loadArtistsData called ===');
+
+        const artistsCards = document.getElementById('artistsCards');
+        console.log('Artists cards element:', artistsCards);
+
+        // Sample artist data with carousel images
+        const artists = [
+          {
+            id: 1,
+            name: 'Reggae Vibes Band',
+            type: 'Live Band',
+            genre: 'Reggae',
+            status: 'live',
+            stage: 'Main Stage',
+            performance_time: '14:00 - 16:00',
+            description: 'Authentic reggae music with Caribbean vibes and steel drums',
+            images: ['🎵', '🥁', '🎤'],
+            contact: 'Marcus Johnson',
+            phone: '+44 7700 900201'
+          },
+          {
+            id: 2,
+            name: 'DJ Calypso Queen',
+            type: 'DJ',
+            genre: 'Calypso',
+            status: 'upcoming',
+            stage: 'Dance Arena',
+            performance_time: '18:00 - 20:00',
+            description: 'High-energy calypso and soca music to get the crowd moving',
+            images: ['🎧', '🎵', '💃'],
+            contact: 'Lisa Thompson',
+            phone: '+44 7700 900202'
+          }
+        ];
+
+        artistsCards.innerHTML = artists.map((artist, index) => {
+          const clickHandler = `selectArtist(${artist.id})`;
+
+          return `
+        <div class="artist-card" onclick="${clickHandler}">
+          <div class="artist-card-header">
+            <span class="artist-name">${artist.name}</span>
+            <span class="artist-status ${artist.status}">${artist.status}</span>
+          </div>
+          <div class="artist-details">
+            <span class="artist-detail">🎵 ${artist.type}</span>
+            <span class="artist-detail">🎼 ${artist.genre}</span>
+            <span class="artist-detail">🎪 ${artist.stage}</span>
+          </div>
+          <div class="artist-description">${artist.description}</div>
+          <div class="artist-image-carousel" id="artistCarousel${artist.id}">
+            ${artist.images.map((img, imgIndex) => `
+              <img src="data:image/svg+xml;base64,${btoa(`<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                <rect width="120" height="120" fill="#f3e5f5"/>
+                <text x="60" y="60" font-size="48" text-anchor="middle" dy=".3em" fill="#8b5cf6">${img}</text>
+              </svg>`)}" 
+              alt="${artist.name} ${imgIndex + 1}" 
+              style="display: ${imgIndex === 0 ? 'block' : 'none'}; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+            `).join('')}
+          </div>
+          <div class="artist-details">
+            <span class="artist-detail">⏰ ${artist.performance_time}</span>
+            <span class="artist-detail">📞 ${artist.contact}</span>
+          </div>
+        </div>
+      `;
+        }).join('');
+
+        console.log('Artists data loaded successfully');
+        console.log('=== loadArtistsData completed ===');
+      }
+
+      function loadArtistsSchedule() {
+        console.log('=== loadArtistsSchedule called ===');
+
+        const artistsScheduleTimeline = document.getElementById('artistsScheduleTimeline');
+        console.log('Artists schedule timeline element:', artistsScheduleTimeline);
+
+        const schedule = [
+          { time: '12:00 PM', title: 'Steel Pan Collective', description: 'Traditional steel pan music' },
+          { time: '2:00 PM', title: 'Reggae Vibes Band', description: 'Live reggae performance' },
+          { time: '4:30 PM', title: 'Soca Warriors', description: 'High-energy soca music' },
+          { time: '6:00 PM', title: 'DJ Calypso Queen', description: 'Calypso DJ set' },
+          { time: '7:00 PM', title: 'Hip Hop Collective', description: 'Local hip hop showcase' }
+        ];
+
+        artistsScheduleTimeline.innerHTML = schedule.map(item => `
+        <div class="artists-schedule-item">
+          <div class="artists-schedule-time">${item.time}</div>
+          <div class="artists-schedule-info">
+            <h5>${item.title}</h5>
+            <p>${item.description}</p>
+          </div>
+        </div>
+      `).join('');
+
+        console.log('Artists schedule loaded successfully');
+        console.log('=== loadArtistsSchedule completed ===');
+      }
+
+      function selectArtist(artistId) {
+        console.log('Artist selected:', artistId);
+        showNotification(`Selected artist: ${artistId}`);
+      }
+
+      function refreshArtistsData() {
+        loadArtistsData();
+        loadArtistsSchedule();
+        showNotification('Artists data refreshed!');
+      }
+
+      function filterArtists(category) {
+        const categoryTags = document.querySelectorAll('.artists-category-tag');
+        const artistCards = document.querySelectorAll('.artist-card');
+
+        categoryTags.forEach(tag => tag.classList.remove('active'));
+        event.target.classList.add('active');
+
+        artistCards.forEach(card => {
+          const artistType = card.querySelector('.artist-detail').textContent.split(' ')[1];
+          if (category === 'all' || artistType === category) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+
+      function showArtistsPanel() {
+        switchTab('artists');
       }
 
 
