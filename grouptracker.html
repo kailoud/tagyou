@@ -7859,8 +7859,8 @@
               </td>
               <td data-label="Actions">
                 <div class="action-buttons">
-                  <button onclick="editAdminItem(${item.id})" class="edit-btn">✏️ Edit</button>
-                  <button onclick="deleteAdminItem(${item.id})" class="delete-btn">🗑️ Delete</button>
+                  <button onclick="editAdminItem('${item.id}')" class="edit-btn">✏️ Edit</button>
+                  <button onclick="deleteAdminItem('${item.id}')" class="delete-btn">🗑️ Delete</button>
                 </div>
               </td>
             </tr>
@@ -7871,7 +7871,8 @@
         console.log('editAdminItem called with id:', id, 'activeAdminTab:', activeAdminTab);
         console.log('adminData:', adminData);
 
-        const item = adminData[activeAdminTab].find(item => item.id === id);
+        // Convert id to string for comparison to handle both string and numeric IDs
+        const item = adminData[activeAdminTab].find(item => String(item.id) === String(id));
         console.log('Found item:', item);
 
         if (item) {
@@ -7964,7 +7965,7 @@
                     ${formFields.map(field => renderAdminFormField(field, formData[field.key])).join('')}
                   </div>
                   <div class="form-actions">
-                    <button type="button" onclick="saveAdminItem(${item?.id || 'null'}, ${isEditing})" class="save-btn">
+                    <button type="button" onclick="saveAdminItem('${item?.id || 'null'}', ${isEditing})" class="save-btn">
                       ${isEditing ? 'Update' : 'Add'} ${adminTabConfig[activeAdminTab].title.slice(0, -1)}
                     </button>
                     <button type="button" onclick="closeAdminForm()" class="cancel-btn">Cancel</button>
@@ -8125,6 +8126,9 @@
       }
 
       function saveAdminItem(id, isEditing) {
+        // Convert 'null' string back to null for new items
+        const actualId = id === 'null' ? null : id;
+
         const form = document.getElementById('adminForm');
         const formData = new FormData(form);
         const itemData = {};
@@ -8141,7 +8145,7 @@
             reader.onload = function (e) {
               itemData[key] = e.target.result;
               // Continue with saving after file is processed
-              completeSave(itemData, id, isEditing);
+              completeSave(itemData, actualId, isEditing);
             };
             reader.readAsDataURL(value);
             return; // Exit early, will continue in callback
@@ -8151,7 +8155,7 @@
         }
 
         // If no file upload, save immediately
-        completeSave(itemData, id, isEditing);
+        completeSave(itemData, actualId, isEditing);
       }
 
       async function completeSave(itemData, id, isEditing) {
