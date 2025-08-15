@@ -2941,7 +2941,7 @@
 
     .location-pin-btn {
       position: absolute;
-      right: 10px;
+      right: 50px;
       top: 50%;
       transform: translateY(-50%);
       background: #8b5cf6;
@@ -2958,6 +2958,33 @@
       transition: all 0.3s ease;
       z-index: 10;
       box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+    }
+
+    .manual-pin-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #059669;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+    }
+
+    .manual-pin-btn:hover {
+      background: #047857;
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
     }
 
     .location-pin-btn:hover {
@@ -3055,6 +3082,40 @@
 
       100% {
         box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+      }
+    }
+
+    .manual-pin-marker {
+      background: #059669;
+      border: 3px solid white;
+      border-radius: 50%;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+      line-height: 26px;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+      animation: manualMarkerPulse 2s infinite;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .manual-pin-marker:hover {
+      transform: scale(1.2);
+      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
+    }
+
+    @keyframes manualMarkerPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.7);
+      }
+
+      70% {
+        box-shadow: 0 0 0 8px rgba(5, 150, 105, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(5, 150, 105, 0);
       }
     }
 
@@ -5786,6 +5847,9 @@
         <div class="tab" onclick="switchTab('settings')">Settings</div>
         <button class="location-pin-btn" onclick="toggleLocationMode()" title="Toggle location mode">
           📍
+        </button>
+        <button class="manual-pin-btn" onclick="addManualPin()" title="Add manual pin">
+          📌
         </button>
       </div>
 
@@ -12588,6 +12652,72 @@
         }).catch(() => {
           showNotification('Failed to copy coordinates', 'error');
         });
+      }
+
+      function addManualPin() {
+        const lat = prompt('Enter latitude (e.g., 51.516369):');
+        if (!lat) return;
+
+        const lng = prompt('Enter longitude (e.g., -0.209404):');
+        if (!lng) return;
+
+        const latNum = parseFloat(lat);
+        const lngNum = parseFloat(lng);
+
+        if (isNaN(latNum) || isNaN(lngNum)) {
+          showNotification('Invalid coordinates. Please enter valid numbers.', 'error');
+          return;
+        }
+
+        // Validate coordinates are within reasonable London bounds
+        if (latNum < 51.0 || latNum > 52.0 || lngNum < -1.0 || lngNum > 0.5) {
+          const confirm = window.confirm('Coordinates seem to be outside London area. Continue anyway?');
+          if (!confirm) return;
+        }
+
+        // Remove any existing manual pin
+        if (window.manualPin) {
+          map.removeLayer(window.manualPin);
+        }
+
+        // Create new pin
+        const coords = { lat: latNum, lng: lngNum };
+        window.manualPin = L.marker(coords, {
+          icon: L.divIcon({
+            className: 'manual-pin-marker',
+            html: '📍',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32]
+          })
+        }).addTo(map);
+
+        // Add popup with coordinates
+        const coordsString = `${latNum.toFixed(6)}, ${lngNum.toFixed(6)}`;
+        window.manualPin.bindPopup(`
+          <div style="text-align: center; padding: 8px;">
+            <strong>Manual Pin</strong><br>
+            <small>${coordsString}</small><br>
+            <button onclick="copyCoordinates('${coordsString}')" style="margin-top: 8px; padding: 4px 8px; background: #8b5cf6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+              Copy Coordinates
+            </button>
+            <button onclick="removeManualPin()" style="margin-top: 8px; margin-left: 4px; padding: 4px 8px; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+              Remove Pin
+            </button>
+          </div>
+        `).openPopup();
+
+        // Center map on the pin
+        map.setView(coords, Math.max(map.getZoom(), 15));
+
+        showNotification(`Manual pin placed at: ${coordsString}`, 'success');
+      }
+
+      function removeManualPin() {
+        if (window.manualPin) {
+          map.removeLayer(window.manualPin);
+          window.manualPin = null;
+          showNotification('Manual pin removed', 'info');
+        }
       }
 
       function refreshArtistsData() {
