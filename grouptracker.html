@@ -7402,7 +7402,24 @@
         const modal = document.getElementById('adminModal');
         if (modal) {
           modal.classList.remove('show');
-          setTimeout(() => modal.remove(), 300);
+          setTimeout(() => {
+            modal.remove();
+
+            // Refresh artists data if artists button is active
+            const artistsBtn = document.querySelector('.artists-btn');
+            if (artistsBtn && artistsBtn.classList.contains('active')) {
+              // Refresh map markers
+              removeArtistMarkers();
+              addArtistMarkers();
+
+              // Refresh panel data
+              const artistsContent = document.getElementById('artists-content');
+              if (artistsContent && artistsContent.classList.contains('active')) {
+                loadArtistsData();
+                loadArtistsSchedule();
+              }
+            }
+          }, 300);
         }
       }
 
@@ -7418,6 +7435,11 @@
 
       // Make adminData globally accessible for map markers
       window.adminData = adminData;
+
+      // Load admin data on page load
+      document.addEventListener('DOMContentLoaded', function () {
+        loadAdminData();
+      });
 
       // Firebase Database Functions
       async function loadAdminData() {
@@ -8130,6 +8152,25 @@
 
           // Reload data from database
           await loadAdminData();
+
+          // Refresh map markers if artists were updated
+          if (activeAdminTab === 'artists') {
+            // Remove existing artist markers
+            removeArtistMarkers();
+
+            // Add updated artist markers if artists button is active
+            const artistsBtn = document.querySelector('.artists-btn');
+            if (artistsBtn && artistsBtn.classList.contains('active')) {
+              addArtistMarkers();
+            }
+
+            // Refresh artists panel if it's open
+            const artistsContent = document.getElementById('artists-content');
+            if (artistsContent && artistsContent.classList.contains('active')) {
+              loadArtistsData();
+              loadArtistsSchedule();
+            }
+          }
 
           // Close form
           closeAdminForm();
@@ -10139,12 +10180,39 @@
       }
 
       function addArtistMarkers() {
-        // Sample artist locations - you can customize these
-        const artists = [
-          { lat: 51.522592, lng: -0.202544, name: 'Reggae Vibes Band', type: 'Live Band', stage: 'Main Stage' },
-          { lat: 51.516226, lng: -0.201240, name: 'DJ Calypso Queen', type: 'DJ', stage: 'Dance Arena' },
-          { lat: 51.524981, lng: -0.209562, name: 'Steel Pan Collective', type: 'Live Band', stage: 'Cultural Corner' }
-        ];
+        // Load artists from admin data or use sample data as fallback
+        let artists = [];
+
+        if (window.adminData && window.adminData.artists && window.adminData.artists.length > 0) {
+          // Use admin data
+          artists = window.adminData.artists.filter(artist =>
+            artist.coordinates && artist.status === 'confirmed'
+          ).map(artist => {
+            const [lat, lng] = artist.coordinates.split(',').map(coord => parseFloat(coord.trim()));
+            return {
+              lat: lat || 0,
+              lng: lng || 0,
+              name: artist.name,
+              type: artist.type,
+              stage: artist.stage_name,
+              genre: artist.genre,
+              performance_time: artist.performance_time,
+              description: artist.description,
+              contact: artist.contact_person,
+              phone: artist.phone,
+              email: artist.email,
+              social_media: artist.social_media,
+              image: artist.image
+            };
+          });
+        } else {
+          // Fallback to sample data
+          artists = [
+            { lat: 51.522592, lng: -0.202544, name: 'Reggae Vibes Band', type: 'Live Band', stage: 'Main Stage' },
+            { lat: 51.516226, lng: -0.201240, name: 'DJ Calypso Queen', type: 'DJ', stage: 'Dance Arena' },
+            { lat: 51.524981, lng: -0.209562, name: 'Steel Pan Collective', type: 'Live Band', stage: 'Cultural Corner' }
+          ];
+        }
 
         artists.forEach(artist => {
           try {
@@ -10163,7 +10231,13 @@
               })
             }).addTo(map);
 
-            marker.bindPopup(`<b>${artist.name}</b><br>${artist.type}<br>${artist.stage}`);
+            marker.bindPopup(`
+              <b>${artist.name}</b><br>
+              <small>${artist.type} - ${artist.genre || ''}</small><br>
+              <small>${artist.stage}</small><br>
+              <small>${artist.performance_time || ''}</small><br>
+              <small>${artist.description || ''}</small>
+            `);
             marker.artistData = artist;
           } catch (error) {
             console.error('Error creating artist marker:', error);
@@ -10860,35 +10934,57 @@
         const artistsCards = document.getElementById('artistsCards');
         console.log('Artists cards element:', artistsCards);
 
-        // Sample artist data with carousel images
-        const artists = [
-          {
-            id: 1,
-            name: 'Reggae Vibes Band',
-            type: 'Live Band',
-            genre: 'Reggae',
-            status: 'live',
-            stage: 'Main Stage',
-            performance_time: '14:00 - 16:00',
-            description: 'Authentic reggae music with Caribbean vibes and steel drums',
-            images: ['🎵', '🥁', '🎤'],
-            contact: 'Marcus Johnson',
-            phone: '+44 7700 900201'
-          },
-          {
-            id: 2,
-            name: 'DJ Calypso Queen',
-            type: 'DJ',
-            genre: 'Calypso',
-            status: 'upcoming',
-            stage: 'Dance Arena',
-            performance_time: '18:00 - 20:00',
-            description: 'High-energy calypso and soca music to get the crowd moving',
-            images: ['🎧', '🎵', '💃'],
-            contact: 'Lisa Thompson',
-            phone: '+44 7700 900202'
-          }
-        ];
+        // Load artists from admin data or use sample data as fallback
+        let artists = [];
+
+        if (window.adminData && window.adminData.artists && window.adminData.artists.length > 0) {
+          // Use admin data
+          artists = window.adminData.artists.filter(artist => artist.status === 'confirmed').map(artist => ({
+            id: artist.id,
+            name: artist.name,
+            type: artist.type,
+            genre: artist.genre,
+            status: artist.status,
+            stage: artist.stage_name,
+            performance_time: artist.performance_time,
+            description: artist.description,
+            images: artist.image ? [artist.image] : ['🎵', '🥁', '🎤'],
+            contact: artist.contact_person,
+            phone: artist.phone,
+            email: artist.email,
+            social_media: artist.social_media
+          }));
+        } else {
+          // Fallback to sample data
+          artists = [
+            {
+              id: 1,
+              name: 'Reggae Vibes Band',
+              type: 'Live Band',
+              genre: 'Reggae',
+              status: 'live',
+              stage: 'Main Stage',
+              performance_time: '14:00 - 16:00',
+              description: 'Authentic reggae music with Caribbean vibes and steel drums',
+              images: ['🎵', '🥁', '🎤'],
+              contact: 'Marcus Johnson',
+              phone: '+44 7700 900201'
+            },
+            {
+              id: 2,
+              name: 'DJ Calypso Queen',
+              type: 'DJ',
+              genre: 'Calypso',
+              status: 'upcoming',
+              stage: 'Dance Arena',
+              performance_time: '18:00 - 20:00',
+              description: 'High-energy calypso and soca music to get the crowd moving',
+              images: ['🎧', '🎵', '💃'],
+              contact: 'Lisa Thompson',
+              phone: '+44 7700 900202'
+            }
+          ];
+        }
 
         artistsCards.innerHTML = artists.map((artist, index) => {
           const clickHandler = `selectArtist(${artist.id})`;
@@ -10906,14 +11002,20 @@
           </div>
           <div class="artist-description">${artist.description}</div>
           <div class="artist-image-carousel" id="artistCarousel${artist.id}">
-            ${artist.images.map((img, imgIndex) => `
-              <img src="data:image/svg+xml;base64,${btoa(`<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                <rect width="120" height="120" fill="#f3e5f5"/>
-                <text x="60" y="60" font-size="48" text-anchor="middle" dy=".3em" fill="#8b5cf6">${img}</text>
-              </svg>`)}" 
-              alt="${artist.name} ${imgIndex + 1}" 
-              style="display: ${imgIndex === 0 ? 'block' : 'none'}; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
-            `).join('')}
+            ${artist.images.map((img, imgIndex) => {
+            // Check if image is a data URL (uploaded image) or emoji
+            if (img.startsWith('data:image/')) {
+              return `<img src="${img}" alt="${artist.name} ${imgIndex + 1}" style="display: ${imgIndex === 0 ? 'block' : 'none'}; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+            } else {
+              // Create SVG placeholder for emoji
+              return `<img src="data:image/svg+xml;base64,${btoa(`<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="120" height="120" fill="#f3e5f5"/>
+                  <text x="60" y="60" font-size="48" text-anchor="middle" dy=".3em" fill="#8b5cf6">${img}</text>
+                </svg>`)}" 
+                alt="${artist.name} ${imgIndex + 1}" 
+                style="display: ${imgIndex === 0 ? 'block' : 'none'}; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+            }
+          }).join('')}
           </div>
           <div class="artist-details">
             <span class="artist-detail">⏰ ${artist.performance_time}</span>
@@ -10933,13 +11035,34 @@
         const artistsScheduleTimeline = document.getElementById('artistsScheduleTimeline');
         console.log('Artists schedule timeline element:', artistsScheduleTimeline);
 
-        const schedule = [
-          { time: '12:00 PM', title: 'Steel Pan Collective', description: 'Traditional steel pan music' },
-          { time: '2:00 PM', title: 'Reggae Vibes Band', description: 'Live reggae performance' },
-          { time: '4:30 PM', title: 'Soca Warriors', description: 'High-energy soca music' },
-          { time: '6:00 PM', title: 'DJ Calypso Queen', description: 'Calypso DJ set' },
-          { time: '7:00 PM', title: 'Hip Hop Collective', description: 'Local hip hop showcase' }
-        ];
+        // Load schedule from admin data or use sample data as fallback
+        let schedule = [];
+
+        if (window.adminData && window.adminData.artists && window.adminData.artists.length > 0) {
+          // Use admin data
+          schedule = window.adminData.artists
+            .filter(artist => artist.status === 'confirmed' && artist.performance_time)
+            .map(artist => ({
+              time: artist.performance_time,
+              title: artist.name,
+              description: `${artist.type} - ${artist.genre || ''} at ${artist.stage_name}`
+            }))
+            .sort((a, b) => {
+              // Simple time sorting (you can improve this)
+              const timeA = a.time.split(' ')[0];
+              const timeB = b.time.split(' ')[0];
+              return timeA.localeCompare(timeB);
+            });
+        } else {
+          // Fallback to sample data
+          schedule = [
+            { time: '12:00 PM', title: 'Steel Pan Collective', description: 'Traditional steel pan music' },
+            { time: '2:00 PM', title: 'Reggae Vibes Band', description: 'Live reggae performance' },
+            { time: '4:30 PM', title: 'Soca Warriors', description: 'High-energy soca music' },
+            { time: '6:00 PM', title: 'DJ Calypso Queen', description: 'Calypso DJ set' },
+            { time: '7:00 PM', title: 'Hip Hop Collective', description: 'Local hip hop showcase' }
+          ];
+        }
 
         artistsScheduleTimeline.innerHTML = schedule.map(item => `
         <div class="artists-schedule-item">
