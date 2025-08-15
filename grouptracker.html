@@ -12382,10 +12382,16 @@
       function getCoordinatesFromMap(fieldName) {
         console.log('Getting coordinates from map for field:', fieldName);
 
-        // Close the admin form temporarily
+        // Close all admin modals temporarily
         const formModal = document.getElementById('adminFormModal');
+        const adminModal = document.getElementById('adminModal');
+
         if (formModal) {
           formModal.classList.remove('show');
+        }
+
+        if (adminModal) {
+          adminModal.classList.remove('show');
         }
 
         // Show instruction to user
@@ -12454,10 +12460,7 @@
 
         // Reopen form and fill coordinates
         setTimeout(() => {
-          const formModal = document.getElementById('adminFormModal');
-          if (formModal) {
-            formModal.classList.add('show');
-          }
+          reopenAdminModal();
 
           const coordInput = document.querySelector(`input[name="${fieldName}"]`);
           if (coordInput) {
@@ -12743,10 +12746,16 @@
           return;
         }
 
-        // Close admin form temporarily
+        // Close all admin modals temporarily
         const formModal = document.getElementById('adminFormModal');
+        const adminModal = document.getElementById('adminModal');
+
         if (formModal) {
           formModal.classList.remove('show');
+        }
+
+        if (adminModal) {
+          adminModal.classList.remove('show');
         }
 
         // Create pin and show confirmation
@@ -12897,13 +12906,49 @@
 
           // Reopen admin form
           setTimeout(() => {
-            const formModal = document.getElementById('adminFormModal');
-            if (formModal) {
-              formModal.classList.add('show');
-            }
+            reopenAdminModal();
 
             showNotification(`Manual pin confirmed. Coordinates: ${coordsString}`, 'success');
           }, 500);
+        }
+      }
+
+      function minimizeAllAdminModals() {
+        console.log('Minimizing all admin modals');
+
+        // Close admin form modal
+        const formModal = document.getElementById('adminFormModal');
+        if (formModal) {
+          formModal.classList.remove('show');
+        }
+
+        // Close admin portal modal
+        const adminModal = document.getElementById('adminModal');
+        if (adminModal) {
+          adminModal.classList.remove('show');
+        }
+
+        // Close any other admin-related modals
+        const allModals = document.querySelectorAll('.modal-overlay.show, .admin-modal.show');
+        allModals.forEach(modal => {
+          modal.classList.remove('show');
+        });
+      }
+
+      function reopenAdminModal() {
+        console.log('Reopening admin modal');
+
+        // Try to reopen the most recently used modal
+        const formModal = document.getElementById('adminFormModal');
+        const adminModal = document.getElementById('adminModal');
+
+        // Check which modal was active before
+        if (formModal && formModal.classList.contains('admin-form-modal')) {
+          formModal.classList.add('show');
+        } else if (adminModal) {
+          adminModal.classList.add('show');
+        } else if (formModal) {
+          formModal.classList.add('show');
         }
       }
 
