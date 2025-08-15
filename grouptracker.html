@@ -8202,6 +8202,7 @@
           }
 
           // Update map markers for artists if artists button is active
+          const artistsBtn = document.querySelector('.artists-btn');
           if (artistsBtn && artistsBtn.classList.contains('active')) {
             console.log('Artists button is active, updating map markers...');
             removeArtistMarkers();
@@ -8929,6 +8930,7 @@
             selectedImageIndex = 0;
 
             // Refresh artist data in panel if artists button is active
+            const artistsBtn = document.querySelector('.artists-btn');
             if (artistsBtn && artistsBtn.classList.contains('active')) {
               setTimeout(() => {
                 loadArtistsData();
@@ -12266,7 +12268,9 @@
           });
         }
 
-        console.log('Artists button active:', document.querySelector('.artists-btn')?.classList.contains('active'));
+        const artistsBtn = document.querySelector('.artists-btn');
+        console.log('Artists button found:', !!artistsBtn);
+        console.log('Artists button active:', artistsBtn?.classList.contains('active'));
         console.log('Current map markers:', map._layers);
 
         // Try to add markers manually
@@ -12787,6 +12791,7 @@
           updateArtistCategoriesFromAdminData();
 
           // Force update map markers
+          const artistsBtn = document.querySelector('.artists-btn');
           if (artistsBtn && artistsBtn.classList.contains('active')) {
             console.log('Artists button is active, refreshing map markers...');
             removeArtistMarkers();
