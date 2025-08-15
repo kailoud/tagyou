@@ -11383,12 +11383,14 @@
           console.log('Displaying main parade route:', mainRoute.route_name);
           displayMainFloatRoute(mainRoute);
 
-          // Center map on the carnival area
-          const carnivalBounds = L.latLngBounds([
-            [51.5120, -0.2160], // Southwest
-            [51.5270, -0.1950]  // Northeast
-          ]);
-          map.fitBounds(carnivalBounds, { padding: [20, 20] });
+          // Center map on the carnival area with delay to ensure route is loaded
+          setTimeout(() => {
+            const carnivalBounds = L.latLngBounds([
+              [51.5120, -0.2160], // Southwest
+              [51.5270, -0.1950]  // Northeast
+            ]);
+            map.fitBounds(carnivalBounds, { padding: [20, 20] });
+          }, 500);
 
           // Activate the parade route button
           const paradeRouteBtn = document.querySelector('.parade-route-btn');
@@ -13459,7 +13461,17 @@
 
         if (mainRoute) {
           displayMainFloatRoute(mainRoute);
-          showNotification('Main parade route displayed', 'success');
+
+          // Center map on the carnival area with delay to ensure route is loaded
+          setTimeout(() => {
+            const carnivalBounds = L.latLngBounds([
+              [51.5120, -0.2160], // Southwest
+              [51.5270, -0.1950]  // Northeast
+            ]);
+            map.fitBounds(carnivalBounds, { padding: [20, 20] });
+          }, 500);
+
+          showNotification('🎪 Carnival route displayed • Click 📍 to go to your location', 'success');
         } else {
           showNotification('No main parade route found. Add one in Admin Portal.', 'info');
           paradeRouteBtn.classList.remove('active');
