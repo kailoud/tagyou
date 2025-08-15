@@ -2558,6 +2558,14 @@
         width: 100%;
         border-radius: 20px 20px 0 0;
         overflow-x: hidden;
+        /* Ensure panel doesn't exceed viewport on mobile */
+        max-height: 100vh;
+      }
+
+      /* Mobile artists content optimization */
+      #artists-content {
+        max-height: calc(100vh - 120px);
+        padding-bottom: 20px;
       }
 
       .panel-content {
@@ -2565,6 +2573,10 @@
         margin: 0;
         width: 100%;
         box-sizing: border-box;
+        /* Ensure content doesn't get cut off on mobile */
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
       .panel-tabs {
@@ -3013,6 +3025,9 @@
       z-index: 1000;
       transition: transform 0.3s ease;
       transform: translateY(calc(100% - 80px));
+      /* Ensure panel doesn't exceed viewport height */
+      max-height: 100vh;
+      overflow: hidden;
     }
 
     .bottom-panel.expanded {
@@ -3107,7 +3122,8 @@
 
     .panel-content {
       padding: 0 20px 32px;
-      max-height: 60vh;
+      max-height: calc(100vh - 200px);
+      /* Account for panel handle, tabs, and bottom spacing */
       overflow-y: auto;
       overflow-x: hidden;
       display: none;
@@ -3117,6 +3133,8 @@
       width: 100%;
       box-sizing: border-box;
       max-width: 100%;
+      /* Ensure proper scrolling on mobile */
+      -webkit-overflow-scrolling: touch;
     }
 
     .panel-content.active {
@@ -4063,6 +4081,14 @@
     }
 
     /* Artists Panel Styles */
+    /* Ensure artists content scrolls properly */
+    #artists-content {
+      max-height: calc(100vh - 200px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
     .artists-header {
       display: flex;
       justify-content: space-between;
@@ -4693,6 +4719,10 @@
         margin: 0;
         width: 100%;
         box-sizing: border-box;
+        /* Ensure content doesn't get cut off on small mobile */
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
       .panel-tabs {
@@ -12083,6 +12113,15 @@
             updateArtistCategoriesFromAdminData();
           }, 300);
         });
+
+        // Ensure panel is properly positioned and scrollable
+        setTimeout(() => {
+          const artistsContent = document.getElementById('artists-content');
+          if (artistsContent) {
+            artistsContent.scrollTop = 0; // Reset scroll position
+            console.log('Artists content scroll position reset');
+          }
+        }, 100);
 
         showNotification('Artists & bands panel opened');
       } else {
