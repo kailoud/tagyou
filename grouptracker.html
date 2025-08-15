@@ -8179,6 +8179,7 @@
                   <button onclick="testFirebaseConnection()" class="test-btn" title="Test Firebase Connection">🧪</button>
                   <button onclick="forceProcessBatchOperations()" class="test-btn" title="Process Pending Operations">🔄</button>
                   <button onclick="cleanupOrphanedDocuments()" class="test-btn" title="Cleanup Orphaned Documents">🧹</button>
+                  <button onclick="cleanupMockData()" class="test-btn" title="Cleanup Mock Data">🎭</button>
                   <button onclick="toggleAdminPortalSize()" class="expand-btn" title="Expand/Minimize">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
@@ -9176,35 +9177,43 @@
       console.log('Found item:', item);
 
       if (item) {
-        // Validate that the item exists in Firebase before editing
-        try {
-          const tableMap = {
-            'food-stalls': 'food_stalls',
-            'float-trucks': 'float_trucks',
-            'float-routes': 'float_routes',
-            'groups': 'groups',
-            'friends': 'friends',
-            'artists': 'artists'
-          };
+        // Check if this is mock data (items with timestamp-based IDs)
+        const isMockData = String(id).length > 10 && !isNaN(id);
 
-          const collectionName = tableMap[activeAdminTab];
-          if (collectionName) {
-            const db = window.firebaseDB;
-            if (db) {
-              const docRef = db.collection(collectionName).doc(String(id));
-              const doc = await docRef.get();
+        if (isMockData) {
+          console.log('This appears to be mock data. Allowing edit to create a real item.');
+          showNotification('Converting mock data to real item. Your changes will be saved to Firebase.', 'info');
+        } else {
+          // Validate that the item exists in Firebase before editing (only for real Firebase IDs)
+          try {
+            const tableMap = {
+              'food-stalls': 'food_stalls',
+              'float-trucks': 'float_trucks',
+              'float-routes': 'float_routes',
+              'groups': 'groups',
+              'friends': 'friends',
+              'artists': 'artists'
+            };
 
-              if (!doc.exists) {
-                console.warn(`Document ${id} does not exist in Firebase, but exists in local data. This might be mock data.`);
-                showNotification('This item appears to be demo data. Creating a new item instead.', 'warning');
-                showAdminForm(null, false); // Show add form instead
-                return;
+            const collectionName = tableMap[activeAdminTab];
+            if (collectionName) {
+              const db = window.firebaseDB;
+              if (db) {
+                const docRef = db.collection(collectionName).doc(String(id));
+                const doc = await docRef.get();
+
+                if (!doc.exists) {
+                  console.warn(`Document ${id} does not exist in Firebase, but exists in local data. This might be mock data.`);
+                  showNotification('This item appears to be demo data. Creating a new item instead.', 'warning');
+                  showAdminForm(null, false); // Show add form instead
+                  return;
+                }
               }
             }
+          } catch (error) {
+            console.warn('Error validating document existence:', error);
+            // Continue with edit anyway
           }
-        } catch (error) {
-          console.warn('Error validating document existence:', error);
-          // Continue with edit anyway
         }
 
         showAdminForm(item, true);
@@ -9285,6 +9294,8 @@
       const formData = item ? { ...item } : {};
 
       console.log('Form data to render:', formData);
+      console.log('Form fields:', formFields);
+      console.log('Active admin tab:', activeAdminTab);
 
       const formModal = document.createElement('div');
       formModal.className = 'modal-overlay';
@@ -9305,7 +9316,11 @@
               <div class="modal-body">
                 <form id="adminForm" class="admin-form">
                   <div class="form-grid">
-                    ${formFields.map(field => renderAdminFormField(field, formData[field.key])).join('')}
+                    ${formFields.map(field => {
+        const fieldValue = formData[field.key];
+        console.log(`Field ${field.key}:`, fieldValue);
+        return renderAdminFormField(field, fieldValue);
+      }).join('')}
                   </div>
                   <div class="form-actions">
                     <button type="button" onclick="saveAdminItem(${item?.id ? `'${item.id}'` : 'null'}, ${isEditing})" class="save-btn">
@@ -9459,6 +9474,7 @@
     }
 
     function renderAdminFormField(field, value) {
+      console.log(`Rendering field: ${field.key}, value:`, value);
       let fieldValue = value || '';
 
       if (field.key === 'coordinates') {
@@ -9706,23 +9722,35 @@
         if (isEditing && id && id !== 'null') {
           console.log('Editing existing item with ID:', id);
 
-          // For editing, preserve existing image/images if no new ones were uploaded
-          const existingItem = adminData[activeAdminTab].find(item => item.id === id);
-          if (existingItem) {
-            // Handle single image
-            if (existingItem.image && !itemData.image) {
-              itemData.image = existingItem.image;
-              console.log('Preserving existing image:', existingItem.image);
-            }
-            // Handle multiple images
-            if (existingItem.images && !itemData.images) {
-              itemData.images = existingItem.images;
-              console.log('Preserving existing images:', existingItem.images);
-            }
-          }
+          // Check if this is mock data (items with timestamp-based IDs)
+          const isMockData = String(id).length > 10 && !isNaN(id);
 
-          // Update existing item in Firebase
-          await updateInFirebase(tableName, id, itemData);
+          if (isMockData) {
+            console.log('Converting mock data to real item - creating new item in Firebase');
+            // Create new item instead of updating
+            if (!itemData.status) {
+              itemData.status = 'active';
+            }
+            await saveToFirebase(tableName, itemData);
+          } else {
+            // For editing real Firebase items, preserve existing image/images if no new ones were uploaded
+            const existingItem = adminData[activeAdminTab].find(item => item.id === id);
+            if (existingItem) {
+              // Handle single image
+              if (existingItem.image && !itemData.image) {
+                itemData.image = existingItem.image;
+                console.log('Preserving existing image:', existingItem.image);
+              }
+              // Handle multiple images
+              if (existingItem.images && !itemData.images) {
+                itemData.images = existingItem.images;
+                console.log('Preserving existing images:', existingItem.images);
+              }
+            }
+
+            // Update existing item in Firebase
+            await updateInFirebase(tableName, id, itemData);
+          }
         } else {
           console.log('Creating new item');
 
@@ -14360,6 +14388,44 @@
         console.log('✅ Batch operations processed');
       } else {
         console.log('ℹ️ No pending batch operations');
+      }
+    }
+
+    // Clean up mock data from admin data
+    function cleanupMockData() {
+      console.log('🧹 Cleaning up mock data from admin data...');
+
+      let cleanedCount = 0;
+
+      Object.keys(adminData).forEach(tabKey => {
+        const originalLength = adminData[tabKey].length;
+        adminData[tabKey] = adminData[tabKey].filter(item => {
+          // Remove items with timestamp-based IDs (mock data)
+          const isMockData = String(item.id).length > 10 && !isNaN(item.id);
+          if (isMockData) {
+            console.log(`Removing mock data: ${item.name || item.id} from ${tabKey}`);
+            cleanedCount++;
+            return false;
+          }
+          return true;
+        });
+
+        console.log(`Cleaned ${tabKey}: ${originalLength} → ${adminData[tabKey].length} items`);
+      });
+
+      if (cleanedCount > 0) {
+        console.log(`✅ Cleaned ${cleanedCount} mock data items`);
+        showNotification(`Cleaned ${cleanedCount} mock data items`, 'success');
+
+        // Update the admin portal display
+        const tableBody = document.getElementById('adminTableBody');
+        if (tableBody) {
+          tableBody.innerHTML = renderAdminTableData();
+        }
+        updateAdminTabCounts();
+      } else {
+        console.log('ℹ️ No mock data found to clean');
+        showNotification('No mock data found to clean', 'info');
       }
     }
 
