@@ -1018,6 +1018,30 @@
       border-bottom: 1px solid #e5e7eb;
       margin-bottom: 24px;
       gap: 8px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: #c1c1c1 #f1f1f1;
+    }
+
+    .admin-tabs::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .admin-tabs::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    .admin-tabs::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+
+    .admin-tabs::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
     }
 
     .admin-tab {
@@ -1032,6 +1056,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .admin-tab.active {
