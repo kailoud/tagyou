@@ -11712,37 +11712,39 @@
 
     // Helper functions for markers
     function addFoodStallMarkers() {
-      // Sample food stall locations - you can customize these
-      const foodStalls = [
-        { lat: 51.5074, lng: -0.1278, name: 'Burger Palace' },
-        { lat: 51.5080, lng: -0.1280, name: 'Pizza Corner' },
-        { lat: 51.5068, lng: -0.1275, name: 'Taco Truck' },
-        { lat: 51.5078, lng: -0.1285, name: 'Ice Cream Stand' }
-      ];
+      // Only display food stalls from actual data, no demo data
+      if (window.stallsData && window.stallsData.length > 0) {
+        console.log('Adding food stall markers from actual data:', window.stallsData.length);
 
-      foodStalls.forEach(stall => {
-        try {
-          // Validate coordinates before creating marker
-          if (isNaN(stall.lat) || isNaN(stall.lng)) {
-            console.error('Invalid coordinates for food stall:', stall.name, stall);
-            return;
+        window.stallsData.forEach(stall => {
+          try {
+            // Only add markers for stalls with valid location data
+            if (stall.location && stall.location.lat && stall.location.lng) {
+              // Validate coordinates before creating marker
+              if (isNaN(stall.location.lat) || isNaN(stall.location.lng)) {
+                console.error('Invalid coordinates for food stall:', stall.name, stall.location);
+                return;
+              }
+
+              const marker = L.marker([stall.location.lat, stall.location.lng], {
+                icon: L.divIcon({
+                  className: 'food-stall-marker',
+                  html: '🍔',
+                  iconSize: [30, 30],
+                  iconAnchor: [15, 15]
+                })
+              }).addTo(map);
+
+              marker.bindPopup(`<b>${stall.name}</b><br>${stall.origin || 'Food Stall'}`);
+              marker.foodStallData = stall;
+            }
+          } catch (error) {
+            console.error('Error creating food stall marker:', error);
           }
-
-          const marker = L.marker([stall.lat, stall.lng], {
-            icon: L.divIcon({
-              className: 'food-stall-marker',
-              html: '🍔',
-              iconSize: [30, 30],
-              iconAnchor: [15, 15]
-            })
-          }).addTo(map);
-
-          marker.bindPopup(`<b>${stall.name}</b><br>Food Stall`);
-          marker.foodStallData = stall;
-        } catch (error) {
-          console.error('Error creating food stall marker:', error);
-        }
-      });
+        });
+      } else {
+        console.log('No food stall data available to display');
+      }
     }
 
     function removeFoodStallMarkers() {
@@ -11755,36 +11757,39 @@
     }
 
     function addTruckFloatMarkers() {
-      // Sample truck float locations - you can customize these
-      const truckFloats = [
-        { lat: 51.5070, lng: -0.1270, name: 'Main Stage Float' },
-        { lat: 51.5085, lng: -0.1285, name: 'VIP Float' },
-        { lat: 51.5065, lng: -0.1265, name: 'Food Court Float' }
-      ];
+      // Only display truck floats from actual data, no demo data
+      if (window.floatData && window.floatData.length > 0) {
+        console.log('Adding truck float markers from actual data:', window.floatData.length);
 
-      truckFloats.forEach(float => {
-        try {
-          // Validate coordinates before creating marker
-          if (isNaN(float.lat) || isNaN(float.lng)) {
-            console.error('Invalid coordinates for truck float:', float.name, float);
-            return;
+        window.floatData.forEach(float => {
+          try {
+            // Only add markers for floats with valid location data
+            if (float.location && float.location.lat && float.location.lng) {
+              // Validate coordinates before creating marker
+              if (isNaN(float.location.lat) || isNaN(float.location.lng)) {
+                console.error('Invalid coordinates for truck float:', float.name, float.location);
+                return;
+              }
+
+              const marker = L.marker([float.location.lat, float.location.lng], {
+                icon: L.divIcon({
+                  className: 'truck-float-marker',
+                  html: '🚛',
+                  iconSize: [30, 30],
+                  iconAnchor: [15, 15]
+                })
+              }).addTo(map);
+
+              marker.bindPopup(`<b>${float.name}</b><br>${float.type || 'Truck Float'}`);
+              marker.truckFloatData = float;
+            }
+          } catch (error) {
+            console.error('Error creating truck float marker:', error);
           }
-
-          const marker = L.marker([float.lat, float.lng], {
-            icon: L.divIcon({
-              className: 'truck-float-marker',
-              html: '🚛',
-              iconSize: [30, 30],
-              iconAnchor: [15, 15]
-            })
-          }).addTo(map);
-
-          marker.bindPopup(`<b>${float.name}</b><br>Truck Float`);
-          marker.truckFloatData = float;
-        } catch (error) {
-          console.error('Error creating truck float marker:', error);
-        }
-      });
+        });
+      } else {
+        console.log('No truck float data available to display');
+      }
 
       // Show float panel content
       showFloatPanel();
