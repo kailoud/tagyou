@@ -2939,6 +2939,125 @@
       display: block;
     }
 
+    .location-pin-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #8b5cf6;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+    }
+
+    .location-pin-btn:hover {
+      background: #7c3aed;
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    }
+
+    .location-pin-btn.active {
+      background: #dc2626;
+      animation: locationPulse 2s infinite;
+    }
+
+    .location-pin-btn.active:hover {
+      background: #b91c1c;
+    }
+
+    @keyframes locationPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+      }
+    }
+
+    .location-mode-indicator {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(220, 38, 38, 0.9);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .location-mode-indicator.show {
+      display: flex;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    .location-mode-marker {
+      background: #dc2626;
+      border: 3px solid white;
+      border-radius: 50%;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+      line-height: 26px;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+      animation: locationMarkerPulse 2s infinite;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .location-mode-marker:hover {
+      transform: scale(1.2);
+      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
+    }
+
+    @keyframes locationMarkerPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+      }
+
+      70% {
+        box-shadow: 0 0 0 8px rgba(220, 38, 38, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+      }
+    }
+
     .member-item {
       padding: 16px 0;
       border-bottom: 1px solid #eee;
@@ -5650,6 +5769,11 @@
       <span style="font-size: 8px; margin-top: 2px;">LOC</span>
     </button>
 
+    <div class="location-mode-indicator" id="locationModeIndicator">
+      <span>📍</span>
+      <span>Drop Pin Mode Active - Click on map to place pin</span>
+    </div>
+
     <div class="bottom-panel" id="bottomPanel">
       <div class="panel-handle" onclick="togglePanel()">
         <div class="handle-bar"></div>
@@ -5660,6 +5784,9 @@
         <div class="tab" onclick="switchTab('float')">Floats</div>
         <div class="tab" onclick="switchTab('artists')">Artists</div>
         <div class="tab" onclick="switchTab('settings')">Settings</div>
+        <button class="location-pin-btn" onclick="toggleLocationMode()" title="Toggle location mode">
+          📍
+        </button>
       </div>
 
       <div class="panel-content active" id="members-content">
@@ -12349,6 +12476,118 @@
           updateCarouselDisplay();
           showNotification('All images cleared', 'success');
         }
+      }
+
+      // Location Mode Management
+      let locationModeActive = false;
+      let locationModeMarker = null;
+      let locationModeClickHandler = null;
+
+      function toggleLocationMode() {
+        console.log('Toggling location mode');
+
+        if (locationModeActive) {
+          // Deactivate location mode
+          deactivateLocationMode();
+        } else {
+          // Activate location mode
+          activateLocationMode();
+        }
+      }
+
+      function activateLocationMode() {
+        console.log('Activating location mode');
+        locationModeActive = true;
+
+        // Update button appearance
+        const locationBtn = document.querySelector('.location-pin-btn');
+        if (locationBtn) {
+          locationBtn.classList.add('active');
+        }
+
+        // Show indicator
+        const indicator = document.getElementById('locationModeIndicator');
+        if (indicator) {
+          indicator.classList.add('show');
+        }
+
+        // Add map click handler
+        locationModeClickHandler = (e) => {
+          const coords = e.latlng;
+          console.log('Location mode: clicked at', coords);
+
+          // Remove previous marker if exists
+          if (locationModeMarker) {
+            map.removeLayer(locationModeMarker);
+          }
+
+          // Create new marker
+          locationModeMarker = L.marker(coords, {
+            icon: L.divIcon({
+              className: 'location-mode-marker',
+              html: '📍',
+              iconSize: [32, 32],
+              iconAnchor: [16, 32]
+            })
+          }).addTo(map);
+
+          // Add popup with coordinates
+          const coordsString = `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`;
+          locationModeMarker.bindPopup(`
+            <div style="text-align: center; padding: 8px;">
+              <strong>Dropped Pin</strong><br>
+              <small>${coordsString}</small><br>
+              <button onclick="copyCoordinates('${coordsString}')" style="margin-top: 8px; padding: 4px 8px; background: #8b5cf6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                Copy Coordinates
+              </button>
+            </div>
+          `).openPopup();
+
+          showNotification(`Pin dropped at: ${coordsString}`, 'success');
+        };
+
+        map.on('click', locationModeClickHandler);
+
+        showNotification('Location mode activated - Click on map to drop pins', 'info');
+      }
+
+      function deactivateLocationMode() {
+        console.log('Deactivating location mode');
+        locationModeActive = false;
+
+        // Update button appearance
+        const locationBtn = document.querySelector('.location-pin-btn');
+        if (locationBtn) {
+          locationBtn.classList.remove('active');
+        }
+
+        // Hide indicator
+        const indicator = document.getElementById('locationModeIndicator');
+        if (indicator) {
+          indicator.classList.remove('show');
+        }
+
+        // Remove map click handler
+        if (locationModeClickHandler) {
+          map.off('click', locationModeClickHandler);
+          locationModeClickHandler = null;
+        }
+
+        // Remove marker if exists
+        if (locationModeMarker) {
+          map.removeLayer(locationModeMarker);
+          locationModeMarker = null;
+        }
+
+        showNotification('Location mode deactivated', 'info');
+      }
+
+      function copyCoordinates(coordsString) {
+        navigator.clipboard.writeText(coordsString).then(() => {
+          showNotification('Coordinates copied to clipboard!', 'success');
+        }).catch(() => {
+          showNotification('Failed to copy coordinates', 'error');
+        });
       }
 
       function refreshArtistsData() {
