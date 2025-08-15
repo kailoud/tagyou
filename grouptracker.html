@@ -2564,7 +2564,7 @@
 
       /* Mobile artists content optimization */
       #artists-content {
-        max-height: calc(100vh - 120px);
+        max-height: calc(85vh - 100px);
         padding-bottom: 20px;
       }
 
@@ -2574,7 +2574,7 @@
         width: 100%;
         box-sizing: border-box;
         /* Ensure content doesn't get cut off on mobile */
-        max-height: calc(100vh - 120px);
+        max-height: calc(85vh - 100px);
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
       }
@@ -3026,12 +3026,15 @@
       transition: transform 0.3s ease;
       transform: translateY(calc(100% - 80px));
       /* Ensure panel doesn't exceed viewport height */
-      max-height: 100vh;
+      max-height: 85vh;
       overflow: hidden;
     }
 
     .bottom-panel.expanded {
       transform: translateY(0);
+      /* Ensure expanded panel doesn't exceed viewport */
+      max-height: 85vh;
+      overflow: hidden;
     }
 
     .panel-handle {
@@ -3122,7 +3125,7 @@
 
     .panel-content {
       padding: 0 20px 32px;
-      max-height: calc(100vh - 200px);
+      max-height: calc(85vh - 120px);
       /* Account for panel handle, tabs, and bottom spacing */
       overflow-y: auto;
       overflow-x: hidden;
@@ -4083,7 +4086,7 @@
     /* Artists Panel Styles */
     /* Ensure artists content scrolls properly */
     #artists-content {
-      max-height: calc(100vh - 200px);
+      max-height: calc(85vh - 120px);
       overflow-y: auto;
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
@@ -4153,9 +4156,11 @@
       display: flex;
       flex-direction: column;
       gap: 20px;
-      max-height: 500px;
+      max-height: 400px;
       overflow-y: auto;
       padding-right: 8px;
+      /* Ensure cards don't overflow the panel */
+      margin-bottom: 20px;
     }
 
     /* Desktop optimizations */
@@ -4720,7 +4725,7 @@
         width: 100%;
         box-sizing: border-box;
         /* Ensure content doesn't get cut off on small mobile */
-        max-height: calc(100vh - 100px);
+        max-height: calc(85vh - 80px);
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
       }
