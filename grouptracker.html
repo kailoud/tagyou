@@ -2786,6 +2786,47 @@
       background-color: #f8f9fa;
     }
 
+    .festival-item.active {
+      background-color: #ff6b35;
+      color: white;
+    }
+
+    .festival-item.active .festival-name,
+    .festival-item.active .festival-location {
+      color: white;
+    }
+
+    .festival-item.coming-soon {
+      opacity: 0.6;
+      filter: blur(0.5px);
+      cursor: not-allowed;
+      position: relative;
+    }
+
+    .festival-item.coming-soon:hover {
+      background-color: #f0f0f0;
+      opacity: 0.7;
+    }
+
+    .festival-item.coming-soon .festival-name,
+    .festival-item.coming-soon .festival-location {
+      color: #999;
+    }
+
+    .coming-soon-badge {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: #ff9800;
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
     .festival-name {
       font-weight: 600;
       color: #2c3e50;
@@ -5814,53 +5855,63 @@
       <div class="festival-dropdown">
         <button class="festival-btn" onclick="toggleFestivalDropdown()">
           <span class="festival-icon">🎪</span>
-          <span>UK Festivals</span>
+          <span>Notting Hill Carnival</span>
           <span class="dropdown-arrow">▼</span>
         </button>
         <div class="festival-list" id="festivalList">
-          <div class="festival-item" onclick="selectFestival('Glastonbury Festival')">
-            <span class="festival-name">Glastonbury Festival</span>
-            <span class="festival-location">Somerset</span>
-          </div>
-          <div class="festival-item" onclick="selectFestival('Reading & Leeds Festival')">
-            <span class="festival-name">Reading & Leeds Festival</span>
-            <span class="festival-location">Berkshire & West Yorkshire</span>
-          </div>
-          <div class="festival-item" onclick="selectFestival('Download Festival')">
-            <span class="festival-name">Download Festival</span>
-            <span class="festival-location">Derbyshire</span>
-          </div>
-          <div class="festival-item" onclick="selectFestival('Isle of Wight Festival')">
-            <span class="festival-name">Isle of Wight Festival</span>
-            <span class="festival-location">Isle of Wight</span>
-          </div>
-          <div class="festival-item" onclick="selectFestival('Latitude Festival')">
-            <span class="festival-name">Latitude Festival</span>
-            <span class="festival-location">Suffolk</span>
-          </div>
-          <div class="festival-item" onclick="selectFestival('Boomtown Fair')">
-            <span class="festival-name">Boomtown Fair</span>
-            <span class="festival-location">Hampshire</span>
-          </div>
-          <div class="festival-item" onclick="selectFestival('Creamfields')">
-            <span class="festival-name">Creamfields</span>
-            <span class="festival-location">Cheshire</span>
-          </div>
-          <div class="festival-item" onclick="selectFestival('Parklife Festival')">
-            <span class="festival-name">Parklife Festival</span>
-            <span class="festival-location">Manchester</span>
-          </div>
-          <div class="festival-item" onclick="selectFestival('Wireless Festival')">
-            <span class="festival-name">Wireless Festival</span>
-            <span class="festival-location">London</span>
-          </div>
-          <div class="festival-item" onclick="selectFestival('Boardmasters')">
-            <span class="festival-name">Boardmasters</span>
-            <span class="festival-location">Cornwall</span>
-          </div>
-          <div class="festival-item" onclick="selectFestival('Notting Hill Carnival')">
+          <div class="festival-item active" onclick="selectFestival('Notting Hill Carnival')">
             <span class="festival-name">Notting Hill Carnival</span>
             <span class="festival-location">London</span>
+          </div>
+          <div class="festival-item coming-soon" onclick="showComingSoon()">
+            <span class="festival-name">Glastonbury Festival</span>
+            <span class="festival-location">Somerset</span>
+            <span class="coming-soon-badge">Coming Soon</span>
+          </div>
+          <div class="festival-item coming-soon" onclick="showComingSoon()">
+            <span class="festival-name">Reading & Leeds Festival</span>
+            <span class="festival-location">Berkshire & West Yorkshire</span>
+            <span class="coming-soon-badge">Coming Soon</span>
+          </div>
+          <div class="festival-item coming-soon" onclick="showComingSoon()">
+            <span class="festival-name">Download Festival</span>
+            <span class="festival-location">Derbyshire</span>
+            <span class="coming-soon-badge">Coming Soon</span>
+          </div>
+          <div class="festival-item coming-soon" onclick="showComingSoon()">
+            <span class="festival-name">Isle of Wight Festival</span>
+            <span class="festival-location">Isle of Wight</span>
+            <span class="coming-soon-badge">Coming Soon</span>
+          </div>
+          <div class="festival-item coming-soon" onclick="showComingSoon()">
+            <span class="festival-name">Latitude Festival</span>
+            <span class="festival-location">Suffolk</span>
+            <span class="coming-soon-badge">Coming Soon</span>
+          </div>
+          <div class="festival-item coming-soon" onclick="showComingSoon()">
+            <span class="festival-name">Boomtown Fair</span>
+            <span class="festival-location">Hampshire</span>
+            <span class="coming-soon-badge">Coming Soon</span>
+          </div>
+          <div class="festival-item coming-soon" onclick="showComingSoon()">
+            <span class="festival-name">Creamfields</span>
+            <span class="festival-location">Cheshire</span>
+            <span class="coming-soon-badge">Coming Soon</span>
+          </div>
+          <div class="festival-item coming-soon" onclick="showComingSoon()">
+            <span class="festival-name">Parklife Festival</span>
+            <span class="festival-location">Manchester</span>
+            <span class="coming-soon-badge">Coming Soon</span>
+          </div>
+          <div class="festival-item coming-soon" onclick="showComingSoon()">
+            <span class="festival-name">Wireless Festival</span>
+            <span class="festival-location">London</span>
+            <span class="coming-soon-badge">Coming Soon</span>
+          </div>
+          <div class="festival-item coming-soon" onclick="showComingSoon()">
+            <span class="festival-name">Boardmasters</span>
+            <span class="festival-location">Cornwall</span>
+            <span class="coming-soon-badge">Coming Soon</span>
           </div>
         </div>
       </div>
@@ -10819,6 +10870,19 @@
       // Close the dropdown
       document.querySelector('.festival-dropdown').classList.remove('open');
 
+      // Update active state in dropdown
+      document.querySelectorAll('.festival-item').forEach(item => {
+        item.classList.remove('active');
+      });
+
+      // Find and activate the selected festival item
+      const festivalItems = document.querySelectorAll('.festival-item');
+      festivalItems.forEach(item => {
+        if (item.querySelector('.festival-name').textContent === festivalName) {
+          item.classList.add('active');
+        }
+      });
+
       // Load festival-specific data
       if (festivalName === 'Notting Hill Carnival') {
         console.log('Loading Notting Hill Carnival stalls data...');
@@ -10831,6 +10895,10 @@
         // Remove carnival route if switching to different festival
         removeCarnivalFloatRoute();
       }
+    }
+
+    function showComingSoon() {
+      showNotification('This festival is coming soon! Stay tuned for updates.');
     }
 
     function showNotification(message) {
