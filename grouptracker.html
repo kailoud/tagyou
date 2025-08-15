@@ -5862,12 +5862,7 @@
         <div class="tab" onclick="switchTab('float')">Floats</div>
         <div class="tab" onclick="switchTab('artists')">Artists</div>
         <div class="tab" onclick="switchTab('settings')">Settings</div>
-        <button class="location-pin-btn" onclick="toggleLocationMode()" title="Toggle location mode">
-          📍
-        </button>
-        <button class="manual-pin-btn" onclick="addManualPin()" title="Add manual pin">
-          📌
-        </button>
+
       </div>
 
       <div class="panel-content active" id="members-content">
@@ -12399,6 +12394,7 @@
         // Enable map click listener
         let clickCount = 0;
         let selectedCoords = null;
+        let tempMarker = null;
 
         const mapClickHandler = (e) => {
           clickCount++;
@@ -12408,7 +12404,7 @@
             selectedCoords = e.latlng;
 
             // Create temporary marker
-            const tempMarker = L.marker(selectedCoords, {
+            tempMarker = L.marker(selectedCoords, {
               icon: L.divIcon({
                 className: 'temp-coordinate-marker',
                 html: '📍',
@@ -12417,41 +12413,58 @@
               })
             }).addTo(map);
 
-            // Show coordinates
-            tempMarker.bindPopup(`Coordinates: ${selectedCoords.lat.toFixed(6)}, ${selectedCoords.lng.toFixed(6)}`).openPopup();
+            // Show coordinates with confirm button
+            const coordsString = `${selectedCoords.lat.toFixed(6)}, ${selectedCoords.lng.toFixed(6)}`;
+            tempMarker.bindPopup(`
+              <div style="text-align: center; padding: 8px;">
+                <strong>Selected Coordinates</strong><br>
+                <small>${coordsString}</small><br>
+                <button onclick="confirmCoordinates('${fieldName}', '${coordsString}', ${selectedCoords.lat}, ${selectedCoords.lng})" 
+                        style="margin-top: 8px; padding: 6px 12px; background: #8b5cf6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                  Confirm & Save
+                </button>
+              </div>
+            `).openPopup();
 
-            showNotification('Click again to confirm these coordinates', 'info');
+            showNotification('Coordinates selected. Click "Confirm & Save" to apply.', 'info');
 
           } else if (clickCount === 2) {
-            // Second click - confirm and fill form
-            const coordsString = `${selectedCoords.lat.toFixed(6)}, ${selectedCoords.lng.toFixed(6)}`;
-
-            // Remove temporary marker
-            map.eachLayer(layer => {
-              if (layer._icon && layer._icon.className.includes('temp-coordinate-marker')) {
-                map.removeLayer(layer);
-              }
-            });
-
-            // Remove click listener
-            map.off('click', mapClickHandler);
-
-            // Reopen form and fill coordinates
-            setTimeout(() => {
-              if (formModal) {
-                formModal.classList.add('show');
-              }
-
-              const coordInput = document.querySelector(`input[name="${fieldName}"]`);
-              if (coordInput) {
-                coordInput.value = coordsString;
-                showNotification(`Coordinates set: ${coordsString}`, 'success');
-              }
-            }, 500);
+            // Second click - show confirm dialog
+            if (tempMarker) {
+              tempMarker.openPopup();
+            }
           }
         };
 
         map.on('click', mapClickHandler);
+      }
+
+      function confirmCoordinates(fieldName, coordsString, lat, lng) {
+        console.log('Confirming coordinates:', coordsString);
+
+        // Remove temporary marker
+        map.eachLayer(layer => {
+          if (layer._icon && layer._icon.className.includes('temp-coordinate-marker')) {
+            map.removeLayer(layer);
+          }
+        });
+
+        // Remove click listener
+        map.off('click');
+
+        // Reopen form and fill coordinates
+        setTimeout(() => {
+          const formModal = document.getElementById('adminFormModal');
+          if (formModal) {
+            formModal.classList.add('show');
+          }
+
+          const coordInput = document.querySelector(`input[name="${fieldName}"]`);
+          if (coordInput) {
+            coordInput.value = coordsString;
+            showNotification(`Coordinates confirmed and saved: ${coordsString}`, 'success');
+          }
+        }, 500);
       }
 
       // Carousel Image Management Functions
@@ -12683,24 +12696,20 @@
       }
 
       function addManualPin() {
+        // Check if we're in admin form context
+        const coordInput = document.querySelector('input[name="coordinates"]');
+        if (coordInput) {
+          // We're in admin form - use form coordinates
+          addManualPinFromAdmin();
+          return;
+        }
+
+        // Regular manual pin (outside admin form)
         const lat = prompt('Enter latitude (e.g., 51.516369):');
         if (!lat) return;
 
         const lng = prompt('Enter longitude (e.g., -0.209404):');
         if (!lng) return;
-
-        // Auto-fill with coordinates from form if available
-        const coordInput = document.querySelector('input[name="coordinates"]');
-        if (coordInput && coordInput.value && !lat && !lng) {
-          const coords = coordInput.value.split(',').map(c => c.trim());
-          if (coords.length === 2) {
-            const autoLat = coords[0];
-            const autoLng = coords[1];
-            if (confirm(`Use coordinates from form: ${autoLat}, ${autoLng}?`)) {
-              return createManualPin(parseFloat(autoLat), parseFloat(autoLng));
-            }
-          }
-        }
 
         const latNum = parseFloat(lat);
         const lngNum = parseFloat(lng);
@@ -12711,6 +12720,54 @@
         }
 
         createManualPin(latNum, lngNum);
+      }
+
+      function addManualPinFromAdmin() {
+        const coordInput = document.querySelector('input[name="coordinates"]');
+        if (!coordInput || !coordInput.value) {
+          showNotification('No coordinates in form to locate', 'error');
+          return;
+        }
+
+        const coords = coordInput.value.split(',').map(c => c.trim());
+        if (coords.length !== 2) {
+          showNotification('Invalid coordinate format in form', 'error');
+          return;
+        }
+
+        const lat = parseFloat(coords[0]);
+        const lng = parseFloat(coords[1]);
+
+        if (isNaN(lat) || isNaN(lng)) {
+          showNotification('Invalid coordinates in form', 'error');
+          return;
+        }
+
+        // Close admin form temporarily
+        const formModal = document.getElementById('adminFormModal');
+        if (formModal) {
+          formModal.classList.remove('show');
+        }
+
+        // Create pin and show confirmation
+        createManualPin(lat, lng);
+
+        // Show confirmation dialog
+        setTimeout(() => {
+          if (window.manualPin) {
+            const coordsString = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            window.manualPin.bindPopup(`
+              <div style="text-align: center; padding: 8px;">
+                <strong>Manual Pin Created</strong><br>
+                <small>${coordsString}</small><br>
+                <button onclick="confirmManualPin('${coordsString}')" 
+                        style="margin-top: 8px; padding: 6px 12px; background: #8b5cf6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                  Confirm & Return to Form
+                </button>
+              </div>
+            `).openPopup();
+          }
+        }, 500);
       }
 
       function createManualPin(latNum, lngNum) {
@@ -12827,6 +12884,26 @@
             }
           }
           showNotification('No valid coordinates found in form', 'error');
+        }
+
+        function confirmManualPin(coordsString) {
+          console.log('Confirming manual pin:', coordsString);
+
+          // Remove manual pin
+          if (window.manualPin) {
+            map.removeLayer(window.manualPin);
+            window.manualPin = null;
+          }
+
+          // Reopen admin form
+          setTimeout(() => {
+            const formModal = document.getElementById('adminFormModal');
+            if (formModal) {
+              formModal.classList.add('show');
+            }
+
+            showNotification(`Manual pin confirmed. Coordinates: ${coordsString}`, 'success');
+          }, 500);
         }
       }
 
