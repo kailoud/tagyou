@@ -1603,6 +1603,19 @@
       box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
     }
 
+    .carousel-image-slot.main-image {
+      border-color: #10b981;
+      border-width: 3px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+    .carousel-image-slot.main-image.selected {
+      border-color: #10b981;
+      border-width: 3px;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
     .carousel-image-slot img {
       width: 100%;
       height: 100%;
@@ -1614,6 +1627,31 @@
       font-size: 24px;
       color: #cbd5e1;
       font-weight: bold;
+    }
+
+    .carousel-image-slot .image-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 4px;
+      pointer-events: none;
+    }
+
+    .carousel-image-slot .main-badge {
+      background: #10b981;
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      pointer-events: none;
     }
 
     .carousel-image-slot .remove-btn {
@@ -1632,6 +1670,7 @@
       align-items: center;
       justify-content: center;
       transition: all 0.2s ease;
+      pointer-events: auto;
     }
 
     .carousel-image-slot:hover .remove-btn {
@@ -1697,29 +1736,29 @@
     }
 
     .carousel-btn {
-      background: #8b5cf6;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 12px;
+      padding: 4px 8px;
+      font-size: 11px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      background: white;
+      color: #374151;
       cursor: pointer;
       transition: all 0.2s ease;
     }
 
     .carousel-btn:hover {
-      background: #7c3aed;
-      transform: translateY(-1px);
+      background: #f3f4f6;
+      border-color: #9ca3af;
     }
 
     .carousel-btn.secondary {
-      background: #f3f4f6;
-      color: #374151;
-      border: 1px solid #d1d5db;
+      background: #f8fafc;
+      border-color: #e5e7eb;
     }
 
     .carousel-btn.secondary:hover {
-      background: #e5e7eb;
+      background: #f1f5f9;
+      border-color: #cbd5e1;
     }
 
     .temp-coordinate-marker {
@@ -9077,17 +9116,22 @@
 
           const carouselSlots = Array.from({ length: maxImages }, (_, index) => {
             const image = existingImages[index];
+            const isMainImage = index === 0; // First image is main image
             const isSelected = index === 0; // First image is selected by default
 
             return `
-                <div class="carousel-image-slot ${isSelected ? 'selected' : ''}" 
+                <div class="carousel-image-slot ${isSelected ? 'selected' : ''} ${isMainImage ? 'main-image' : ''}" 
                      onclick="selectCarouselImage(${index})" 
                      data-index="${index}">
                   ${image ? `
                     <img src="${image}" alt="Image ${index + 1}">
-                    <button class="remove-btn" onclick="removeCarouselImage(${index}, event)">×</button>
+                    <div class="image-overlay">
+                      ${isMainImage ? '<span class="main-badge">Main</span>' : ''}
+                      <button class="remove-btn" onclick="removeCarouselImage(${index}, event)">×</button>
+                    </div>
                   ` : `
                     <div class="slot-number">${index + 1}</div>
+                    ${index === 0 ? '<div class="main-badge">Main</div>' : ''}
                   `}
                 </div>
               `;
@@ -9112,6 +9156,9 @@
                     ${existingImages.length}/${maxImages} images uploaded
                   </div>
                   <div class="carousel-actions">
+                    <button type="button" class="carousel-btn secondary" onclick="setMainImage(window.selectedImageIndex)" title="Set selected image as main">
+                      Set as Main
+                    </button>
                     <button type="button" class="carousel-btn secondary" onclick="reorderCarouselImages()">
                       Reorder
                     </button>
@@ -12897,16 +12944,25 @@
         const image = window.carouselImages[index];
 
         if (image) {
+          const isMainImage = index === 0;
           slot.innerHTML = `
               <img src="${image}" alt="Image ${index + 1}">
-              <button class="remove-btn" onclick="removeCarouselImage(${index}, event)">×</button>
+              <div class="image-overlay">
+                ${isMainImage ? '<span class="main-badge">Main</span>' : ''}
+                <button class="remove-btn" onclick="removeCarouselImage(${index}, event)">×</button>
+              </div>
             `;
         } else {
-          slot.innerHTML = `<div class="slot-number">${index + 1}</div>`;
+          const isMainImage = index === 0;
+          slot.innerHTML = `
+              <div class="slot-number">${index + 1}</div>
+              ${isMainImage ? '<div class="main-badge">Main</div>' : ''}
+            `;
         }
 
-        // Update selected state
+        // Update selected state and main image class
         slot.classList.toggle('selected', index === window.selectedImageIndex);
+        slot.classList.toggle('main-image', index === 0);
       });
 
       // Update info
@@ -12941,6 +12997,24 @@
         updateCarouselDisplay();
         showNotification('All images cleared', 'success');
       }
+    }
+
+    function setMainImage(index) {
+      if (window.carouselImages.length === 0 || index >= window.carouselImages.length) {
+        showNotification('Invalid image selection', 'error');
+        return;
+      }
+
+      // Move the selected image to the first position (main image)
+      const selectedImage = window.carouselImages[index];
+      window.carouselImages.splice(index, 1);
+      window.carouselImages.unshift(selectedImage);
+
+      // Update selected index to the new position
+      window.selectedImageIndex = 0;
+
+      updateCarouselDisplay();
+      showNotification('Main image updated', 'success');
     }
 
     // Location Mode Management
