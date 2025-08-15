@@ -8259,6 +8259,9 @@
           if (loadingIndicator) {
             loadingIndicator.style.display = 'none';
           }
+
+          // Update tab counts after modal is shown
+          updateAdminTabCounts();
         }, 100);
       } catch (error) {
         console.error('Error loading admin portal:', error);
@@ -9064,6 +9067,30 @@
       'artists': { title: 'Artists & Bands', icon: '🎵' }
     };
 
+    function updateAdminTabCounts() {
+      // Update tab counts for all tabs
+      const tabCounts = {
+        'food-stalls': adminData['food-stalls'].length,
+        'float-trucks': adminData['float-trucks'].length,
+        'groups': adminData['groups'].length,
+        'friends': adminData['friends'].length,
+        'artists': adminData['artists'].length
+      };
+
+      // Update each tab count
+      Object.keys(tabCounts).forEach(tabKey => {
+        const tabButton = document.querySelector(`.admin-tab[onclick*="${tabKey}"]`);
+        if (tabButton) {
+          const countSpan = tabButton.querySelector('.tab-count');
+          if (countSpan) {
+            countSpan.textContent = tabCounts[tabKey];
+          }
+        }
+      });
+
+      console.log('Updated tab counts:', tabCounts);
+    }
+
     function switchAdminTab(tab) {
       activeAdminTab = tab;
 
@@ -9215,6 +9242,9 @@
 
           // Reload data from database
           await loadAdminData();
+
+          // Update tab counts after deletion
+          updateAdminTabCounts();
 
           // Refresh map markers if artists were deleted
           if (activeAdminTab === 'artists') {
@@ -9727,6 +9757,9 @@
             tableBody.innerHTML = renderAdminTableData();
           });
         }
+
+        // Update tab counts immediately
+        updateAdminTabCounts();
 
         // Refresh map markers if artists were updated (defer for performance)
         if (activeAdminTab === 'artists') {
