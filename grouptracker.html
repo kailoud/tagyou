@@ -1490,6 +1490,23 @@
       transform: scale(1.05);
     }
 
+    .coordinate-locate-btn {
+      background: #059669;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .coordinate-locate-btn:hover {
+      background: #047857;
+      transform: scale(1.05);
+    }
+
     .form-hint {
       color: #666;
       font-size: 12px;
@@ -8891,6 +8908,9 @@
                   <button type="button" onclick="getCoordinatesFromMap('${field.key}')" class="coordinate-picker-btn" title="Pick from map">
                     📍
                   </button>
+                  <button type="button" onclick="locateFormCoordinates()" class="coordinate-locate-btn" title="Locate coordinates on map">
+                    🎯
+                  </button>
                 </div>
                 <small class="form-hint">Format: latitude, longitude (e.g., 51.522592, -0.202544)</small>
               `;
@@ -12669,6 +12689,19 @@
         const lng = prompt('Enter longitude (e.g., -0.209404):');
         if (!lng) return;
 
+        // Auto-fill with coordinates from form if available
+        const coordInput = document.querySelector('input[name="coordinates"]');
+        if (coordInput && coordInput.value && !lat && !lng) {
+          const coords = coordInput.value.split(',').map(c => c.trim());
+          if (coords.length === 2) {
+            const autoLat = coords[0];
+            const autoLng = coords[1];
+            if (confirm(`Use coordinates from form: ${autoLat}, ${autoLng}?`)) {
+              return createManualPin(parseFloat(autoLat), parseFloat(autoLng));
+            }
+          }
+        }
+
         const latNum = parseFloat(lat);
         const lngNum = parseFloat(lng);
 
@@ -12676,6 +12709,11 @@
           showNotification('Invalid coordinates. Please enter valid numbers.', 'error');
           return;
         }
+
+        createManualPin(latNum, lngNum);
+      }
+
+      function createManualPin(latNum, lngNum) {
 
         // Validate coordinates are within reasonable London bounds
         if (latNum < 51.0 || latNum > 52.0 || lngNum < -1.0 || lngNum > 0.5) {
@@ -12771,6 +12809,24 @@
           } else {
             showNotification('No manual pin found', 'info');
           }
+        }
+
+        function locateFormCoordinates() {
+          const coordInput = document.querySelector('input[name="coordinates"]');
+          if (coordInput && coordInput.value) {
+            const coords = coordInput.value.split(',').map(c => c.trim());
+            if (coords.length === 2) {
+              const lat = parseFloat(coords[0]);
+              const lng = parseFloat(coords[1]);
+
+              if (!isNaN(lat) && !isNaN(lng)) {
+                console.log('Locating form coordinates:', lat, lng);
+                createManualPin(lat, lng);
+                return;
+              }
+            }
+          }
+          showNotification('No valid coordinates found in form', 'error');
         }
       }
 
