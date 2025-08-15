@@ -1103,47 +1103,7 @@
       background: #1e3a8a;
     }
 
-    .send-btn {
-      background: #059669;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
 
-    .send-btn:hover {
-      background: #047857;
-      transform: scale(1.02);
-    }
-
-    .send-btn.sent {
-      background: #10b981;
-      animation: sendPulse 0.6s ease;
-    }
-
-    .send-btn.sent:hover {
-      background: #059669;
-    }
-
-    @keyframes sendPulse {
-      0% {
-        transform: scale(1);
-      }
-
-      50% {
-        transform: scale(1.05);
-      }
-
-      100% {
-        transform: scale(1);
-      }
-    }
 
     .admin-table-container {
       background: white;
@@ -8176,9 +8136,6 @@
                   <button onclick="showAdminAddForm()" class="add-btn">
                     ➕ Add ${adminTabConfig[activeAdminTab].title.slice(0, -1)}
                   </button>
-                  <button id="sendToUsersBtn" onclick="sendToUsers()" class="send-btn" title="Send changes to users">
-                    📤 Send to Users
-                  </button>
                 </div>
 
                 <!-- Admin Data Table -->
@@ -8248,57 +8205,7 @@
       }
     }
 
-    // Send changes to users function (from Admin Portal)
-    async function sendToUsers() {
-      console.log('Sending changes to users...');
 
-      const sendBtn = document.getElementById('sendToUsersBtn');
-      if (!sendBtn) return;
-
-      // Check if there are any pending changes
-      const hasPendingChanges = Object.values(pendingChanges).some(hasChanges => hasChanges);
-
-      if (!hasPendingChanges) {
-        showNotification('No changes to send to users', 'info');
-        return;
-      }
-
-      try {
-        // Show loading state
-        sendBtn.disabled = true;
-        sendBtn.innerHTML = '📤 Sending...';
-
-        // Copy admin data to user data for all changed categories
-        for (const [category, hasChanges] of Object.entries(pendingChanges)) {
-          if (hasChanges) {
-            console.log(`Updating user data for ${category}`);
-            userData[category] = JSON.parse(JSON.stringify(adminData[category])); // Deep copy
-            pendingChanges[category] = false;
-          }
-        }
-
-        // Update user-facing displays
-        updateUserDisplays();
-
-        // Show success state
-        sendBtn.classList.add('sent');
-        sendBtn.innerHTML = '✅ Sent to Users';
-        showNotification('Changes sent to users successfully!', 'success');
-
-        // Reset button after 3 seconds
-        setTimeout(() => {
-          sendBtn.classList.remove('sent');
-          sendBtn.disabled = false;
-          sendBtn.innerHTML = '📤 Send to Users';
-        }, 3000);
-
-      } catch (error) {
-        console.error('Error sending changes to users:', error);
-        sendBtn.disabled = false;
-        sendBtn.innerHTML = '📤 Send to Users';
-        showNotification('Error sending changes to users', 'error');
-      }
-    }
 
     // Send changes to users function (from Main Interface)
     async function sendToUsersFromMain() {
@@ -8407,21 +8314,9 @@
 
     // Update send button state based on pending changes
     function updateSendButtonState() {
-      const sendBtn = document.getElementById('sendToUsersBtn');
       const sendMenuItem = document.getElementById('sendToUsersMenuItem');
 
       const hasPendingChanges = Object.values(pendingChanges).some(hasChanges => hasChanges);
-
-      // Update Admin Portal button
-      if (sendBtn) {
-        if (hasPendingChanges) {
-          sendBtn.style.background = '#dc2626'; // Red to indicate pending changes
-          sendBtn.title = 'Send changes to users (changes pending)';
-        } else {
-          sendBtn.style.background = '#059669'; // Green when no pending changes
-          sendBtn.title = 'Send changes to users';
-        }
-      }
 
       // Update Main Interface menu item
       if (sendMenuItem) {
