@@ -8106,6 +8106,57 @@
         }
       }
 
+      async function uploadCarouselImagesToFirebase(images, id, isEditing, itemData) {
+        try {
+          console.log('Uploading carousel images to Firebase Storage:', images.length);
+
+          const storage = window.firebaseStorage;
+          if (!storage) {
+            throw new Error('Firebase Storage not initialized');
+          }
+
+          // Filter out data URLs and keep only File objects for upload
+          const filesToUpload = images.filter(img => img instanceof File);
+          const dataUrls = images.filter(img => !(img instanceof File) && (img.startsWith('data:image/') || img.startsWith('http')));
+
+          console.log('Files to upload:', filesToUpload.length);
+          console.log('Existing data URLs:', dataUrls.length);
+
+          if (filesToUpload.length === 0) {
+            // No files to upload, just save the data URLs
+            itemData.images = dataUrls;
+            completeSave(itemData, id, isEditing);
+            return;
+          }
+
+          const storageRef = storage.ref();
+          const uploadPromises = filesToUpload.map(async (file, index) => {
+            const timestamp = Date.now();
+            const fileName = `artists/${id || 'new'}_${timestamp}_${index}_${file.name}`;
+            const imageRef = storageRef.child(fileName);
+
+            const snapshot = await imageRef.put(file);
+            const downloadURL = await snapshot.ref.getDownloadURL();
+            console.log(`Image ${index + 1} uploaded:`, downloadURL);
+            return downloadURL;
+          });
+
+          const downloadURLs = await Promise.all(uploadPromises);
+          console.log('All carousel images uploaded successfully:', downloadURLs);
+
+          // Combine existing data URLs with new Firebase URLs
+          itemData.images = [...dataUrls, ...downloadURLs];
+          completeSave(itemData, id, isEditing);
+
+        } catch (error) {
+          console.error('Error uploading carousel images:', error);
+          showNotification('Error uploading images: ' + error.message, 'error');
+
+          // Continue without images if upload fails
+          completeSave(itemData, id, isEditing);
+        }
+      }
+
       // Mock Data Functions for Demo
       function getMockFoodStalls() {
         return [
@@ -8774,9 +8825,13 @@
           } else if (key === 'memberCount' || key === 'rating' || key === 'duration') {
             itemData[key] = parseFloat(value) || 0;
           } else if (key === 'images' && carouselImages.length > 0) {
-            // Handle carousel images
+            // Handle carousel images - upload to Firebase Storage
             console.log('Saving carousel images:', carouselImages.length);
-            itemData[key] = carouselImages;
+
+            // Upload carousel images to Firebase Storage
+            uploadCarouselImagesToFirebase(carouselImages, actualId, isEditing, itemData);
+            return; // Exit early, will continue in callback
+
             // Reset carousel for next use
             carouselImages = [];
             selectedImageIndex = 0;
@@ -12228,7 +12283,9 @@
 
           const reader = new FileReader();
           reader.onload = function (e) {
-            carouselImages.push(e.target.result);
+            // Convert to data URL for storage
+            const dataUrl = e.target.result;
+            carouselImages.push(dataUrl);
             updateCarouselDisplay();
           };
           reader.readAsDataURL(file);
