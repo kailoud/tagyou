@@ -7520,10 +7520,29 @@
             const artistsSnapshot = await db.collection('artists')
               .orderBy('created_at', 'desc')
               .get();
-            adminData['artists'] = artistsSnapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data()
-            }));
+            adminData['artists'] = artistsSnapshot.docs.map(doc => {
+              const data = doc.data();
+              // Ensure all artists have a status, default to 'confirmed' if missing
+              if (!data.status) {
+                console.log(`Artist ${data.name} has no status, setting to 'confirmed'`);
+                data.status = 'confirmed';
+
+                // Update the document in Firebase to save the status
+                db.collection('artists').doc(doc.id).update({
+                  status: 'confirmed',
+                  updated_at: new Date().toISOString()
+                }).then(() => {
+                  console.log(`Updated artist ${data.name} status to 'confirmed'`);
+                }).catch(error => {
+                  console.error(`Error updating artist ${data.name} status:`, error);
+                });
+              }
+              return {
+                id: doc.id,
+                ...data
+              };
+            });
+            console.log('Loaded artists with status check:', adminData['artists']);
           } catch (error) {
             console.warn('Artists collection not found, using mock data:', error);
             adminData['artists'] = getMockArtists();
@@ -11009,8 +11028,11 @@
         let artists = [];
 
         if (window.adminData && window.adminData.artists && window.adminData.artists.length > 0) {
-          // Use admin data
-          artists = window.adminData.artists.filter(artist => artist.status === 'confirmed').map(artist => ({
+          // Use admin data - show all artists if no confirmed ones exist
+          const confirmedArtists = window.adminData.artists.filter(artist => artist.status === 'confirmed');
+          const artistsToShow = confirmedArtists.length > 0 ? confirmedArtists : window.adminData.artists;
+
+          artists = artistsToShow.map(artist => ({
             id: artist.id,
             name: artist.name,
             type: artist.type,
@@ -11179,15 +11201,25 @@
           console.warn('Admin data not available, loading it now...');
           // Try to load admin data if not available
           loadAdminData().then(() => {
+            console.log('Admin data loaded, artists:', window.adminData.artists);
             const artists = window.adminData.artists.filter(artist => artist.status === 'confirmed');
+            console.log('Filtered confirmed artists:', artists);
             updateArtistCategories(artists);
           });
           return;
         }
 
+        console.log('Admin data available, all artists:', window.adminData.artists);
         const artists = window.adminData.artists.filter(artist => artist.status === 'confirmed');
         console.log('Filtered artists for categories:', artists);
-        updateArtistCategories(artists);
+
+        // If no confirmed artists, show all artists for debugging
+        if (artists.length === 0 && window.adminData.artists.length > 0) {
+          console.log('No confirmed artists found, showing all artists for debugging');
+          updateArtistCategories(window.adminData.artists);
+        } else {
+          updateArtistCategories(artists);
+        }
       }
 
       function loadArtistsSchedule() {
@@ -11301,6 +11333,18 @@
         // Force reload admin data and refresh everything
         loadAdminData().then(() => {
           console.log('Admin data reloaded, updating artists...');
+          console.log('All artists in admin data:', window.adminData.artists);
+
+          // Debug: Check each artist's status
+          window.adminData.artists.forEach((artist, index) => {
+            console.log(`Artist ${index + 1}:`, {
+              name: artist.name,
+              type: artist.type,
+              status: artist.status,
+              id: artist.id
+            });
+          });
+
           loadArtistsData();
           loadArtistsSchedule();
           updateArtistCategoriesFromAdminData();
