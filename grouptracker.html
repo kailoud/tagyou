@@ -4152,6 +4152,28 @@
       transform: scale(1.2);
     }
 
+    /* Park Stage Marker Styles */
+    .park-stage-marker {
+      background: #16a34a;
+      border: 2px solid white;
+      border-radius: 50%;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      line-height: 28px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      transition: transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .park-stage-marker:hover {
+      transform: scale(1.2);
+      background: #15803d;
+    }
+
     /* Carnival route polyline styling */
     .leaflet-interactive.carnival-route {
       cursor: pointer;
@@ -9729,7 +9751,32 @@
           marker.carnivalRouteData = true;
         });
 
+        // Add park stage markers (drum set icons with circular boundaries)
+        // Places where people can sit and watch
+        const parkStageLocations = [
+          { coord: [51.522592, -0.202544], area: "Meanwhile Garden" },
+          { coord: [51.516226, -0.201240], area: "Powis Square" },
+          { coord: [51.524981, -0.209562], area: "Hornimans Park Stage" },
+        ];
 
+        parkStageLocations.forEach((stage) => {
+          const marker = L.marker(stage.coord, {
+            icon: L.divIcon({
+              className: 'park-stage-marker',
+              html: '🥁', // Drum set icon
+              iconSize: [28, 28],
+              iconAnchor: [14, 14]
+            })
+          }).addTo(map);
+
+          marker.bindPopup(`
+            <b>PARK STAGE</b><br>
+            <small>${stage.area}</small><br>
+            <small>Notting Hill Carnival 2023</small><br>
+            <small>Live entertainment - sit and watch</small>
+          `);
+          marker.carnivalRouteData = true;
+        });
 
         // Fit map to show the entire carnival route
         map.fitBounds(gridBounds, { padding: [20, 20] });
