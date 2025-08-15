@@ -2392,7 +2392,7 @@
 
     /* When panel is expanded, put left controls behind it */
     body.panel-expanded .left-controls {
-      z-index: 9999;
+      z-index: 999;
     }
 
     .top-location-control {
@@ -2884,7 +2884,7 @@
       background: white;
       border-radius: 16px 16px 0 0;
       box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.1);
-      z-index: 10002;
+      z-index: 1000;
       transition: transform 0.3s ease;
       transform: translateY(calc(100% - 80px));
     }
@@ -2987,7 +2987,6 @@
       display: none;
       /* Ensure content doesn't interfere with tab scrolling */
       position: relative;
-      z-index: 10003;
       /* Prevent horizontal overflow */
       width: 100%;
       box-sizing: border-box;
@@ -3586,8 +3585,6 @@
 
     .float-categories {
       margin-bottom: 24px;
-      position: relative;
-      z-index: 10003;
     }
 
     .float-categories h4 {
@@ -3600,8 +3597,6 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      position: relative;
-      z-index: 10003;
     }
 
     .category-tag {
@@ -6165,6 +6160,18 @@
           </div>
         </div>
 
+        <!-- Float Categories -->
+        <div class="float-categories">
+          <h4>🎨 Float Categories</h4>
+          <div class="category-tags">
+            <span class="category-tag active" onclick="filterFloats('all')">All</span>
+            <span class="category-tag" onclick="filterFloats('cultural')">Cultural</span>
+            <span class="category-tag" onclick="filterFloats('fantasy')">Fantasy</span>
+            <span class="category-tag" onclick="filterFloats('historical')">Historical</span>
+            <span class="category-tag" onclick="filterFloats('modern')">Modern</span>
+          </div>
+        </div>
+
         <!-- Float Parade Route -->
         <div class="float-route-section">
           <h4>📍 Parade Route</h4>
@@ -6205,18 +6212,6 @@
           </div>
         </div>
         <!-- Schedule items will be dynamically generated -->
-      </div>
-    </div>
-
-    <!-- Float Categories -->
-    <div class="float-categories">
-      <h4>🎨 Float Categories</h4>
-      <div class="category-tags">
-        <span class="category-tag active" onclick="filterFloats('all')">All</span>
-        <span class="category-tag" onclick="filterFloats('cultural')">Cultural</span>
-        <span class="category-tag" onclick="filterFloats('fantasy')">Fantasy</span>
-        <span class="category-tag" onclick="filterFloats('historical')">Historical</span>
-        <span class="category-tag" onclick="filterFloats('modern')">Modern</span>
       </div>
     </div>
   </div>
