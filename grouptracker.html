@@ -2748,6 +2748,23 @@
       box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
     }
 
+    .parade-route-btn {
+      background: #ffb366;
+      color: #8b4513;
+      transition: all 0.3s ease;
+    }
+
+    .parade-route-btn:hover {
+      background: #ffa040;
+      transform: scale(1.05);
+    }
+
+    .parade-route-btn.active {
+      background: #ff8c00;
+      color: white;
+      box-shadow: 0 4px 16px rgba(255, 140, 0, 0.4);
+    }
+
 
 
     /* Festival Dropdown Styles */
@@ -5997,6 +6014,12 @@
         </svg>
       </button>
 
+      <button class="control-btn parade-route-btn" onclick="toggleParadeRoute()" title="Toggle Main Parade Route">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+        </svg>
+      </button>
+
 
 
     </div>
@@ -8491,6 +8514,123 @@
             };
           });
           console.log('Loaded float routes:', adminData['float-routes'].length);
+
+          // Auto-display main parade route if available
+          const mainRoute = adminData['float-routes'].find(route =>
+            route.route_type === 'Main Parade Route' && route.status === 'active'
+          );
+          if (mainRoute) {
+            console.log('Auto-displaying main parade route:', mainRoute.route_name);
+            setTimeout(() => {
+              displayMainFloatRoute(mainRoute);
+            }, 1000); // Delay to ensure map is loaded
+          } else {
+            // Create default Notting Hill Carnival route if none exists
+            console.log('Creating default Notting Hill Carnival route...');
+            const defaultRoute = {
+              id: 'default-carnival-route',
+              route_name: 'Notting Hill Carnival Main Parade Route 2024',
+              route_type: 'Main Parade Route',
+              start_point: '51.512565, -0.206491',
+              end_point: '51.512588, -0.206464',
+              route_coordinates: JSON.stringify([
+                { "lat": 51.512565, "lng": -0.206491 }, // A1 - Ladbroke Grove
+                { "lat": 51.513412, "lng": -0.207095 }, // A2
+                { "lat": 51.526325, "lng": -0.215112 }, // A3
+                { "lat": 51.514257, "lng": -0.207705 }, // A4
+                { "lat": 51.515175, "lng": -0.208372 }, // A5
+                { "lat": 51.516227, "lng": -0.209131 }, // A6
+                { "lat": 51.516945, "lng": -0.209692 }, // A7
+                { "lat": 51.517616, "lng": -0.210155 }, // A8
+                { "lat": 51.517915, "lng": -0.210328 }, // A9
+                { "lat": 51.518306, "lng": -0.210546 }, // A10
+                { "lat": 51.518959, "lng": -0.210919 }, // A11
+                { "lat": 51.519609, "lng": -0.211299 }, // A12
+                { "lat": 51.520169, "lng": -0.211619 }, // A13
+                { "lat": 51.520670, "lng": -0.211909 }, // A14
+                { "lat": 51.521160, "lng": -0.212196 }, // A15
+                { "lat": 51.521639, "lng": -0.212464 }, // A16
+                { "lat": 51.522116, "lng": -0.212742 }, // A17
+                { "lat": 51.522353, "lng": -0.212883 }, // A18
+                { "lat": 51.522966, "lng": -0.213237 }, // A19
+                { "lat": 51.523684, "lng": -0.213660 }, // A20
+                { "lat": 51.524082, "lng": -0.213921 }, // A21
+                { "lat": 51.524327, "lng": -0.213996 }, // A22
+                { "lat": 51.525289, "lng": -0.214583 }, // A23
+                { "lat": 51.525740, "lng": -0.214874 }, // A24
+                { "lat": 51.525909, "lng": -0.215061 }, // A25
+                { "lat": 51.526085, "lng": -0.215144 }, // A26
+                { "lat": 51.526336, "lng": -0.215253 }, // A29 - Kensal Rd
+                { "lat": 51.526310, "lng": -0.213861 }, // B1
+                { "lat": 51.526270, "lng": -0.212296 }, // B2
+                { "lat": 51.526242, "lng": -0.211541 }, // B3
+                { "lat": 51.526186, "lng": -0.210546 }, // B4
+                { "lat": 51.526127, "lng": -0.209911 }, // B5
+                { "lat": 51.526004, "lng": -0.209122 }, // B6
+                { "lat": 51.525930, "lng": -0.208710 }, // B7
+                { "lat": 51.525820, "lng": -0.208111 }, // B8
+                { "lat": 51.525691, "lng": -0.207379 }, // B9
+                { "lat": 51.525598, "lng": -0.206951 }, // B10
+                { "lat": 51.525475, "lng": -0.206583 }, // B11
+                { "lat": 51.525399, "lng": -0.206423 }, // B12
+                { "lat": 51.525235, "lng": -0.206137 }, // B13
+                { "lat": 51.524480, "lng": -0.205508 }, // B14
+                { "lat": 51.524295, "lng": -0.205380 }, // C1 - Golbourne Rd
+                { "lat": 51.524214, "lng": -0.205371 }, // C2
+                { "lat": 51.524129, "lng": -0.205661 }, // C3
+                { "lat": 51.524048, "lng": -0.205953 }, // C4
+                { "lat": 51.523901, "lng": -0.206208 }, // C5
+                { "lat": 51.523697, "lng": -0.206490 }, // C6
+                { "lat": 51.523589, "lng": -0.206582 }, // C7
+                { "lat": 51.523308, "lng": -0.206721 }, // C8
+                { "lat": 51.523212, "lng": -0.206733 }, // C9
+                { "lat": 51.523150, "lng": -0.206637 }, // C10
+                { "lat": 51.523124, "lng": -0.206516 }, // D1 - Elkstone Road
+                { "lat": 51.523059, "lng": -0.206407 }, // D2
+                { "lat": 51.522984, "lng": -0.206246 }, // D3
+                { "lat": 51.522871, "lng": -0.206050 }, // D4
+                { "lat": 51.522714, "lng": -0.205583 }, // D5
+                { "lat": 51.522626, "lng": -0.205293 }, // D6
+                { "lat": 51.522480, "lng": -0.204769 }, // D7
+                { "lat": 51.522359, "lng": -0.204341 }, // D8
+                { "lat": 51.522286, "lng": -0.204071 }, // D9
+                { "lat": 51.522257, "lng": -0.203941 }, // D10
+                { "lat": 51.522244, "lng": -0.203688 }, // D11
+                { "lat": 51.522315, "lng": -0.203307 }, // D12
+                { "lat": 51.522393, "lng": -0.203068 }, // D13
+                { "lat": 51.522420, "lng": -0.202845 }, // D14
+                { "lat": 51.522409, "lng": -0.202589 }, // D15
+                { "lat": 51.522330, "lng": -0.202250 }, // D16
+                { "lat": 51.522233, "lng": -0.201823 }, // D17
+                { "lat": 51.522189, "lng": -0.201602 }, // D18
+                { "lat": 51.522114, "lng": -0.201366 }, // D19
+                { "lat": 51.521849, "lng": -0.201236 }, // E1
+                { "lat": 51.521627, "lng": -0.201093 }, // E2
+                { "lat": 51.521353, "lng": -0.200893 }, // E3
+                { "lat": 51.521025, "lng": -0.200637 }, // E4
+                { "lat": 51.520742, "lng": -0.200437 }, // E5
+                { "lat": 51.518595, "lng": -0.198448 }, // E6
+                { "lat": 51.518613, "lng": -0.198423 }, // F - Westbourne Park Road
+                { "lat": 51.519079, "lng": -0.196369 }, // G - Westbourne Park Road
+                { "lat": 51.515062, "lng": -0.195045 }, // H - Chepstow Rd
+                { "lat": 51.514405, "lng": -0.200323 }, // I - Westbourne Grove
+                { "lat": 51.512588, "lng": -0.206464 }  // J - Ladbroke Gardens (Back to A1)
+              ]),
+              estimated_duration: 4.5,
+              start_time: '14:00',
+              description: 'Complete Notting Hill Carnival Main Parade Route 2024 - Starting from Ladbroke Grove, through Kensal Rd, Golbourne Rd, Elkstone Road, Westbourne Park Road, Chepstow Rd, Westbourne Grove, and back to Ladbroke Gardens',
+              status: 'active'
+            };
+
+            // Add to admin data
+            if (!adminData['float-routes']) adminData['float-routes'] = [];
+            adminData['float-routes'].unshift(defaultRoute);
+
+            // Display the route
+            setTimeout(() => {
+              displayMainFloatRoute(defaultRoute);
+            }, 1000);
+          }
         } catch (error) {
           console.warn('Float routes collection not found:', error);
           adminData['float-routes'] = [];
@@ -13125,6 +13265,86 @@
           map.removeLayer(route);
         });
         window.floatRoutes = [];
+      }
+    }
+
+    // Main Display Route Functions
+    function displayMainFloatRoute(routeData) {
+      try {
+        // Parse route coordinates
+        const coordinates = JSON.parse(routeData.route_coordinates);
+
+        // Create polyline for the main display route with light orange color
+        const mainRoutePolyline = L.polyline(coordinates, {
+          color: '#ffb366', // Light orange color
+          weight: 6,
+          opacity: 0.7,
+          dashArray: '10, 5' // Dashed line for main route
+        }).addTo(map);
+
+        // Add start and end markers for main route
+        const startCoords = routeData.start_point.split(',').map(c => parseFloat(c.trim()));
+        const endCoords = routeData.end_point.split(',').map(c => parseFloat(c.trim()));
+
+        // Start marker (larger and more prominent)
+        L.marker(startCoords, {
+          icon: L.divIcon({
+            className: 'main-route-start-marker',
+            html: '🎪',
+            iconSize: [30, 30]
+          })
+        }).addTo(map).bindPopup(`🎪 Main Parade Start: ${routeData.route_name}`);
+
+        // End marker
+        L.marker(endCoords, {
+          icon: L.divIcon({
+            className: 'main-route-end-marker',
+            html: '🏁',
+            iconSize: [30, 30]
+          })
+        }).addTo(map).bindPopup(`🏁 Main Parade End: ${routeData.route_name}`);
+
+        // Store reference for main route
+        if (!window.mainFloatRoute) window.mainFloatRoute = [];
+        window.mainFloatRoute.push(mainRoutePolyline);
+
+        showNotification(`Main parade route "${routeData.route_name}" displayed`, 'success');
+      } catch (error) {
+        console.error('Error displaying main float route:', error);
+        showNotification('Error displaying main route. Check coordinate format.', 'error');
+      }
+    }
+
+    function clearMainFloatRoute() {
+      if (window.mainFloatRoute) {
+        window.mainFloatRoute.forEach(route => {
+          map.removeLayer(route);
+        });
+        window.mainFloatRoute = [];
+      }
+    }
+
+    function toggleParadeRoute() {
+      const paradeRouteBtn = document.querySelector('.parade-route-btn');
+      const isActive = paradeRouteBtn.classList.toggle('active');
+
+      if (isActive) {
+        // Show main parade route
+        const mainRoute = adminData['float-routes']?.find(route =>
+          route.route_type === 'Main Parade Route' && route.status === 'active'
+        );
+
+        if (mainRoute) {
+          displayMainFloatRoute(mainRoute);
+          showNotification('Main parade route displayed', 'success');
+        } else {
+          showNotification('No main parade route found. Add one in Admin Portal.', 'info');
+          paradeRouteBtn.classList.remove('active');
+        }
+      } else {
+        // Hide main parade route
+        clearMainFloatRoute();
+        showNotification('Main parade route hidden', 'info');
       }
     }
 
