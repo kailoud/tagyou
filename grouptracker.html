@@ -6545,6 +6545,14 @@
             // Initialize app
             initializeApp();
 
+            // Add keyboard shortcut for finding manual pin (Ctrl+F or Cmd+F)
+            document.addEventListener('keydown', function (e) {
+              if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                findManualPin();
+              }
+            });
+
           } else {
             // User is not authenticated
             console.log('No authenticated user found'); // Debug log
@@ -12682,6 +12690,8 @@
 
         // Create new pin
         const coords = { lat: latNum, lng: lngNum };
+        console.log('Creating manual pin at coordinates:', coords);
+
         window.manualPin = L.marker(coords, {
           icon: L.divIcon({
             className: 'manual-pin-marker',
@@ -12690,6 +12700,15 @@
             iconAnchor: [16, 32]
           })
         }).addTo(map);
+
+        // Ensure the pin is added to the map
+        if (!map.hasLayer(window.manualPin)) {
+          console.error('Failed to add manual pin to map');
+          showNotification('Error: Failed to add pin to map', 'error');
+          return;
+        }
+
+        console.log('Manual pin successfully added to map');
 
         // Add popup with coordinates
         const coordsString = `${latNum.toFixed(6)}, ${lngNum.toFixed(6)}`;
@@ -12703,11 +12722,26 @@
             <button onclick="removeManualPin()" style="margin-top: 8px; margin-left: 4px; padding: 4px 8px; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
               Remove Pin
             </button>
+            <button onclick="findManualPin()" style="margin-top: 8px; margin-left: 4px; padding: 4px 8px; background: #f59e0b; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+              Find Pin
+            </button>
           </div>
         `).openPopup();
 
-        // Center map on the pin
-        map.setView(coords, Math.max(map.getZoom(), 15));
+        // Center map on the pin with better zoom and animation
+        map.setView(coords, 16, {
+          animate: true,
+          duration: 1
+        });
+
+        // Force a map update
+        setTimeout(() => {
+          map.invalidateSize();
+        }, 100);
+
+        console.log('Manual pin created at:', coords);
+        console.log('Map center:', map.getCenter());
+        console.log('Map zoom:', map.getZoom());
 
         showNotification(`Manual pin placed at: ${coordsString}`, 'success');
       }
@@ -12717,6 +12751,26 @@
           map.removeLayer(window.manualPin);
           window.manualPin = null;
           showNotification('Manual pin removed', 'info');
+        }
+
+        function findManualPin() {
+          if (window.manualPin) {
+            const coords = window.manualPin.getLatLng();
+            console.log('Finding manual pin at:', coords);
+
+            // Center map on the pin with animation
+            map.setView(coords, 16, {
+              animate: true,
+              duration: 1
+            });
+
+            // Open the popup
+            window.manualPin.openPopup();
+
+            showNotification('Map centered on manual pin', 'success');
+          } else {
+            showNotification('No manual pin found', 'info');
+          }
         }
       }
 
