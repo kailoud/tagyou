@@ -8247,8 +8247,12 @@
       }
 
       function showAdminForm(item = null, isEditing = false) {
+        console.log('showAdminForm called with:', { item, isEditing, activeAdminTab });
+
         const formFields = getAdminFormFields();
         const formData = item ? { ...item } : {};
+
+        console.log('Form data to render:', formData);
 
         const formModal = document.createElement('div');
         formModal.className = 'modal-overlay';
@@ -8284,6 +8288,13 @@
 
         document.body.appendChild(formModal);
         setTimeout(() => formModal.classList.add('show'), 10);
+
+        // After form is rendered, set up image preview if editing
+        if (isEditing && item && item.image) {
+          setTimeout(() => {
+            setupImagePreview(item.image);
+          }, 100);
+        }
       }
 
       function closeAdminForm() {
@@ -8291,6 +8302,34 @@
         if (modal) {
           modal.classList.remove('show');
           setTimeout(() => modal.remove(), 300);
+        }
+      }
+
+      function setupImagePreview(imageUrl) {
+        console.log('Setting up image preview for:', imageUrl);
+
+        const imagePreview = document.getElementById('image-preview');
+        if (imagePreview && imageUrl) {
+          // Check if it's a Firebase Storage URL or data URL
+          if (imageUrl.startsWith('http')) {
+            // Firebase Storage URL
+            imagePreview.innerHTML = `
+              <img src="${imageUrl}" alt="Artist Photo" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+              <p style="margin-top: 8px; font-size: 12px; color: #666;">Current image (upload new to replace)</p>
+            `;
+          } else if (imageUrl.startsWith('data:image/')) {
+            // Data URL
+            imagePreview.innerHTML = `
+              <img src="${imageUrl}" alt="Artist Photo" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+              <p style="margin-top: 8px; font-size: 12px; color: #666;">Current image (upload new to replace)</p>
+            `;
+          } else {
+            // Emoji or text
+            imagePreview.innerHTML = `
+              <div style="font-size: 48px; text-align: center; padding: 20px;">${imageUrl}</div>
+              <p style="margin-top: 8px; font-size: 12px; color: #666;">Current placeholder (upload image to replace)</p>
+            `;
+          }
         }
       }
 
@@ -8405,7 +8444,20 @@
               `;
             break;
           case 'file':
+            // Show existing image if editing
+            const existingImageHtml = fieldValue ? `
+              <div style="margin-bottom: 12px; padding: 12px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
+                <p style="margin: 0 0 8px 0; font-size: 12px; color: #666; font-weight: 500;">Current Image:</p>
+                ${fieldValue.startsWith('http') || fieldValue.startsWith('data:image/')
+                ? `<img src="${fieldValue}" alt="Current" style="max-width: 100%; max-height: 150px; border-radius: 6px;">`
+                : `<div style="font-size: 32px; text-align: center; padding: 10px;">${fieldValue}</div>`
+              }
+                <p style="margin: 8px 0 0 0; font-size: 11px; color: #888;">Upload new image to replace</p>
+              </div>
+            ` : '';
+
             inputHtml = `
+                ${existingImageHtml}
                 <div class="file-upload-container">
                   <input type="file" name="${field.key}" accept="${field.accept}" required="${field.required}" class="file-input" onchange="previewImage(this, '${field.key}-preview')">
                   <div class="file-upload-area">
@@ -8470,6 +8522,10 @@
             // Handle file upload to Firebase Storage
             uploadImageToFirebase(value, actualId, isEditing, itemData);
             return; // Exit early, will continue in callback
+          } else if (key === 'image' && !value && isEditing) {
+            // Keep existing image if no new file is uploaded during edit
+            console.log('No new image uploaded, keeping existing image');
+            // Don't overwrite the existing image
           } else {
             itemData[key] = value;
           }
@@ -8500,7 +8556,14 @@
           }
 
           if (isEditing) {
-            // Update existing item in Supabase
+            // For editing, preserve existing image if no new one was uploaded
+            const existingItem = adminData[activeAdminTab].find(item => item.id === id);
+            if (existingItem && existingItem.image && !itemData.image) {
+              itemData.image = existingItem.image;
+              console.log('Preserving existing image:', existingItem.image);
+            }
+
+            // Update existing item in Firebase
             await updateInFirebase(tableName, id, itemData);
           } else {
             // Add new item to Firebase
