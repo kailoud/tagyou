@@ -7442,6 +7442,11 @@
       // Load admin data on page load
       document.addEventListener('DOMContentLoaded', function () {
         loadAdminData();
+
+        // Initialize artist categories after a short delay
+        setTimeout(() => {
+          updateArtistCategoriesFromAdminData();
+        }, 500);
       });
 
       // Firebase Database Functions
@@ -7530,6 +7535,7 @@
           }
 
           console.log('Admin data loaded successfully');
+          return adminData; // Return the loaded data
         } catch (error) {
           console.error('Error loading admin data:', error);
           // Fallback to mock data
@@ -7545,6 +7551,8 @@
 
           showNotification('Using demo data (database not configured)', 'info');
         }
+
+        return adminData; // Return the data even in case of error
       }
 
       async function saveToFirebase(collectionName, data) {
@@ -9188,6 +9196,17 @@
         if (targetContent) {
           targetContent.classList.add('active');
           console.log('✅ Content activated:', tabName + '-content');
+
+          // Special handling for artists tab
+          if (tabName === 'artists') {
+            console.log('Artists tab activated, refreshing data...');
+            // Refresh admin data and categories when artists tab is opened
+            loadAdminData().then(() => {
+              loadArtistsData();
+              loadArtistsSchedule();
+              updateArtistCategoriesFromAdminData();
+            });
+          }
         } else {
           console.error('❌ Content not found:', tabName + '-content');
         }
@@ -10109,8 +10128,17 @@
           }
           // Switch to artists-content tab to show artists information
           switchTab('artists');
-          loadArtistsData();
-          loadArtistsSchedule();
+
+          // Ensure admin data is loaded and categories are updated
+          loadAdminData().then(() => {
+            loadArtistsData();
+            loadArtistsSchedule();
+
+            // Force update categories after data is loaded
+            setTimeout(() => {
+              updateArtistCategoriesFromAdminData();
+            }, 300);
+          });
         } else {
           console.log('Deactivating artists');
 
@@ -11077,6 +11105,7 @@
 
       function updateArtistCategories(artists) {
         console.log('=== updateArtistCategories called ===');
+        console.log('Artists data:', artists);
 
         const categoryTagsContainer = document.querySelector('.artists-category-tags');
         if (!categoryTagsContainer) {
@@ -11093,20 +11122,40 @@
         });
 
         const uniqueTypes = Object.keys(typeCounts);
+        console.log('Unique types found:', uniqueTypes);
 
         // Create category tags dynamically with counts
         let categoryTagsHTML = `<span class="artists-category-tag active" onclick="filterArtists('all')">All (${artists.length})</span>`;
 
-        uniqueTypes.forEach(type => {
-          const displayName = getCategoryDisplayName(type);
-          const count = typeCounts[type];
-          categoryTagsHTML += `<span class="artists-category-tag" onclick="filterArtists('${type}')">${displayName} (${count})</span>`;
-        });
+        // If no artists, show default categories from admin form
+        if (artists.length === 0) {
+          const defaultCategories = [
+            'Live Band',
+            'DJ',
+            'Solo Artist',
+            'Dance Group',
+            'Street Performer',
+            'Sound System',
+            'Other'
+          ];
+
+          defaultCategories.forEach(type => {
+            const displayName = getCategoryDisplayName(type);
+            categoryTagsHTML += `<span class="artists-category-tag" onclick="filterArtists('${type}')">${displayName} (0)</span>`;
+          });
+        } else {
+          // Show actual categories with counts
+          uniqueTypes.forEach(type => {
+            const displayName = getCategoryDisplayName(type);
+            const count = typeCounts[type];
+            categoryTagsHTML += `<span class="artists-category-tag" onclick="filterArtists('${type}')">${displayName} (${count})</span>`;
+          });
+        }
 
         // Update the container
         categoryTagsContainer.innerHTML = categoryTagsHTML;
 
-        console.log('Updated artist categories:', uniqueTypes);
+        console.log('Updated artist categories HTML:', categoryTagsHTML);
       }
 
       function getCategoryDisplayName(type) {
@@ -11127,11 +11176,17 @@
         console.log('=== updateArtistCategoriesFromAdminData called ===');
 
         if (!window.adminData || !window.adminData.artists) {
-          console.warn('Admin data not available');
+          console.warn('Admin data not available, loading it now...');
+          // Try to load admin data if not available
+          loadAdminData().then(() => {
+            const artists = window.adminData.artists.filter(artist => artist.status === 'confirmed');
+            updateArtistCategories(artists);
+          });
           return;
         }
 
         const artists = window.adminData.artists.filter(artist => artist.status === 'confirmed');
+        console.log('Filtered artists for categories:', artists);
         updateArtistCategories(artists);
       }
 
@@ -11189,11 +11244,7 @@
         showNotification(`Selected artist: ${artistId}`);
       }
 
-      function refreshArtistsData() {
-        loadArtistsData();
-        loadArtistsSchedule();
-        showNotification('Artists data refreshed!');
-      }
+      // This function is now defined later in the file with enhanced functionality
 
       function filterArtists(category) {
         console.log('=== filterArtists called with category:', category);
@@ -11232,8 +11283,32 @@
 
         // Refresh categories when artists panel is opened
         setTimeout(() => {
+          // First try to load from admin data
           updateArtistCategoriesFromAdminData();
+
+          // If no categories were created, create default ones
+          const categoryTagsContainer = document.querySelector('.artists-category-tags');
+          if (categoryTagsContainer && categoryTagsContainer.children.length <= 1) {
+            console.log('No categories found, creating default categories');
+            updateArtistCategories([]); // Pass empty array to show default categories
+          }
         }, 100);
+      }
+
+      function refreshArtistsData() {
+        console.log('=== refreshArtistsData called ===');
+
+        // Force reload admin data and refresh everything
+        loadAdminData().then(() => {
+          console.log('Admin data reloaded, updating artists...');
+          loadArtistsData();
+          loadArtistsSchedule();
+          updateArtistCategoriesFromAdminData();
+          showNotification('Artists data refreshed!', 'success');
+        }).catch(error => {
+          console.error('Error refreshing artists data:', error);
+          showNotification('Error refreshing data', 'error');
+        });
       }
 
 
