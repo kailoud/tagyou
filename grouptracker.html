@@ -8184,17 +8184,17 @@
               .get();
             adminData['artists'] = artistsSnapshot.docs.map(doc => {
               const data = doc.data();
-              // Ensure all artists have a status, default to 'confirmed' if missing
+              // Ensure all artists have a status, default to 'active' if missing
               if (!data.status) {
-                console.log(`Artist ${data.name} has no status, setting to 'confirmed'`);
-                data.status = 'confirmed';
+                console.log(`Artist ${data.name} has no status, setting to 'active'`);
+                data.status = 'active';
 
                 // Update the document in Firebase to save the status
                 db.collection('artists').doc(doc.id).update({
-                  status: 'confirmed',
+                  status: 'active',
                   updated_at: new Date().toISOString()
                 }).then(() => {
-                  console.log(`Updated artist ${data.name} status to 'confirmed'`);
+                  console.log(`Updated artist ${data.name} status to 'active'`);
                 }).catch(error => {
                   console.error(`Error updating artist ${data.name} status:`, error);
                 });
@@ -8961,8 +8961,17 @@
             // Don't overwrite the existing image
           } else {
             itemData[key] = value;
+            // Debug status field specifically
+            if (key === 'status') {
+              console.log('Status field value:', value);
+              console.log('Status field type:', typeof value);
+            }
           }
         }
+
+        // Debug the final itemData before saving
+        console.log('Final itemData before saving:', itemData);
+        console.log('Status field value:', itemData.status);
 
         // If no file upload, save immediately
         completeSave(itemData, actualId, isEditing);
@@ -9004,7 +9013,10 @@
             console.log('Creating new item');
 
             // Add new item to Firebase
-            itemData.status = 'active';
+            // Only set default status if not already set
+            if (!itemData.status) {
+              itemData.status = 'active';
+            }
             await saveToFirebase(tableName, itemData);
           }
 
@@ -12450,7 +12462,7 @@
               // Fix missing status
               if (!artist.status) {
                 console.log(`Fixing missing status for artist: ${artist.name}`);
-                await updateInFirebase('artists', artist.id, { status: 'confirmed' });
+                await updateInFirebase('artists', artist.id, { status: 'active' });
               }
 
               // Fix missing coordinates if they exist in the form
