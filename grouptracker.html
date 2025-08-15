@@ -8262,11 +8262,22 @@
             throw new Error('Firebase database not initialized');
           }
 
-          await db.collection(collectionName).doc(id).update({
+          console.log(`Updating document ${id} in collection ${collectionName}`);
+
+          // Check if document exists before updating
+          const docRef = db.collection(collectionName).doc(id);
+          const doc = await docRef.get();
+
+          if (!doc.exists) {
+            throw new Error(`Document with ID ${id} does not exist in collection ${collectionName}. Cannot update non-existent document.`);
+          }
+
+          await docRef.update({
             ...data,
             updated_at: new Date().toISOString()
           });
 
+          console.log(`Successfully updated document ${id} in ${collectionName}`);
           return { id, ...data };
         } catch (error) {
           console.error(`Error updating ${collectionName}:`, error);
@@ -8742,7 +8753,7 @@
                     ${formFields.map(field => renderAdminFormField(field, formData[field.key])).join('')}
                   </div>
                   <div class="form-actions">
-                    <button type="button" onclick="saveAdminItem('${item?.id || 'null'}', ${isEditing})" class="save-btn">
+                    <button type="button" onclick="saveAdminItem(${item?.id ? `'${item.id}'` : 'null'}, ${isEditing})" class="save-btn">
                       ${isEditing ? 'Update' : 'Add'} ${adminTabConfig[activeAdminTab].title.slice(0, -1)}
                     </button>
                     <button type="button" onclick="closeAdminForm()" class="cancel-btn">Cancel</button>
@@ -9102,7 +9113,9 @@
             throw new Error(`Unknown table for tab: ${activeAdminTab}`);
           }
 
-          if (isEditing) {
+          if (isEditing && id && id !== 'null') {
+            console.log('Editing existing item with ID:', id);
+
             // For editing, preserve existing image if no new one was uploaded
             const existingItem = adminData[activeAdminTab].find(item => item.id === id);
             if (existingItem && existingItem.image && !itemData.image) {
@@ -9113,6 +9126,8 @@
             // Update existing item in Firebase
             await updateInFirebase(tableName, id, itemData);
           } else {
+            console.log('Creating new item');
+
             // Add new item to Firebase
             itemData.status = 'active';
             await saveToFirebase(tableName, itemData);
@@ -12404,7 +12419,8 @@
               name: artist.name,
               status: artist.status,
               coordinates: artist.coordinates,
-              hasCoordinates: !!artist.coordinates
+              hasCoordinates: !!artist.coordinates,
+              id: artist.id
             });
           });
         }
@@ -12416,6 +12432,47 @@
         console.log('Attempting to add markers manually...');
         removeArtistMarkers();
         addArtistMarkers();
+      }
+
+      // Function to fix artist data issues
+      async function fixArtistData() {
+        console.log('=== Fix Artist Data ===');
+
+        try {
+          // Reload admin data
+          await loadAdminData();
+
+          if (window.adminData?.artists) {
+            console.log('Checking and fixing artist data...');
+
+            for (const artist of window.adminData.artists) {
+              // Fix missing status
+              if (!artist.status) {
+                console.log(`Fixing missing status for artist: ${artist.name}`);
+                await updateInFirebase('artists', artist.id, { status: 'confirmed' });
+              }
+
+              // Fix missing coordinates if they exist in the form
+              if (!artist.coordinates && artist.coordinates_lat && artist.coordinates_lng) {
+                const coordsString = `${artist.coordinates_lat}, ${artist.coordinates_lng}`;
+                console.log(`Fixing coordinates for artist: ${artist.name} -> ${coordsString}`);
+                await updateInFirebase('artists', artist.id, { coordinates: coordsString });
+              }
+            }
+
+            // Reload data after fixes
+            await loadAdminData();
+            console.log('Artist data fixes completed');
+
+            // Update map markers
+            if (document.querySelector('.artists-btn')?.classList.contains('active')) {
+              removeArtistMarkers();
+              addArtistMarkers();
+            }
+          }
+        } catch (error) {
+          console.error('Error fixing artist data:', error);
+        }
       }
 
       // Carousel Image Management Functions
