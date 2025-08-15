@@ -4592,19 +4592,106 @@
 
     /* Artist Marker Styles */
     .artist-marker {
-      background: #8b5cf6;
-      border: 2px solid white;
+      background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #c084fc 100%);
+      border: 3px solid white;
       border-radius: 50%;
       color: white;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: bold;
       text-align: center;
-      line-height: 28px;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-      transition: transform 0.2s ease;
+      line-height: 32px;
+      filter: drop-shadow(0 4px 8px rgba(139, 92, 246, 0.4));
+      transition: all 0.3s ease;
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
+      animation: artistPulse 2s infinite;
+    }
+
+    .artist-marker::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      right: -6px;
+      bottom: -6px;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(168, 85, 247, 0.3));
+      border-radius: 50%;
+      z-index: -1;
+      animation: artistGlow 2s infinite alternate;
+    }
+
+    .artist-marker::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      border-radius: 50%;
+      z-index: -2;
+      opacity: 0.8;
+    }
+
+    .artist-marker:hover {
+      transform: scale(1.3);
+      filter: drop-shadow(0 6px 12px rgba(139, 92, 246, 0.6));
+      animation: artistBounce 0.6s ease;
+    }
+
+    @keyframes artistPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes artistGlow {
+      0% {
+        opacity: 0.3;
+        transform: scale(1);
+      }
+
+      100% {
+        opacity: 0.6;
+        transform: scale(1.1);
+      }
+    }
+
+    @keyframes artistBounce {
+
+      0%,
+      100% {
+        transform: scale(1.3);
+      }
+
+      50% {
+        transform: scale(1.4);
+      }
+    }
+
+    @keyframes artistHighlight {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      }
+
+      50% {
+        transform: scale(1.02);
+        box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+      }
+
+      100% {
+        transform: scale(1);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      }
     }
 
     .artist-marker:hover {
@@ -10369,18 +10456,43 @@
       }
 
       function addArtistMarkers() {
+        console.log('=== addArtistMarkers called ===');
+
         // Load artists from admin data or use sample data as fallback
         let artists = [];
 
         if (window.adminData && window.adminData.artists && window.adminData.artists.length > 0) {
-          // Use admin data
-          artists = window.adminData.artists.filter(artist =>
-            artist.coordinates && artist.status === 'confirmed'
-          ).map(artist => {
-            const [lat, lng] = artist.coordinates.split(',').map(coord => parseFloat(coord.trim()));
+          console.log('Loading artists from admin data:', window.adminData.artists);
+
+          // Use admin data - show all artists if no confirmed ones exist
+          const confirmedArtists = window.adminData.artists.filter(artist => artist.status === 'confirmed');
+          const artistsToShow = confirmedArtists.length > 0 ? confirmedArtists : window.adminData.artists;
+
+          artists = artistsToShow.filter(artist => artist.coordinates).map(artist => {
+            console.log('Processing artist:', artist.name, 'with coordinates:', artist.coordinates);
+
+            // Handle different coordinate formats
+            let lat, lng;
+            if (typeof artist.coordinates === 'string') {
+              const coords = artist.coordinates.split(',').map(coord => parseFloat(coord.trim()));
+              lat = coords[0] || 0;
+              lng = coords[1] || 0;
+            } else if (artist.coordinates && typeof artist.coordinates === 'object') {
+              lat = artist.coordinates.lat || 0;
+              lng = artist.coordinates.lng || 0;
+            } else {
+              console.warn('Invalid coordinates for artist:', artist.name, artist.coordinates);
+              return null;
+            }
+
+            if (lat === 0 && lng === 0) {
+              console.warn('Zero coordinates for artist:', artist.name);
+              return null;
+            }
+
             return {
-              lat: lat || 0,
-              lng: lng || 0,
+              lat: lat,
+              lng: lng,
               name: artist.name,
               type: artist.type,
               stage: artist.stage_name,
@@ -10391,11 +10503,15 @@
               phone: artist.phone,
               email: artist.email,
               social_media: artist.social_media,
-              image: artist.image
+              image: artist.image,
+              id: artist.id
             };
-          });
+          }).filter(artist => artist !== null);
+
+          console.log('Processed artists for map:', artists);
         } else {
-          // Fallback to sample data
+          console.log('No admin data available, using fallback coordinates');
+          // Fallback to sample data with Notting Hill Carnival coordinates
           artists = [
             { lat: 51.522592, lng: -0.202544, name: 'Reggae Vibes Band', type: 'Live Band', stage: 'Main Stage' },
             { lat: 51.516226, lng: -0.201240, name: 'DJ Calypso Queen', type: 'DJ', stage: 'Dance Arena' },
@@ -10411,22 +10527,68 @@
               return;
             }
 
+            console.log('Creating marker for artist:', artist.name, 'at coordinates:', artist.lat, artist.lng);
+
+            // Create unique icon based on artist type
+            const getArtistIcon = (type) => {
+              const icons = {
+                'Live Band': '🎸',
+                'DJ': '🎧',
+                'Solo Artist': '🎤',
+                'Dance Group': '💃',
+                'Street Performer': '🎭',
+                'Sound System': '🔊',
+                'Other': '🎵'
+              };
+              return icons[type] || '🎵';
+            };
+
             const marker = L.marker([artist.lat, artist.lng], {
               icon: L.divIcon({
                 className: 'artist-marker',
-                html: '🎵',
-                iconSize: [30, 30],
-                iconAnchor: [15, 15]
+                html: getArtistIcon(artist.type),
+                iconSize: [36, 36],
+                iconAnchor: [18, 18]
               })
             }).addTo(map);
 
-            marker.bindPopup(`
-              <b>${artist.name}</b><br>
-              <small>${artist.type} - ${artist.genre || ''}</small><br>
-              <small>${artist.stage}</small><br>
-              <small>${artist.performance_time || ''}</small><br>
-              <small>${artist.description || ''}</small>
-            `);
+            // Create rich popup content
+            const popupContent = `
+              <div style="min-width: 250px; font-family: Arial, sans-serif;">
+                <div style="background: linear-gradient(135deg, #8b5cf6, #a855f7); color: white; padding: 12px; border-radius: 8px 8px 0 0; margin: -12px -12px 12px -12px;">
+                  <h3 style="margin: 0; font-size: 16px; font-weight: bold;">${artist.name}</h3>
+                  <p style="margin: 4px 0 0 0; font-size: 12px; opacity: 0.9;">${artist.type} • ${artist.genre || 'Music'}</p>
+                </div>
+                
+                <div style="margin-bottom: 12px;">
+                  <p style="margin: 4px 0; font-size: 13px; color: #666;">
+                    <strong>📍 Stage:</strong> ${artist.stage || 'TBA'}
+                  </p>
+                  <p style="margin: 4px 0; font-size: 13px; color: #666;">
+                    <strong>⏰ Time:</strong> ${artist.performance_time || 'TBA'}
+                  </p>
+                  ${artist.description ? `<p style="margin: 8px 0; font-size: 12px; color: #555; font-style: italic;">"${artist.description}"</p>` : ''}
+                </div>
+                
+                ${artist.contact ? `
+                <div style="border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px;">
+                  <p style="margin: 2px 0; font-size: 12px; color: #666;">
+                    <strong>👤 Contact:</strong> ${artist.contact}
+                  </p>
+                  ${artist.phone ? `<p style="margin: 2px 0; font-size: 12px; color: #666;"><strong>📞 Phone:</strong> ${artist.phone}</p>` : ''}
+                  ${artist.email ? `<p style="margin: 2px 0; font-size: 12px; color: #666;"><strong>📧 Email:</strong> ${artist.email}</p>` : ''}
+                </div>
+                ` : ''}
+                
+                <div style="margin-top: 8px; text-align: center;">
+                  <button onclick="showArtistDetails('${artist.id || artist.name}')" style="background: #8b5cf6; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">
+                    View Details
+                  </button>
+                </div>
+              </div>
+            `;
+
+            marker.bindPopup(popupContent);
             marker.artistData = artist;
           } catch (error) {
             console.error('Error creating artist marker:', error);
@@ -11436,6 +11598,35 @@
             updateArtistCategories([]); // Pass empty array to show default categories
           }
         }, 100);
+      }
+
+      function showArtistDetails(artistId) {
+        console.log('Showing artist details for:', artistId);
+
+        // Find the artist in admin data
+        let artist = null;
+        if (window.adminData && window.adminData.artists) {
+          artist = window.adminData.artists.find(a => a.id === artistId || a.name === artistId);
+        }
+
+        if (artist) {
+          // Open the artists panel and scroll to the artist card
+          showArtistsPanel();
+
+          setTimeout(() => {
+            // Find and highlight the artist card
+            const artistCards = document.querySelectorAll('.artist-card');
+            artistCards.forEach(card => {
+              const cardName = card.querySelector('.artist-name')?.textContent;
+              if (cardName === artist.name) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                card.style.animation = 'artistHighlight 1s ease';
+              }
+            });
+          }, 500);
+        } else {
+          showNotification('Artist details not found', 'error');
+        }
       }
 
       function refreshArtistsData() {
