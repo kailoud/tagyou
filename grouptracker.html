@@ -4119,15 +4119,24 @@
 
     /* Medical Marker Styles */
     .medical-marker {
-      background: transparent;
-      border: none;
-      font-size: 18px;
+      background: #dc2626;
+      border: 2px solid white;
+      border-radius: 4px;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      text-align: center;
+      line-height: 20px;
       filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
       transition: transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .medical-marker:hover {
       transform: scale(1.2);
+      background: #b91c1c;
     }
 
     /* Safety Zone Marker Styles */
@@ -9755,9 +9764,9 @@
           const marker = L.marker(medical.coord, {
             icon: L.divIcon({
               className: 'medical-marker',
-              html: '🏥', // Medical cross icon
-              iconSize: [20, 20],
-              iconAnchor: [10, 10]
+              html: '✚', // White cross symbol
+              iconSize: [24, 24],
+              iconAnchor: [12, 12]
             })
           }).addTo(map);
 
