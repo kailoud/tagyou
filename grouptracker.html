@@ -2765,6 +2765,46 @@
       box-shadow: 0 4px 16px rgba(255, 140, 0, 0.4);
     }
 
+    /* Route Numbered Markers */
+    .route-number-marker {
+      background: none;
+      border: none;
+    }
+
+    .route-marker-number {
+      width: 24px;
+      height: 24px;
+      background: #ff6b35;
+      color: white;
+      border: 2px solid white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .route-marker-popup {
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .route-marker-popup strong {
+      color: #ff6b35;
+      font-size: 14px;
+    }
+
+    .route-marker-popup small {
+      color: #666;
+      line-height: 1.4;
+    }
+
 
 
     /* Festival Dropdown Styles */
@@ -13320,33 +13360,62 @@
           dashArray: '10, 5' // Dashed line for main route
         }).addTo(map);
 
-        // Add start and end markers for main route
+        // Add numbered markers along the route
+        const routeMarkers = [];
+        coordinates.forEach((coord, index) => {
+          // Create numbered marker
+          const markerNumber = index + 1;
+          const marker = L.marker([coord.lat, coord.lng], {
+            icon: L.divIcon({
+              className: 'route-number-marker',
+              html: `<div class="route-marker-number">${markerNumber}</div>`,
+              iconSize: [24, 24],
+              iconAnchor: [12, 12]
+            })
+          }).addTo(map);
+
+          // Add popup with coordinate info
+          const popupContent = `
+            <div class="route-marker-popup">
+              <strong>Point ${markerNumber}</strong><br>
+              <small>Lat: ${coord.lat.toFixed(6)}<br>
+              Lng: ${coord.lng.toFixed(6)}</small>
+            </div>
+          `;
+          marker.bindPopup(popupContent);
+          routeMarkers.push(marker);
+        });
+
+        // Add start and end markers for main route (more prominent)
         const startCoords = routeData.start_point.split(',').map(c => parseFloat(c.trim()));
         const endCoords = routeData.end_point.split(',').map(c => parseFloat(c.trim()));
 
         // Start marker (larger and more prominent)
-        L.marker(startCoords, {
+        const startMarker = L.marker(startCoords, {
           icon: L.divIcon({
             className: 'main-route-start-marker',
             html: '🎪',
-            iconSize: [30, 30]
+            iconSize: [40, 40]
           })
         }).addTo(map).bindPopup(`🎪 Main Parade Start: ${routeData.route_name}`);
 
         // End marker
-        L.marker(endCoords, {
+        const endMarker = L.marker(endCoords, {
           icon: L.divIcon({
             className: 'main-route-end-marker',
             html: '🏁',
-            iconSize: [30, 30]
+            iconSize: [40, 40]
           })
         }).addTo(map).bindPopup(`🏁 Main Parade End: ${routeData.route_name}`);
 
-        // Store reference for main route
+        // Store references for cleanup
         if (!window.mainFloatRoute) window.mainFloatRoute = [];
         window.mainFloatRoute.push(mainRoutePolyline);
+        window.mainFloatRoute.push(...routeMarkers);
+        window.mainFloatRoute.push(startMarker);
+        window.mainFloatRoute.push(endMarker);
 
-        showNotification(`Main parade route "${routeData.route_name}" displayed`, 'success');
+        showNotification(`Main parade route "${routeData.route_name}" displayed with ${coordinates.length} numbered points`, 'success');
       } catch (error) {
         console.error('Error displaying main float route:', error);
         showNotification('Error displaying main route. Check coordinate format.', 'error');
@@ -13356,7 +13425,9 @@
     function clearMainFloatRoute() {
       if (window.mainFloatRoute) {
         window.mainFloatRoute.forEach(route => {
-          map.removeLayer(route);
+          if (route && map.hasLayer(route)) {
+            map.removeLayer(route);
+          }
         });
         window.mainFloatRoute = [];
       }
