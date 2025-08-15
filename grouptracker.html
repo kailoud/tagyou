@@ -11319,7 +11319,39 @@
         console.log('Admin data available:', window.adminData);
         console.log('User data available:', window.userData);
         loadStallsData();
-        showCarnivalFloatRoute();
+
+        // Display the main parade route from admin data
+        const mainRoute = window.adminData?.['float-routes']?.find(route =>
+          route.route_type === 'Main Parade Route' && route.status === 'active'
+        );
+
+        if (mainRoute) {
+          console.log('Displaying main parade route:', mainRoute.route_name);
+          displayMainFloatRoute(mainRoute);
+
+          // Center map on the carnival area
+          const carnivalBounds = L.latLngBounds([
+            [51.5120, -0.2160], // Southwest
+            [51.5270, -0.1950]  // Northeast
+          ]);
+          map.fitBounds(carnivalBounds, { padding: [20, 20] });
+
+          // Activate the parade route button
+          const paradeRouteBtn = document.querySelector('.parade-route-btn');
+          if (paradeRouteBtn) {
+            paradeRouteBtn.classList.add('active');
+          }
+        } else {
+          // Fallback to the old carnival route display
+          showCarnivalFloatRoute();
+
+          // Center map on the carnival area
+          const carnivalBounds = L.latLngBounds([
+            [51.5120, -0.2160], // Southwest
+            [51.5270, -0.1950]  // Northeast
+          ]);
+          map.fitBounds(carnivalBounds, { padding: [20, 20] });
+        }
 
         // Automatically switch to Find Stalls tab
         const stallsTab = document.querySelector('.stalls-btn');
@@ -11333,6 +11365,12 @@
         showNotification(`Selected: ${festivalName}`);
         // Remove carnival route if switching to different festival
         removeCarnivalFloatRoute();
+
+        // Deactivate the parade route button
+        const paradeRouteBtn = document.querySelector('.parade-route-btn');
+        if (paradeRouteBtn) {
+          paradeRouteBtn.classList.remove('active');
+        }
       }
     }
 
