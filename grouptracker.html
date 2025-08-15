@@ -10682,9 +10682,13 @@
 
     function centerOnMe() {
       if (currentLocation) {
+        // Fly to user's current location
         map.flyTo(currentLocation, 16, {
           duration: 1.0
         });
+
+        // Show notification about carnival route
+        showNotification('📍 Your location • Click ⭐ to return to Carnival route', 'info');
       } else {
         // If no location yet, try to get it
         requestLocationPermission();
@@ -11409,7 +11413,7 @@
           stallsTab.click();
         }
 
-        showNotification(`Loaded ${festivalName} stalls data and parade route!`);
+        showNotification(`🎪 Carnival loaded! • Click 📍 to find your location`);
       } else {
         console.log(`Selected festival: ${festivalName}`);
         showNotification(`Selected: ${festivalName}`);
@@ -13425,7 +13429,7 @@
         window.mainFloatRoute.push(startMarker);
         window.mainFloatRoute.push(endMarker);
 
-        showNotification(`Main parade route "${routeData.route_name}" displayed with ${coordinates.length} numbered points`, 'success');
+        showNotification(`🎪 Carnival route displayed • Click 📍 to go to your location`, 'success');
       } catch (error) {
         console.error('Error displaying main float route:', error);
         showNotification('Error displaying main route. Check coordinate format.', 'error');
