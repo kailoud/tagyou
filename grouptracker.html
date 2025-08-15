@@ -4449,6 +4449,33 @@
       border-color: #8b5cf6;
     }
 
+    /* Settings Styles */
+    .settings-section {
+      margin: 20px 0;
+      text-align: left;
+      padding: 0 20px;
+    }
+
+    .settings-section h4 {
+      margin-bottom: 12px;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      margin: 8px 0;
+      cursor: pointer;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .setting-item input[type="checkbox"] {
+      margin-right: 12px;
+      transform: scale(1.2);
+    }
+
     /* Custom scrollbar for artists cards */
     .artists-cards::-webkit-scrollbar {
       width: 6px;
@@ -6368,59 +6395,96 @@
         <!-- Schedule items will be dynamically generated -->
       </div>
     </div>
-  </div>
 
-  <div class="panel-content" id="artists-content">
-    <!-- Artists Header -->
-    <div class="artists-header">
-      <div class="artists-title">
-        <h3>🎵 Artists & Bands</h3>
-        <p>Live music & entertainment schedule</p>
+    <div class="panel-content" id="artists-content">
+      <!-- Artists Header -->
+      <div class="artists-header">
+        <div class="artists-title">
+          <h3>🎵 Artists & Bands</h3>
+          <p>Live music & entertainment schedule</p>
+        </div>
+        <div class="artists-controls">
+          <button class="artists-control-btn" onclick="toggleArtistsAutoScroll()" id="artistsAutoScrollBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+            </svg>
+            Auto
+          </button>
+          <button class="artists-control-btn" onclick="refreshArtistsData()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+            </svg>
+            Refresh
+          </button>
+        </div>
       </div>
-      <div class="artists-controls">
-        <button class="artists-control-btn" onclick="toggleArtistsAutoScroll()" id="artistsAutoScrollBtn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-          </svg>
-          Auto
-        </button>
-        <button class="artists-control-btn" onclick="refreshArtistsData()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
-          </svg>
-          Refresh
-        </button>
+
+      <!-- Artists Feed -->
+      <div class="artists-feed">
+        <h4>🎤 Live Artists Feed</h4>
+        <div class="artists-cards" id="artistsCards">
+          <!-- Artist cards will be dynamically generated -->
+        </div>
+      </div>
+
+      <!-- Artists Schedule -->
+      <div class="artists-schedule">
+        <h4>⏰ Performance Schedule</h4>
+        <div class="artists-schedule-timeline" id="artistsScheduleTimeline">
+          <!-- Schedule items will be dynamically generated -->
+        </div>
+      </div>
+
+      <!-- Artists Categories -->
+      <div class="artists-categories">
+        <h4>🎨 Artist Categories</h4>
+        <div class="artists-category-tags">
+          <span class="artists-category-tag active" onclick="filterArtists('all')">All</span>
+          <span class="artists-category-tag" onclick="filterArtists('Live Band')">Live Bands</span>
+          <span class="artists-category-tag" onclick="filterArtists('DJ')">DJs</span>
+          <span class="artists-category-tag" onclick="filterArtists('Solo Artist')">Solo Artists</span>
+          <span class="artists-category-tag" onclick="filterArtists('Dance Group')">Dance Groups</span>
+          <span class="artists-category-tag" onclick="filterArtists('Sound System')">Sound Systems</span>
+        </div>
       </div>
     </div>
 
-    <!-- Artists Feed -->
-    <div class="artists-feed">
-      <h4>🎤 Live Artists Feed</h4>
-      <div class="artists-cards" id="artistsCards">
-        <!-- Artist cards will be dynamically generated -->
-      </div>
-    </div>
-
-    <!-- Artists Schedule -->
-    <div class="artists-schedule">
-      <h4>⏰ Performance Schedule</h4>
-      <div class="artists-schedule-timeline" id="artistsScheduleTimeline">
-        <!-- Schedule items will be dynamically generated -->
-      </div>
-    </div>
-
-    <!-- Artists Categories -->
-    <div class="artists-categories">
-      <h4>🎨 Artist Categories</h4>
-      <div class="artists-category-tags">
-        <span class="artists-category-tag active" onclick="filterArtists('all')">All</span>
-        <span class="artists-category-tag" onclick="filterArtists('Live Band')">Live Bands</span>
-        <span class="artists-category-tag" onclick="filterArtists('DJ')">DJs</span>
-        <span class="artists-category-tag" onclick="filterArtists('Solo Artist')">Solo Artists</span>
-        <span class="artists-category-tag" onclick="filterArtists('Dance Group')">Dance Groups</span>
-        <span class="artists-category-tag" onclick="filterArtists('Sound System')">Sound Systems</span>
+    <div class="panel-content" id="settings-content">
+      <div style="text-align: center; padding: 20px 0;">
+        <div style="font-size: 48px; margin-bottom: 16px;">⚙️</div>
+        <h3 style="margin-bottom: 16px;">Settings</h3>
+        <div class="settings-section">
+          <h4>🔔 Notifications</h4>
+          <label class="setting-item">
+            <input type="checkbox" checked> Enable push notifications
+          </label>
+          <label class="setting-item">
+            <input type="checkbox" checked> Location sharing
+          </label>
+          <label class="setting-item">
+            <input type="checkbox"> Emergency alerts
+          </label>
+        </div>
+        <div class="settings-section">
+          <h4>🗺️ Map Settings</h4>
+          <label class="setting-item">
+            <input type="checkbox" checked> Show my location
+          </label>
+          <label class="setting-item">
+            <input type="checkbox" checked> Auto-center on group
+          </label>
+        </div>
+        <div class="settings-section">
+          <h4>👥 Privacy</h4>
+          <label class="setting-item">
+            <input type="checkbox" checked> Share location with group
+          </label>
+          <label class="setting-item">
+            <input type="checkbox"> Share with all users
+          </label>
+        </div>
       </div>
     </div>
   </div>
@@ -14350,6 +14414,29 @@
         console.error('Error refreshing artists data:', error);
         showNotification('Error refreshing data', 'error');
       });
+    }
+
+    function toggleArtistsAutoScroll() {
+      const btn = document.getElementById('artistsAutoScrollBtn');
+      const isAuto = btn.classList.toggle('active');
+
+      if (isAuto) {
+        btn.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+          </svg>
+          Auto
+        `;
+        showNotification('Auto-scroll enabled for artists', 'success');
+      } else {
+        btn.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          Auto
+        `;
+        showNotification('Auto-scroll disabled for artists', 'info');
+      }
     }
 
 
