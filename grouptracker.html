@@ -1103,6 +1103,48 @@
       background: #1e3a8a;
     }
 
+    .send-btn {
+      background: #059669;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .send-btn:hover {
+      background: #047857;
+      transform: scale(1.02);
+    }
+
+    .send-btn.sent {
+      background: #10b981;
+      animation: sendPulse 0.6s ease;
+    }
+
+    .send-btn.sent:hover {
+      background: #059669;
+    }
+
+    @keyframes sendPulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
     .admin-table-container {
       background: white;
       border-radius: 8px;
@@ -8084,6 +8126,9 @@
                   <button onclick="showAdminAddForm()" class="add-btn">
                     ➕ Add ${adminTabConfig[activeAdminTab].title.slice(0, -1)}
                   </button>
+                  <button id="sendToUsersBtn" onclick="sendToUsers()" class="send-btn" title="Send changes to users">
+                    📤 Send to Users
+                  </button>
                 </div>
 
                 <!-- Admin Data Table -->
@@ -8153,6 +8198,107 @@
       }
     }
 
+    // Send changes to users function
+    async function sendToUsers() {
+      console.log('Sending changes to users...');
+
+      const sendBtn = document.getElementById('sendToUsersBtn');
+      if (!sendBtn) return;
+
+      // Check if there are any pending changes
+      const hasPendingChanges = Object.values(pendingChanges).some(hasChanges => hasChanges);
+
+      if (!hasPendingChanges) {
+        showNotification('No changes to send to users', 'info');
+        return;
+      }
+
+      try {
+        // Show loading state
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '📤 Sending...';
+
+        // Copy admin data to user data for all changed categories
+        for (const [category, hasChanges] of Object.entries(pendingChanges)) {
+          if (hasChanges) {
+            console.log(`Updating user data for ${category}`);
+            userData[category] = JSON.parse(JSON.stringify(adminData[category])); // Deep copy
+            pendingChanges[category] = false;
+          }
+        }
+
+        // Update user-facing displays
+        updateUserDisplays();
+
+        // Show success state
+        sendBtn.classList.add('sent');
+        sendBtn.innerHTML = '✅ Sent to Users';
+        showNotification('Changes sent to users successfully!', 'success');
+
+        // Reset button after 3 seconds
+        setTimeout(() => {
+          sendBtn.classList.remove('sent');
+          sendBtn.disabled = false;
+          sendBtn.innerHTML = '📤 Send to Users';
+        }, 3000);
+
+      } catch (error) {
+        console.error('Error sending changes to users:', error);
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '📤 Send to Users';
+        showNotification('Error sending changes to users', 'error');
+      }
+    }
+
+    // Update user-facing displays
+    function updateUserDisplays() {
+      console.log('Updating user displays...');
+
+      // Update map markers
+      removeArtistMarkers();
+      addArtistMarkers();
+
+      // Update panel data
+      const artistsContent = document.getElementById('artists-content');
+      if (artistsContent && artistsContent.classList.contains('active')) {
+        loadArtistsData();
+        loadArtistsSchedule();
+      }
+
+      // Update categories
+      updateArtistCategoriesFromUserData();
+
+      // Update other panels
+      const stallsContent = document.getElementById('find-stalls-content');
+      if (stallsContent && stallsContent.classList.contains('active')) {
+        loadStallsData();
+      }
+
+      const floatContent = document.getElementById('float-content');
+      if (floatContent && floatContent.classList.contains('active')) {
+        loadFloatData();
+        loadFloatSchedule();
+      }
+
+      console.log('User displays updated');
+    }
+
+    // Update send button state based on pending changes
+    function updateSendButtonState() {
+      const sendBtn = document.getElementById('sendToUsersBtn');
+      if (!sendBtn) return;
+
+      const hasPendingChanges = Object.values(pendingChanges).some(hasChanges => hasChanges);
+
+      if (hasPendingChanges) {
+        sendBtn.style.background = '#dc2626'; // Red to indicate pending changes
+        sendBtn.title = 'Send changes to users (changes pending)';
+      } else {
+        sendBtn.style.background = '#059669'; // Green when no pending changes
+        sendBtn.title = 'Send changes to users';
+      }
+    }
+
     // Admin data and configuration
     let activeAdminTab = 'food-stalls';
     let adminData = {
@@ -8163,8 +8309,27 @@
       'artists': []
     };
 
+    // User-facing data (what users see)
+    let userData = {
+      'food-stalls': [],
+      'float-trucks': [],
+      'groups': [],
+      'friends': [],
+      'artists': []
+    };
+
+    // Track pending changes
+    let pendingChanges = {
+      'food-stalls': false,
+      'float-trucks': false,
+      'groups': false,
+      'friends': false,
+      'artists': false
+    };
+
     // Make adminData globally accessible for map markers
     window.adminData = adminData;
+    window.userData = userData;
 
     // Load admin data on page load
     document.addEventListener('DOMContentLoaded', function () {
@@ -8294,6 +8459,14 @@
         }
 
         console.log('Admin data loaded successfully');
+
+        // Initialize user data with admin data (first time)
+        if (Object.values(userData).every(arr => arr.length === 0)) {
+          console.log('Initializing user data with admin data');
+          for (const [category, data] of Object.entries(adminData)) {
+            userData[category] = JSON.parse(JSON.stringify(data)); // Deep copy
+          }
+        }
 
         // Hide loading indicator
         if (loadingIndicator) {
@@ -8520,6 +8693,9 @@
 
       // Update table
       document.getElementById('adminTableBody').innerHTML = renderAdminTableData();
+
+      // Update send button state
+      updateSendButtonState();
     }
 
     function renderAdminTableData() {
@@ -8645,6 +8821,10 @@
           // Delete from Firebase
           await deleteFromFirebase(collectionName, id);
 
+          // Mark pending changes
+          pendingChanges[activeAdminTab] = true;
+          updateSendButtonState();
+
           // Reload data from database
           await loadAdminData();
 
@@ -8734,7 +8914,7 @@
             }
             if (item.images && Array.isArray(item.images)) {
               // Load existing carousel images
-              carouselImages = [...item.images];
+              window.carouselImages = [...item.images];
               updateCarouselDisplay();
             }
           }, 50);
@@ -8792,7 +8972,7 @@
           { key: 'hours', label: 'Operating Hours', type: 'text', required: true },
           { key: 'rating', label: 'Rating', type: 'number', min: 0, max: 5, step: 0.1, required: false },
           { key: 'description', label: 'Description', type: 'textarea', required: false },
-          { key: 'image', label: 'Image', type: 'file', accept: 'image/*', required: false }
+          { key: 'images', label: 'Stall Photos (Carousel)', type: 'multiple-images', accept: 'image/*', required: false, maxImages: 5 }
         ],
         'float-trucks': [
           { key: 'name', label: 'Float Truck Name', type: 'text', required: true },
@@ -8809,7 +8989,7 @@
           { key: 'estimated_arrival', label: 'Estimated Arrival', type: 'time', required: false },
           { key: 'rating', label: 'Rating', type: 'number', min: 0, max: 5, step: 0.1, required: false },
           { key: 'description', label: 'Description', type: 'textarea', required: false },
-          { key: 'image', label: 'Image', type: 'file', accept: 'image/*', required: false }
+          { key: 'images', label: 'Float Photos (Carousel)', type: 'multiple-images', accept: 'image/*', required: false, maxImages: 5 }
         ],
         'groups': [
           { key: 'name', label: 'Group Name', type: 'text', required: true },
@@ -9018,17 +9198,17 @@
           console.log('Processed coordinates:', itemData[key]);
         } else if (key === 'memberCount' || key === 'rating' || key === 'duration') {
           itemData[key] = parseFloat(value) || 0;
-        } else if (key === 'images' && carouselImages.length > 0) {
+        } else if (key === 'images' && window.carouselImages.length > 0) {
           // Handle carousel images - upload to Firebase Storage
-          console.log('Saving carousel images:', carouselImages.length);
+          console.log('Saving carousel images:', window.carouselImages.length);
 
           // Upload carousel images to Firebase Storage
           uploadCarouselImagesToFirebase(carouselImages, actualId, isEditing, itemData);
           return; // Exit early, will continue in callback
 
           // Reset carousel for next use
-          carouselImages = [];
-          selectedImageIndex = 0;
+          window.carouselImages = [];
+          window.selectedImageIndex = 0;
 
           // Refresh artist data in panel if artists button is active
           const artistsBtn = document.querySelector('.artists-btn');
@@ -9038,11 +9218,11 @@
               updateArtistCategoriesFromAdminData();
             }, 500);
           }
-        } else if (key === 'image' && value instanceof File) {
+        } else if ((key === 'image' || key === 'images') && value instanceof File) {
           // Handle file upload to Firebase Storage
           uploadImageToFirebase(value, actualId, isEditing, itemData);
           return; // Exit early, will continue in callback
-        } else if (key === 'image' && !value && isEditing) {
+        } else if ((key === 'image' || key === 'images') && !value && isEditing) {
           // Keep existing image if no new file is uploaded during edit
           console.log('No new image uploaded, keeping existing image');
           // Don't overwrite the existing image
@@ -9087,11 +9267,19 @@
         if (isEditing && id && id !== 'null') {
           console.log('Editing existing item with ID:', id);
 
-          // For editing, preserve existing image if no new one was uploaded
+          // For editing, preserve existing image/images if no new ones were uploaded
           const existingItem = adminData[activeAdminTab].find(item => item.id === id);
-          if (existingItem && existingItem.image && !itemData.image) {
-            itemData.image = existingItem.image;
-            console.log('Preserving existing image:', existingItem.image);
+          if (existingItem) {
+            // Handle single image
+            if (existingItem.image && !itemData.image) {
+              itemData.image = existingItem.image;
+              console.log('Preserving existing image:', existingItem.image);
+            }
+            // Handle multiple images
+            if (existingItem.images && !itemData.images) {
+              itemData.images = existingItem.images;
+              console.log('Preserving existing images:', existingItem.images);
+            }
           }
 
           // Update existing item in Firebase
@@ -9119,6 +9307,10 @@
           const newItem = { id: Date.now().toString(), ...itemData };
           adminData[activeAdminTab].unshift(newItem);
         }
+
+        // Mark pending changes
+        pendingChanges[activeAdminTab] = true;
+        updateSendButtonState();
 
         // Update table display immediately
         const tableBody = document.getElementById('adminTableBody');
@@ -11820,10 +12012,10 @@
       const floatCards = document.getElementById('floatCards');
       console.log('Float cards element:', floatCards);
 
-      // Load float data from admin data
+      // Load float data from user data
       let floats = [];
-      if (window.adminData && window.adminData['float-trucks'] && window.adminData['float-trucks'].length > 0) {
-        floats = window.adminData['float-trucks'].map(truck => ({
+      if (window.userData && window.userData['float-trucks'] && window.userData['float-trucks'].length > 0) {
+        floats = window.userData['float-trucks'].map(truck => ({
           id: truck.id,
           name: truck.name || truck.truck_name,
           status: truck.status || 'upcoming',
@@ -11887,10 +12079,10 @@
       const scheduleTimeline = document.getElementById('scheduleTimeline');
       console.log('Schedule timeline element:', scheduleTimeline);
 
-      // Load schedule from admin data
+      // Load schedule from user data
       let schedule = [];
-      if (window.adminData && window.adminData['float-trucks'] && window.adminData['float-trucks'].length > 0) {
-        schedule = window.adminData['float-trucks']
+      if (window.userData && window.userData['float-trucks'] && window.userData['float-trucks'].length > 0) {
+        schedule = window.userData['float-trucks']
           .filter(truck => truck.parade_time && truck.parade_time !== 'TBA')
           .map(truck => ({
             time: truck.parade_time,
@@ -12046,10 +12238,10 @@
       // Load artists from admin data or use sample data as fallback
       let artists = [];
 
-      if (window.adminData && window.adminData.artists && window.adminData.artists.length > 0) {
-        // Use admin data - show all artists if no confirmed/active ones exist
-        const activeArtists = window.adminData.artists.filter(artist => artist.status === 'confirmed' || artist.status === 'active');
-        const artistsToShow = activeArtists.length > 0 ? activeArtists : window.adminData.artists;
+      if (window.userData && window.userData.artists && window.userData.artists.length > 0) {
+        // Use user data - show all artists if no confirmed/active ones exist
+        const activeArtists = window.userData.artists.filter(artist => artist.status === 'confirmed' || artist.status === 'active');
+        const artistsToShow = activeArtists.length > 0 ? activeArtists : window.userData.artists;
 
         artists = artistsToShow.map(artist => ({
           id: artist.id,
@@ -12269,6 +12461,27 @@
       }
     }
 
+    function updateArtistCategoriesFromUserData() {
+      console.log('=== updateArtistCategoriesFromUserData called ===');
+
+      if (!window.userData || !window.userData.artists) {
+        console.warn('User data not available');
+        return;
+      }
+
+      console.log('User data available, all artists:', window.userData.artists);
+      const artists = window.userData.artists.filter(artist => artist.status === 'confirmed' || artist.status === 'active');
+      console.log('Filtered artists for categories:', artists);
+
+      // If no confirmed/active artists, show all artists for debugging
+      if (artists.length === 0 && window.userData.artists.length > 0) {
+        console.log('No confirmed/active artists found, showing all artists for debugging');
+        updateArtistCategories(window.userData.artists);
+      } else {
+        updateArtistCategories(artists);
+      }
+    }
+
     function loadArtistsSchedule() {
       console.log('=== loadArtistsSchedule called ===');
 
@@ -12278,9 +12491,9 @@
       // Load schedule from admin data or use sample data as fallback
       let schedule = [];
 
-      if (window.adminData && window.adminData.artists && window.adminData.artists.length > 0) {
-        // Use admin data
-        schedule = window.adminData.artists
+      if (window.userData && window.userData.artists && window.userData.artists.length > 0) {
+        // Use user data
+        schedule = window.userData.artists
           .filter(artist => (artist.status === 'confirmed' || artist.status === 'active') && artist.performance_time)
           .map(artist => ({
             time: artist.performance_time,
@@ -12615,8 +12828,8 @@
 
 
     // Carousel Image Management Functions
-    let carouselImages = [];
-    let selectedImageIndex = 0;
+    window.carouselImages = [];
+    window.selectedImageIndex = 0;
 
     function selectCarouselImage(index) {
       console.log('Selecting carousel image:', index);
@@ -12626,7 +12839,7 @@
         slot.classList.toggle('selected', i === index);
       });
 
-      selectedImageIndex = index;
+      window.selectedImageIndex = index;
     }
 
     function removeCarouselImage(index, event) {
@@ -12634,7 +12847,7 @@
       console.log('Removing carousel image:', index);
 
       // Remove image from array
-      carouselImages.splice(index, 1);
+      window.carouselImages.splice(index, 1);
 
       // Update display
       updateCarouselDisplay();
@@ -12646,7 +12859,7 @@
       console.log('Handling carousel upload:', input.files.length, 'files');
 
       const files = Array.from(input.files);
-      const remainingSlots = maxImages - carouselImages.length;
+      const remainingSlots = maxImages - window.carouselImages.length;
 
       if (files.length > remainingSlots) {
         showNotification(`Only ${remainingSlots} more images can be uploaded`, 'warning');
@@ -12664,7 +12877,7 @@
         reader.onload = function (e) {
           // Convert to data URL for storage
           const dataUrl = e.target.result;
-          carouselImages.push(dataUrl);
+          window.carouselImages.push(dataUrl);
           updateCarouselDisplay();
         };
         reader.readAsDataURL(file);
@@ -12681,7 +12894,7 @@
       const infoElement = document.querySelector('.carousel-info');
 
       slots.forEach((slot, index) => {
-        const image = carouselImages[index];
+        const image = window.carouselImages[index];
 
         if (image) {
           slot.innerHTML = `
@@ -12693,38 +12906,38 @@
         }
 
         // Update selected state
-        slot.classList.toggle('selected', index === selectedImageIndex);
+        slot.classList.toggle('selected', index === window.selectedImageIndex);
       });
 
       // Update info
       if (infoElement) {
-        infoElement.textContent = `${carouselImages.length}/${slots.length} images uploaded`;
+        infoElement.textContent = `${window.carouselImages.length}/${slots.length} images uploaded`;
       }
     }
 
     function reorderCarouselImages() {
-      if (carouselImages.length < 2) {
+      if (window.carouselImages.length < 2) {
         showNotification('Need at least 2 images to reorder', 'info');
         return;
       }
 
       // Simple reorder: move first image to end
-      const firstImage = carouselImages.shift();
-      carouselImages.push(firstImage);
+      const firstImage = window.carouselImages.shift();
+      window.carouselImages.push(firstImage);
 
       updateCarouselDisplay();
       showNotification('Images reordered', 'success');
     }
 
     function clearCarouselImages() {
-      if (carouselImages.length === 0) {
+      if (window.carouselImages.length === 0) {
         showNotification('No images to clear', 'info');
         return;
       }
 
       if (confirm('Are you sure you want to remove all images?')) {
-        carouselImages = [];
-        selectedImageIndex = 0;
+        window.carouselImages = [];
+        window.selectedImageIndex = 0;
         updateCarouselDisplay();
         showNotification('All images cleared', 'success');
       }
@@ -13144,10 +13357,10 @@
     function loadStallsData() {
       console.log('=== loadStallsData called ===');
 
-      // Load stalls data from admin data
+      // Load stalls data from user data
       stallsData = [];
-      if (window.adminData && window.adminData['food-stalls'] && window.adminData['food-stalls'].length > 0) {
-        stallsData = window.adminData['food-stalls'].map(stall => ({
+      if (window.userData && window.userData['food-stalls'] && window.userData['food-stalls'].length > 0) {
+        stallsData = window.userData['food-stalls'].map(stall => ({
           id: stall.id,
           name: stall.name || stall.stall_name,
           origin: stall.origin || stall.country || 'Unknown',
