@@ -1467,6 +1467,60 @@
       box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
     }
 
+    .coordinates-input-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .coordinate-picker-btn {
+      background: #8b5cf6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .coordinate-picker-btn:hover {
+      background: #7c3aed;
+      transform: scale(1.05);
+    }
+
+    .form-hint {
+      color: #666;
+      font-size: 12px;
+      margin-top: 4px;
+      display: block;
+    }
+
+    .temp-coordinate-marker {
+      background: #fbbf24;
+      border: 3px solid white;
+      border-radius: 50%;
+      color: white;
+      font-size: 16px;
+      text-align: center;
+      line-height: 18px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      animation: tempMarkerPulse 1s infinite;
+    }
+
+    @keyframes tempMarkerPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+    }
+
     .form-actions {
       display: flex;
       gap: 12px;
@@ -7820,6 +7874,43 @@
         }
       }
 
+      async function uploadImageToFirebase(file, id, isEditing, itemData) {
+        try {
+          console.log('Uploading image to Firebase Storage...');
+
+          const storage = window.firebaseStorage;
+          if (!storage) {
+            throw new Error('Firebase Storage not initialized');
+          }
+
+          // Create unique filename
+          const timestamp = Date.now();
+          const fileName = `artists/${id || 'new'}_${timestamp}_${file.name}`;
+          const storageRef = storage.ref().child(fileName);
+
+          // Upload file
+          const snapshot = await storageRef.put(file);
+          console.log('Image uploaded successfully:', fileName);
+
+          // Get download URL
+          const downloadURL = await snapshot.ref.getDownloadURL();
+          console.log('Download URL:', downloadURL);
+
+          // Add image URL to item data
+          itemData.image = downloadURL;
+
+          // Continue with saving
+          completeSave(itemData, id, isEditing);
+
+        } catch (error) {
+          console.error('Error uploading image:', error);
+          showNotification('Error uploading image: ' + error.message, 'error');
+
+          // Continue without image if upload fails
+          completeSave(itemData, id, isEditing);
+        }
+      }
+
       // Mock Data Functions for Demo
       function getMockFoodStalls() {
         return [
@@ -8304,7 +8395,13 @@
             break;
           case 'coordinates':
             inputHtml = `
-                <input type="text" name="${field.key}" value="${fieldValue}" required="${field.required}" class="form-input" placeholder="40.7128, -74.0060">
+                <div class="coordinates-input-group">
+                  <input type="text" name="${field.key}" value="${fieldValue}" required="${field.required}" class="form-input" placeholder="51.522592, -0.202544">
+                  <button type="button" onclick="getCoordinatesFromMap('${field.key}')" class="coordinate-picker-btn" title="Pick from map">
+                    📍
+                  </button>
+                </div>
+                <small class="form-hint">Format: latitude, longitude (e.g., 51.522592, -0.202544)</small>
               `;
             break;
           case 'file':
@@ -8351,19 +8448,27 @@
 
         for (let [key, value] of formData.entries()) {
           if (key === 'coordinates') {
+            console.log('Processing coordinates:', value);
             const [lat, lng] = value.split(',').map(v => parseFloat(v.trim()));
-            itemData[key] = `${lat || 0}, ${lng || 0}`; // Store as string for consistency
+
+            // Validate coordinates
+            if (isNaN(lat) || isNaN(lng)) {
+              showNotification('Invalid coordinates format. Please use: lat, lng (e.g., 51.522592, -0.202544)', 'error');
+              return;
+            }
+
+            // Check if coordinates are in reasonable range (London area)
+            if (lat < 51.0 || lat > 52.0 || lng < -1.0 || lng > 0.5) {
+              showNotification('Coordinates seem to be outside London area. Please check.', 'warning');
+            }
+
+            itemData[key] = `${lat}, ${lng}`; // Store as string for consistency
+            console.log('Processed coordinates:', itemData[key]);
           } else if (key === 'memberCount' || key === 'rating' || key === 'duration') {
             itemData[key] = parseFloat(value) || 0;
           } else if (key === 'image' && value instanceof File) {
-            // Handle file upload - convert to data URL
-            const reader = new FileReader();
-            reader.onload = function (e) {
-              itemData[key] = e.target.result;
-              // Continue with saving after file is processed
-              completeSave(itemData, actualId, isEditing);
-            };
-            reader.readAsDataURL(value);
+            // Handle file upload to Firebase Storage
+            uploadImageToFirebase(value, actualId, isEditing, itemData);
             return; // Exit early, will continue in callback
           } else {
             itemData[key] = value;
@@ -11627,6 +11732,76 @@
         } else {
           showNotification('Artist details not found', 'error');
         }
+      }
+
+      function getCoordinatesFromMap(fieldName) {
+        console.log('Getting coordinates from map for field:', fieldName);
+
+        // Close the admin form temporarily
+        const formModal = document.getElementById('adminFormModal');
+        if (formModal) {
+          formModal.classList.remove('show');
+        }
+
+        // Show instruction to user
+        showNotification('Click on the map to select coordinates. Click again to confirm.', 'info');
+
+        // Enable map click listener
+        let clickCount = 0;
+        let selectedCoords = null;
+
+        const mapClickHandler = (e) => {
+          clickCount++;
+
+          if (clickCount === 1) {
+            // First click - show preview marker
+            selectedCoords = e.latlng;
+
+            // Create temporary marker
+            const tempMarker = L.marker(selectedCoords, {
+              icon: L.divIcon({
+                className: 'temp-coordinate-marker',
+                html: '📍',
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+              })
+            }).addTo(map);
+
+            // Show coordinates
+            tempMarker.bindPopup(`Coordinates: ${selectedCoords.lat.toFixed(6)}, ${selectedCoords.lng.toFixed(6)}`).openPopup();
+
+            showNotification('Click again to confirm these coordinates', 'info');
+
+          } else if (clickCount === 2) {
+            // Second click - confirm and fill form
+            const coordsString = `${selectedCoords.lat.toFixed(6)}, ${selectedCoords.lng.toFixed(6)}`;
+
+            // Remove temporary marker
+            map.eachLayer(layer => {
+              if (layer._icon && layer._icon.className.includes('temp-coordinate-marker')) {
+                map.removeLayer(layer);
+              }
+            });
+
+            // Remove click listener
+            map.off('click', mapClickHandler);
+
+            // Reopen form and fill coordinates
+            setTimeout(() => {
+              if (formModal) {
+                formModal.classList.add('show');
+              }
+
+              const coordInput = document.querySelector(`input[name="${fieldName}"]`);
+              if (coordInput) {
+                coordInput.value = coordsString;
+                showNotification(`Coordinates set: ${coordsString}`, 'success');
+              }
+            }, 500);
+          }
+        };
+
+        map.on('click', mapClickHandler);
       }
 
       function refreshArtistsData() {
