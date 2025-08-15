@@ -3136,36 +3136,7 @@
       }
     }
 
-    .pin-cursor {
-      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23dc2626"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>') 12 12, crosshair !important;
-    }
 
-    .map-pin-mode {
-      cursor: crosshair !important;
-    }
-
-    .map-pin-mode * {
-      cursor: crosshair !important;
-    }
-
-    /* Force cursor override for pin mode */
-    .pin-cursor * {
-      cursor: crosshair !important;
-    }
-
-    .pin-cursor .leaflet-container,
-    .pin-cursor .leaflet-container * {
-      cursor: crosshair !important;
-    }
-
-    /* Ensure map elements get the cursor */
-    .leaflet-container.pin-mode {
-      cursor: crosshair !important;
-    }
-
-    .leaflet-container.pin-mode * {
-      cursor: crosshair !important;
-    }
 
     .member-item {
       padding: 16px 0;
@@ -8791,10 +8762,7 @@
           }, 100);
         }
 
-        // Apply any pending coordinates after form is shown
-        setTimeout(() => {
-          applyPendingCoordinates();
-        }, 150);
+
       }
 
       function closeAdminForm() {
@@ -8936,9 +8904,6 @@
             inputHtml = `
                 <div class="coordinates-input-group">
                   <input type="text" name="${field.key}" value="${fieldValue}" required="${field.required}" class="form-input" placeholder="51.522592, -0.202544">
-                  <button type="button" onclick="getCoordinatesFromMap('${field.key}')" class="coordinate-picker-btn" title="Pick from map">
-                    📍
-                  </button>
                   <button type="button" onclick="locateFormCoordinates()" class="coordinate-locate-btn" title="Locate coordinates on map">
                     🎯
                   </button>
@@ -12415,135 +12380,11 @@
         }
       }
 
-      function getCoordinatesFromMap(fieldName) {
-        console.log('Getting coordinates from map for field:', fieldName);
-
-        // Close all admin modals temporarily
-        const formModal = document.getElementById('adminFormModal');
-        const adminModal = document.getElementById('adminModal');
-
-        if (formModal) {
-          formModal.classList.remove('show');
-        }
-
-        if (adminModal) {
-          adminModal.classList.remove('show');
-        }
-
-        // Show instruction to user
-        showNotification('Click on the map to select coordinates. Click again to confirm.', 'info');
-
-        // Enable map click listener
-        let clickCount = 0;
-        let selectedCoords = null;
-        let tempMarker = null;
-
-        const mapClickHandler = (e) => {
-          clickCount++;
-
-          if (clickCount === 1) {
-            // First click - show preview marker
-            selectedCoords = e.latlng;
-
-            // Create temporary marker
-            tempMarker = L.marker(selectedCoords, {
-              icon: L.divIcon({
-                className: 'temp-coordinate-marker',
-                html: '📍',
-                iconSize: [24, 24],
-                iconAnchor: [12, 12]
-              })
-            }).addTo(map);
-
-            // Show coordinates with confirm button
-            const coordsString = `${selectedCoords.lat.toFixed(6)}, ${selectedCoords.lng.toFixed(6)}`;
-            tempMarker.bindPopup(`
-              <div style="text-align: center; padding: 8px;">
-                <strong>Selected Coordinates</strong><br>
-                <small>${coordsString}</small><br>
-                <button onclick="confirmCoordinates('${fieldName}', '${coordsString}', ${selectedCoords.lat}, ${selectedCoords.lng})" 
-                        style="margin-top: 8px; padding: 6px 12px; background: #8b5cf6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
-                  Confirm & Save
-                </button>
-              </div>
-            `).openPopup();
-
-            showNotification('Coordinates selected. Click "Confirm & Save" to apply.', 'info');
-
-          } else if (clickCount === 2) {
-            // Second click - show confirm dialog
-            if (tempMarker) {
-              tempMarker.openPopup();
-            }
-          }
-        };
-
-        map.on('click', mapClickHandler);
-      }
-
-      function confirmCoordinates(fieldName, coordsString, lat, lng) {
-        console.log('Confirming coordinates:', coordsString);
-
-        // Store coordinates temporarily
-        pendingCoordinates = {
-          fieldName: fieldName,
-          coordsString: coordsString,
-          lat: lat,
-          lng: lng
-        };
-
-        // Remove temporary marker
-        map.eachLayer(layer => {
-          if (layer._icon && layer._icon.className.includes('temp-coordinate-marker')) {
-            map.removeLayer(layer);
-          }
-        });
-
-        // Remove click listener
-        map.off('click');
-
-        // Reopen form and fill coordinates
-        setTimeout(() => {
-          reopenAdminModal();
-          applyPendingCoordinates();
-        }, 500);
-      }
-
-      function applyPendingCoordinates() {
-        if (!pendingCoordinates) return;
-
-        // Wait for form to be ready
-        setTimeout(() => {
-          const { fieldName, coordsString } = pendingCoordinates;
-
-          // Try multiple selectors to find the coordinates input
-          const coordInput = document.querySelector(`input[name="${fieldName}"]`) ||
-            document.querySelector('.coordinates-input-group input') ||
-            document.querySelector('input[placeholder*="51.522592"]') ||
-            document.querySelector('input[placeholder*="latitude"]');
-
-          console.log('Looking for coordinates input:', fieldName);
-          console.log('Found input:', coordInput);
-
-          if (coordInput) {
-            coordInput.value = coordsString;
-            console.log('Coordinates set to input:', coordsString);
-            showNotification(`Coordinates confirmed and saved: ${coordsString}`, 'success');
-            pendingCoordinates = null; // Clear pending coordinates
-          } else {
-            console.error('Coordinates input not found for field:', fieldName);
-            console.log('Available inputs:', Array.from(document.querySelectorAll('input')).map(i => ({ name: i.name, placeholder: i.placeholder })));
-            showNotification('Could not find coordinates field. Please enter manually.', 'error');
-          }
-        }, 300);
-      }
+      // Coordinates functionality removed - manual entry only
 
       // Carousel Image Management Functions
       let carouselImages = [];
       let selectedImageIndex = 0;
-
-      // Temporary coordinates storage
-      let pendingCoordinates = null;
 
       function selectCarouselImage(index) {
         console.log('Selecting carousel image:', index);
@@ -12984,93 +12825,7 @@
         }
       }
 
-      function minimizeAllAdminModals() {
-        console.log('Minimizing all admin modals');
-
-        // Close admin form modal
-        const formModal = document.getElementById('adminFormModal');
-        if (formModal) {
-          formModal.classList.remove('show');
-        }
-
-        // Close admin portal modal
-        const adminModal = document.getElementById('adminModal');
-        if (adminModal) {
-          adminModal.classList.remove('show');
-        }
-
-        // Close any other admin-related modals
-        const allModals = document.querySelectorAll('.modal-overlay.show, .admin-modal.show');
-        allModals.forEach(modal => {
-          modal.classList.remove('show');
-        });
-
-        // Change cursor to pin
-        console.log('Changing cursor to pin mode...');
-
-        // Apply cursor changes with multiple methods for better compatibility
-        document.body.classList.add('pin-cursor');
-        document.body.style.cursor = 'crosshair';
-
-        if (map && map.getContainer()) {
-          const mapContainer = map.getContainer();
-          mapContainer.classList.add('map-pin-mode', 'pin-mode');
-          mapContainer.style.cursor = 'crosshair';
-          console.log('Map container cursor changed');
-        } else {
-          console.warn('Map container not found');
-        }
-
-        // Force cursor change on all map elements
-        const mapElements = document.querySelectorAll('.leaflet-container, .leaflet-container *');
-        mapElements.forEach(el => {
-          el.style.cursor = 'crosshair';
-        });
-
-        console.log('Cursor change applied');
-
-        // Add visual indicator
-        showNotification('Click on the map to place pin', 'info');
-      }
-
-      function reopenAdminModal() {
-        console.log('Reopening admin modal');
-
-        // Restore normal cursor
-        console.log('Restoring normal cursor...');
-
-        // Remove cursor classes and styles
-        document.body.classList.remove('pin-cursor');
-        document.body.style.cursor = 'default';
-
-        if (map && map.getContainer()) {
-          const mapContainer = map.getContainer();
-          mapContainer.classList.remove('map-pin-mode', 'pin-mode');
-          mapContainer.style.cursor = 'grab';
-          console.log('Map container cursor restored');
-        }
-
-        // Restore cursor on all map elements
-        const mapElements = document.querySelectorAll('.leaflet-container, .leaflet-container *');
-        mapElements.forEach(el => {
-          el.style.cursor = '';
-        });
-
-        console.log('Normal cursor restored');
-
-        // Try to reopen the most recently used modal
-        const formModal = document.getElementById('adminFormModal');
-        const adminModal = document.getElementById('adminModal');
-
-        // Check which modal was active before
-        if (formModal && formModal.classList.contains('admin-form-modal')) {
-          formModal.classList.add('show');
-        } else if (adminModal) {
-          adminModal.classList.add('show');
-        } else if (formModal) {
-          formModal.classList.add('show');
-        }
-      }
+      // Modal management functions removed - no longer needed for automatic pin functionality
 
       function refreshArtistsData() {
         console.log('=== refreshArtistsData called ===');
