@@ -8337,6 +8337,7 @@
     let adminData = {
       'food-stalls': [],
       'float-trucks': [],
+      'float-routes': [],
       'groups': [],
       'friends': [],
       'artists': []
@@ -8346,6 +8347,7 @@
     let userData = {
       'food-stalls': [],
       'float-trucks': [],
+      'float-routes': [],
       'groups': [],
       'friends': [],
       'artists': []
@@ -8355,6 +8357,7 @@
     let pendingChanges = {
       'food-stalls': false,
       'float-trucks': false,
+      'float-routes': false,
       'groups': false,
       'friends': false,
       'artists': false
@@ -8469,6 +8472,28 @@
         } catch (error) {
           console.warn('Artists collection not found:', error);
           adminData['artists'] = [];
+        }
+
+        // Load float routes
+        try {
+          const floatRoutesSnapshot = await db.collection('float_routes')
+            .orderBy('created_at', 'desc')
+            .get();
+          adminData['float-routes'] = floatRoutesSnapshot.docs.map(doc => {
+            const data = doc.data();
+            // Set default status locally only
+            if (!data.status) {
+              data.status = 'active';
+            }
+            return {
+              id: doc.id,
+              ...data
+            };
+          });
+          console.log('Loaded float routes:', adminData['float-routes'].length);
+        } catch (error) {
+          console.warn('Float routes collection not found:', error);
+          adminData['float-routes'] = [];
         }
 
         // Update table display efficiently
@@ -8706,6 +8731,7 @@
     const adminTabConfig = {
       'food-stalls': { title: 'Food Stalls', icon: '🍔' },
       'float-trucks': { title: 'Float Trucks', icon: '🚚' },
+      'float-routes': { title: 'Float Routes', icon: '🗺️' },
       'groups': { title: 'Groups', icon: '👥' },
       'friends': { title: 'Friends', icon: '👤' },
       'artists': { title: 'Artists & Bands', icon: '🎵' }
@@ -8800,6 +8826,7 @@
           const tableMap = {
             'food-stalls': 'food_stalls',
             'float-trucks': 'float_trucks',
+            'float-routes': 'float_routes',
             'groups': 'groups',
             'friends': 'friends',
             'artists': 'artists'
@@ -8841,6 +8868,7 @@
           const tableMap = {
             'food-stalls': 'food_stalls',
             'float-trucks': 'float_trucks',
+            'float-routes': 'float_routes',
             'groups': 'groups',
             'friends': 'friends',
             'artists': 'artists'
@@ -9054,6 +9082,17 @@
           { key: 'social_media', label: 'Social Media', type: 'text', required: false },
           { key: 'description', label: 'Description', type: 'textarea', required: false },
           { key: 'images', label: 'Artist Photos (Carousel)', type: 'multiple-images', accept: 'image/*', required: false, maxImages: 5 },
+          { key: 'status', label: 'Status', type: 'select', options: ['active', 'confirmed', 'pending', 'cancelled'], required: true }
+        ],
+        'float-routes': [
+          { key: 'route_name', label: 'Route Name', type: 'text', required: true },
+          { key: 'route_type', label: 'Route Type', type: 'select', options: ['Main Parade Route', 'Side Route', 'Alternative Route', 'Emergency Route'], required: true },
+          { key: 'start_point', label: 'Start Point Coordinates', type: 'coordinates', required: true },
+          { key: 'end_point', label: 'End Point Coordinates', type: 'coordinates', required: true },
+          { key: 'route_coordinates', label: 'Route Coordinates (JSON array)', type: 'textarea', required: true },
+          { key: 'estimated_duration', label: 'Estimated Duration (hours)', type: 'number', min: 1, max: 8, step: 0.5, required: true },
+          { key: 'start_time', label: 'Start Time', type: 'time', required: true },
+          { key: 'description', label: 'Route Description', type: 'textarea', required: false },
           { key: 'status', label: 'Status', type: 'select', options: ['active', 'confirmed', 'pending', 'cancelled'], required: true }
         ]
       };
@@ -9293,6 +9332,7 @@
         const tableMap = {
           'food-stalls': 'food_stalls',
           'float-trucks': 'float_trucks',
+          'float-routes': 'float_routes',
           'groups': 'groups',
           'friends': 'friends',
           'artists': 'artists'
@@ -13033,6 +13073,59 @@
 
       updateCarouselDisplay();
       showNotification('Main image updated', 'success');
+    }
+
+    // Float Route Management Functions
+    function displayFloatRoute(routeData) {
+      try {
+        // Parse route coordinates
+        const coordinates = JSON.parse(routeData.route_coordinates);
+
+        // Create polyline for the route
+        const routePolyline = L.polyline(coordinates, {
+          color: '#ff6b35',
+          weight: 4,
+          opacity: 0.8
+        }).addTo(map);
+
+        // Add start and end markers
+        const startCoords = routeData.start_point.split(',').map(c => parseFloat(c.trim()));
+        const endCoords = routeData.end_point.split(',').map(c => parseFloat(c.trim()));
+
+        L.marker(startCoords, {
+          icon: L.divIcon({
+            className: 'route-start-marker',
+            html: '🟢',
+            iconSize: [20, 20]
+          })
+        }).addTo(map).bindPopup(`Start: ${routeData.route_name}`);
+
+        L.marker(endCoords, {
+          icon: L.divIcon({
+            className: 'route-end-marker',
+            html: '🔴',
+            iconSize: [20, 20]
+          })
+        }).addTo(map).bindPopup(`End: ${routeData.route_name}`);
+
+        // Store reference for later removal
+        if (!window.floatRoutes) window.floatRoutes = [];
+        window.floatRoutes.push(routePolyline);
+
+        showNotification(`Route "${routeData.route_name}" displayed on map`, 'success');
+      } catch (error) {
+        console.error('Error displaying float route:', error);
+        showNotification('Error displaying route. Check coordinate format.', 'error');
+      }
+    }
+
+    function clearFloatRoutes() {
+      if (window.floatRoutes) {
+        window.floatRoutes.forEach(route => {
+          map.removeLayer(route);
+        });
+        window.floatRoutes = [];
+      }
     }
 
     // Location Mode Management
