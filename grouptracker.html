@@ -2771,6 +2771,11 @@
       border: none;
     }
 
+    .route-number-marker.invisible {
+      opacity: 0;
+      pointer-events: none;
+    }
+
     .route-marker-number {
       width: 24px;
       height: 24px;
@@ -2788,6 +2793,11 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+    }
+
+    .route-marker-number.invisible {
+      opacity: 0;
+      pointer-events: none;
     }
 
     .route-marker-popup {
@@ -13360,21 +13370,21 @@
           dashArray: '10, 5' // Dashed line for main route
         }).addTo(map);
 
-        // Add numbered markers along the route
+        // Add invisible numbered markers along the route (for reference only)
         const routeMarkers = [];
         coordinates.forEach((coord, index) => {
-          // Create numbered marker
+          // Create invisible numbered marker
           const markerNumber = index + 1;
           const marker = L.marker([coord.lat, coord.lng], {
             icon: L.divIcon({
-              className: 'route-number-marker',
-              html: `<div class="route-marker-number">${markerNumber}</div>`,
-              iconSize: [24, 24],
-              iconAnchor: [12, 12]
+              className: 'route-number-marker invisible',
+              html: `<div class="route-marker-number invisible">${markerNumber}</div>`,
+              iconSize: [1, 1], // Minimal size
+              iconAnchor: [0.5, 0.5]
             })
           }).addTo(map);
 
-          // Add popup with coordinate info
+          // Add popup with coordinate info (still accessible)
           const popupContent = `
             <div class="route-marker-popup">
               <strong>Point ${markerNumber}</strong><br>
