@@ -5972,7 +5972,7 @@
       <div class="festival-dropdown">
         <button class="festival-btn" onclick="toggleFestivalDropdown()">
           <span class="festival-icon">🎪</span>
-          <span>Notting Hill Carnival</span>
+          <span>UK Festival</span>
           <span class="dropdown-arrow">▼</span>
         </button>
         <div class="festival-list" id="festivalList">
@@ -11397,6 +11397,12 @@
           if (paradeRouteBtn) {
             paradeRouteBtn.classList.add('active');
           }
+
+          // Update festival button text to show Notting Hill Carnival
+          const festivalBtn = document.querySelector('.festival-btn');
+          if (festivalBtn) {
+            festivalBtn.innerHTML = `🎪 Notting Hill Carnival <span class="dropdown-arrow">▼</span>`;
+          }
         } else {
           // Fallback to the old carnival route display
           showCarnivalFloatRoute();
@@ -11407,6 +11413,12 @@
             [51.5270, -0.1950]  // Northeast
           ]);
           map.fitBounds(carnivalBounds, { padding: [20, 20] });
+
+          // Update festival button text to show Notting Hill Carnival
+          const festivalBtn = document.querySelector('.festival-btn');
+          if (festivalBtn) {
+            festivalBtn.innerHTML = `🎪 Notting Hill Carnival <span class="dropdown-arrow">▼</span>`;
+          }
         }
 
         // Automatically switch to Find Stalls tab
@@ -11426,6 +11438,12 @@
         const paradeRouteBtn = document.querySelector('.parade-route-btn');
         if (paradeRouteBtn) {
           paradeRouteBtn.classList.remove('active');
+        }
+
+        // Reset festival button text back to "UK Festival"
+        const festivalBtn = document.querySelector('.festival-btn');
+        if (festivalBtn) {
+          festivalBtn.innerHTML = `🎪 UK Festival <span class="dropdown-arrow">▼</span>`;
         }
       }
     }
@@ -13454,6 +13472,9 @@
       const isActive = paradeRouteBtn.classList.toggle('active');
 
       if (isActive) {
+        // Automatically select Notting Hill Carnival from dropdown
+        selectFestival('Notting Hill Carnival');
+
         // Show main parade route
         const mainRoute = adminData['float-routes']?.find(route =>
           route.route_type === 'Main Parade Route' && route.status === 'active'
