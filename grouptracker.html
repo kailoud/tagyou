@@ -4174,6 +4174,28 @@
       background: #15803d;
     }
 
+    /* Artist Marker Styles */
+    .artist-marker {
+      background: #8b5cf6;
+      border: 2px solid white;
+      border-radius: 50%;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      line-height: 28px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      transition: transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .artist-marker:hover {
+      transform: scale(1.2);
+      background: #7c3aed;
+    }
+
     /* Carnival route polyline styling */
     .leaflet-interactive.carnival-route {
       cursor: pointer;
@@ -6950,6 +6972,10 @@
                     👤 Friends
                     <span class="tab-count">${adminData['friends'].length}</span>
                   </button>
+                  <button class="admin-tab" onclick="switchAdminTab('artists')">
+                    🎵 Artists & Bands
+                    <span class="tab-count">${adminData['artists'].length}</span>
+                  </button>
                 </div>
 
                 <!-- Search and Add -->
@@ -7007,8 +7033,12 @@
         'food-stalls': [],
         'float-trucks': [],
         'groups': [],
-        'friends': []
+        'friends': [],
+        'artists': []
       };
+
+      // Make adminData globally accessible for map markers
+      window.adminData = adminData;
 
       // Firebase Database Functions
       async function loadAdminData() {
@@ -7076,6 +7106,20 @@
             adminData['friends'] = getMockFriends();
           }
 
+          // Load artists
+          try {
+            const artistsSnapshot = await db.collection('artists')
+              .orderBy('created_at', 'desc')
+              .get();
+            adminData['artists'] = artistsSnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
+          } catch (error) {
+            console.warn('Artists collection not found, using mock data:', error);
+            adminData['artists'] = getMockArtists();
+          }
+
           // Update table display
           if (document.getElementById('adminTableBody')) {
             document.getElementById('adminTableBody').innerHTML = renderAdminTableData();
@@ -7089,6 +7133,7 @@
           adminData['float-trucks'] = getMockFloatTrucks();
           adminData['groups'] = getMockGroups();
           adminData['friends'] = getMockFriends();
+          adminData['artists'] = getMockArtists();
 
           if (document.getElementById('adminTableBody')) {
             document.getElementById('adminTableBody').innerHTML = renderAdminTableData();
@@ -7246,6 +7291,83 @@
             status: 'online',
             avatar: 'S'
           },
+        ];
+      }
+
+      function getMockArtists() {
+        return [
+          {
+            id: 1,
+            name: 'Reggae Vibes Band',
+            type: 'Live Band',
+            genre: 'Reggae',
+            stage_name: 'Main Stage',
+            coordinates: '51.522592, -0.202544',
+            performance_time: '14:00 - 16:00',
+            duration: 120,
+            contact_person: 'Marcus Johnson',
+            phone: '+44 7700 900201',
+            email: 'marcus@reggaevibes.com',
+            social_media: '@reggaevibesband',
+            description: 'Authentic reggae music with Caribbean vibes',
+            status: 'confirmed',
+            image: '🎵'
+          },
+          {
+            id: 2,
+            name: 'DJ Calypso Queen',
+            type: 'DJ',
+            genre: 'Calypso',
+            stage_name: 'Dance Arena',
+            coordinates: '51.516226, -0.201240',
+            performance_time: '18:00 - 20:00',
+            duration: 120,
+            contact_person: 'Lisa Thompson',
+            phone: '+44 7700 900202',
+            email: 'lisa@calypsoqueen.com',
+            social_media: '@calypsoqueen',
+            description: 'High-energy calypso and soca music',
+            status: 'confirmed',
+            image: '🎧'
+          },
+          {
+            id: 3,
+            name: 'Steel Pan Collective',
+            type: 'Live Band',
+            genre: 'World Music',
+            stage_name: 'Cultural Corner',
+            coordinates: '51.524981, -0.209562',
+            performance_time: '12:00 - 13:30',
+            duration: 90,
+            contact_person: 'David Williams',
+            phone: '+44 7700 900203',
+            email: 'david@steelpancollective.com',
+            social_media: '@steelpancollective',
+            description: 'Traditional steel pan music from Trinidad',
+            status: 'confirmed',
+            image: '🥁'
+          }
+        ];
+      }
+
+      function getMockFriends() {
+        return [
+          {
+            id: 1,
+            name: 'Alex Johnson',
+            email: 'alex@example.com',
+            phone: '+44 7700 900123',
+            status: 'online',
+            avatar: 'A'
+          },
+          {
+            id: 2,
+            name: 'Sarah Smith',
+            email: 'sarah@example.com',
+            phone: '+44 7700 900124',
+            status: 'online',
+            avatar: 'S'
+          },
           {
             id: 3,
             name: 'Mike Wilson',
@@ -7261,7 +7383,8 @@
         'food-stalls': { title: 'Food Stalls', icon: '🍔' },
         'float-trucks': { title: 'Float Trucks', icon: '🚚' },
         'groups': { title: 'Groups', icon: '👥' },
-        'friends': { title: 'Friends', icon: '👤' }
+        'friends': { title: 'Friends', icon: '👤' },
+        'artists': { title: 'Artists & Bands', icon: '🎵' }
       };
 
       function switchAdminTab(tab) {
@@ -7351,7 +7474,8 @@
               'food-stalls': 'food_stalls',
               'float-trucks': 'float_trucks',
               'groups': 'groups',
-              'friends': 'friends'
+              'friends': 'friends',
+              'artists': 'artists'
             };
 
             const tableName = tableMap[activeAdminTab];
@@ -7468,6 +7592,22 @@
             { key: 'phone', label: 'Phone', type: 'tel', required: false },
             { key: 'location', label: 'Location', type: 'text', required: false },
             { key: 'joinDate', label: 'Join Date', type: 'date', required: true }
+          ],
+          'artists': [
+            { key: 'name', label: 'Artist/Band Name', type: 'text', required: true },
+            { key: 'type', label: 'Artist Type', type: 'select', options: ['Live Band', 'DJ', 'Solo Artist', 'Dance Group', 'Street Performer', 'Sound System', 'Other'], required: true },
+            { key: 'genre', label: 'Music Genre', type: 'select', options: ['Reggae', 'Soca', 'Calypso', 'Hip Hop', 'R&B', 'Jazz', 'Blues', 'Rock', 'Pop', 'Electronic', 'World Music', 'Other'], required: true },
+            { key: 'stage_name', label: 'Stage/Venue Name', type: 'text', required: true },
+            { key: 'coordinates', label: 'Coordinates (lat, lng)', type: 'coordinates', required: true },
+            { key: 'performance_time', label: 'Performance Time', type: 'text', required: true },
+            { key: 'duration', label: 'Duration (minutes)', type: 'number', min: 15, max: 180, required: true },
+            { key: 'contact_person', label: 'Contact Person', type: 'text', required: true },
+            { key: 'phone', label: 'Phone', type: 'tel', required: true },
+            { key: 'email', label: 'Email', type: 'email', required: true },
+            { key: 'social_media', label: 'Social Media', type: 'text', required: false },
+            { key: 'description', label: 'Description', type: 'textarea', required: false },
+            { key: 'image', label: 'Artist Photo', type: 'file', accept: 'image/*', required: false },
+            { key: 'status', label: 'Status', type: 'select', options: ['confirmed', 'pending', 'cancelled'], required: true }
           ]
         };
 
@@ -9831,6 +9971,34 @@
           `);
           marker.carnivalRouteData = true;
         });
+
+        // Add artist markers from admin data
+        if (window.adminData && window.adminData.artists) {
+          window.adminData.artists.forEach((artist) => {
+            if (artist.coordinates && artist.status === 'confirmed') {
+              const [lat, lng] = artist.coordinates.split(',').map(coord => parseFloat(coord.trim()));
+              if (!isNaN(lat) && !isNaN(lng)) {
+                const marker = L.marker([lat, lng], {
+                  icon: L.divIcon({
+                    className: 'artist-marker',
+                    html: '🎵',
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                  })
+                }).addTo(map);
+
+                marker.bindPopup(`
+                  <b>${artist.name}</b><br>
+                  <small>${artist.type} - ${artist.genre}</small><br>
+                  <small>${artist.stage_name}</small><br>
+                  <small>${artist.performance_time}</small><br>
+                  <small>${artist.description || ''}</small>
+                `);
+                marker.carnivalRouteData = true;
+              }
+            }
+          });
+        }
 
         // Fit map to show the entire carnival route
         map.fitBounds(gridBounds, { padding: [20, 20] });
