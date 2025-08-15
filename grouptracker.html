@@ -11136,8 +11136,17 @@
       // Load festival-specific data
       if (festivalName === 'Notting Hill Carnival') {
         console.log('Loading Notting Hill Carnival stalls data...');
+        console.log('Admin data available:', window.adminData);
+        console.log('User data available:', window.userData);
         loadStallsData();
         showCarnivalFloatRoute();
+
+        // Automatically switch to Find Stalls tab
+        const stallsTab = document.querySelector('.stalls-btn');
+        if (stallsTab) {
+          stallsTab.click();
+        }
+
         showNotification(`Loaded ${festivalName} stalls data and parade route!`);
       } else {
         console.log(`Selected festival: ${festivalName}`);
@@ -13445,6 +13454,9 @@
       // Use admin data for testing if user is admin, otherwise use user data
       const dataSource = (window.firebaseAuth?.currentUser && isUserAdmin(window.firebaseAuth.currentUser)) ? window.adminData : window.userData;
 
+      console.log('Data source being used:', dataSource === window.adminData ? 'adminData' : 'userData');
+      console.log('Food stalls in data source:', dataSource?.['food-stalls']);
+
       if (dataSource && dataSource['food-stalls'] && dataSource['food-stalls'].length > 0) {
         stallsData = dataSource['food-stalls'].map(stall => ({
           id: stall.id,
@@ -13463,6 +13475,41 @@
           hours: stall.operating_hours || 'TBA',
           contact: stall.contact_person || stall.phone || 'N/A'
         }));
+      }
+
+      // If no data available, add some sample data for testing
+      if (stallsData.length === 0) {
+        console.log('No stalls data found, adding sample data for testing...');
+        stallsData = [
+          {
+            id: 'sample1',
+            name: 'Caribbean Delights',
+            origin: 'Jamaica',
+            description: 'Authentic Caribbean cuisine',
+            image: '🍗',
+            rating: 4.5,
+            priceRange: '££',
+            categories: ['Caribbean', 'Jerk Chicken', 'Rice & Peas'],
+            location: { lat: 51.522592, lng: -0.202544 },
+            menu: ['Jerk Chicken', 'Rice & Peas', 'Plantains'],
+            hours: '10:00 AM - 8:00 PM',
+            contact: 'N/A'
+          },
+          {
+            id: 'sample2',
+            name: 'Street Food Express',
+            origin: 'UK',
+            description: 'Quick and delicious street food',
+            image: '🌭',
+            rating: 4.2,
+            priceRange: '£',
+            categories: ['Street Food', 'Burgers', 'Hot Dogs'],
+            location: { lat: 51.521977, lng: -0.210971 },
+            menu: ['Burgers', 'Hot Dogs', 'Chips'],
+            hours: '11:00 AM - 9:00 PM',
+            contact: 'N/A'
+          }
+        ];
       }
 
       // Initialize filtered stalls
