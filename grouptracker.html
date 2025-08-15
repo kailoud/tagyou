@@ -1497,6 +1497,172 @@
       display: block;
     }
 
+    .image-carousel-container {
+      background: #f8f9fa;
+      border: 2px dashed #dee2e6;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .image-carousel-container:hover {
+      border-color: #8b5cf6;
+      background: #f3f4f6;
+    }
+
+    .carousel-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .carousel-image-slot {
+      aspect-ratio: 1;
+      border: 2px dashed #cbd5e1;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .carousel-image-slot:hover {
+      border-color: #8b5cf6;
+      background: #f8fafc;
+    }
+
+    .carousel-image-slot.selected {
+      border-color: #8b5cf6;
+      border-width: 3px;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+    }
+
+    .carousel-image-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .carousel-image-slot .slot-number {
+      font-size: 24px;
+      color: #cbd5e1;
+      font-weight: bold;
+    }
+
+    .carousel-image-slot .remove-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: rgba(239, 68, 68, 0.9);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .carousel-image-slot:hover .remove-btn {
+      display: flex;
+    }
+
+    .carousel-image-slot .remove-btn:hover {
+      background: rgba(239, 68, 68, 1);
+      transform: scale(1.1);
+    }
+
+    .carousel-upload-area {
+      text-align: center;
+      padding: 20px;
+      border: 2px dashed #8b5cf6;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(168, 85, 247, 0.05));
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .carousel-upload-area:hover {
+      border-color: #7c3aed;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1));
+      transform: translateY(-2px);
+    }
+
+    .carousel-upload-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+      color: #8b5cf6;
+    }
+
+    .carousel-upload-text {
+      font-size: 14px;
+      color: #374151;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+
+    .carousel-upload-hint {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .carousel-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      padding: 8px 0;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .carousel-info {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .carousel-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .carousel-btn {
+      background: #8b5cf6;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .carousel-btn:hover {
+      background: #7c3aed;
+      transform: translateY(-1px);
+    }
+
+    .carousel-btn.secondary {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #d1d5db;
+    }
+
+    .carousel-btn.secondary:hover {
+      background: #e5e7eb;
+    }
+
     .temp-coordinate-marker {
       background: #fbbf24;
       border: 3px solid white;
@@ -8290,9 +8456,16 @@
         setTimeout(() => formModal.classList.add('show'), 10);
 
         // After form is rendered, set up image preview if editing
-        if (isEditing && item && item.image) {
+        if (isEditing && item) {
           setTimeout(() => {
-            setupImagePreview(item.image);
+            if (item.image) {
+              setupImagePreview(item.image);
+            }
+            if (item.images && Array.isArray(item.images)) {
+              // Load existing carousel images
+              carouselImages = [...item.images];
+              updateCarouselDisplay();
+            }
           }, 100);
         }
       }
@@ -8393,7 +8566,7 @@
             { key: 'email', label: 'Email', type: 'email', required: true },
             { key: 'social_media', label: 'Social Media', type: 'text', required: false },
             { key: 'description', label: 'Description', type: 'textarea', required: false },
-            { key: 'image', label: 'Artist Photo', type: 'file', accept: 'image/*', required: false },
+            { key: 'images', label: 'Artist Photos (Carousel)', type: 'multiple-images', accept: 'image/*', required: false, maxImages: 5 },
             { key: 'status', label: 'Status', type: 'select', options: ['confirmed', 'pending', 'cancelled'], required: true }
           ]
         };
@@ -8442,6 +8615,59 @@
                 </div>
                 <small class="form-hint">Format: latitude, longitude (e.g., 51.522592, -0.202544)</small>
               `;
+            break;
+          case 'multiple-images':
+            // Handle multiple image carousel
+            const existingImages = Array.isArray(fieldValue) ? fieldValue : (fieldValue ? [fieldValue] : []);
+            const maxImages = field.maxImages || 5;
+
+            const carouselSlots = Array.from({ length: maxImages }, (_, index) => {
+              const image = existingImages[index];
+              const isSelected = index === 0; // First image is selected by default
+
+              return `
+                <div class="carousel-image-slot ${isSelected ? 'selected' : ''}" 
+                     onclick="selectCarouselImage(${index})" 
+                     data-index="${index}">
+                  ${image ? `
+                    <img src="${image}" alt="Image ${index + 1}">
+                    <button class="remove-btn" onclick="removeCarouselImage(${index}, event)">×</button>
+                  ` : `
+                    <div class="slot-number">${index + 1}</div>
+                  `}
+                </div>
+              `;
+            }).join('');
+
+            inputHtml = `
+              <div class="image-carousel-container">
+                <div class="carousel-preview-grid">
+                  ${carouselSlots}
+                </div>
+                <div class="carousel-upload-area" onclick="document.getElementById('${field.key}-input').click()">
+                  <div class="carousel-upload-icon">📷</div>
+                  <div class="carousel-upload-text">Click to upload images</div>
+                  <div class="carousel-upload-hint">PNG, JPG, GIF up to 5MB each</div>
+                </div>
+                <input type="file" id="${field.key}-input" name="${field.key}" 
+                       accept="${field.accept}" multiple 
+                       style="display: none;" 
+                       onchange="handleCarouselUpload(this, '${field.key}', ${maxImages})">
+                <div class="carousel-controls">
+                  <div class="carousel-info">
+                    ${existingImages.length}/${maxImages} images uploaded
+                  </div>
+                  <div class="carousel-actions">
+                    <button type="button" class="carousel-btn secondary" onclick="reorderCarouselImages()">
+                      Reorder
+                    </button>
+                    <button type="button" class="carousel-btn secondary" onclick="clearCarouselImages()">
+                      Clear All
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
             break;
           case 'file':
             // Show existing image if editing
@@ -8518,6 +8744,13 @@
             console.log('Processed coordinates:', itemData[key]);
           } else if (key === 'memberCount' || key === 'rating' || key === 'duration') {
             itemData[key] = parseFloat(value) || 0;
+          } else if (key === 'images' && carouselImages.length > 0) {
+            // Handle carousel images
+            console.log('Saving carousel images:', carouselImages.length);
+            itemData[key] = carouselImages;
+            // Reset carousel for next use
+            carouselImages = [];
+            selectedImageIndex = 0;
           } else if (key === 'image' && value instanceof File) {
             // Handle file upload to Firebase Storage
             uploadImageToFirebase(value, actualId, isEditing, itemData);
@@ -11865,6 +12098,120 @@
         };
 
         map.on('click', mapClickHandler);
+      }
+
+      // Carousel Image Management Functions
+      let carouselImages = [];
+      let selectedImageIndex = 0;
+
+      function selectCarouselImage(index) {
+        console.log('Selecting carousel image:', index);
+
+        // Update selected state
+        document.querySelectorAll('.carousel-image-slot').forEach((slot, i) => {
+          slot.classList.toggle('selected', i === index);
+        });
+
+        selectedImageIndex = index;
+      }
+
+      function removeCarouselImage(index, event) {
+        event.stopPropagation();
+        console.log('Removing carousel image:', index);
+
+        // Remove image from array
+        carouselImages.splice(index, 1);
+
+        // Update display
+        updateCarouselDisplay();
+
+        showNotification('Image removed from carousel', 'success');
+      }
+
+      function handleCarouselUpload(input, fieldName, maxImages) {
+        console.log('Handling carousel upload:', input.files.length, 'files');
+
+        const files = Array.from(input.files);
+        const remainingSlots = maxImages - carouselImages.length;
+
+        if (files.length > remainingSlots) {
+          showNotification(`Only ${remainingSlots} more images can be uploaded`, 'warning');
+          files.splice(remainingSlots);
+        }
+
+        // Process each file
+        files.forEach((file, index) => {
+          if (file.size > 5 * 1024 * 1024) {
+            showNotification(`File ${file.name} is too large (max 5MB)`, 'error');
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            carouselImages.push(e.target.result);
+            updateCarouselDisplay();
+          };
+          reader.readAsDataURL(file);
+        });
+
+        // Clear input
+        input.value = '';
+
+        showNotification(`${files.length} image(s) added to carousel`, 'success');
+      }
+
+      function updateCarouselDisplay() {
+        const slots = document.querySelectorAll('.carousel-image-slot');
+        const infoElement = document.querySelector('.carousel-info');
+
+        slots.forEach((slot, index) => {
+          const image = carouselImages[index];
+
+          if (image) {
+            slot.innerHTML = `
+              <img src="${image}" alt="Image ${index + 1}">
+              <button class="remove-btn" onclick="removeCarouselImage(${index}, event)">×</button>
+            `;
+          } else {
+            slot.innerHTML = `<div class="slot-number">${index + 1}</div>`;
+          }
+
+          // Update selected state
+          slot.classList.toggle('selected', index === selectedImageIndex);
+        });
+
+        // Update info
+        if (infoElement) {
+          infoElement.textContent = `${carouselImages.length}/${slots.length} images uploaded`;
+        }
+      }
+
+      function reorderCarouselImages() {
+        if (carouselImages.length < 2) {
+          showNotification('Need at least 2 images to reorder', 'info');
+          return;
+        }
+
+        // Simple reorder: move first image to end
+        const firstImage = carouselImages.shift();
+        carouselImages.push(firstImage);
+
+        updateCarouselDisplay();
+        showNotification('Images reordered', 'success');
+      }
+
+      function clearCarouselImages() {
+        if (carouselImages.length === 0) {
+          showNotification('No images to clear', 'info');
+          return;
+        }
+
+        if (confirm('Are you sure you want to remove all images?')) {
+          carouselImages = [];
+          selectedImageIndex = 0;
+          updateCarouselDisplay();
+          showNotification('All images cleared', 'success');
+        }
       }
 
       function refreshArtistsData() {
