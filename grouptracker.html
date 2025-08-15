@@ -9696,59 +9696,9 @@
           line.carnivalRouteData = true;
         });
 
-        // Add sound system markers based on actual NHC2023 map data
-        // Positioned along the real route coordinates
-        const soundSystemLocations = [
-          { name: "DISYA GENERATION", coord: [51.520143, -0.211625], area: "Ladbroke Grove" },
-          { name: "KCC", coord: [51.526325, -0.215112], area: "Ladbroke Grove" },
-          { name: "POWIS SQUARE", coord: [51.526234, -0.211620], area: "Kensal Rd" },
-          { name: "MARK ROSS", coord: [51.524214, -0.205375], area: "Kensal Rd" },
-          { name: "SOUND SYSTEM 5", coord: [51.523143, -0.206751], area: "Golbourne Rd" },
-          { name: "SOUND SYSTEM 6", coord: [51.523059, -0.206407], area: "Elkstone Road" },
-          { name: "SOUND SYSTEM 7", coord: [51.522147, -0.201387], area: "A4207" },
-          { name: "SOUND SYSTEM 8", coord: [51.518613, -0.198423], area: "Westbourne Park Road" },
-          { name: "SOUND SYSTEM 9", coord: [51.519079, -0.196369], area: "Westbourne Park Road" },
-          { name: "SOUND SYSTEM 10", coord: [51.515062, -0.195045], area: "Chepstow Rd" },
-          { name: "SOUND SYSTEM 11", coord: [51.514405, -0.200323], area: "Westbourne Grove" },
-          { name: "SOUND SYSTEM 12", coord: [51.512588, -0.206464], area: "Ladbroke Gardens" },
-        ];
 
-        soundSystemLocations.forEach((soundSystem, index) => {
-          const marker = L.marker(soundSystem.coord, {
-            icon: L.divIcon({
-              className: 'sound-system-marker',
-              html: '🔊', // Speaker icon for sound systems
-              iconSize: [25, 25],
-              iconAnchor: [12, 12]
-            })
-          }).addTo(map);
 
-          marker.bindPopup(`
-            <b>${soundSystem.name}</b><br>
-            <small>${soundSystem.area}</small><br>
-            <small>Notting Hill Carnival 2023</small><br>
-            <small>Live music and entertainment</small>
-          `);
-          marker.carnivalRouteData = true;
-        });
 
-        // Add judging zone marker (from the image)
-        const judgingZoneCoord = [51.523143, -0.206751]; // Golbourne Rd area
-        const judgingZoneMarker = L.marker(judgingZoneCoord, {
-          icon: L.divIcon({
-            className: 'judging-zone-marker',
-            html: '🏆', // Trophy icon for judging zone
-            iconSize: [30, 30],
-            iconAnchor: [15, 15]
-          })
-        }).addTo(map);
-
-        judgingZoneMarker.bindPopup(`
-          <b>JUDGING ZONE</b><br>
-          <small>Notting Hill Carnival 2023</small><br>
-          <small>Parade judging and awards</small>
-        `);
-        judgingZoneMarker.carnivalRouteData = true;
 
         // Add medical/welfare points (red cross icons from the map)
         // Positioned along the real route coordinates
@@ -9779,23 +9729,7 @@
           marker.carnivalRouteData = true;
         });
 
-        // Add safety zone (green shield icon from the map)
-        const safetyZoneCoord = [51.522147, -0.201387]; // A4207 area
-        const safetyZoneMarker = L.marker(safetyZoneCoord, {
-          icon: L.divIcon({
-            className: 'safety-zone-marker',
-            html: '🛡️', // Shield icon for safety zone
-            iconSize: [25, 25],
-            iconAnchor: [12, 12]
-          })
-        }).addTo(map);
 
-        safetyZoneMarker.bindPopup(`
-          <b>Safety Zone</b><br>
-          <small>Notting Hill Carnival 2023</small><br>
-          <small>Emergency services and safety information</small>
-        `);
-        safetyZoneMarker.carnivalRouteData = true;
 
         // Fit map to show the entire carnival route
         map.fitBounds(gridBounds, { padding: [20, 20] });
