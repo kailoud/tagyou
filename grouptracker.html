@@ -1263,6 +1263,21 @@
       color: #dc2626;
     }
 
+    .status-badge.confirmed {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-badge.pending {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .status-badge.cancelled {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
     .action-buttons {
       display: flex;
       gap: 8px;
@@ -5091,6 +5106,192 @@
       overflow-y: auto;
     }
 
+    /* Artists Panel Styles */
+    .artists-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .artists-title h3 {
+      margin: 0 0 4px 0;
+      color: #e91e63;
+      font-size: 18px;
+    }
+
+    .artists-title p {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .artists-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .artists-control-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #f5f5f5;
+      color: #666;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .artists-control-btn:hover {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .artists-filters {
+      margin-bottom: 24px;
+    }
+
+    .artists-filters h4 {
+      margin: 0 0 16px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .artists-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .artist-card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #e91e63;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .artist-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .artist-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .artist-name {
+      font-weight: 600;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .artist-status {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+      background: #fce4ec;
+      color: #c2185b;
+    }
+
+    .artist-status.confirmed {
+      background: #e8f5e8;
+      color: #2e7d32;
+    }
+
+    .artist-status.pending {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .artist-image {
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #e91e63;
+      font-size: 24px;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .artist-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .artist-emoji {
+      font-size: 48px;
+      line-height: 1;
+      display: block;
+      text-align: center;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .artist-details {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .artist-detail {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .artist-description {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    .artist-performance {
+      margin-top: 8px;
+    }
+
+    .performance-time {
+      font-size: 13px;
+      color: #e91e63;
+      font-weight: 500;
+    }
+
+    .setlist-item {
+      display: inline-block;
+      background: #fce4ec;
+      color: #c2185b;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      margin: 2px;
+    }
+
     .stall-card {
       background: white;
       border-radius: 12px;
@@ -5304,6 +5505,84 @@
     }
 
     .stall-menu {
+      margin-bottom: 16px;
+    }
+
+    /* Artist Modal Styles */
+    .artist-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .artist-modal.show {
+      display: flex;
+    }
+
+    .artist-modal-content {
+      background: white;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .artist-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .artist-modal-header h3 {
+      margin: 0;
+      color: #333;
+      font-size: 20px;
+    }
+
+    .artist-modal-body {
+      padding: 0 24px 24px;
+    }
+
+    .artist-image-gallery {
+      margin-bottom: 24px;
+    }
+
+    .artist-image-gallery img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .artist-info {
+      margin-bottom: 24px;
+    }
+
+    .artist-info h4 {
+      margin: 0 0 8px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .artist-info p {
+      margin: 0 0 16px 0;
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .artist-setlist {
       margin-bottom: 16px;
     }
 
@@ -6395,10 +6674,9 @@
       <div class="panel-tabs">
         <div class="tab active" onclick="switchTab('members')">Group</div>
         <div class="tab" onclick="switchTab('find-stalls')">Find Stalls</div>
+        <div class="tab" onclick="switchTab('artists')">Artists</div>
         <div class="tab" onclick="switchTab('float')">Floats</div>
-
         <div class="tab" onclick="switchTab('settings')">Settings</div>
-
       </div>
 
       <div class="panel-content active" id="members-content">
@@ -6534,6 +6812,114 @@
                 </button>
                 <button class="btn btn-secondary" onclick="shareStall()">
                   📤 Share Stall
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-content" id="artists-content">
+        <!-- Artists Header -->
+        <div class="artists-header">
+          <div class="artists-title">
+            <h3>🎵 Artists & Bands</h3>
+            <p>Discover amazing artists performing at the carnival</p>
+          </div>
+          <div class="artists-controls">
+            <button class="artists-control-btn" onclick="refreshArtistsData()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+              </svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="artists-filters">
+          <h4>🔍 Filters</h4>
+          <div class="filter-row">
+            <div class="filter-group">
+              <label>Genre:</label>
+              <select id="genreFilter" onchange="filterArtists()">
+                <option value="all">All Genres</option>
+                <option value="reggae">Reggae</option>
+                <option value="dancehall">Dancehall</option>
+                <option value="soca">Soca</option>
+                <option value="calypso">Calypso</option>
+                <option value="steelpan">Steelpan</option>
+                <option value="hip-hop">Hip-Hop</option>
+                <option value="r&b">R&B</option>
+                <option value="jazz">Jazz</option>
+                <option value="blues">Blues</option>
+                <option value="gospel">Gospel</option>
+                <option value="traditional">Traditional</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>Stage:</label>
+              <select id="stageFilter" onchange="filterArtists()">
+                <option value="all">All Stages</option>
+                <option value="main stage">Main Stage</option>
+                <option value="sound system stage">Sound System Stage</option>
+                <option value="reggae stage">Reggae Stage</option>
+                <option value="steelpan stage">Steelpan Stage</option>
+                <option value="community stage">Community Stage</option>
+                <option value="youth stage">Youth Stage</option>
+                <option value="street performance">Street Performance</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Artists Grid -->
+        <div class="artists-grid" id="artistsGrid">
+          <div class="empty-state">
+            <div class="empty-icon">🎵</div>
+            <h3>No Artists Available</h3>
+            <p>Artists and bands will appear here when they are added to the event.</p>
+          </div>
+        </div>
+
+        <!-- Artist Details Modal -->
+        <div class="artist-modal" id="artistModal">
+          <div class="artist-modal-content">
+            <div class="artist-modal-header">
+              <button class="close-btn" onclick="closeArtistModal()">×</button>
+              <h3 id="artistModalTitle">Artist Details</h3>
+            </div>
+            <div class="artist-modal-body">
+              <div class="artist-image-gallery" id="artistImageGallery">
+                <!-- Images will be loaded here -->
+              </div>
+              <div class="artist-info">
+                <div class="artist-stage">
+                  <h4>🎪 Stage & Performance</h4>
+                  <p id="artistStage"></p>
+                  <p id="artistPerformanceTime"></p>
+                </div>
+                <div class="artist-description">
+                  <h4>📝 About</h4>
+                  <p id="artistDescription"></p>
+                </div>
+                <div class="artist-setlist">
+                  <h4>🎼 Setlist</h4>
+                  <div id="artistSetlist"></div>
+                </div>
+                <div class="artist-contact">
+                  <h4>📞 Contact</h4>
+                  <p id="artistContact"></p>
+                  <p id="artistSocialMedia"></p>
+                </div>
+              </div>
+              <div class="artist-actions">
+                <button class="btn btn-primary" onclick="locateArtistOnMap()">
+                  📍 Show on Map
+                </button>
+                <button class="btn btn-secondary" onclick="shareArtist()">
+                  📤 Share Artist
                 </button>
               </div>
             </div>
@@ -8478,7 +8864,10 @@
                     👤 Friends
                     <span class="tab-count">${adminData['friends'].length}</span>
                   </button>
-
+                  <button class="admin-tab" onclick="switchAdminTab('artists')">
+                    🎵 Artists
+                    <span class="tab-count">${adminData['artists'].length}</span>
+                  </button>
                 </div>
 
                 <!-- Loading indicator -->
@@ -8547,21 +8936,17 @@
           modal.remove();
 
           // Refresh artists data if artists button is active
-          const artistsBtn = document.querySelector('.artists-btn');
-          if (artistsBtn && artistsBtn.classList.contains('active')) {
+          const artistBandsBtn = document.querySelector('.artist-bands-btn');
+          if (artistBandsBtn && artistBandsBtn.classList.contains('active')) {
             // Refresh map markers
-            removeArtistMarkers();
-            addArtistMarkers();
+            removeArtistBandMarkers();
+            addArtistBandMarkers();
 
             // Refresh panel data
             const artistsContent = document.getElementById('artists-content');
             if (artistsContent && artistsContent.classList.contains('active')) {
               loadArtistsData();
-              loadArtistsSchedule();
             }
-
-            // Update categories
-            updateArtistCategoriesFromAdminData();
           }
         }, 300);
       }
@@ -9438,6 +9823,10 @@
                   ${item.location ? `<div>📍 ${item.location}</div>` : ''}
                   ${item.current_location ? `<div>📍 ${item.current_location}</div>` : ''}
                   ${item.type ? `<div>${item.type}</div>` : ''}
+                  ${item.genre ? `<div>🎵 ${item.genre}</div>` : ''}
+                  ${item.stage_name ? `<div>🎪 ${item.stage_name}</div>` : ''}
+                  ${item.performance_time ? `<div>⏰ ${item.performance_time}</div>` : ''}
+                  ${item.duration ? `<div>⏱️ ${item.duration} min</div>` : ''}
                   ${item.memberCount ? `<div>👥 ${item.memberCount} members</div>` : ''}
                   ${item.hours ? `<div>🕐 ${item.hours}</div>` : ''}
                   ${item.rating ? `<div>⭐ ${item.rating}/5</div>` : ''}
@@ -9486,6 +9875,7 @@
               'float-routes': 'float_routes',
               'groups': 'groups',
               'friends': 'friends',
+              'artists': 'artists',
             };
 
             const collectionName = tableMap[activeAdminTab];
@@ -9528,6 +9918,7 @@
             'float-routes': 'float_routes',
             'groups': 'groups',
             'friends': 'friends',
+            'artists': 'artists',
           };
 
           const collectionName = tableMap[activeAdminTab];
@@ -11079,6 +11470,15 @@
             loadArtistsData();
           }).catch(error => {
             loadStallsData();
+            loadArtistsData();
+          });
+        }
+
+        // Special handling for artists tab
+        if (tabName === 'artists') {
+          loadAdminData().then(() => {
+            loadArtistsData();
+          }).catch(error => {
             loadArtistsData();
           });
         }
@@ -15014,6 +15414,7 @@
 
       console.log('Artists data loaded:', artistsData);
       console.log('Filtered artists:', filteredArtists);
+      renderArtists();
       console.log('=== loadArtistsData completed ===');
     }
 
@@ -15471,6 +15872,197 @@
       modal.classList.add('show');
     }
 
+    function renderArtists() {
+      console.log('=== renderArtists called ===');
+
+      const artistsGrid = document.getElementById('artistsGrid');
+      console.log('Artists grid element:', artistsGrid);
+
+      if (!artistsGrid) {
+        console.error('❌ Artists grid not found!');
+        return;
+      }
+
+      console.log('Total artists to render:', filteredArtists.length);
+
+      artistsGrid.innerHTML = filteredArtists.map((artist, index) => {
+        const clickHandler = `openArtistModal('${artist.id}')`;
+
+        return `
+        <div class="artist-card" onclick="${clickHandler}">
+          <div class="artist-card-header">
+            <div class="artist-name">${artist.name}</div>
+            <div class="artist-status ${artist.status}">${artist.status}</div>
+          </div>
+          <div class="artist-image">
+            <span class="artist-emoji">${artist.image}</span>
+          </div>
+          <div class="artist-details">
+            <div class="artist-detail">
+              <span>🎵</span>
+              <span>${artist.genre}</span>
+            </div>
+            <div class="artist-detail">
+              <span>🎪</span>
+              <span>${artist.stage}</span>
+            </div>
+          </div>
+          <div class="artist-description">${artist.description}</div>
+          <div class="artist-performance">
+            <span class="performance-time">⏰ ${artist.performance_time}</span>
+          </div>
+        </div>
+      `;
+      }).join('');
+
+      console.log('Artists rendered successfully');
+      console.log('Filtered artists count:', filteredArtists.length);
+      console.log('=== renderArtists completed ===');
+    }
+
+    function filterArtists() {
+      const genreFilter = document.getElementById('genreFilter').value;
+      const stageFilter = document.getElementById('stageFilter').value;
+
+      filteredArtists = artistsData.filter(artist => {
+        const genreMatch = genreFilter === 'all' || artist.genre.toLowerCase() === genreFilter.toLowerCase();
+        const stageMatch = stageFilter === 'all' || artist.stage.toLowerCase() === stageFilter.toLowerCase();
+
+        return genreMatch && stageMatch;
+      });
+
+      renderArtists();
+    }
+
+    function openArtistModal(artistId) {
+      const artist = artistsData.find(a => a.id === artistId);
+      if (!artist) return;
+
+      const modal = document.getElementById('artistModal');
+      modal.setAttribute('data-artist-id', artistId);
+
+      // Update the modal content
+      document.getElementById('artistModalTitle').textContent = artist.name;
+      document.getElementById('artistStage').textContent = artist.stage;
+      document.getElementById('artistPerformanceTime').textContent = artist.performance_time;
+      document.getElementById('artistDescription').textContent = artist.description;
+      document.getElementById('artistContact').textContent = artist.contact;
+      document.getElementById('artistSocialMedia').textContent = artist.social_media;
+
+      // Update the setlist
+      const setlistContainer = document.getElementById('artistSetlist');
+      setlistContainer.innerHTML = artist.setlist.map(song => `<span class="setlist-item">🎵 ${song}</span>`).join('');
+
+      // Update the image gallery with the emoji
+      const imageGallery = document.getElementById('artistImageGallery');
+      imageGallery.innerHTML = `
+        <div style="text-align: center; padding: 20px; font-size: 72px; background: #fce4ec; border-radius: 8px;">
+          ${artist.image}
+        </div>
+      `;
+
+      modal.classList.add('show');
+    }
+
+    function closeArtistModal() {
+      const modal = document.getElementById('artistModal');
+      modal.classList.remove('show');
+    }
+
+    function locateArtistOnMap() {
+      const modal = document.getElementById('artistModal');
+      const artistId = modal.getAttribute('data-artist-id');
+      const artist = artistsData.find(a => a.id === artistId);
+
+      if (!artist) {
+        showNotification('Artist not found');
+        return;
+      }
+
+      // Validate coordinates
+      if (!validateMapAndCoordinates(artist.location, `artist ${artistId}`)) {
+        return;
+      }
+
+      // Center map on artist location with smooth animation
+      map.flyTo([artist.location.lat, artist.location.lng], 18, {
+        duration: 1.5,
+        easeLinearity: 0.25
+      });
+
+      // Add a temporary highlight marker
+      const highlightMarker = L.marker([artist.location.lat, artist.location.lng], {
+        icon: L.divIcon({
+          className: 'artist-highlight-marker',
+          html: `<div style="background: #e91e63; width: 40px; height: 40px; border-radius: 50%; border: 4px solid white; box-shadow: 0 6px 12px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px; animation: pulse 2s infinite;">🎵</div>`,
+          iconSize: [40, 40],
+          iconAnchor: [20, 20]
+        })
+      });
+
+      highlightMarker.addTo(map);
+
+      // Remove highlight marker after 3 seconds
+      setTimeout(() => {
+        map.removeLayer(highlightMarker);
+      }, 3000);
+
+      // Show success message
+      showNotification(`Centered map on ${artist.name}`);
+    }
+
+    function shareArtist() {
+      const modal = document.getElementById('artistModal');
+      const artistId = modal.getAttribute('data-artist-id');
+      const artist = artistsData.find(a => a.id === artistId);
+
+      if (!artist) {
+        showNotification('Artist not found');
+        return;
+      }
+
+      // Create share content
+      const shareText = `Check out ${artist.name} performing at the carnival! ${artist.description}`;
+      const shareUrl = `${window.location.origin}${window.location.pathname}?artist=${artistId}`;
+
+      // Try to use Web Share API first
+      if (navigator.share) {
+        navigator.share({
+          title: `${artist.name} - Festival Artist`,
+          text: shareText,
+          url: shareUrl
+        }).then(() => {
+          showNotification('Shared successfully!');
+        }).catch((error) => {
+          console.log('Share cancelled or failed:', error);
+          fallbackShareArtist(artist, shareText, shareUrl);
+        });
+      } else {
+        // Fallback for browsers that don't support Web Share API
+        fallbackShareArtist(artist, shareText, shareUrl);
+      }
+    }
+
+    function fallbackShareArtist(artist, shareText, shareUrl) {
+      // Create a temporary textarea to copy to clipboard
+      const textarea = document.createElement('textarea');
+      textarea.value = `${shareText}\n\nLocation: ${shareUrl}`;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+
+      try {
+        document.execCommand('copy');
+        showNotification(`${artist.name} info copied to clipboard!`);
+      } catch (err) {
+        console.error('Failed to copy to clipboard:', err);
+        showNotification('Sharing not supported on this device');
+      }
+
+      document.body.removeChild(textarea);
+    }
+
     function closeStallModal() {
       const modal = document.getElementById('stallModal');
       modal.classList.remove('show');
@@ -15671,6 +16263,11 @@
       const modal = document.getElementById('stallModal');
       if (event.target === modal) {
         closeStallModal();
+      }
+
+      const artistModal = document.getElementById('artistModal');
+      if (event.target === artistModal) {
+        closeArtistModal();
       }
     });
 
