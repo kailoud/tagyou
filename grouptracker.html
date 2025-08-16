@@ -25,7 +25,7 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: white;
+      background: transparent;
       overflow: hidden;
       overflow-x: hidden;
       height: 100vh;
@@ -2462,6 +2462,7 @@
       align-items: center;
       z-index: 1001;
       transition: z-index 0.3s ease;
+      background: transparent;
     }
 
     /* When panel is expanded, put left controls behind it */
@@ -2475,6 +2476,7 @@
       left: 16px !important;
       z-index: 1000 !important;
       display: block !important;
+      background: transparent !important;
     }
 
     .location-control-btn {
@@ -2491,6 +2493,7 @@
       justify-content: center;
       cursor: pointer;
       transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
     }
 
     .location-control-btn:hover {
@@ -2503,20 +2506,24 @@
       height: 36px;
       border: none;
       border-radius: 8px;
-      background: #4285f4;
-      color: white;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      background: rgba(66, 133, 244, 0.1);
+      color: #4285f4;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(66, 133, 244, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: all 0.2s ease;
       margin-top: 8px;
+      box-shadow: none;
     }
 
     .zoom-control-btn:hover {
-      background: #3367d6;
+      background: rgba(66, 133, 244, 0.2);
+      color: #3367d6;
       transform: scale(1.05);
+      border-color: rgba(66, 133, 244, 0.4);
     }
 
     .search-container {
@@ -6664,17 +6671,6 @@
             d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" />
         </svg>
       </button>
-      <button class="zoom-control-btn" onclick="quickZoom(16)" title="Street Level">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-        </svg>
-      </button>
-      <button class="zoom-control-btn" onclick="quickZoom(18)" title="Close Up">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-        </svg>
-      </button>
     </div>
 
     <button class="share-location-fab" id="shareBtn" onclick="toggleLocationSharing()">
@@ -8543,7 +8539,9 @@
                       <option value="16" ${currentUser?.settings?.defaultZoom === 16 ? 'selected' : ''}>Street Level (16)</option>
                       <option value="17" ${currentUser?.settings?.defaultZoom === 17 ? 'selected' : ''}>Close Up (17)</option>
                       <option value="18" ${currentUser?.settings?.defaultZoom === 18 ? 'selected' : ''}>Very Close (18)</option>
-                      <option value="19" ${currentUser?.settings?.defaultZoom === 19 ? 'selected' : ''}>Maximum Zoom (19)</option>
+                      <option value="19" ${currentUser?.settings?.defaultZoom === 19 ? 'selected' : ''}>Maximum OSM (19)</option>
+                      <option value="20" ${currentUser?.settings?.defaultZoom === 20 ? 'selected' : ''}>Ultra Close (20)</option>
+                      <option value="21" ${currentUser?.settings?.defaultZoom === 21 ? 'selected' : ''}>Google Maps Level (21)</option>
                     </select>
                   </div>
                   <div class="setting-item">
@@ -10964,7 +10962,7 @@
       const isMobile = window.innerWidth <= 768;
 
       map = L.map('map', {
-        zoomControl: true,
+        zoomControl: false,
         preferCanvas: true,
         renderer: L.canvas(),
         fadeAnimation: false,
@@ -10998,11 +10996,26 @@
       // Use fastest possible tile server for tracking
       let tileLayer;
 
-      // Primary: Reliable OSM server for immediate loading
+      // Option 1: Google Maps (Higher zoom levels - requires API key)
+      // tileLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+      //   ...tileOptions,
+      //   maxZoom: 21,
+      //   attribution: '© Google Maps'
+      // }).addTo(map);
+
+      // Option 2: High-zoom OpenStreetMap (Free)
       tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         ...tileOptions,
-        subdomains: 'abc'
+        subdomains: 'abc',
+        maxZoom: 19
       }).addTo(map);
+
+      // Option 3: CartoDB High-DPI (Better quality, still free)
+      // tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      //   ...tileOptions,
+      //   maxZoom: 20,
+      //   attribution: '© CartoDB'
+      // }).addTo(map);
 
       // Immediate map visibility for tracking with full bleed
       if (mapContainer) {
@@ -11891,7 +11904,9 @@
           16: 'Street Level',
           17: 'Close Up',
           18: 'Very Close',
-          19: 'Maximum Zoom'
+          19: 'Maximum OSM',
+          20: 'Ultra Close',
+          21: 'Google Maps Level'
         };
 
         showNotification(`Zoomed to ${zoomLabels[zoomLevel] || `Level ${zoomLevel}`}`);
