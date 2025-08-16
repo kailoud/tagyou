@@ -11347,15 +11347,17 @@
   }
 
     // EMERGENCY MAP SHOW - Run immediately
-    console.log('EMERGENCY: Attempting to show map immediately');
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initializeMap);
-    } else {
-      // Only initialize if not already done
-      if (!window.mapInitialized) {
-        initializeMap();
+    (function () {
+      console.log('EMERGENCY: Attempting to show map immediately');
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeMap);
+      } else {
+        // Only initialize if not already done
+        if (!window.mapInitialized) {
+          initializeMap();
+        }
       }
-    }
+    })();
 
     // High-precision location services with instant updates
     function initializeLocationServices() {
