@@ -7653,12 +7653,6 @@
               setTimeout(() => {
                 initializeApp();
                 console.log('App initialized after auth');
-
-                // Force refresh the page to ensure clean state
-                setTimeout(() => {
-                  console.log('Forcing page refresh for clean state');
-                  window.location.reload();
-                }, 500);
               }, 100);
             } else {
               // User is signed out
