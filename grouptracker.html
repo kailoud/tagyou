@@ -10933,6 +10933,54 @@
       return true;
     }
 
+    // Function to add Judging Zone Marker - Static
+    function addJudgingZoneMarker() {
+      console.log('addJudgingZoneMarker function called');
+
+      if (!map) {
+        console.log('Map not available');
+        return;
+      }
+
+      // Judging Zone coordinates (Great Western Rd)
+      const judgingZoneCoords = [51.519641, -0.199409];
+      console.log('Creating marker at coordinates:', judgingZoneCoords);
+
+      // Create static icon for judging zone
+      const judgingZoneIcon = L.divIcon({
+        className: 'judging-zone-marker',
+        html: 'JUDGING<br>ZONE',
+        iconSize: [25, 25],
+        iconAnchor: [12.5, 28], // Center horizontally, bottom vertically to account for the tail
+        popupAnchor: [0, -30]
+      });
+
+      // Add marker to map
+      const judgingZoneMarker = L.marker(judgingZoneCoords, {
+        icon: judgingZoneIcon,
+        zIndexOffset: 9999
+      }).addTo(map);
+
+      console.log('Marker added to map:', judgingZoneMarker);
+
+      // Add popup with information
+      judgingZoneMarker.bindPopup(`
+        <div style="text-align: center; padding: 8px;">
+          <h3 style="margin: 0 0 8px 0; color: #ff8c00;">🏆 JUDGING ZONE</h3>
+          <p style="margin: 0 0 8px 0; font-weight: bold;">Great Western Road</p>
+          <p style="margin: 0; font-size: 12px; color: #666;">
+            Float parade judging area<br>
+            Coordinates: 51.519641, -0.199409
+          </p>
+        </div>
+      `);
+
+      // Store reference for later use
+      window.judgingZoneMarker = judgingZoneMarker;
+
+      console.log('Static Judging Zone marker added at:', judgingZoneCoords);
+    }
+
     // Simple map initialization - just make it work!
     function initializeMap() {
       // Prevent duplicate initialization
@@ -11128,6 +11176,54 @@
             map.setZoom(map.getZoom(), { animate: false });
           }
 
+          // Function to add Judging Zone Marker - Static
+          function addJudgingZoneMarker() {
+            console.log('addJudgingZoneMarker function called');
+
+            if (!map) {
+              console.log('Map not available');
+              return;
+            }
+
+            // Judging Zone coordinates (Great Western Rd)
+            const judgingZoneCoords = [51.519641, -0.199409];
+            console.log('Creating marker at coordinates:', judgingZoneCoords);
+
+            // Create static icon for judging zone
+            const judgingZoneIcon = L.divIcon({
+              className: 'judging-zone-marker',
+              html: 'JUDGING<br>ZONE',
+              iconSize: [25, 25],
+              iconAnchor: [12.5, 28], // Center horizontally, bottom vertically to account for the tail
+              popupAnchor: [0, -30]
+            });
+
+            // Add marker to map
+            const judgingZoneMarker = L.marker(judgingZoneCoords, {
+              icon: judgingZoneIcon,
+              zIndexOffset: 9999
+            }).addTo(map);
+
+            console.log('Marker added to map:', judgingZoneMarker);
+
+            // Add popup with information
+            judgingZoneMarker.bindPopup(`
+          <div style="text-align: center; padding: 8px;">
+            <h3 style="margin: 0 0 8px 0; color: #ff8c00;">🏆 JUDGING ZONE</h3>
+            <p style="margin: 0 0 8px 0; font-weight: bold;">Great Western Road</p>
+            <p style="margin: 0; font-size: 12px; color: #666;">
+              Float parade judging area<br>
+              Coordinates: 51.519641, -0.199409
+            </p>
+          </div>
+        `);
+
+            // Store reference for later use
+            window.judgingZoneMarker = judgingZoneMarker;
+
+            console.log('Static Judging Zone marker added at:', judgingZoneCoords);
+          }
+
           // Add Judging Zone Marker
           addJudgingZoneMarker();
 
@@ -11171,39 +11267,36 @@
           console.log('Map forced to full viewport');
         }
       }, 200);
+      console.log('addJudgingZoneMarker function called');
 
-      // Function to add Judging Zone Marker - Static
-      function addJudgingZoneMarker() {
-        console.log('addJudgingZoneMarker function called');
+      if (!map) {
+        console.log('Map not available');
+        return;
+      }
 
-        if (!map) {
-          console.log('Map not available');
-          return;
-        }
+      // Judging Zone coordinates (Great Western Rd)
+      const judgingZoneCoords = [51.519641, -0.199409];
+      console.log('Creating marker at coordinates:', judgingZoneCoords);
 
-        // Judging Zone coordinates (Great Western Rd)
-        const judgingZoneCoords = [51.519641, -0.199409];
-        console.log('Creating marker at coordinates:', judgingZoneCoords);
+      // Create static icon for judging zone
+      const judgingZoneIcon = L.divIcon({
+        className: 'judging-zone-marker',
+        html: 'JUDGING<br>ZONE',
+        iconSize: [25, 25],
+        iconAnchor: [12.5, 28], // Center horizontally, bottom vertically to account for the tail
+        popupAnchor: [0, -30]
+      });
 
-        // Create static icon for judging zone
-        const judgingZoneIcon = L.divIcon({
-          className: 'judging-zone-marker',
-          html: 'JUDGING<br>ZONE',
-          iconSize: [25, 25],
-          iconAnchor: [12.5, 28], // Center horizontally, bottom vertically to account for the tail
-          popupAnchor: [0, -30]
-        });
+      // Add marker to map
+      const judgingZoneMarker = L.marker(judgingZoneCoords, {
+        icon: judgingZoneIcon,
+        zIndexOffset: 9999
+      }).addTo(map);
 
-        // Add marker to map
-        const judgingZoneMarker = L.marker(judgingZoneCoords, {
-          icon: judgingZoneIcon,
-          zIndexOffset: 9999
-        }).addTo(map);
+      console.log('Marker added to map:', judgingZoneMarker);
 
-        console.log('Marker added to map:', judgingZoneMarker);
-
-        // Add popup with information
-        judgingZoneMarker.bindPopup(`
+      // Add popup with information
+      judgingZoneMarker.bindPopup(`
           <div style="text-align: center; padding: 8px;">
             <h3 style="margin: 0 0 8px 0; color: #ff8c00;">🏆 JUDGING ZONE</h3>
             <p style="margin: 0 0 8px 0; font-weight: bold;">Great Western Road</p>
@@ -11214,19 +11307,19 @@
           </div>
         `);
 
-        // Store reference for later use
-        window.judgingZoneMarker = judgingZoneMarker;
+      // Store reference for later use
+      window.judgingZoneMarker = judgingZoneMarker;
 
-        console.log('Static Judging Zone marker added at:', judgingZoneCoords);
-      }
+      console.log('Static Judging Zone marker added at:', judgingZoneCoords);
+    }
 
-      // Add user marker with avatar
-      const userAvatar = currentUser?.avatar || '👤';
-      const userName = currentUser?.name || 'Demo User';
+    // Add user marker with avatar
+    const userAvatar = currentUser?.avatar || '👤';
+    const userName = currentUser?.name || 'Demo User';
 
-      const avatarIcon = L.divIcon({
-        className: 'avatar-marker',
-        html: `<div style="
+    const avatarIcon = L.divIcon({
+      className: 'avatar-marker',
+      html: `<div style="
               position: relative;
               width: 0;
               height: 0;
@@ -11267,33 +11360,38 @@
                 z-index: 1;
               "></div>
             </div>`,
-        iconSize: [40, 50],
-        iconAnchor: [20, 50]
-      });
+      iconSize: [40, 50],
+      iconAnchor: [20, 50]
+    });
 
-      const userMarker = L.marker([51.5074, -0.1278], { icon: avatarIcon })
-        .addTo(map)
-        .bindPopup(`<strong>${userName}</strong><br>You are here (London)`);
+    const userMarker = L.marker([51.5074, -0.1278], { icon: avatarIcon })
+      .addTo(map)
+      .bindPopup(`<strong>${userName}</strong><br>You are here (London)`);
 
-      // Store reference to user marker for updates
-      window.userMarker = userMarker;
+    // Store reference to user marker for updates
+    window.userMarker = userMarker;
 
-      // Clear any existing duplicate markers
-      clearDuplicateMarkers();
+    // Clear any existing duplicate markers
+    clearDuplicateMarkers();
 
-      // Mark map as initialized
-      window.mapInitialized = true;
+    // Mark map as initialized
+    window.mapInitialized = true;
 
-      // Initialize location services for live updates
-      initializeLocationServices();
+    // Initialize location services for live updates
+    initializeLocationServices();
 
-      console.log('Map initialized successfully');
-      console.log('Map object:', map);
-      console.log('Map container:', document.getElementById('map'));
-      console.log('Map size:', map.getSize());
-      console.log('Map center:', map.getCenter());
-      console.log('Map zoom:', map.getZoom());
-      console.log('=== MAP INITIALIZATION COMPLETE ===');
+    console.log('Map initialized successfully');
+    console.log('Map object:', map);
+    console.log('Map container:', document.getElementById('map'));
+    console.log('Map size:', map.getSize());
+    console.log('Map center:', map.getCenter());
+    console.log('Map zoom:', map.getZoom());
+    console.log('=== MAP INITIALIZATION COMPLETE ===');
+
+    // Add judging zone marker after map is fully initialized
+    setTimeout(() => {
+      addJudgingZoneMarker();
+    }, 1000);
     }
 
     // EMERGENCY MAP SHOW - Run immediately
