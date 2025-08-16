@@ -4328,6 +4328,9 @@
         <div class="auth-links">
           <a href="#" onclick="switchAuthTab('forgot')">Forgot Password?</a>
         </div>
+        <button type="button" onclick="createAdminAccount()"
+          style="background: green; color: white; padding: 10px; margin: 10px 0; cursor: pointer; border: none; border-radius: 5px; width: 100%;">🔧
+          Create Admin Account</button>
       </form>
 
       <!-- Register Form -->
@@ -5167,7 +5170,7 @@
               if (profileError) {
                 console.error('Error fetching user profile:', profileError);
                 // Fallback to email-based check
-                isProUser = user.email.endsWith('@admin.com') || user.email === 'demo@tagyou.com';
+                isProUser = user.email.endsWith('@admin.com') || user.email === 'demo@tagyou.com' || user.email === 'kailoud639@gmail.com';
               } else {
                 // Use database admin status
                 isProUser = profileData.is_admin || profileData.role === 'admin' || profileData.role === 'super_admin';
@@ -5176,7 +5179,7 @@
             } catch (error) {
               console.error('Error checking admin status:', error);
               // Fallback to email-based check
-              isProUser = user.email.endsWith('@admin.com') || user.email === 'demo@tagyou.com';
+              isProUser = user.email.endsWith('@admin.com') || user.email === 'demo@tagyou.com' || user.email === 'kailoud639@gmail.com';
             }
 
             console.log('User authenticated:', currentUser); // Debug log
@@ -5364,7 +5367,7 @@
                 if (profileError) {
                   console.error('Error fetching user profile:', profileError);
                   // Fallback to email-based check
-                  isProUser = email.endsWith('@admin.com') || email === 'demo@tagyou.com';
+                  isProUser = email.endsWith('@admin.com') || email === 'demo@tagyou.com' || email === 'kailoud639@gmail.com';
                 } else {
                   // Use database admin status
                   isProUser = profileData.is_admin || profileData.role === 'admin' || profileData.role === 'super_admin';
@@ -5373,7 +5376,7 @@
               } catch (error) {
                 console.error('Error checking admin status:', error);
                 // Fallback to email-based check
-                isProUser = email.endsWith('@admin.com') || email === 'demo@tagyou.com';
+                isProUser = email.endsWith('@admin.com') || email === 'demo@tagyou.com' || email === 'kailoud639@gmail.com';
               }
 
               // Update Admin Portal visibility
@@ -10117,6 +10120,40 @@
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
       }
+
+      // CREATE ADMIN ACCOUNT FUNCTION
+      window.createAdminAccount = async function () {
+        console.log('🔧 CREATING ADMIN ACCOUNT');
+
+        try {
+          const email = 'kailoud639@gmail.com';
+          const password = 'admin123456';
+
+          // Try to create the admin account
+          const userCredential = await window.firebaseAuth.createUserWithEmailAndPassword(email, password);
+          console.log('✅ Admin account created:', userCredential);
+
+          // Create admin profile in Firestore
+          await window.firebaseDB.collection('user_profiles').doc(userCredential.user.uid).set({
+            id: userCredential.user.uid,
+            email: email,
+            full_name: 'Kailoud Admin',
+            role: 'admin',
+            is_admin: true,
+            created_at: new Date().toISOString()
+          });
+
+          alert('✅ ADMIN ACCOUNT CREATED!\n\nEmail: kailoud639@gmail.com\nPassword: admin123456\n\nYou can now log in with these credentials!');
+
+        } catch (error) {
+          if (error.code === 'auth/email-already-in-use') {
+            alert('ℹ️ Admin account already exists!\n\nEmail: kailoud639@gmail.com\n\nYou can log in with this email.');
+          } else {
+            console.error('❌ Admin account creation failed:', error);
+            alert('❌ ADMIN ACCOUNT CREATION FAILED: ' + error.message);
+          }
+        }
+      };
     </script>
 </body>
 
