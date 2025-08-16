@@ -4525,14 +4525,6 @@
         </svg>
       </button>
 
-      <button class="control-btn admin-btn" onclick="showAdminPortal()" title="Admin Portal"
-        style="background: #1e40af;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-        </svg>
-      </button>
-
     </div>
 
     <div class="top-location-control">
@@ -7586,7 +7578,7 @@
       // Simple map initialization - just make it work!
       function initializeMap() {
         // Prevent duplicate initialization
-        if (window.mapInitialized) {
+        if (window.mapInitialized || map) {
           console.log('Map already initialized, skipping...');
           return;
         }
@@ -7639,10 +7631,21 @@
 
         console.log('Leaflet is available, initializing map');
 
+        // Check if map container already has a Leaflet instance
+        if (mapContainer && mapContainer._leaflet_id) {
+          console.log('Map container already has Leaflet instance, skipping initialization');
+          return;
+        }
+
         // Initialize map without zoom controls
-        map = L.map('map', {
-          zoomControl: false
-        }).setView([51.5074, -0.1278], 16);
+        try {
+          map = L.map('map', {
+            zoomControl: false
+          }).setView([51.5074, -0.1278], 16);
+        } catch (error) {
+          console.error('Error initializing map:', error);
+          return;
+        }
 
         // Center map on user's current location with better error handling
         if (navigator.geolocation) {
