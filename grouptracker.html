@@ -2562,11 +2562,7 @@
         max-height: 100vh;
       }
 
-      /* Mobile artists content optimization */
-      #artists-content {
-        max-height: calc(85vh - 100px);
-        padding-bottom: 20px;
-      }
+
 
       .panel-content {
         padding: 0 16px 32px;
@@ -2745,13 +2741,7 @@
       background: #7b1fa2;
     }
 
-    .artists-btn {
-      background: #8b5cf6;
-    }
 
-    .artists-btn:hover {
-      background: #7c3aed;
-    }
 
 
 
@@ -2771,10 +2761,7 @@
       box-shadow: 0 4px 16px rgba(156, 39, 176, 0.4);
     }
 
-    .artists-btn.active {
-      background: #7c3aed;
-      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
-    }
+
 
     .parade-route-btn {
       background: #ffb366;
@@ -4083,107 +4070,29 @@
       border-color: #ff6b35;
     }
 
-    /* Artists Panel Styles */
-    /* Ensure artists content scrolls properly */
-    #artists-content {
-      max-height: calc(85vh - 120px);
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
-    }
 
-    .artists-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 2px solid #f0f0f0;
-    }
-
-    .artists-title h3 {
-      margin: 0 0 4px 0;
-      color: #8b5cf6;
-      font-size: 18px;
-    }
-
-    .artists-title p {
-      margin: 0;
-      color: #666;
-      font-size: 14px;
-    }
-
-    .artists-controls {
-      display: flex;
-      gap: 8px;
-    }
-
-    .artists-control-btn {
-      padding: 8px 12px;
-      border: none;
-      border-radius: 6px;
-      background: #f5f5f5;
-      color: #666;
-      font-size: 12px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.2s ease;
-    }
-
-    .artists-control-btn:hover {
-      background: #e0e0e0;
-      color: #333;
-    }
-
-    .artists-control-btn.active {
-      background: #8b5cf6;
-      color: white;
-    }
-
-    .artists-feed {
-      margin-bottom: 24px;
-    }
-
-    .artists-feed h4 {
-      margin: 0 0 16px 0;
-      color: #333;
-      font-size: 16px;
-    }
-
-    .artists-cards {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      max-height: 400px;
-      overflow-y: auto;
-      padding-right: 8px;
-      /* Ensure cards don't overflow the panel */
-      margin-bottom: 20px;
-    }
 
     /* Desktop optimizations */
     @media (min-width: 768px) {
-      .artists-cards {
+      .food-stalls-cards {
         max-height: 600px;
         gap: 24px;
       }
 
-      .artist-card {
+      .food-stall-card {
         padding: 24px;
         margin-bottom: 24px;
       }
 
-      .artist-image-carousel {
+      .food-stall-image {
         height: 250px;
       }
 
-      .artist-name {
+      .food-stall-name {
         font-size: 20px;
       }
 
-      .artist-detail {
+      .food-stall-detail {
         font-size: 15px;
         padding: 8px 16px;
       }
@@ -6136,12 +6045,7 @@
         </svg>
       </button>
 
-      <button class="control-btn artists-btn" onclick="console.log('Artists button clicked'); toggleArtists();"
-        title="Artists & Bands">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-        </svg>
-      </button>
+
 
       <button class="control-btn parade-route-btn" onclick="toggleParadeRoute()" title="Toggle Main Parade Route">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -6206,7 +6110,7 @@
         <div class="tab active" onclick="switchTab('members')">Group</div>
         <div class="tab" onclick="switchTab('find-stalls')">Find Stalls</div>
         <div class="tab" onclick="switchTab('float')">Floats</div>
-        <div class="tab" onclick="switchTab('artists')">Artists</div>
+
         <div class="tab" onclick="switchTab('settings')">Settings</div>
 
       </div>
@@ -6431,14 +6335,7 @@
       </div>
     </div>
 
-    <div class="panel-content" id="artists-content">
-      <!-- Artists content removed - now handled by map markers only -->
-      <div class="empty-state">
-        <div class="empty-icon">🎵</div>
-        <h3>Artists & Bands</h3>
-        <p>Artists are now displayed as markers on the map. Click the Artists button to toggle markers.</p>
-      </div>
-    </div>
+
 
     <div class="panel-content" id="settings-content">
       <div style="text-align: center; padding: 20px 0;">
@@ -8276,10 +8173,7 @@
                     👤 Friends
                     <span class="tab-count">${adminData['friends'].length}</span>
                   </button>
-                  <button class="admin-tab" onclick="switchAdminTab('artists')">
-                    🎵 Artists & Bands
-                    <span class="tab-count">${adminData['artists'].length}</span>
-                  </button>
+
                 </div>
 
                 <!-- Loading indicator -->
@@ -8500,8 +8394,7 @@
       'float-trucks': [],
       'float-routes': [],
       'groups': [],
-      'friends': [],
-      'artists': []
+      'friends': []
     };
 
     // User-facing data (what users see)
@@ -8510,8 +8403,7 @@
       'float-trucks': [],
       'float-routes': [],
       'groups': [],
-      'friends': [],
-      'artists': []
+      'friends': []
     };
 
     // Track pending changes
@@ -8520,8 +8412,7 @@
       'float-trucks': false,
       'float-routes': false,
       'groups': false,
-      'friends': false,
-      'artists': false
+      'friends': false
     };
 
     // Make adminData globally accessible for map markers
@@ -8639,34 +8530,7 @@
           adminData['friends'] = [];
         }
 
-        // Load artists - TEMPORARILY LOAD ALL ITEMS FOR DEBUGGING
-        try {
-          console.log('Loading artists from Firebase...');
-          const artistsSnapshot = await db.collection('artists')
-            .orderBy('created_at', 'desc')
-            .limit(100) // Increased limit for debugging
-            .get();
 
-          console.log(`Found ${artistsSnapshot.docs.length} total artists in Firebase`);
-
-          adminData['artists'] = artistsSnapshot.docs.map(doc => {
-            const data = doc.data();
-            console.log(`Artist ${doc.id}:`, { name: data.name, status: data.status });
-            // Set default status locally only (don't update Firebase here for performance)
-            if (!data.status) {
-              data.status = 'active';
-            }
-            return {
-              id: doc.id,
-              ...data
-            };
-          });
-          logFirebaseUsage('reads', artistsSnapshot.docs.length);
-          console.log(`Loaded ${adminData['artists'].length} artists (all statuses)`);
-        } catch (error) {
-          console.warn('Artists collection not found:', error);
-          adminData['artists'] = [];
-        }
 
         // Load float routes
         try {
@@ -9147,7 +9011,7 @@
       'float-routes': { title: 'Float Routes', icon: '🗺️' },
       'groups': { title: 'Groups', icon: '👥' },
       'friends': { title: 'Friends', icon: '👤' },
-      'artists': { title: 'Artists & Bands', icon: '🎵' }
+
     };
 
     function updateAdminTabCounts() {
@@ -9157,7 +9021,7 @@
         'float-trucks': adminData['float-trucks'].length,
         'groups': adminData['groups'].length,
         'friends': adminData['friends'].length,
-        'artists': adminData['artists'].length
+
       };
 
       // Update each tab count
@@ -9273,7 +9137,6 @@
               'float-routes': 'float_routes',
               'groups': 'groups',
               'friends': 'friends',
-              'artists': 'artists'
             };
 
             const collectionName = tableMap[activeAdminTab];
@@ -9316,7 +9179,6 @@
             'float-routes': 'float_routes',
             'groups': 'groups',
             'friends': 'friends',
-            'artists': 'artists'
           };
 
           const collectionName = tableMap[activeAdminTab];
@@ -9337,24 +9199,7 @@
           // Update tab counts after deletion
           updateAdminTabCounts();
 
-          // Refresh map markers if artists were deleted
-          if (activeAdminTab === 'artists') {
-            // Remove existing artist markers
-            removeArtistMarkers();
 
-            // Add updated artist markers if artists button is active
-            const artistsBtn = document.querySelector('.artists-btn');
-            if (artistsBtn && artistsBtn.classList.contains('active')) {
-              addArtistMarkers();
-            }
-
-            // Refresh artists panel if it's open
-            const artistsContent = document.getElementById('artists-content');
-            if (artistsContent && artistsContent.classList.contains('active')) {
-              loadArtistsData();
-              loadArtistsSchedule();
-            }
-          }
 
           showNotification('Item deleted successfully!', 'success');
         } catch (error) {
@@ -10918,38 +10763,7 @@
         targetContent.classList.add('active');
         console.log('✅ Content activated:', tabName + '-content');
 
-        // Special handling for artists tab
-        if (tabName === 'artists') {
-          console.log('Artists tab activated, opening panel and adding markers...');
 
-          // Ensure panel is open
-          const panel = document.getElementById('bottomPanel');
-          if (!panel.classList.contains('expanded')) {
-            panel.classList.add('expanded');
-            document.body.classList.add('panel-expanded');
-          }
-
-          // Activate artists button
-          const artistsBtn = document.querySelector('.artists-btn');
-          if (!artistsBtn.classList.contains('active')) {
-            artistsBtn.classList.add('active');
-          }
-
-          // Add artist markers to map
-          addArtistMarkers();
-
-          // Update search placeholder
-          const searchInput = document.getElementById('searchInput');
-          searchInput.placeholder = 'Find artist or band...';
-          searchInput.value = '';
-
-          // Load admin data for markers
-          loadAdminData().then(() => {
-            console.log('Admin data loaded for artists');
-          }).catch(error => {
-            console.error('Error loading admin data for artists tab:', error);
-          });
-        }
       } else {
         console.error('❌ Content not found:', tabName + '-content');
       }
@@ -12050,69 +11864,7 @@
       }
     }
 
-    function toggleArtists() {
-      console.log('toggleArtists called');
 
-      const artistsBtn = document.querySelector('.artists-btn');
-      const panel = document.getElementById('bottomPanel');
-      const isPanelOpen = panel.classList.contains('expanded');
-
-      console.log('Panel open:', isPanelOpen);
-
-      // Toggle artists button state (ON/OFF effect)
-      const artistsActive = artistsBtn.classList.toggle('active');
-      console.log('Artists active:', artistsActive);
-
-      const searchInput = document.getElementById('searchInput');
-
-      if (artistsActive) {
-        console.log('Activating artists panel');
-
-        // Update search placeholder
-        searchInput.placeholder = 'Find artist or band...';
-        // Clear search input
-        searchInput.value = '';
-
-        // Always ensure panel is open when artists are activated
-        if (!isPanelOpen) {
-          console.log('Opening panel to show artists information');
-          panel.classList.add('expanded');
-          document.body.classList.add('panel-expanded');
-        }
-
-        // Switch to artists tab to show artists information
-        console.log('Calling switchTab with artists');
-        switchTab('artists');
-
-        // Add artist markers to map
-        addArtistMarkers();
-
-        // Ensure admin data is loaded
-        loadAdminData().then(() => {
-          console.log('Admin data loaded for artists');
-        });
-
-        showNotification('Artists & bands panel opened');
-      } else {
-        console.log('Deactivating artists panel');
-
-        // Reset search placeholder to default
-        searchInput.value = '';
-        searchInput.placeholder = 'Find group member by phone...';
-
-        // Remove artist markers from map
-        removeArtistMarkers();
-
-        // If no other features are active, close the panel
-        const hasActiveFeatures = document.querySelector('.food-stalls-btn').classList.contains('active') ||
-          document.querySelector('.truck-floats-btn').classList.contains('active');
-        if (!hasActiveFeatures && isPanelOpen) {
-          console.log('No active features, closing panel');
-          panel.classList.remove('expanded');
-          document.body.classList.remove('panel-expanded');
-        }
-      }
-    }
 
     // Helper functions for markers
     function addFoodStallMarkers() {
@@ -14428,77 +14180,7 @@
       });
     }
 
-    function toggleArtistsAutoScroll() {
-      const btn = document.getElementById('artistsAutoScrollBtn');
-      const isAuto = btn.classList.toggle('active');
 
-      if (isAuto) {
-        btn.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-          </svg>
-          Auto
-        `;
-        showNotification('Auto-scroll enabled for artists', 'success');
-      } else {
-        btn.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-          </svg>
-          Auto
-        `;
-        showNotification('Auto-scroll disabled for artists', 'info');
-      }
-    }
-
-    // Function to handle Artists tab click - opens panel
-    function toggleArtistsFromTab() {
-      console.log('Artists tab clicked - opening artists panel');
-
-      // Ensure panel is open
-      const panel = document.getElementById('bottomPanel');
-      if (!panel.classList.contains('expanded')) {
-        panel.classList.add('expanded');
-        document.body.classList.add('panel-expanded');
-      }
-
-      // Switch to artists tab
-      switchTab('artists');
-
-      // Activate artists button if not already active
-      const artistsBtn = document.querySelector('.artists-btn');
-      if (!artistsBtn.classList.contains('active')) {
-        artistsBtn.classList.add('active');
-      }
-
-      // Add artist markers to map
-      addArtistMarkers();
-
-      showNotification('Artists & bands panel opened');
-    }
-
-    // Test function to manually switch to Artists tab
-    function testArtistsTab() {
-      console.log('Testing Artists tab...');
-
-      // Ensure panel is open
-      const panel = document.getElementById('bottomPanel');
-      if (!panel.classList.contains('expanded')) {
-        panel.classList.add('expanded');
-        document.body.classList.add('panel-expanded');
-      }
-
-      // Switch to artists tab
-      switchTab('artists');
-
-      // Force load data
-      setTimeout(() => {
-        loadArtistsData();
-        loadArtistsSchedule();
-        updateArtistCategoriesFromAdminData();
-        console.log('Artists tab test completed');
-      }, 100);
-    }
 
 
 
