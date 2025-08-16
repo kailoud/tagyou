@@ -15877,22 +15877,22 @@
     window.directLogin = async function () {
       console.log('🚀 DIRECT LOGIN STARTED');
       alert('Starting login process...');
-      
+
       try {
         // Check if Firebase is available
         if (!window.firebaseAuth) {
           alert('Firebase not loaded! Please refresh the page.');
           return;
         }
-        
+
         console.log('Firebase Auth available, attempting login...');
-        
+
         // Direct login with demo credentials
         const userCredential = await window.firebaseAuth.signInWithEmailAndPassword('demo@tagyou.com', 'demo123');
-        
+
         console.log('✅ Login successful!', userCredential);
         alert('Login successful! Redirecting...');
-        
+
         // Update user state
         currentUser = {
           id: userCredential.user.uid,
@@ -15900,27 +15900,27 @@
           name: userCredential.user.displayName || 'Demo User'
         };
         isAuthenticated = true;
-        
+
         // Hide auth overlay and show app
         const authOverlay = document.getElementById('authOverlay');
         const appContent = document.getElementById('appContent');
-        
+
         if (authOverlay) {
           authOverlay.style.display = 'none';
         }
-        
+
         if (appContent) {
           appContent.classList.add('authenticated');
         }
-        
+
         // Initialize the app
         initializeApp();
-        
+
         // Update admin portal visibility
         updateAdminPortalVisibility();
-        
+
         console.log('🎉 User is now logged in and app is initialized!');
-        
+
       } catch (error) {
         console.error('❌ Login failed:', error);
         alert('Login failed: ' + error.message);
