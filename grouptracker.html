@@ -2442,21 +2442,21 @@
 
     /* Judging Zone Marker Styles - Static */
     .judging-zone-marker {
-      background: #ff8c00;
-      border: 3px solid #e67e00;
+      background: rgba(255, 140, 0, 0.75);
+      border: 2px solid rgba(230, 126, 0, 0.75);
       border-radius: 50%;
-      width: 80px;
-      height: 80px;
+      width: 25px;
+      height: 25px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #000;
       font-weight: bold;
-      font-size: 10px;
+      font-size: 4px;
       text-align: center;
       line-height: 1.2;
       text-transform: uppercase;
-      box-shadow: 0 4px 12px rgba(255, 140, 0, 0.4);
+      box-shadow: 0 2px 6px rgba(255, 140, 0, 0.5);
       position: relative;
       z-index: 1000;
     }
@@ -2464,28 +2464,28 @@
     .judging-zone-marker::after {
       content: '';
       position: absolute;
-      bottom: -10px;
+      bottom: -3px;
       left: 50%;
       transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-top: 10px solid #ff8c00;
+      border-left: 3px solid transparent;
+      border-right: 3px solid transparent;
+      border-top: 3px solid rgba(255, 140, 0, 0.75);
       z-index: 999;
     }
 
     .judging-zone-marker::before {
       content: '';
       position: absolute;
-      bottom: -12px;
+      bottom: -4px;
       left: 50%;
       transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 12px solid transparent;
-      border-right: 12px solid transparent;
-      border-top: 12px solid #e67e00;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 4px solid rgba(230, 126, 0, 0.75);
       z-index: 998;
     }
 
@@ -11175,9 +11175,9 @@
         const judgingZoneIcon = L.divIcon({
           className: 'judging-zone-marker',
           html: 'JUDGING<br>ZONE',
-          iconSize: [80, 80],
-          iconAnchor: [40, 90], // Center horizontally, bottom vertically to account for the tail
-          popupAnchor: [0, -95]
+          iconSize: [25, 25],
+          iconAnchor: [12.5, 28], // Center horizontally, bottom vertically to account for the tail
+          popupAnchor: [0, -30]
         });
 
         // Add marker to map
