@@ -2427,6 +2427,16 @@
       height: 100% !important;
     }
 
+    /* Hide default Leaflet zoom controls */
+    .leaflet-control-zoom {
+      display: none !important;
+    }
+
+    .leaflet-control-zoom-in,
+    .leaflet-control-zoom-out {
+      display: none !important;
+    }
+
     .leaflet-tile-pane {
       width: 100% !important;
       height: 100% !important;
@@ -2462,7 +2472,10 @@
       align-items: center;
       z-index: 1001;
       transition: z-index 0.3s ease;
-      background: transparent;
+      background: transparent !important;
+      padding: 0;
+      margin: 0;
+      border: none;
     }
 
     /* When panel is expanded, put left controls behind it */
@@ -2722,6 +2735,7 @@
       position: relative;
       z-index: 1001;
       transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
     }
 
     .group-btn:hover {
@@ -2743,6 +2757,7 @@
       justify-content: center;
       cursor: pointer;
       transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
     }
 
     .control-btn:hover {
