@@ -10341,7 +10341,11 @@
         createTestAccount();
 
         // Initialize group count display
-        updateGroupCount();
+        try {
+          updateGroupCount();
+        } catch (error) {
+          console.log('Group count update failed (element may not exist yet):', error.message);
+        }
       });
 
       // Create test account for demo purposes
@@ -11573,9 +11577,10 @@
         console.log('Updating location in group:', currentLocation);
 
         // Simulate real-time location sharing
-        if (currentGroup && currentGroup.members) {
+        const group = getCurrentGroup();
+        if (group && group.members) {
           // Update current user's location in the group
-          const currentMember = currentGroup.members.find(m => m.id === currentUser?.id);
+          const currentMember = group.members.find(m => m.id === currentUser?.id);
           if (currentMember) {
             currentMember.location = currentLocation;
             currentMember.lastUpdated = new Date().toISOString();
@@ -11645,10 +11650,11 @@
     }
 
     function simulateOtherMembersLocation() {
-      if (!currentGroup || !currentGroup.members) return;
+      const group = getCurrentGroup();
+      if (!group || !group.members) return;
 
       // Simulate other members moving around
-      currentGroup.members.forEach(member => {
+      group.members.forEach(member => {
         if (member.id !== currentUser?.id && Math.random() < 0.3) { // 30% chance
           // Simulate small movement
           const latOffset = (Math.random() - 0.5) * 0.001; // Small random movement
@@ -11684,7 +11690,7 @@
 
     // Member location functions
     function locateMember(memberId) {
-      const member = currentGroup.members.find(m => m.id === memberId);
+      const member = getCurrentGroup().members.find(m => m.id === memberId);
       if (member && member.location) {
         // Validate map and coordinates
         if (!validateMapAndCoordinates(member.location, `member ${memberId}`)) {
@@ -11830,8 +11836,9 @@
       addEmergencyMarker(emergencyAlert);
 
       // Notify group members (simulate)
-      if (currentGroup && currentGroup.members) {
-        currentGroup.members.forEach(member => {
+      const group = getCurrentGroup();
+      if (group && group.members) {
+        group.members.forEach(member => {
           if (member.id !== currentUser?.id) {
             // Simulate notification to other members
             setTimeout(() => {
@@ -12037,14 +12044,17 @@
 
     // Utility functions
     function updateGroupCount() {
-      document.getElementById('groupCount').textContent = currentGroup.members.length;
+      const groupCountElement = document.getElementById('groupCount');
+      if (groupCountElement) {
+        groupCountElement.textContent = getCurrentGroup().members.length;
+      }
     }
 
     function simulateMemberLocations() {
       // Simulate member location updates
       setInterval(() => {
         try {
-          currentGroup.members.forEach(member => {
+          getCurrentGroup().members.forEach(member => {
             if (member.location && member.id !== 'alex') {
               // Add small random movement
               member.location.lat += (Math.random() - 0.5) * 0.0001;
@@ -12072,8 +12082,8 @@
       const sharing = document.getElementById('locationSharing').value;
 
       // Update current user info
-      currentGroup.members[0].name = name;
-      currentGroup.members[0].phone = phone;
+      getCurrentGroup().members[0].name = name;
+      getCurrentGroup().members[0].phone = phone;
 
       // Update location sharing settings
       if (sharing === 'off') {
