@@ -6177,6 +6177,9 @@
     <div class="bottom-panel" id="bottomPanel">
       <div class="panel-handle" onclick="togglePanel()">
         <div class="handle-bar"></div>
+        <!-- Test button for debugging -->
+        <button onclick="testPanelFunctions()"
+          style="position: absolute; right: 10px; top: 5px; background: red; color: white; border: none; border-radius: 4px; padding: 2px 6px; font-size: 10px;">TEST</button>
       </div>
       <div class="panel-tabs">
         <div class="tab active" onclick="switchTab('members')">Group</div>
@@ -10689,32 +10692,45 @@
 
     // Panel controls
     function togglePanel() {
+      console.log('togglePanel called');
       const panel = document.getElementById('bottomPanel');
       const isExpanded = panel.classList.contains('expanded');
 
+      console.log('Panel expanded before toggle:', isExpanded);
+
       if (isExpanded) {
         // Close panel
+        console.log('Closing panel...');
         panel.classList.remove('expanded');
         document.body.classList.remove('panel-expanded');
         resetAllButtonStates();
         updateTabHighlighting(false);
       } else {
         // Open panel
+        console.log('Opening panel...');
         panel.classList.add('expanded');
         document.body.classList.add('panel-expanded');
         updateTabHighlighting(true);
       }
+
+      console.log('Panel expanded after toggle:', panel.classList.contains('expanded'));
     }
 
     function updateTabHighlighting(panelOpen) {
+      console.log('updateTabHighlighting called with panelOpen:', panelOpen);
       const tabs = document.querySelectorAll('.tab');
       const activeTab = document.querySelector('.tab.active');
+
+      console.log('Found tabs:', tabs.length);
+      console.log('Active tab:', activeTab);
 
       if (panelOpen) {
         // Show active tab highlighting when panel is open
         if (activeTab) {
           activeTab.style.opacity = '1';
           activeTab.style.color = '#ff6b35';
+          activeTab.style.borderBottomColor = '#ff6b35';
+          console.log('Applied active tab highlighting');
         }
       } else {
         // Hide all tab highlighting when panel is closed
@@ -10723,7 +10739,39 @@
           tab.style.color = '#666';
           tab.style.borderBottomColor = 'transparent';
         });
+        console.log('Applied dimmed tab highlighting');
       }
+    }
+
+    function testPanelFunctions() {
+      console.log('=== Testing Panel Functions ===');
+
+      // Test 1: Check if elements exist
+      const panel = document.getElementById('bottomPanel');
+      const handle = document.querySelector('.panel-handle');
+      const tabs = document.querySelectorAll('.tab');
+
+      console.log('Panel exists:', !!panel);
+      console.log('Handle exists:', !!handle);
+      console.log('Tabs found:', tabs.length);
+
+      // Test 2: Check panel state
+      const isExpanded = panel.classList.contains('expanded');
+      console.log('Panel expanded:', isExpanded);
+
+      // Test 3: Test toggle function
+      console.log('Testing togglePanel...');
+      togglePanel();
+
+      // Test 4: Test tab switching
+      console.log('Testing switchTab...');
+      switchTab('find-stalls');
+
+      // Test 5: Test tab highlighting
+      console.log('Testing updateTabHighlighting...');
+      updateTabHighlighting(true);
+
+      console.log('=== Test Complete ===');
     }
 
     // Swipe functionality for bottom panel
@@ -10850,6 +10898,9 @@
       const panel = document.getElementById('bottomPanel');
       const handle = document.querySelector('.panel-handle');
 
+      console.log('Panel element:', panel);
+      console.log('Handle element:', handle);
+
       if (handle) {
         // Add touch event listeners with mobile-specific handling
         handle.addEventListener('touchstart', handleTouchStart, { passive: false });
@@ -10868,7 +10919,16 @@
 
       // Initialize tab highlighting based on panel state
       const isPanelOpen = panel.classList.contains('expanded');
+      console.log('Initial panel state - expanded:', isPanelOpen);
       updateTabHighlighting(isPanelOpen);
+
+      // Test panel functionality
+      console.log('Testing panel functionality...');
+      const tabs = document.querySelectorAll('.tab');
+      console.log('Found tabs:', tabs.length);
+      tabs.forEach((tab, index) => {
+        console.log(`Tab ${index}:`, tab.textContent, tab.onclick);
+      });
     });
 
     function switchTab(tabName) {
@@ -10927,7 +10987,21 @@
       }
 
       // Find and activate the correct tab
-      const targetTab = document.querySelector(`.tab[onclick*="${tabName}"]`);
+      let targetTab = null;
+      const allTabs = document.querySelectorAll('.tab');
+
+      // Try to find the tab by checking onclick attribute
+      for (let tab of allTabs) {
+        const onclick = tab.getAttribute('onclick');
+        if (onclick && onclick.includes(`switchTab('${tabName}')`)) {
+          targetTab = tab;
+          break;
+        }
+      }
+
+      console.log('Looking for tab with onclick containing:', `switchTab('${tabName}')`);
+      console.log('Found target tab:', targetTab);
+
       if (targetTab) {
         targetTab.classList.add('active');
         console.log('✅ Tab activated:', tabName);
@@ -10938,6 +11012,11 @@
         updateTabHighlighting(isPanelOpen);
       } else {
         console.error('❌ Tab not found for:', tabName);
+        // Show all available tabs for debugging
+        console.log('All available tabs:');
+        allTabs.forEach((tab, index) => {
+          console.log(`Tab ${index}:`, tab.textContent, tab.getAttribute('onclick'));
+        });
       }
 
       console.log('=== switchTab completed ===');
