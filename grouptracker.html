@@ -8529,19 +8529,30 @@
           adminData['food-stalls'] = [];
         }
 
-        // Load float trucks - OPTIMIZED: Only load active items, limit to 50
+        // Load float trucks - TEMPORARILY LOAD ALL ITEMS FOR DEBUGGING
         try {
+          console.log('Loading float trucks from Firebase...');
           const floatTrucksSnapshot = await db.collection('float_trucks')
-            .where('status', 'in', ['active', 'confirmed'])
             .orderBy('created_at', 'desc')
-            .limit(50)
+            .limit(100) // Increased limit for debugging
             .get();
-          adminData['float-trucks'] = floatTrucksSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
+
+          console.log(`Found ${floatTrucksSnapshot.docs.length} total float trucks in Firebase`);
+
+          adminData['float-trucks'] = floatTrucksSnapshot.docs.map(doc => {
+            const data = doc.data();
+            console.log(`Float Truck ${doc.id}:`, { name: data.name || data.truck_name, status: data.status });
+            // Set default status locally only (don't update Firebase here for performance)
+            if (!data.status) {
+              data.status = 'active';
+            }
+            return {
+              id: doc.id,
+              ...data
+            };
+          });
           logFirebaseUsage('reads', floatTrucksSnapshot.docs.length);
-          console.log(`Loaded ${adminData['float-trucks'].length} active float trucks`);
+          console.log(`Loaded ${adminData['float-trucks'].length} float trucks (all statuses)`);
         } catch (error) {
           console.warn('Float trucks collection not found:', error);
           adminData['float-trucks'] = [];
@@ -14525,17 +14536,14 @@
         // Get all documents from Firebase
         const foodStallsSnapshot = await db.collection('food_stalls').get();
         const floatTrucksSnapshot = await db.collection('float_trucks').get();
-        const artistsSnapshot = await db.collection('artists').get();
 
         console.log(`📊 Found in Firebase:`);
         console.log(`   Food Stalls: ${foodStallsSnapshot.size}`);
         console.log(`   Float Trucks: ${floatTrucksSnapshot.size}`);
-        console.log(`   Artists: ${artistsSnapshot.size}`);
 
         console.log(`📊 Found in Admin Portal:`);
         console.log(`   Food Stalls: ${adminData['food-stalls'].length}`);
         console.log(`   Float Trucks: ${adminData['float-trucks'].length}`);
-        console.log(`   Artists: ${adminData['artists'].length}`);
 
         // Check for orphaned food stalls
         const adminFoodStallIds = new Set(adminData['food-stalls'].map(item => item.id));
@@ -14550,6 +14558,8 @@
               console.log(`✅ Deleted orphaned food stall: ${doc.id}`);
             }
           }
+        } else {
+          console.log(`✅ No orphaned food stalls found`);
         }
 
         // Check for orphaned float trucks
@@ -14565,22 +14575,11 @@
               console.log(`✅ Deleted orphaned float truck: ${doc.id}`);
             }
           }
+        } else {
+          console.log(`✅ No orphaned float trucks found`);
         }
 
-        // Check for orphaned artists
-        const adminArtistIds = new Set(adminData['artists'].map(item => item.id));
-        const orphanedArtists = artistsSnapshot.docs.filter(doc => !adminArtistIds.has(doc.id));
 
-        if (orphanedArtists.length > 0) {
-          console.log(`🗑️ Found ${orphanedArtists.length} orphaned artists:`, orphanedArtists.map(doc => doc.id));
-
-          if (confirm(`Found ${orphanedArtists.length} orphaned artists. Delete them?`)) {
-            for (const doc of orphanedArtists) {
-              await doc.ref.delete();
-              console.log(`✅ Deleted orphaned artist: ${doc.id}`);
-            }
-          }
-        }
 
         console.log('✅ Cleanup completed');
         showNotification('Cleanup completed!', 'success');
