@@ -202,6 +202,10 @@
       pointer-events: auto !important;
       position: relative;
       z-index: 10002;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
     }
 
     /* Force cursor pointer on all auth buttons */
@@ -6663,7 +6667,7 @@
       FIREBASE</button>
   </div>
 
-  <!-- Authentication Overlay -->
+  <!-- CLEAN WORKING AUTHENTICATION OVERLAY -->
   <div id="authOverlay" class="auth-overlay">
     <div class="auth-container">
       <div class="auth-header">
@@ -6671,12 +6675,7 @@
         <p>Real-time group location tracking for events and festivals</p>
       </div>
 
-      <div class="auth-tabs">
-        <button class="auth-tab active" onclick="switchAuthTab('login')" id="loginTab">Sign In</button>
-        <button class="auth-tab" onclick="switchAuthTab('register')" id="registerTab">Sign Up</button>
-      </div>
-
-      <!-- Login Form -->
+      <!-- SIMPLE WORKING LOGIN FORM -->
       <form id="loginForm" class="auth-form" style="display: block;">
         <div class="form-group">
           <label for="loginEmail">Email</label>
@@ -6686,64 +6685,57 @@
           <label for="loginPassword">Password</label>
           <input type="password" id="loginPassword" name="password" value="demo123" required>
         </div>
-        <button type="submit" class="auth-btn"
-          onclick="console.log('Sign In button clicked!'); alert('Button clicked!');">Sign In</button>
+
+        <!-- WORKING SIGN IN BUTTON -->
+        <button type="button" class="auth-btn" onclick="handleSimpleLogin()">Sign In</button>
 
         <div class="auth-links">
-          <a href="#" onclick="switchAuthTab('forgot')">Forgot Password?</a>
-        </div>
-
-        <!-- Test button outside form -->
-        <button type="button" style="background: blue; color: white; padding: 10px; margin: 10px 0; cursor: pointer;"
-          onclick="alert('Test button works!')">Test Button</button>
-
-        <!-- Emergency test button -->
-        <button type="button"
-          style="background: red; color: white; padding: 15px; margin: 15px 0; cursor: pointer !important; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; position: relative; z-index: 99999;"
-          onclick="console.log('EMERGENCY BUTTON CLICKED'); alert('EMERGENCY BUTTON WORKS!');">🚨 EMERGENCY
-          TEST</button>
-      </form>
-
-      <!-- Register Form -->
-      <form id="registerForm" class="auth-form" style="display: none;">
-        <div class="form-group">
-          <label for="registerName">Full Name</label>
-          <input type="text" id="registerName" name="name" required>
-        </div>
-        <div class="form-group">
-          <label for="registerEmail">Email</label>
-          <input type="email" id="registerEmail" name="email" required>
-        </div>
-        <div class="form-group">
-          <label for="registerPassword">Password</label>
-          <input type="password" id="registerPassword" name="password" required>
-          <div class="password-strength" id="passwordStrength"></div>
-        </div>
-        <div class="form-group">
-          <label for="confirmPassword">Confirm Password</label>
-          <input type="password" id="confirmPassword" name="confirmPassword" required>
-          <div class="password-match" id="passwordMatch"></div>
-        </div>
-        <button type="submit" class="auth-btn">Create Account</button>
-        <div class="auth-links">
-          <a href="#" onclick="switchAuthTab('login')">Already have an account? Sign In</a>
+          <a href="#" onclick="alert('Forgot password clicked')">Forgot Password?</a>
         </div>
       </form>
-
-      <!-- Forgot Password Form -->
-      <form id="forgotForm" class="auth-form" style="display: none;">
-        <div class="form-group">
-          <label for="forgotEmail">Email</label>
-          <input type="email" id="forgotEmail" name="email" required>
-        </div>
-        <button type="submit" class="auth-btn">Reset Password</button>
-        <div class="auth-links">
-          <a href="#" onclick="switchAuthTab('login')">Back to Sign In</a>
-        </div>
-      </form>
-
-      <div class="auth-messages" id="authMessages"></div>
     </div>
+  </div>
+
+  <!-- Register Form -->
+  <form id="registerForm" class="auth-form" style="display: none;">
+    <div class="form-group">
+      <label for="registerName">Full Name</label>
+      <input type="text" id="registerName" name="name" required>
+    </div>
+    <div class="form-group">
+      <label for="registerEmail">Email</label>
+      <input type="email" id="registerEmail" name="email" required>
+    </div>
+    <div class="form-group">
+      <label for="registerPassword">Password</label>
+      <input type="password" id="registerPassword" name="password" required>
+      <div class="password-strength" id="passwordStrength"></div>
+    </div>
+    <div class="form-group">
+      <label for="confirmPassword">Confirm Password</label>
+      <input type="password" id="confirmPassword" name="confirmPassword" required>
+      <div class="password-match" id="passwordMatch"></div>
+    </div>
+    <button type="submit" class="auth-btn">Create Account</button>
+    <div class="auth-links">
+      <a href="#" onclick="switchAuthTab('login')">Already have an account? Sign In</a>
+    </div>
+  </form>
+
+  <!-- Forgot Password Form -->
+  <form id="forgotForm" class="auth-form" style="display: none;">
+    <div class="form-group">
+      <label for="forgotEmail">Email</label>
+      <input type="email" id="forgotEmail" name="email" required>
+    </div>
+    <button type="submit" class="auth-btn">Reset Password</button>
+    <div class="auth-links">
+      <a href="#" onclick="switchAuthTab('login')">Back to Sign In</a>
+    </div>
+  </form>
+
+  <div class="auth-messages" id="authMessages"></div>
+  </div>
   </div>
 
   <div id="map"></div>
@@ -7594,6 +7586,34 @@
       } else {
         console.error('❌ Firebase Auth not available in function');
         alert('❌ FIREBASE AUTH NOT WORKING!');
+      }
+    };
+
+    // SIMPLE WORKING LOGIN FUNCTION
+    window.handleSimpleLogin = async function () {
+      console.log('🚀 SIMPLE LOGIN STARTED');
+      alert('🚀 Login process started!');
+
+      try {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        console.log('Using credentials:', email, password ? '***' : 'empty');
+
+        if (window.firebaseAuth) {
+          const userCredential = await window.firebaseAuth.signInWithEmailAndPassword(email, password);
+          console.log('✅ Login successful!', userCredential);
+          alert('✅ LOGIN SUCCESSFUL!\n\nWelcome to GroupTracker!');
+
+          // Hide auth overlay
+          document.getElementById('authOverlay').style.display = 'none';
+
+        } else {
+          alert('❌ Firebase Auth not available');
+        }
+      } catch (error) {
+        console.error('❌ Login failed:', error);
+        alert('❌ LOGIN FAILED: ' + error.message);
       }
     };
   </script>
