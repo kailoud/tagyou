@@ -9,6 +9,7 @@
 const firebaseConfig = {
   apiKey: "AIzaSyDWm3v-1WXxHWDYIzqK1nCjrBeVW-GvG1I",
   authDomain: "tagyouapp-b0d30.firebaseapp.com",
+  databaseURL: "https://tagyouapp-b0d30-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "tagyouapp-b0d30",
   storageBucket: "tagyouapp-b0d30.firebasestorage.app",
   messagingSenderId: "955342799504",
@@ -17,17 +18,25 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+try {
+  firebase.initializeApp(firebaseConfig);
+  console.log('Firebase initialized with project:', firebaseConfig.projectId);
+} catch (error) {
+  console.error('Error initializing Firebase:', error);
+}
 
 // Initialize Firebase services
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
+try {
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
 
-// Export for use in other files
-window.firebaseAuth = auth;
-window.firebaseDB = db;
-window.firebaseStorage = storage;
+  // Export for use in other files
+  window.firebaseAuth = auth;
+  window.firebaseDB = db;
+  window.firebaseStorage = storage;
 
-// Log configuration status
-console.log('Firebase initialized with project:', firebaseConfig.projectId);
+  console.log('Firebase services initialized successfully');
+} catch (error) {
+  console.error('Error initializing Firebase services:', error);
+}
