@@ -11712,13 +11712,9 @@
 
     // Control Button Functions
     function toggleFoodStalls() {
-      console.log('toggleFoodStalls called');
+      console.log('=== toggleFoodStalls called ===');
 
       const foodStallsBtn = document.querySelector('.food-stalls-btn');
-      const panel = document.getElementById('bottomPanel');
-      const isPanelOpen = panel.classList.contains('expanded');
-
-      console.log('Panel open:', isPanelOpen);
 
       // Toggle food stalls visibility on map
       const foodStallsVisible = foodStallsBtn.classList.toggle('active');
@@ -11727,50 +11723,32 @@
       const searchInput = document.getElementById('searchInput');
 
       if (foodStallsVisible) {
-        console.log('Activating food stalls');
+        console.log('Activating food stalls on map');
 
         // Add food stall markers to map
         addFoodStallMarkers();
-        showNotification('Food stalls displayed on map');
+
         // Update search placeholder
         searchInput.placeholder = 'Find food stall...';
-        // Clear search input
         searchInput.value = '';
 
-        // Deactivate other buttons
-        document.querySelector('.truck-floats-btn').classList.remove('active');
-
-        // If panel is closed, open it to show the map with food stalls
-        if (!isPanelOpen) {
-          console.log('Opening panel to show food stalls on map');
-          panel.classList.add('expanded');
-          document.body.classList.add('panel-expanded');
-        }
-        // Switch to find-stalls tab to show stall information
-        switchTab('find-stalls');
+        showNotification('Food stalls displayed on map');
       } else {
-        console.log('Deactivating food stalls');
+        console.log('Deactivating food stalls from map');
 
         // Remove food stall markers from map
         removeFoodStallMarkers();
-        showNotification('Food stalls hidden from map');
+
         // Reset search placeholder to default
         searchInput.placeholder = 'Find group member by phone...';
-        // Clear search input
         searchInput.value = '';
 
-        // If no other features are active, close the panel
-        const hasActiveFeatures = document.querySelector('.truck-floats-btn').classList.contains('active');
-        if (!hasActiveFeatures && isPanelOpen) {
-          console.log('No active features, closing panel');
-          panel.classList.remove('expanded');
-          document.body.classList.remove('panel-expanded');
-        }
+        showNotification('Food stalls hidden from map');
       }
     }
 
     function toggleTruckFloats() {
-      console.log('toggleTruckFloats called');
+      console.log('=== toggleTruckFloats called ===');
 
       const truckFloatsBtn = document.querySelector('.truck-floats-btn');
 
@@ -11990,9 +11968,6 @@
       } else {
         console.log('No truck float data available to display');
       }
-
-      // Show float panel content
-      showFloatPanel();
     }
 
     function removeTruckFloatMarkers() {
