@@ -13821,26 +13821,11 @@
           console.log('No main route found in Firebase');
           showNotification('No parade route available', 'info');
         }
-        const carnivalBounds = L.latLngBounds([
-          [51.5120, -0.2160], // Southwest
-          [51.5270, -0.1950]  // Northeast
-        ]);
-        if (map) {
-          map.fitBounds(carnivalBounds, { padding: [20, 20] });
-          console.log('Map centered on carnival area (fallback)');
-          console.log('Map center after:', map.getCenter());
-        } else {
-          console.error('Map not available for centering');
-        }
-      }, 500);
-
-      showNotification('🎪 Carnival route displayed • Click ⭐ to go to your location', 'success');
-    }
       } else {
-      // Hide main parade route
-      clearMainFloatRoute();
-      showNotification('Main parade route hidden', 'info');
-    }
+        // Hide main parade route
+        clearMainFloatRoute();
+        showNotification('Main parade route hidden', 'info');
+      }
     }
 
     // Location Mode Management
