@@ -6409,165 +6409,165 @@
         </div>
         <!-- Schedule items will be dynamically generated -->
       </div>
+
+
+      <div class="panel-content" id="settings-content">
+        <div style="text-align: center; padding: 20px 0; max-height: 100%; overflow-y: auto;">
+          <div style="font-size: 48px; margin-bottom: 16px;">⚙️</div>
+          <h3 style="margin-bottom: 16px;">Settings</h3>
+          <div class="settings-section">
+            <h4>🔔 Notifications</h4>
+            <label class="setting-item">
+              <input type="checkbox" id="push_notifications" checked
+                onchange="updateSetting('push_notifications', this.checked)">
+              Enable push notifications
+            </label>
+            <label class="setting-item">
+              <input type="checkbox" id="location_sharing" checked
+                onchange="updateSetting('location_sharing', this.checked)">
+              Location sharing
+            </label>
+            <label class="setting-item">
+              <input type="checkbox" id="emergency_alerts" onchange="updateSetting('emergency_alerts', this.checked)">
+              Emergency alerts
+            </label>
+          </div>
+          <div class="settings-section">
+            <h4>🗺️ Map Settings</h4>
+            <label class="setting-item">
+              <input type="checkbox" id="show_location" checked onchange="updateSetting('show_location', this.checked)">
+              Show my location
+            </label>
+            <label class="setting-item">
+              <input type="checkbox" id="auto_center" checked onchange="updateSetting('auto_center', this.checked)">
+              Auto-center on group
+            </label>
+          </div>
+          <div class="settings-section">
+            <h4>🔒 Privacy</h4>
+            <label class="setting-item">
+              <input type="checkbox" id="share_group" checked onchange="updateSetting('share_group', this.checked)">
+              Share location with group
+            </label>
+            <label class="setting-item">
+              <input type="checkbox" id="share_all" onchange="updateSetting('share_all', this.checked)">
+              Share with all users
+            </label>
+          </div>
+          <div style="margin-top: 30px;">
+            <button class="btn btn-primary" onclick="saveSettings()" style="width: 100%; max-width: 200px;">
+              💾 Save Settings
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="panel-content" id="settings-content">
-      <div style="text-align: center; padding: 20px 0; max-height: 100%; overflow-y: auto;">
-        <div style="font-size: 48px; margin-bottom: 16px;">⚙️</div>
-        <h3 style="margin-bottom: 16px;">Settings</h3>
-        <div class="settings-section">
-          <h4>🔔 Notifications</h4>
-          <label class="setting-item">
-            <input type="checkbox" id="push_notifications" checked
-              onchange="updateSetting('push_notifications', this.checked)">
-            Enable push notifications
-          </label>
-          <label class="setting-item">
-            <input type="checkbox" id="location_sharing" checked
-              onchange="updateSetting('location_sharing', this.checked)">
-            Location sharing
-          </label>
-          <label class="setting-item">
-            <input type="checkbox" id="emergency_alerts" onchange="updateSetting('emergency_alerts', this.checked)">
-            Emergency alerts
-          </label>
+    <div class="panel-content" id="food-stalls-content">
+      <!-- Food Stalls Header -->
+      <div class="food-stalls-header">
+        <div class="food-stalls-title">
+          <h3>🍔 Food Stalls & Trucks</h3>
+          <p>Discover delicious food & refreshments</p>
         </div>
-        <div class="settings-section">
-          <h4>🗺️ Map Settings</h4>
-          <label class="setting-item">
-            <input type="checkbox" id="show_location" checked onchange="updateSetting('show_location', this.checked)">
-            Show my location
-          </label>
-          <label class="setting-item">
-            <input type="checkbox" id="auto_center" checked onchange="updateSetting('auto_center', this.checked)">
-            Auto-center on group
-          </label>
-        </div>
-        <div class="settings-section">
-          <h4>🔒 Privacy</h4>
-          <label class="setting-item">
-            <input type="checkbox" id="share_group" checked onchange="updateSetting('share_group', this.checked)">
-            Share location with group
-          </label>
-          <label class="setting-item">
-            <input type="checkbox" id="share_all" onchange="updateSetting('share_all', this.checked)">
-            Share with all users
-          </label>
-        </div>
-        <div style="margin-top: 30px;">
-          <button class="btn btn-primary" onclick="saveSettings()" style="width: 100%; max-width: 200px;">
-            💾 Save Settings
+        <div class="food-stalls-controls">
+          <button class="food-stalls-control-btn" onclick="toggleFoodStallsAutoScroll()" id="foodAutoScrollBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+            </svg>
+            Auto
+          </button>
+          <button class="food-stalls-control-btn" onclick="refreshFoodStallsData()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+            </svg>
+            Refresh
           </button>
         </div>
       </div>
-    </div>
-  </div>
 
-  <div class="panel-content" id="food-stalls-content">
-    <!-- Food Stalls Header -->
-    <div class="food-stalls-header">
-      <div class="food-stalls-title">
-        <h3>🍔 Food Stalls & Trucks</h3>
-        <p>Discover delicious food & refreshments</p>
+      <!-- Food Stalls Map -->
+      <div class="food-stalls-map-section">
+        <h4>🗺️ Food Stalls Map</h4>
+        <div class="food-stalls-map">
+          <div class="map-legend">
+            <div class="legend-item">
+              <span class="legend-icon">🍔</span>
+              <span>Food Stalls</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-icon">🚚</span>
+              <span>Food Trucks</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-icon">🍦</span>
+              <span>Desserts</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-icon">🥤</span>
+              <span>Beverages</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="food-stalls-controls">
-        <button class="food-stalls-control-btn" onclick="toggleFoodStallsAutoScroll()" id="foodAutoScrollBtn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-          </svg>
-          Auto
-        </button>
-        <button class="food-stalls-control-btn" onclick="refreshFoodStallsData()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
-          </svg>
-          Refresh
-        </button>
-      </div>
-    </div>
 
-    <!-- Food Stalls Map -->
-    <div class="food-stalls-map-section">
-      <h4>🗺️ Food Stalls Map</h4>
-      <div class="food-stalls-map">
-        <div class="map-legend">
-          <div class="legend-item">
-            <span class="legend-icon">🍔</span>
-            <span>Food Stalls</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-icon">🚚</span>
-            <span>Food Trucks</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-icon">🍦</span>
-            <span>Desserts</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-icon">🥤</span>
-            <span>Beverages</span>
-          </div>
+      <!-- Live Food Stalls Feed -->
+      <div class="food-stalls-feed">
+        <h4>🍽️ Live Food Stalls Feed</h4>
+        <div class="food-stalls-cards" id="foodStallsCards">
+          <!-- Food stall cards will be dynamically generated -->
+        </div>
+      </div>
+
+      <!-- Food Stalls Schedule -->
+      <div class="food-stalls-schedule">
+        <h4>⏰ Operating Hours</h4>
+        <div class="food-schedule-timeline" id="foodScheduleTimeline">
+          <!-- Schedule items will be dynamically generated -->
+        </div>
+      </div>
+
+      <!-- Food Categories -->
+      <div class="food-stalls-categories">
+        <h4>🍴 Food Categories</h4>
+        <div class="food-category-tags">
+          <span class="food-category-tag active" onclick="filterFoodStalls('all')">All</span>
+          <span class="food-category-tag" onclick="filterFoodStalls('fast-food')">Fast Food</span>
+          <span class="food-category-tag" onclick="filterFoodStalls('ethnic')">Ethnic</span>
+          <span class="food-category-tag" onclick="filterFoodStalls('desserts')">Desserts</span>
+          <span class="food-category-tag" onclick="filterFoodStalls('beverages')">Beverages</span>
+          <span class="food-category-tag" onclick="filterFoodStalls('healthy')">Healthy</span>
         </div>
       </div>
     </div>
 
-    <!-- Live Food Stalls Feed -->
-    <div class="food-stalls-feed">
-      <h4>🍽️ Live Food Stalls Feed</h4>
-      <div class="food-stalls-cards" id="foodStallsCards">
-        <!-- Food stall cards will be dynamically generated -->
+    <div class="panel-content" id="user-profile-content">
+      <div style="padding: 20px 0;">
+        <div class="input-group">
+          <label class="input-label">Your Name</label>
+          <input type="text" class="input-field" value="Alex" id="userName">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Your Phone</label>
+          <input type="tel" class="input-field" value="+44 7700 900123" id="userPhone">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Location Sharing</label>
+          <select class="input-field" id="locationSharing">
+            <option value="always">Always On</option>
+            <option value="group">Only with Group</option>
+            <option value="manual">Manual Only</option>
+            <option value="off">Off</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="leaveGroup()"
+          style="width: 100%; background: #ff5722; margin-top: 20px;">
+          Leave Current Group
+        </button>
       </div>
     </div>
-
-    <!-- Food Stalls Schedule -->
-    <div class="food-stalls-schedule">
-      <h4>⏰ Operating Hours</h4>
-      <div class="food-schedule-timeline" id="foodScheduleTimeline">
-        <!-- Schedule items will be dynamically generated -->
-      </div>
-    </div>
-
-    <!-- Food Categories -->
-    <div class="food-stalls-categories">
-      <h4>🍴 Food Categories</h4>
-      <div class="food-category-tags">
-        <span class="food-category-tag active" onclick="filterFoodStalls('all')">All</span>
-        <span class="food-category-tag" onclick="filterFoodStalls('fast-food')">Fast Food</span>
-        <span class="food-category-tag" onclick="filterFoodStalls('ethnic')">Ethnic</span>
-        <span class="food-category-tag" onclick="filterFoodStalls('desserts')">Desserts</span>
-        <span class="food-category-tag" onclick="filterFoodStalls('beverages')">Beverages</span>
-        <span class="food-category-tag" onclick="filterFoodStalls('healthy')">Healthy</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="panel-content" id="user-profile-content">
-    <div style="padding: 20px 0;">
-      <div class="input-group">
-        <label class="input-label">Your Name</label>
-        <input type="text" class="input-field" value="Alex" id="userName">
-      </div>
-      <div class="input-group">
-        <label class="input-label">Your Phone</label>
-        <input type="tel" class="input-field" value="+44 7700 900123" id="userPhone">
-      </div>
-      <div class="input-group">
-        <label class="input-label">Location Sharing</label>
-        <select class="input-field" id="locationSharing">
-          <option value="always">Always On</option>
-          <option value="group">Only with Group</option>
-          <option value="manual">Manual Only</option>
-          <option value="off">Off</option>
-        </select>
-      </div>
-      <button class="btn btn-primary" onclick="leaveGroup()"
-        style="width: 100%; background: #ff5722; margin-top: 20px;">
-        Leave Current Group
-      </button>
-    </div>
-  </div>
   </div>
 
   <!-- Group Management Modal -->
