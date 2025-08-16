@@ -3558,105 +3558,101 @@
     }
 
     .float-cards {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
       max-height: 400px;
       overflow-y: auto;
-      padding-right: 8px;
-      margin-bottom: 20px;
     }
 
     .float-card {
       background: white;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      border: 1px solid #f0f0f0;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #9c27b0;
       transition: all 0.3s ease;
       cursor: pointer;
-      position: relative;
-      overflow: hidden;
     }
 
     .float-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-      border-color: #9c27b0;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
     }
 
     .float-card-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 16px;
+      align-items: center;
+      margin-bottom: 12px;
     }
 
     .float-name {
-      font-weight: 700;
+      font-weight: 600;
       color: #333;
-      font-size: 18px;
-      line-height: 1.3;
-      flex: 1;
-      margin-right: 12px;
+      font-size: 16px;
     }
 
     .float-status {
-      padding: 6px 12px;
-      border-radius: 20px;
+      padding: 4px 8px;
+      border-radius: 12px;
       font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
+      font-weight: 500;
     }
 
     .float-status.live {
       background: #e8f5e8;
       color: #2e7d32;
-      border: 1px solid #c8e6c9;
     }
 
     .float-status.upcoming {
       background: #fff3e0;
       color: #f57c00;
-      border: 1px solid #ffcc02;
     }
 
     .float-status.completed {
       background: #f3e5f5;
       color: #7b1fa2;
-      border: 1px solid #e1bee7;
     }
 
     .float-image {
       width: 100%;
-      height: 180px;
+      height: 120px;
       background: linear-gradient(135deg, #f3e5f5, #e1bee7);
-      border-radius: 12px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #9c27b0;
-      font-size: 48px;
-      margin-bottom: 16px;
+      font-size: 24px;
+      margin-bottom: 12px;
       position: relative;
       overflow: hidden;
-      border: 2px solid #f0f0f0;
     }
 
     .float-image img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-radius: 10px;
+      border-radius: 8px;
+    }
+
+    .float-emoji {
+      font-size: 48px;
+      line-height: 1;
+      display: block;
+      text-align: center;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .float-details {
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 16px;
+      margin-bottom: 12px;
     }
 
     .float-detail {
@@ -3665,21 +3661,27 @@
       gap: 6px;
       font-size: 13px;
       color: #666;
-      background: #f8f9fa;
-      padding: 6px 10px;
-      border-radius: 8px;
-      border: 1px solid #e9ecef;
     }
 
     .float-description {
       font-size: 14px;
       color: #555;
-      line-height: 1.5;
-      margin-bottom: 0;
-      background: #f8f9fa;
-      padding: 12px;
-      border-radius: 8px;
-      border-left: 3px solid #9c27b0;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    .float-categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .float-category {
+      padding: 4px 8px;
+      background: #f0f0f0;
+      color: #666;
+      border-radius: 12px;
+      font-size: 11px;
     }
 
     .float-image::after {
@@ -4115,31 +4117,35 @@
     @media (min-width: 768px) {
 
       .food-stalls-cards,
-      .float-cards {
+      .float-cards,
+      .stalls-grid {
         max-height: 600px;
         gap: 24px;
       }
 
       .food-stall-card,
-      .float-card {
+      .float-card,
+      .stall-card {
         padding: 24px;
         margin-bottom: 24px;
       }
 
       .food-stall-image,
-      .float-image {
+      .float-image,
+      .stall-image {
         height: 250px;
       }
 
       .food-stall-name,
-      .float-name {
+      .float-name,
+      .stall-name {
         font-size: 20px;
       }
 
       .food-stall-detail,
-      .float-detail {
+      .float-detail,
+      .stall-detail {
         font-size: 15px;
-        padding: 8px 16px;
       }
 
       .artist-description {
@@ -12627,28 +12633,27 @@
 
         return `
           <div class="float-card" onclick="${clickHandler}">
-            <div class="float-image">
-              <span style="font-size: 48px;">${float.image}</span>
-            </div>
             <div class="float-card-header">
-              <span class="float-name">${float.name}</span>
-              <span class="float-status ${float.status}">${float.status.toUpperCase()}</span>
+              <div class="float-name">${float.name}</div>
+              <div class="float-status ${float.status}">${float.status.toUpperCase()}</div>
+            </div>
+            <div class="float-image">
+              <span class="float-emoji">${float.image}</span>
             </div>
             <div class="float-details">
+              <div class="float-detail">
+                <span>⭐</span>
+                <span>4.5</span>
+              </div>
               <div class="float-detail">
                 <span>📍</span>
                 <span>${float.location}</span>
               </div>
-              <div class="float-detail">
-                <span>⏰</span>
-                <span>${float.time}</span>
-              </div>
-              <div class="float-detail">
-                <span>🏷️</span>
-                <span>${float.category}</span>
-              </div>
             </div>
             <div class="float-description">${float.description}</div>
+            <div class="float-categories">
+              <span class="float-category">${float.category}</span>
+            </div>
           </div>
         `;
       }).join('');
