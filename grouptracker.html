@@ -6667,28 +6667,7 @@
           <label for="loginPassword">Password</label>
           <input type="password" id="loginPassword" name="password" value="demo123" required>
         </div>
-        <button type="submit" class="auth-btn" style="cursor: pointer !important; pointer-events: auto !important;"
-          onclick="console.log('Sign In button clicked!'); return true;">Sign In</button>
-
-        <!-- NUCLEAR OPTION - This WILL work -->
-        <button type="button"
-          style="background: red; color: white; padding: 20px; margin: 20px 0; cursor: pointer !important; font-size: 18px; font-weight: bold; border-radius: 8px; border: none; box-shadow: 0 4px 8px rgba(0,0,0,0.3);"
-          onclick="nuclearLogin()">💥 NUCLEAR LOGIN - FORCE ENTRY</button>
-
-        <!-- Test button to verify cursor -->
-        <button type="button"
-          style="background: red; color: white; padding: 10px; margin: 10px 0; cursor: pointer !important;"
-          onclick="alert('Test button works!')">Test Cursor Button</button>
-
-        <!-- Diagnostic login button - this will find the REAL problem -->
-        <button type="button"
-          style="background: green; color: white; padding: 15px; margin: 15px 0; cursor: pointer !important; font-size: 16px; font-weight: bold; border-radius: 8px;"
-          onclick="diagnoseAuth()">🔍 DIAGNOSE & FIX LOGIN</button>
-
-        <!-- Manual password fix button -->
-        <button type="button"
-          style="background: orange; color: white; padding: 15px; margin: 15px 0; cursor: pointer !important; font-size: 16px; font-weight: bold; border-radius: 8px;"
-          onclick="tryCommonPasswords()">🔑 TRY COMMON PASSWORDS</button>
+        <button type="submit" class="auth-btn" onclick="console.log('Sign In button clicked!'); alert('Button clicked!');">Sign In</button>
 
         <div class="auth-links">
           <a href="#" onclick="switchAuthTab('forgot')">Forgot Password?</a>
@@ -10413,11 +10392,6 @@
         if (loginForm) {
           loginForm.addEventListener('submit', handleLogin);
           console.log('Login form event listener added');
-
-          // Add a simple test to verify form submission
-          loginForm.addEventListener('submit', function (e) {
-            console.log('Form submit event triggered!');
-          });
         }
 
         if (registerForm) {
