@@ -6643,12 +6643,17 @@
           <input type="password" id="loginPassword" name="password" value="demo123" required>
         </div>
         <button type="submit" class="auth-btn" style="cursor: pointer !important; pointer-events: auto !important;"
-          onclick="console.log('Sign In button clicked'); alert('Button clicked!')">Sign In</button>
+          onclick="console.log('Button clicked!')">Sign In</button>
 
         <!-- Test button to verify cursor -->
         <button type="button"
           style="background: red; color: white; padding: 10px; margin: 10px 0; cursor: pointer !important;"
           onclick="alert('Test button works!')">Test Cursor Button</button>
+
+        <!-- Manual login test button -->
+        <button type="button"
+          style="background: green; color: white; padding: 10px; margin: 10px 0; cursor: pointer !important;"
+          onclick="testLogin()">Manual Login Test</button>
 
         <div class="auth-links">
           <a href="#" onclick="switchAuthTab('forgot')">Forgot Password?</a>
@@ -6675,8 +6680,7 @@
           <input type="password" id="confirmPassword" name="confirmPassword" required>
           <div class="password-match" id="passwordMatch"></div>
         </div>
-        <button type="submit" class="auth-btn" onclick="console.log('Create Account button clicked')">Create
-          Account</button>
+        <button type="submit" class="auth-btn">Create Account</button>
         <div class="auth-links">
           <a href="#" onclick="switchAuthTab('login')">Already have an account? Sign In</a>
         </div>
@@ -6688,8 +6692,7 @@
           <label for="forgotEmail">Email</label>
           <input type="email" id="forgotEmail" name="email" required>
         </div>
-        <button type="submit" class="auth-btn" onclick="console.log('Reset Password button clicked')">Reset
-          Password</button>
+        <button type="submit" class="auth-btn">Reset Password</button>
         <div class="auth-links">
           <a href="#" onclick="switchAuthTab('login')">Back to Sign In</a>
         </div>
@@ -7690,7 +7693,10 @@
       }
 
       async function handleLogin(event) {
+        console.log('=== LOGIN ATTEMPT START ===');
         console.log('handleLogin called with event:', event);
+        console.log('Event type:', event.type);
+        console.log('Event target:', event.target);
         event.preventDefault();
 
         const email = document.getElementById('loginEmail').value;
@@ -10372,6 +10378,11 @@
         if (loginForm) {
           loginForm.addEventListener('submit', handleLogin);
           console.log('Login form event listener added');
+
+          // Add a simple test to verify form submission
+          loginForm.addEventListener('submit', function (e) {
+            console.log('Form submit event triggered!');
+          });
         }
 
         if (registerForm) {
@@ -15848,13 +15859,29 @@
 
     // Manual login function for testing
     window.testLogin = async function () {
+      console.log('=== MANUAL LOGIN TEST ===');
       console.log('Testing manual login...');
       try {
+        console.log('Firebase Auth available:', !!window.firebaseAuth);
         const userCredential = await window.firebaseAuth.signInWithEmailAndPassword('demo@tagyou.com', 'demo123');
         console.log('Manual login successful:', userCredential);
         checkAuthStatus();
       } catch (error) {
         console.error('Manual login failed:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+      }
+    };
+
+    // Simple form submission test
+    window.testFormSubmission = function () {
+      console.log('=== FORM SUBMISSION TEST ===');
+      const loginForm = document.getElementById('loginForm');
+      if (loginForm) {
+        console.log('Login form found, triggering submit...');
+        loginForm.dispatchEvent(new Event('submit', { bubbles: true }));
+      } else {
+        console.error('Login form not found!');
       }
     };
 
