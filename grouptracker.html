@@ -10774,20 +10774,26 @@
     });
 
     function switchTab(tabName) {
+      console.log('🔍 switchTab called with:', tabName);
+
       // Check if panel is closed - if so, open it first
       const panel = document.getElementById('bottomPanel');
       const isPanelClosed = !panel.classList.contains('expanded');
+      console.log('Panel closed?', isPanelClosed);
 
       if (isPanelClosed) {
         // Open panel first
         panel.classList.add('expanded');
         document.body.classList.add('panel-expanded');
+        console.log('✅ Panel opened');
       }
 
       // Hide all content
       const contents = document.querySelectorAll('.panel-content');
+      console.log('Found', contents.length, 'panel contents');
       contents.forEach(content => {
         content.classList.remove('active');
+        console.log('Hidden:', content.id);
       });
 
       // Remove active class from all tabs
@@ -10798,37 +10804,47 @@
 
       // Show selected content and activate tab
       const targetContent = document.getElementById(tabName + '-content');
+      console.log('Looking for content with ID:', tabName + '-content');
+      console.log('Found target content:', targetContent);
+
       if (targetContent) {
         targetContent.classList.add('active');
+        console.log('✅ Activated content:', tabName + '-content');
+        console.log('Content HTML preview:', targetContent.innerHTML.substring(0, 100) + '...');
+      } else {
+        console.log('❌ Target content not found!');
+      }
 
-        // Special handling for float tab
-        if (tabName === 'float') {
-          loadAdminData().then(() => {
-            loadFloatData();
-            loadFloatSchedule();
-          }).catch(error => {
-            loadFloatData();
-            loadFloatSchedule();
-          });
-        }
+      // Special handling for float tab
+      if (tabName === 'float') {
+        loadAdminData().then(() => {
+          loadFloatData();
+          loadFloatSchedule();
+        }).catch(error => {
+          loadFloatData();
+          loadFloatSchedule();
+        });
+      }
 
-        // Special handling for find-stalls tab
-        if (tabName === 'find-stalls') {
-          loadAdminData().then(() => {
-            loadStallsData();
-          }).catch(error => {
-            loadStallsData();
-          });
-        }
+      // Special handling for find-stalls tab
+      if (tabName === 'find-stalls') {
+        loadAdminData().then(() => {
+          loadStallsData();
+        }).catch(error => {
+          loadStallsData();
+        });
       }
 
       // Find and activate the correct tab
       const targetTab = document.querySelector(`.tab[onclick*="${tabName}"]`);
       if (targetTab) {
         targetTab.classList.add('active');
+        console.log('✅ Activated tab:', targetTab.textContent);
 
         // Always show highlighting since panel will be open
         showTabHighlighting();
+      } else {
+        console.log('❌ Target tab not found!');
       }
     }
 
