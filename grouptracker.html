@@ -11119,8 +11119,7 @@
               map.setZoom(map.getZoom(), { animate: false });
             }
 
-            // Add Judging Zone Marker
-            addJudgingZoneMarker();
+
 
             // Additional refresh to ensure tiles load
             setTimeout(() => {
@@ -11162,50 +11161,7 @@
             console.log('Map forced to full viewport');
           }
         }, 200);
-        console.log('addJudgingZoneMarker function called');
 
-        if (!map) {
-          console.log('Map not available');
-          return;
-        }
-
-        // Judging Zone coordinates (Great Western Rd)
-        const judgingZoneCoords = [51.519641, -0.199409];
-        console.log('Creating marker at coordinates:', judgingZoneCoords);
-
-        // Create static icon for judging zone
-        const judgingZoneIcon = L.divIcon({
-          className: 'judging-zone-marker',
-          html: 'JUDGING<br>ZONE',
-          iconSize: [25, 25],
-          iconAnchor: [12.5, 28], // Center horizontally, bottom vertically to account for the tail
-          popupAnchor: [0, -30]
-        });
-
-        // Add marker to map
-        const judgingZoneMarker = L.marker(judgingZoneCoords, {
-          icon: judgingZoneIcon,
-          zIndexOffset: 9999
-        }).addTo(map);
-
-        console.log('Marker added to map:', judgingZoneMarker);
-
-        // Add popup with information
-        judgingZoneMarker.bindPopup(`
-          <div style="text-align: center; padding: 8px;">
-            <h3 style="margin: 0 0 8px 0; color: #ff8c00;">🏆 JUDGING ZONE</h3>
-            <p style="margin: 0 0 8px 0; font-weight: bold;">Great Western Road</p>
-            <p style="margin: 0; font-size: 12px; color: #666;">
-              Float parade judging area<br>
-              Coordinates: 51.519641, -0.199409
-            </p>
-          </div>
-        `);
-
-        // Store reference for later use
-        window.judgingZoneMarker = judgingZoneMarker;
-
-        console.log('Static Judging Zone marker added at:', judgingZoneCoords);
       }
 
       // Add user marker with avatar
@@ -15401,7 +15357,7 @@
       console.log('=== loadStallsData called ===');
 
       // Load stalls data from user data
-      stallsData = [];
+      window.stallsData = [];
       // Use admin data for testing if user is admin, otherwise use user data
       const dataSource = (window.firebaseAuth?.currentUser && isUserAdmin(window.firebaseAuth.currentUser)) ? window.adminData : window.userData;
 
@@ -15409,7 +15365,7 @@
       console.log('Food stalls in data source:', dataSource?.['food-stalls']);
 
       if (dataSource && dataSource['food-stalls'] && dataSource['food-stalls'].length > 0) {
-        stallsData = dataSource['food-stalls'].map(stall => ({
+        window.stallsData = dataSource['food-stalls'].map(stall => ({
           id: stall.id,
           name: stall.name || stall.stall_name,
           origin: stall.origin || stall.country || 'Unknown',
@@ -15446,9 +15402,9 @@
       }
 
       // If no data available, show demo data for testing
-      if (stallsData.length === 0) {
+      if (window.stallsData.length === 0) {
         console.log('No stalls data found in Firebase - showing demo data for testing');
-        stallsData = [
+        window.stallsData = [
           {
             id: 'demo-1',
             name: 'leisi',
@@ -15481,7 +15437,7 @@
       }
 
       // Initialize filtered stalls
-      filteredStalls = stallsData;
+      filteredStalls = window.stallsData;
 
       // Test Firebase connectivity first
       testFirebaseConnection().then(() => {
@@ -15491,7 +15447,7 @@
 
       // Remove all demo data - only show admin data
       console.log('Stalls data loaded, calling renderStalls...');
-      console.log('Stalls data:', stallsData);
+      console.log('Stalls data:', window.stallsData);
       console.log('Filtered stalls:', filteredStalls);
       renderStalls();
       console.log('=== loadStallsData completed ===');
