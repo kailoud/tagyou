@@ -2442,12 +2442,12 @@
 
     /* Judging Zone Marker Styles - Static */
     .judging-zone-marker {
-      background: rgba(255, 140, 0, 0.6);
-      border: 2px solid rgba(230, 126, 0, 0.6);
+      background: rgba(255, 140, 0, 0.8) !important;
+      border: 2px solid rgba(230, 126, 0, 0.8) !important;
       border-radius: 50%;
       width: 25px !important;
       height: 25px !important;
-      display: flex;
+      display: flex !important;
       align-items: center;
       justify-content: center;
       color: #000;
@@ -2456,11 +2456,13 @@
       text-align: center;
       line-height: 1.2;
       text-transform: uppercase;
-      box-shadow: 0 2px 6px rgba(255, 140, 0, 0.3);
+      box-shadow: 0 2px 6px rgba(255, 140, 0, 0.5) !important;
       position: relative;
-      z-index: 1000;
+      z-index: 9999 !important;
       transform: none !important;
       scale: 1 !important;
+      opacity: 1 !important;
+      visibility: visible !important;
     }
 
     .judging-zone-marker::after {
@@ -2473,8 +2475,10 @@
       height: 0;
       border-left: 3px solid transparent;
       border-right: 3px solid transparent;
-      border-top: 3px solid rgba(255, 140, 0, 0.6);
-      z-index: 999;
+      border-top: 3px solid rgba(255, 140, 0, 0.8) !important;
+      z-index: 9998 !important;
+      opacity: 1 !important;
+      visibility: visible !important;
     }
 
     .judging-zone-marker::before {
@@ -2487,8 +2491,10 @@
       height: 0;
       border-left: 4px solid transparent;
       border-right: 4px solid transparent;
-      border-top: 4px solid rgba(230, 126, 0, 0.6);
-      z-index: 998;
+      border-top: 4px solid rgba(230, 126, 0, 0.8) !important;
+      z-index: 9997 !important;
+      opacity: 1 !important;
+      visibility: visible !important;
     }
 
     .leaflet-tile-pane {
@@ -11168,10 +11174,16 @@
 
       // Function to add Judging Zone Marker - Static
       function addJudgingZoneMarker() {
-        if (!map) return;
+        console.log('addJudgingZoneMarker function called');
+
+        if (!map) {
+          console.log('Map not available');
+          return;
+        }
 
         // Judging Zone coordinates (Great Western Rd)
         const judgingZoneCoords = [51.519641, -0.199409];
+        console.log('Creating marker at coordinates:', judgingZoneCoords);
 
         // Create static icon for judging zone
         const judgingZoneIcon = L.divIcon({
@@ -11185,8 +11197,10 @@
         // Add marker to map
         const judgingZoneMarker = L.marker(judgingZoneCoords, {
           icon: judgingZoneIcon,
-          zIndexOffset: 1000
+          zIndexOffset: 9999
         }).addTo(map);
+
+        console.log('Marker added to map:', judgingZoneMarker);
 
         // Add popup with information
         judgingZoneMarker.bindPopup(`
