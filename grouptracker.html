@@ -8890,6 +8890,9 @@
       const DATA_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
 
       async function loadAdminData() {
+        // Admin portal removed - this function is now a stub
+        console.log('Admin portal removed - loadAdminData is now a stub');
+        return userData;
         try {
           console.log('Loading admin data from Firebase...');
 
@@ -9690,8 +9693,7 @@
             pendingChanges[activeAdminTab] = true;
             updateSendButtonState();
 
-            // Reload data from database
-            await loadAdminData();
+
 
             // Update tab counts after deletion
             updateAdminTabCounts();
@@ -11235,33 +11237,19 @@
 
         // Special handling for float tab
         if (tabName === 'float') {
-          loadAdminData().then(() => {
-            loadFloatData();
-            loadFloatSchedule();
-          }).catch(error => {
-            loadFloatData();
-            loadFloatSchedule();
-          });
+          loadFloatData();
+          loadFloatSchedule();
         }
 
         // Special handling for find-stalls tab
         if (tabName === 'find-stalls') {
-          loadAdminData().then(() => {
-            loadStallsData();
-            loadArtistsData();
-          }).catch(error => {
-            loadStallsData();
-            loadArtistsData();
-          });
+          loadStallsData();
+          loadArtistsData();
         }
 
         // Special handling for artists tab
         if (tabName === 'artists') {
-          loadAdminData().then(() => {
-            loadArtistsData();
-          }).catch(error => {
-            loadArtistsData();
-          });
+          loadArtistsData();
         }
       }
 
@@ -13771,33 +13759,7 @@
       return displayNames[type] || type;
     }
 
-    function updateArtistCategoriesFromAdminData() {
-      console.log('=== updateArtistCategoriesFromAdminData called ===');
 
-      if (!window.adminData || !window.adminData.artists) {
-        console.warn('Admin data not available, loading it now...');
-        // Try to load admin data if not available
-        loadAdminData().then(() => {
-          console.log('Admin data loaded, artists:', window.adminData.artists);
-          const artists = window.adminData.artists.filter(artist => artist.status === 'confirmed');
-          console.log('Filtered confirmed artists:', artists);
-          updateArtistCategories(artists);
-        });
-        return;
-      }
-
-      console.log('Admin data available, all artists:', window.adminData.artists);
-      const artists = window.adminData.artists.filter(artist => artist.status === 'confirmed' || artist.status === 'active');
-      console.log('Filtered artists for categories:', artists);
-
-      // If no confirmed/active artists, show all artists for debugging
-      if (artists.length === 0 && window.adminData.artists.length > 0) {
-        console.log('No confirmed/active artists found, showing all artists for debugging');
-        updateArtistCategories(window.adminData.artists);
-      } else {
-        updateArtistCategories(artists);
-      }
-    }
 
     function updateArtistCategoriesFromUserData() {
       console.log('=== updateArtistCategoriesFromUserData called ===');
