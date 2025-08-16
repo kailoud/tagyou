@@ -4521,8 +4521,15 @@
 
       <button class="control-btn star-btn" onclick="toggleStarFeature()" title="Star Feature">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+        </svg>
+      </button>
+
+      <button class="control-btn admin-btn" onclick="showAdminPortal()" title="Admin Portal"
+        style="background: #1e40af;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <path
-            d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
         </svg>
       </button>
 
@@ -8957,6 +8964,23 @@
             panel.classList.remove('expanded');
             document.body.classList.remove('panel-expanded');
           }
+        }
+      }
+
+      function toggleStarFeature() {
+        console.log('toggleStarFeature called');
+
+        const starBtn = document.querySelector('.star-btn');
+        const starVisible = starBtn.classList.toggle('active');
+
+        if (starVisible) {
+          console.log('Star feature activated');
+          showNotification('Star feature activated');
+          // TODO: Add star feature functionality here
+        } else {
+          console.log('Star feature deactivated');
+          showNotification('Star feature deactivated');
+          // TODO: Remove star feature functionality here
         }
       }
 
