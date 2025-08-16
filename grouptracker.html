@@ -14701,8 +14701,15 @@
       try {
         console.log('displayMainFloatRoute called with:', routeData);
 
+        // Check if map is available
+        if (!map || !window.map) {
+          console.error('Map not available for displaying route');
+          showNotification('Map not ready. Please wait a moment and try again.', 'error');
+          return;
+        }
+
         // Parse route coordinates
-        const coordinates = JSON.parse(routeData.route_coordinates);
+        const coordinates = routeData.route_coordinates;
         console.log('Parsed coordinates:', coordinates);
 
         if (!coordinates || coordinates.length === 0) {
@@ -14715,7 +14722,14 @@
           weight: 6,
           opacity: 0.8,
           dashArray: '10, 5' // Dashed line for main route
-        }).addTo(map);
+        });
+
+        if (mainRoutePolyline && map) {
+          mainRoutePolyline.addTo(map);
+        } else {
+          console.error('Failed to create polyline or map not available');
+          return;
+        }
 
         // Add invisible numbered markers along the route (for reference only)
         const routeMarkers = [];
@@ -14729,7 +14743,11 @@
               iconSize: [1, 1], // Minimal size
               iconAnchor: [0.5, 0.5]
             })
-          }).addTo(map);
+          });
+
+          if (marker && map) {
+            marker.addTo(map);
+          }
 
           // Add popup with coordinate info (still accessible)
           const popupContent = `
@@ -14754,7 +14772,11 @@
             html: '🎪',
             iconSize: [40, 40]
           })
-        }).addTo(map).bindPopup(`🎪 Main Parade Start: ${routeData.route_name}`);
+        });
+
+        if (startMarker && map) {
+          startMarker.addTo(map).bindPopup(`🎪 Main Parade Start: ${routeData.route_name}`);
+        }
 
         // End marker
         const endMarker = L.marker(endCoords, {
@@ -14763,7 +14785,11 @@
             html: '🏁',
             iconSize: [40, 40]
           })
-        }).addTo(map).bindPopup(`🏁 Main Parade End: ${routeData.route_name}`);
+        });
+
+        if (endMarker && map) {
+          endMarker.addTo(map).bindPopup(`🏁 Main Parade End: ${routeData.route_name}`);
+        }
 
         // Store references for cleanup
         if (!window.mainFloatRoute) window.mainFloatRoute = [];
