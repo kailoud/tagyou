@@ -2498,6 +2498,27 @@
       transform: scale(1.05);
     }
 
+    .zoom-control-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 8px;
+      background: #4285f4;
+      color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 8px;
+    }
+
+    .zoom-control-btn:hover {
+      background: #3367d6;
+      transform: scale(1.05);
+    }
+
     .search-container {
       flex: 1;
       max-width: 400px;
@@ -6643,6 +6664,17 @@
             d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" />
         </svg>
       </button>
+      <button class="zoom-control-btn" onclick="quickZoom(16)" title="Street Level">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+        </svg>
+      </button>
+      <button class="zoom-control-btn" onclick="quickZoom(18)" title="Close Up">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+        </svg>
+      </button>
     </div>
 
     <button class="share-location-fab" id="shareBtn" onclick="toggleLocationSharing()">
@@ -8506,9 +8538,12 @@
                   <div class="setting-item">
                     <label>Default Map Zoom Level</label>
                     <select id="defaultZoom">
-                      <option value="15" ${currentUser?.settings?.defaultZoom === 15 ? 'selected' : ''}>Close (15)</option>
-                      <option value="16" ${currentUser?.settings?.defaultZoom === 16 ? 'selected' : ''}>Medium (16)</option>
-                      <option value="17" ${currentUser?.settings?.defaultZoom === 17 ? 'selected' : ''}>Far (17)</option>
+                      <option value="14" ${currentUser?.settings?.defaultZoom === 14 ? 'selected' : ''}>Wide View (14)</option>
+                      <option value="15" ${currentUser?.settings?.defaultZoom === 15 ? 'selected' : ''}>Neighborhood (15)</option>
+                      <option value="16" ${currentUser?.settings?.defaultZoom === 16 ? 'selected' : ''}>Street Level (16)</option>
+                      <option value="17" ${currentUser?.settings?.defaultZoom === 17 ? 'selected' : ''}>Close Up (17)</option>
+                      <option value="18" ${currentUser?.settings?.defaultZoom === 18 ? 'selected' : ''}>Very Close (18)</option>
+                      <option value="19" ${currentUser?.settings?.defaultZoom === 19 ? 'selected' : ''}>Maximum Zoom (19)</option>
                     </select>
                   </div>
                   <div class="setting-item">
@@ -8557,7 +8592,7 @@
         locationSharing: document.getElementById('locationSharing')?.checked || false,
         emergencyAlerts: document.getElementById('emergencyAlerts')?.checked || false,
         notifications: document.getElementById('notifications')?.checked || false,
-        defaultZoom: parseInt(document.getElementById('defaultZoom')?.value) || 16,
+        defaultZoom: parseInt(document.getElementById('defaultZoom')?.value) || 17,
         autoCenter: document.getElementById('autoCenter')?.checked || false
       };
 
@@ -10929,7 +10964,7 @@
       const isMobile = window.innerWidth <= 768;
 
       map = L.map('map', {
-        zoomControl: false,
+        zoomControl: true,
         preferCanvas: true,
         renderer: L.canvas(),
         fadeAnimation: false,
@@ -10943,7 +10978,7 @@
         scrollWheelZoom: !isMobile,
         tap: !isMobile,
         touchZoom: true
-      }).setView([51.5074, -0.1278], 11);
+      }).setView([51.5074, -0.1278], 15);
 
       // Mobile-optimized tile settings for fast loading
       const tileOptions = {
@@ -11838,6 +11873,28 @@
       } else {
         // If no location yet, try to get it
         requestLocationPermission();
+      }
+    }
+
+    function quickZoom(zoomLevel) {
+      console.log('quickZoom called with level:', zoomLevel);
+      if (map) {
+        const currentCenter = map.getCenter();
+        map.flyTo([currentCenter.lat, currentCenter.lng], zoomLevel, {
+          duration: 1.0,
+          easeLinearity: 0.25
+        });
+
+        const zoomLabels = {
+          14: 'Wide View',
+          15: 'Neighborhood',
+          16: 'Street Level',
+          17: 'Close Up',
+          18: 'Very Close',
+          19: 'Maximum Zoom'
+        };
+
+        showNotification(`Zoomed to ${zoomLabels[zoomLevel] || `Level ${zoomLevel}`}`);
       }
     }
 
