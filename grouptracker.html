@@ -2743,6 +2743,19 @@
       box-shadow: 0 4px 16px rgba(156, 39, 176, 0.4);
     }
 
+    .artist-bands-btn {
+      background: #e91e63;
+    }
+
+    .artist-bands-btn:hover {
+      background: #c2185b;
+    }
+
+    .artist-bands-btn.active {
+      background: #c2185b;
+      box-shadow: 0 4px 16px rgba(233, 30, 99, 0.4);
+    }
+
 
 
     .parade-route-btn {
@@ -6324,6 +6337,12 @@
         </svg>
       </button>
 
+      <button class="control-btn artist-bands-btn" onclick="toggleArtistBands()" title="Artists & Bands">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+        </svg>
+      </button>
+
 
 
       <button class="control-btn parade-route-btn" onclick="toggleParadeRoute()" title="Toggle Main Parade Route">
@@ -8646,6 +8665,9 @@
         loadStallsData();
       }
 
+      // Load artists data
+      loadArtistsData();
+
       const floatContent = document.getElementById('float-content');
       if (floatContent && floatContent.classList.contains('active')) {
         loadFloatData();
@@ -8680,7 +8702,8 @@
       'float-trucks': [],
       'float-routes': [],
       'groups': [],
-      'friends': []
+      'friends': [],
+      'artists': []
     };
 
     // User-facing data (what users see)
@@ -8689,7 +8712,8 @@
       'float-trucks': [],
       'float-routes': [],
       'groups': [],
-      'friends': []
+      'friends': [],
+      'artists': []
     };
 
     // Track pending changes
@@ -8698,7 +8722,8 @@
       'float-trucks': false,
       'float-routes': false,
       'groups': false,
-      'friends': false
+      'friends': false,
+      'artists': false
     };
 
     // Make adminData globally accessible for map markers
@@ -8825,6 +8850,32 @@
         } catch (error) {
           console.warn('Friends collection not found:', error);
           adminData['friends'] = [];
+        }
+
+        // Load artists
+        try {
+          console.log('Loading artists from Firebase...');
+          const artistsSnapshot = await db.collection('artists')
+            .orderBy('created_at', 'desc')
+            .limit(100) // Increased limit for debugging
+            .get();
+
+          console.log(`Found ${artistsSnapshot.docs.length} total artists in Firebase`);
+
+          adminData['artists'] = artistsSnapshot.docs.map(doc => {
+            const data = doc.data();
+            console.log(`Artist ${doc.id}:`, { name: data.name, status: data.status });
+            return {
+              id: doc.id,
+              ...data
+            };
+          });
+
+          logFirebaseUsage('reads', artistsSnapshot.docs.length);
+          console.log(`Loaded ${adminData['artists'].length} artists (all statuses)`);
+        } catch (error) {
+          console.warn('Artists collection not found:', error);
+          adminData['artists'] = [];
         }
 
 
@@ -9308,6 +9359,7 @@
       'float-routes': { title: 'Float Routes', icon: '🗺️' },
       'groups': { title: 'Groups', icon: '👥' },
       'friends': { title: 'Friends', icon: '👤' },
+      'artists': { title: 'Artists', icon: '🎵' },
 
     };
 
@@ -9318,7 +9370,7 @@
         'float-trucks': adminData['float-trucks'].length,
         'groups': adminData['groups'].length,
         'friends': adminData['friends'].length,
-
+        'artists': adminData['artists'].length,
       };
 
       // Update each tab count
@@ -11024,8 +11076,10 @@
         if (tabName === 'find-stalls') {
           loadAdminData().then(() => {
             loadStallsData();
+            loadArtistsData();
           }).catch(error => {
             loadStallsData();
+            loadArtistsData();
           });
         }
       }
@@ -12065,6 +12119,7 @@
         console.log('Admin data available:', window.adminData);
         console.log('User data available:', window.userData);
         loadStallsData();
+        loadArtistsData();
 
         // Display the main parade route from admin data
         const mainRoute = window.adminData?.['float-routes']?.find(route =>
@@ -12287,6 +12342,42 @@
       }
     }
 
+    function toggleArtistBands() {
+      console.log('=== toggleArtistBands called ===');
+
+      const artistBandsBtn = document.querySelector('.artist-bands-btn');
+
+      // Toggle artist bands visibility on map
+      const artistBandsVisible = artistBandsBtn.classList.toggle('active');
+      console.log('Artist bands visible:', artistBandsVisible);
+
+      const searchInput = document.getElementById('searchInput');
+
+      if (artistBandsVisible) {
+        console.log('Activating artist bands on map');
+
+        // Add artist band markers to map
+        addArtistBandMarkers();
+
+        // Update search placeholder
+        searchInput.placeholder = 'Find artist or band...';
+        searchInput.value = '';
+
+        showNotification('Artists & bands displayed on map');
+      } else {
+        console.log('Deactivating artist bands from map');
+
+        // Remove artist band markers from map
+        removeArtistBandMarkers();
+
+        // Reset search placeholder to default
+        searchInput.placeholder = 'Find group member by phone...';
+        searchInput.value = '';
+
+        showNotification('Artists & bands hidden from map');
+      }
+    }
+
 
 
 
@@ -12379,6 +12470,51 @@
       // Remove all truck float markers
       map.eachLayer(layer => {
         if (layer.truckFloatData) {
+          map.removeLayer(layer);
+        }
+      });
+    }
+
+    function addArtistBandMarkers() {
+      // Only display artist bands from actual data, no demo data
+      if (window.artistsData && window.artistsData.length > 0) {
+        console.log('Adding artist band markers from actual data:', window.artistsData.length);
+
+        window.artistsData.forEach(artist => {
+          try {
+            // Only add markers for artists with valid location data
+            if (artist.location && artist.location.lat && artist.location.lng) {
+              // Validate coordinates before creating marker
+              if (isNaN(artist.location.lat) || isNaN(artist.location.lng)) {
+                console.error('Invalid coordinates for artist:', artist.name, artist.location);
+                return;
+              }
+
+              const marker = L.marker([artist.location.lat, artist.location.lng], {
+                icon: L.divIcon({
+                  className: 'artist-band-marker',
+                  html: '🎵',
+                  iconSize: [30, 30],
+                  iconAnchor: [15, 15]
+                })
+              }).addTo(map);
+
+              marker.bindPopup(`<b>${artist.name}</b><br>${artist.genre || 'Artist/Band'}<br>${artist.stage || 'Stage TBA'}`);
+              marker.artistBandData = artist;
+            }
+          } catch (error) {
+            console.error('Error creating artist band marker:', error);
+          }
+        });
+      } else {
+        console.log('No artist band data available to display');
+      }
+    }
+
+    function removeArtistBandMarkers() {
+      // Remove all artist band markers
+      map.eachLayer(layer => {
+        if (layer.artistBandData) {
           map.removeLayer(layer);
         }
       });
@@ -13187,19 +13323,21 @@
     let findStallsActive = false;
     let stallsData = [];
     let filteredStalls = [];
+    let artistsData = [];
+    let filteredArtists = [];
 
     // Reset all button states
     function resetAllButtonStates() {
       document.querySelector('.find-stalls-btn').classList.remove('active');
       document.querySelector('.truck-floats-btn').classList.remove('active');
       document.querySelector('.food-stalls-btn').classList.remove('active');
-      document.querySelector('.artists-btn').classList.remove('active');
+      document.querySelector('.artist-bands-btn').classList.remove('active');
       findStallsActive = false;
 
       // Also remove map markers when resetting
       removeFoodStallMarkers();
       removeTruckFloatMarkers();
-      removeArtistMarkers();
+      removeArtistBandMarkers();
 
       // Reset search placeholder
       const searchInput = document.getElementById('searchInput');
@@ -14770,6 +14908,115 @@
       console.log('=== loadStallsData completed ===');
     }
 
+    function loadArtistsData() {
+      console.log('=== loadArtistsData called ===');
+
+      // Load artists data from user data
+      artistsData = [];
+      // Use admin data for testing if user is admin, otherwise use user data
+      const dataSource = (window.firebaseAuth?.currentUser && isUserAdmin(window.firebaseAuth.currentUser)) ? window.adminData : window.userData;
+
+      console.log('Data source being used:', dataSource === window.adminData ? 'adminData' : 'userData');
+      console.log('Artists in data source:', dataSource?.artists);
+
+      if (dataSource && dataSource.artists && dataSource.artists.length > 0) {
+        artistsData = dataSource.artists.map(artist => ({
+          id: artist.id,
+          name: artist.name || artist.artist_name,
+          genre: artist.genre || 'Various',
+          type: artist.type || 'Artist/Band',
+          description: artist.description || 'Performing at the carnival',
+          image: artist.image || '🎵',
+          status: artist.status || 'confirmed',
+          stage: artist.stage_name || artist.stage || 'Stage TBA',
+          performance_time: artist.performance_time || 'TBA',
+          location: artist.coordinates ? (() => {
+            try {
+              // Handle different coordinate formats
+              if (typeof artist.coordinates === 'string') {
+                const coords = artist.coordinates.split(',');
+                return {
+                  lat: parseFloat(coords[0]),
+                  lng: parseFloat(coords[1])
+                };
+              } else if (artist.coordinates.lat && artist.coordinates.lng) {
+                // Already in object format
+                return {
+                  lat: parseFloat(artist.coordinates.lat),
+                  lng: parseFloat(artist.coordinates.lng)
+                };
+              }
+            } catch (error) {
+              console.warn('Invalid coordinates format for artist:', artist.name, artist.coordinates);
+            }
+            return null;
+          })() : null,
+          contact: artist.contact_person || artist.phone || 'N/A',
+          social_media: artist.social_media || 'N/A',
+          setlist: artist.setlist ? artist.setlist.split(',').map(song => song.trim()) : ['Various songs']
+        }));
+      }
+
+      // If no data available, show demo data for testing
+      if (artistsData.length === 0) {
+        console.log('No artists data found in Firebase - showing demo data for testing');
+        artistsData = [
+          {
+            id: 'demo-artist-1',
+            name: 'Steel Pulse',
+            genre: 'Reggae',
+            type: 'Band',
+            description: 'Legendary reggae band performing classic hits',
+            image: '🎵',
+            status: 'confirmed',
+            stage: 'Main Stage',
+            performance_time: '18:00 - 19:30',
+            location: { lat: 51.5074, lng: -0.1278 }, // London coordinates
+            contact: 'N/A',
+            social_media: '@steelpulse',
+            setlist: ['Handsworth Revolution', 'Roller Skates', 'Ku Klux Klan']
+          },
+          {
+            id: 'demo-artist-2',
+            name: 'Sister Nancy',
+            genre: 'Dancehall',
+            type: 'Solo Artist',
+            description: 'Iconic dancehall artist with classic hits',
+            image: '🎤',
+            status: 'confirmed',
+            stage: 'Sound System Stage',
+            performance_time: '20:00 - 21:00',
+            location: { lat: 51.5074, lng: -0.1278 }, // London coordinates
+            contact: 'N/A',
+            social_media: '@sisternancy',
+            setlist: ['Bam Bam', 'Transport Connection', 'One Two']
+          },
+          {
+            id: 'demo-artist-3',
+            name: 'Aswad',
+            genre: 'Reggae',
+            type: 'Band',
+            description: 'British reggae band with soulful harmonies',
+            image: '🥁',
+            status: 'confirmed',
+            stage: 'Reggae Stage',
+            performance_time: '16:30 - 18:00',
+            location: { lat: 51.5074, lng: -0.1278 }, // London coordinates
+            contact: 'N/A',
+            social_media: '@aswad',
+            setlist: ['Don\'t Turn Around', 'Shine', 'Warrior Charge']
+          }
+        ];
+      }
+
+      // Initialize filtered artists
+      filteredArtists = artistsData;
+
+      console.log('Artists data loaded:', artistsData);
+      console.log('Filtered artists:', filteredArtists);
+      console.log('=== loadArtistsData completed ===');
+    }
+
     // COST MONITORING: Track Firebase usage for cost optimization
     let firebaseUsage = {
       reads: 0,
@@ -14959,6 +15206,7 @@
         console.log(`📊 Found in Admin Portal:`);
         console.log(`   Food Stalls: ${adminData['food-stalls'].length}`);
         console.log(`   Float Trucks: ${adminData['float-trucks'].length}`);
+        console.log(`   Artists: ${adminData['artists'].length}`);
 
         // Check for orphaned food stalls
         const adminFoodStallIds = new Set(adminData['food-stalls'].map(item => item.id));
@@ -15407,9 +15655,15 @@
 
     function refreshStallsData() {
       loadStallsData();
+      loadArtistsData();
       // Reset filters
       document.getElementById('countryFilter').value = 'all';
       document.getElementById('foodTypeFilter').value = 'all';
+    }
+
+    function refreshArtistsData() {
+      loadArtistsData();
+      showNotification('Artists data refreshed');
     }
 
     // Close modal when clicking outside
@@ -15424,6 +15678,7 @@
     document.addEventListener('DOMContentLoaded', function () {
       console.log('Page loaded, initializing stalls data...');
       loadStallsData();
+      loadArtistsData();
     });
 
     function isValidEmail(email) {
