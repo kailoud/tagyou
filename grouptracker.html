@@ -1198,8 +1198,120 @@
       font-size: 12px;
       font-weight: 600;
       color: #374151;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .admin-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f3f4f6;
+      vertical-align: top;
+    }
+
+    .admin-table tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .item-name {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .item-description {
+      color: #6b7280;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+    }
+
+    .status-active {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-inactive {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .action-btn.edit {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .action-btn.edit:hover {
+      background: #bfdbfe;
+    }
+
+    .action-btn.delete {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .action-btn.delete:hover {
+      background: #fecaca;
+    }
+
+    /* Admin Tab Content */
+    .admin-tab-content {
+      display: none;
+    }
+
+    .admin-tab-content.active {
+      display: block;
+    }
+
+    /* Coordinate Picker Button */
+    .coordinate-picker-btn {
+      background: #8b5cf6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
+
+    .coordinate-picker-btn:hover {
+      background: #7c3aed;
+    }
+
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     }
 
     .admin-table td {
@@ -2087,250 +2199,249 @@
       .admin-table th,
       .admin-table td {
         padding: 12px 8px;
-        font-size: 13px;
-        border-bottom: 1px solid #e5e7eb;
       }
+    }
 
-      .admin-table th {
-        background: #f8fafc;
-        font-weight: 600;
-        color: #1f2937;
-        position: sticky;
-        top: 0;
-        z-index: 10;
-      }
+    .admin-table th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: #1f2937;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
 
-      .admin-table td {
-        background: white;
-      }
+    .admin-table td {
+      background: white;
+    }
 
-      .admin-table tr:nth-child(even) td {
-        background: #f9fafb;
-      }
+    .admin-table tr:nth-child(even) td {
+      background: #f9fafb;
+    }
 
-      .admin-table tr:hover td {
-        background: #eff6ff;
-      }
+    .admin-table tr:hover td {
+      background: #eff6ff;
+    }
 
-      /* Mobile horizontal table layout */
-      .admin-table tbody tr {
-        display: table-row;
-        margin-bottom: 0;
-        border: none;
-        border-radius: 0;
-        background: transparent;
-        box-shadow: none;
-      }
+    /* Mobile horizontal table layout */
+    .admin-table tbody tr {
+      display: table-row;
+      margin-bottom: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
 
-      .admin-table tbody td {
-        display: table-cell;
-        padding: 8px 6px;
-        border-bottom: 1px solid #e5e7eb;
-        position: relative;
-        font-size: 12px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 80px;
-      }
+    .admin-table tbody td {
+      display: table-cell;
+      padding: 8px 6px;
+      border-bottom: 1px solid #e5e7eb;
+      position: relative;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 80px;
+    }
 
-      .admin-table tbody td:last-child {
-        border-bottom: 1px solid #e5e7eb;
-      }
+    .admin-table tbody td:last-child {
+      border-bottom: 1px solid #e5e7eb;
+    }
 
-      .admin-table tbody td::before {
-        display: none;
-      }
+    .admin-table tbody td::before {
+      display: none;
+    }
 
-      /* Show table header on mobile */
-      .admin-table thead {
-        display: table-header-group;
-      }
+    /* Show table header on mobile */
+    .admin-table thead {
+      display: table-header-group;
+    }
 
-      /* Enhanced item display on mobile */
-      .item-name {
-        font-size: 16px;
-        font-weight: 700;
-        color: #111827;
-        margin-bottom: 8px;
-      }
+    /* Enhanced item display on mobile */
+    .item-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 8px;
+    }
 
-      .item-category,
-      .item-username {
-        font-size: 13px;
-        color: #6b7280;
-        margin-bottom: 4px;
-        padding: 2px 8px;
-        background: #f3f4f6;
-        border-radius: 12px;
-        display: inline-block;
-      }
+    .item-category,
+    .item-username {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 4px;
+      padding: 2px 8px;
+      background: #f3f4f6;
+      border-radius: 12px;
+      display: inline-block;
+    }
 
-      .item-details {
-        font-size: 14px;
-        color: #374151;
-        line-height: 1.5;
-      }
+    .item-details {
+      font-size: 14px;
+      color: #374151;
+      line-height: 1.5;
+    }
 
-      .item-details>div {
-        margin-bottom: 6px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
+    .item-details>div {
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-      .item-details>div:last-child {
-        margin-bottom: 0;
-      }
+    .item-details>div:last-child {
+      margin-bottom: 0;
+    }
 
-      .tracking-badge {
-        font-size: 11px;
-        padding: 3px 8px;
-        border-radius: 12px;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-      }
+    .tracking-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
 
-      .status-badge {
-        font-size: 11px;
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-      }
+    .status-badge {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
 
-      .action-buttons {
-        display: flex;
-        gap: 8px;
-        justify-content: flex-end;
-        margin-top: 8px;
-      }
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
 
-      .edit-btn,
-      .delete-btn {
-        padding: 8px 12px;
-        font-size: 14px;
-        border-radius: 6px;
-        border: 1px solid #e5e7eb;
-        background: white;
-        transition: all 0.3s ease;
-      }
+    .edit-btn,
+    .delete-btn {
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+      background: white;
+      transition: all 0.3s ease;
+    }
 
-      .edit-btn:hover {
-        background: #eff6ff;
-        border-color: #3b82f6;
-        color: #1d4ed8;
-      }
+    .edit-btn:hover {
+      background: #eff6ff;
+      border-color: #3b82f6;
+      color: #1d4ed8;
+    }
 
-      .delete-btn:hover {
-        background: #fef2f2;
-        border-color: #ef4444;
-        color: #dc2626;
-      }
+    .delete-btn:hover {
+      background: #fef2f2;
+      border-color: #ef4444;
+      color: #dc2626;
+    }
 
-      /* Enhanced mobile header and controls */
-      .modal-header {
-        padding: 16px 20px;
-        border-bottom: 1px solid #e5e7eb;
-        background: #f8fafc;
-      }
+    /* Enhanced mobile header and controls */
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f8fafc;
+    }
 
-      .modal-header h2 {
-        font-size: 20px;
-        font-weight: 700;
-        color: #111827;
-        margin: 0;
-      }
+    .modal-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #111827;
+      margin: 0;
+    }
 
-      .admin-subtitle {
-        font-size: 14px;
-        color: #6b7280;
-        margin: 16px 0;
-        line-height: 1.5;
-      }
+    .admin-subtitle {
+      font-size: 14px;
+      color: #6b7280;
+      margin: 16px 0;
+      line-height: 1.5;
+    }
 
-      .admin-tabs {
-        background: white;
-        border-radius: 8px;
-        padding: 4px;
-        margin: 16px 0;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      }
+    .admin-tabs {
+      background: white;
+      border-radius: 8px;
+      padding: 4px;
+      margin: 16px 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
 
-      .admin-tab {
-        border-radius: 6px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-      }
+    .admin-tab {
+      border-radius: 6px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
 
-      .admin-tab.active {
-        box-shadow: 0 2px 4px rgba(30, 64, 175, 0.2);
-      }
+    .admin-tab.active {
+      box-shadow: 0 2px 4px rgba(30, 64, 175, 0.2);
+    }
 
-      .admin-controls {
-        background: white;
-        padding: 16px;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        margin: 16px 0;
-      }
+    .admin-controls {
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin: 16px 0;
+    }
 
-      .admin-search {
-        border: 2px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 12px 16px;
-        font-size: 16px;
-        transition: border-color 0.3s ease;
-      }
+    .admin-search {
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
 
-      .admin-search:focus {
-        border-color: #3b82f6;
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-      }
+    .admin-search:focus {
+      border-color: #3b82f6;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
 
-      .add-btn {
-        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        border-radius: 8px;
-        padding: 12px 20px;
-        font-weight: 600;
-        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
-        transition: all 0.3s ease;
-      }
+    .add-btn {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+      transition: all 0.3s ease;
+    }
 
-      .add-btn:hover {
-        background: linear-gradient(135deg, #2563eb, #1e40af);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
-      }
+    .add-btn:hover {
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+    }
 
-      /* Mobile-specific enhancements */
-      .admin-portal-content.expanded .modal-body {
-        padding: 0;
-      }
+    /* Mobile-specific enhancements */
+    .admin-portal-content.expanded .modal-body {
+      padding: 0;
+    }
 
-      .admin-portal-content.expanded .admin-table-container {
-        border-radius: 0;
-        border: none;
-        box-shadow: none;
-      }
+    .admin-portal-content.expanded .admin-table-container {
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+    }
 
-      .admin-portal-content.expanded .admin-table tbody tr {
-        margin: 0;
-        border-radius: 0;
-        border-left: none;
-        border-right: none;
-        border-top: none;
-        box-shadow: none;
-        border-bottom: 1px solid #e5e7eb;
-      }
+    .admin-portal-content.expanded .admin-table tbody tr {
+      margin: 0;
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+      box-shadow: none;
+      border-bottom: 1px solid #e5e7eb;
+    }
 
-      .admin-portal-content.expanded .admin-table tbody tr:last-child {
-        border-bottom: none;
-      }
+    .admin-portal-content.expanded .admin-table tbody tr:last-child {
+      border-bottom: none;
+    }
     }
 
     @media (max-width: 480px) {
@@ -6580,6 +6691,16 @@
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>
             Go Pro - £9.99/3mo
+          </div>
+
+          <!-- Admin Portal Menu Item (only visible to admins) -->
+          <div class="user-menu-item admin-portal" id="adminPortalMenuItem" onclick="showAdminPortal()"
+            style="display: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
+            </svg>
+            Admin Portal
           </div>
 
           <div class="user-menu-item danger" onclick="handleLogoutClick(event)">
@@ -15311,7 +15432,552 @@
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
     }
+
+    // Admin Portal Functions
+    function showAdminPortal() {
+      const adminModal = document.getElementById('adminPortalModal');
+      if (adminModal) {
+        adminModal.classList.add('show');
+        loadAdminData();
+      }
+    }
+
+    function closeAdminPortal() {
+      const adminModal = document.getElementById('adminPortalModal');
+      if (adminModal) {
+        adminModal.classList.remove('show');
+      }
+    }
+
+    function switchAdminTab(tabName) {
+      // Update tab buttons
+      document.querySelectorAll('.admin-tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+      // Update content
+      document.querySelectorAll('.admin-tab-content').forEach(content => {
+        content.style.display = 'none';
+      });
+      document.getElementById(`${tabName}Content`).style.display = 'block';
+
+      // Load data for the selected tab
+      loadAdminTabData(tabName);
+    }
+
+    async function loadAdminData() {
+      try {
+        // Load data for all tabs
+        await Promise.all([
+          loadAdminTabData('food-stalls'),
+          loadAdminTabData('float-trucks'),
+          loadAdminTabData('artists')
+        ]);
+      } catch (error) {
+        console.error('Error loading admin data:', error);
+        showNotification('Error loading admin data', 'error');
+      }
+    }
+
+    async function loadAdminTabData(tabName) {
+      try {
+        const collectionName = getCollectionName(tabName);
+        const snapshot = await window.firebaseDB.collection(collectionName).get();
+        const data = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        // Update the table
+        updateAdminTable(tabName, data);
+      } catch (error) {
+        console.error(`Error loading ${tabName} data:`, error);
+        showNotification(`Error loading ${tabName} data`, 'error');
+      }
+    }
+
+    function getCollectionName(tabName) {
+      const collections = {
+        'food-stalls': 'food_stalls',
+        'float-trucks': 'float_trucks',
+        'artists': 'artists'
+      };
+      return collections[tabName] || tabName;
+    }
+
+    function updateAdminTable(tabName, data) {
+      const tableBody = document.getElementById(`${tabName}TableBody`);
+      if (!tableBody) return;
+
+      if (data.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="no-data">
+              <div style="text-align: center; padding: 40px;">
+                <div style="font-size: 48px; margin-bottom: 16px;">📭</div>
+                <h3>No ${tabName.replace('-', ' ')} found</h3>
+                <p>Add your first ${tabName.replace('-', ' ')} to get started</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      const rows = data.map(item => {
+        const statusClass = item.status === 'active' ? 'status-active' : 'status-inactive';
+        const statusText = item.status === 'active' ? 'Active' : 'Inactive';
+
+        return `
+          <tr>
+            <td>
+              <div class="item-info">
+                <div class="item-name">${item.name || 'Unnamed'}</div>
+                <div class="item-description">${item.description || item.category || 'No description'}</div>
+              </div>
+            </td>
+            <td>${item.category || 'N/A'}</td>
+            <td>${item.location || item.current_location || 'N/A'}</td>
+            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+            <td>${formatDate(item.created_at || item.updated_at)}</td>
+            <td>
+              <div class="action-buttons">
+                <button onclick="editAdminItem('${tabName}', '${item.id}')" class="action-btn edit" title="Edit">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                  </svg>
+                </button>
+                <button onclick="deleteAdminItem('${tabName}', '${item.id}')" class="action-btn delete" title="Delete">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      tableBody.innerHTML = rows;
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      const date = new Date(dateString);
+      return date.toLocaleDateString();
+    }
+
+    function addAdminItem(tabName) {
+      showAdminForm(tabName);
+    }
+
+    function editAdminItem(tabName, itemId) {
+      showAdminForm(tabName, itemId);
+    }
+
+    async function deleteAdminItem(tabName, itemId) {
+      if (!confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+        return;
+      }
+
+      try {
+        const collectionName = getCollectionName(tabName);
+        await window.firebaseDB.collection(collectionName).doc(itemId).delete();
+
+        showNotification(`${tabName.replace('-', ' ')} deleted successfully`, 'success');
+        loadAdminTabData(tabName);
+      } catch (error) {
+        console.error('Error deleting item:', error);
+        showNotification('Error deleting item', 'error');
+      }
+    }
+
+    function showAdminForm(tabName, itemId = null) {
+      const formModal = document.getElementById('adminFormModal');
+      const formTitle = document.getElementById('adminFormTitle');
+      const form = document.getElementById('adminForm');
+
+      // Set title
+      formTitle.textContent = itemId ? `Edit ${tabName.replace('-', ' ')}` : `Add New ${tabName.replace('-', ' ')}`;
+
+      // Reset form
+      form.reset();
+      form.setAttribute('data-tab', tabName);
+      form.setAttribute('data-item-id', itemId || '');
+
+      // Show form fields based on tab
+      showFormFields(tabName);
+
+      // Load existing data if editing
+      if (itemId) {
+        loadItemData(tabName, itemId);
+      }
+
+      formModal.classList.add('show');
+    }
+
+    function showFormFields(tabName) {
+      // Hide all field groups
+      document.querySelectorAll('.field-group').forEach(group => {
+        group.style.display = 'none';
+      });
+
+      // Show relevant fields based on tab
+      const fieldsToShow = getFieldsForTab(tabName);
+      fieldsToShow.forEach(fieldName => {
+        const field = document.querySelector(`[data-field="${fieldName}"]`);
+        if (field) {
+          field.style.display = 'block';
+        }
+      });
+    }
+
+    function getFieldsForTab(tabName) {
+      const fieldMappings = {
+        'food-stalls': ['name', 'description', 'category', 'location', 'coordinates', 'contact', 'phone', 'email', 'hours', 'rating', 'status', 'image'],
+        'float-trucks': ['name', 'description', 'category', 'location', 'coordinates', 'contact', 'phone', 'email', 'schedule', 'tracking', 'driver', 'rating', 'status', 'image'],
+        'artists': ['name', 'description', 'genre', 'stage', 'schedule', 'contact', 'phone', 'email', 'social', 'rating', 'status', 'image']
+      };
+      return fieldMappings[tabName] || [];
+    }
+
+    async function loadItemData(tabName, itemId) {
+      try {
+        const collectionName = getCollectionName(tabName);
+        const doc = await window.firebaseDB.collection(collectionName).doc(itemId).get();
+
+        if (doc.exists) {
+          const data = doc.data();
+          populateForm(data);
+        }
+      } catch (error) {
+        console.error('Error loading item data:', error);
+        showNotification('Error loading item data', 'error');
+      }
+    }
+
+    function populateForm(data) {
+      Object.keys(data).forEach(key => {
+        const input = document.querySelector(`[name="${key}"]`);
+        if (input) {
+          input.value = data[key];
+        }
+      });
+    }
+
+    async function saveAdminItem(event) {
+      event.preventDefault();
+
+      const form = event.target;
+      const tabName = form.getAttribute('data-tab');
+      const itemId = form.getAttribute('data-item-id');
+      const collectionName = getCollectionName(tabName);
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      // Add timestamps
+      if (itemId) {
+        data.updated_at = new Date().toISOString();
+      } else {
+        data.created_at = new Date().toISOString();
+        data.updated_at = new Date().toISOString();
+      }
+
+      try {
+        if (itemId) {
+          await window.firebaseDB.collection(collectionName).doc(itemId).update(data);
+          showNotification(`${tabName.replace('-', ' ')} updated successfully`, 'success');
+        } else {
+          await window.firebaseDB.collection(collectionName).add(data);
+          showNotification(`${tabName.replace('-', ' ')} added successfully`, 'success');
+        }
+
+        closeAdminForm();
+        loadAdminTabData(tabName);
+      } catch (error) {
+        console.error('Error saving item:', error);
+        showNotification('Error saving item', 'error');
+      }
+    }
+
+    function closeAdminForm() {
+      const formModal = document.getElementById('adminFormModal');
+      formModal.classList.remove('show');
+    }
+
+    // Update admin portal visibility based on user role
+    function updateAdminPortalVisibility() {
+      const adminMenuItem = document.getElementById('adminPortalMenuItem');
+      if (adminMenuItem) {
+        adminMenuItem.style.display = isProUser ? 'flex' : 'none';
+      }
+    }
+
+    // Helper function to get current admin tab
+    function getCurrentAdminTab() {
+      const activeTab = document.querySelector('.admin-tab.active');
+      return activeTab ? activeTab.getAttribute('data-tab') : 'food-stalls';
+    }
+
+    // Coordinate picker function
+    function pickCoordinates() {
+      // For now, this is a placeholder. In a real implementation,
+      // this would open a map picker or use geolocation
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const latInput = document.querySelector('input[name="coordinates_lat"]');
+          const lngInput = document.querySelector('input[name="coordinates_lng"]');
+          if (latInput && lngInput) {
+            latInput.value = position.coords.latitude.toFixed(6);
+            lngInput.value = position.coords.longitude.toFixed(6);
+            showNotification('Coordinates set to current location', 'success');
+          }
+        }, (error) => {
+          showNotification('Could not get current location. Please enter coordinates manually.', 'error');
+        });
+      } else {
+        showNotification('Geolocation not supported. Please enter coordinates manually.', 'error');
+      }
+    }
+
+    // Call this function after user authentication
+    updateAdminPortalVisibility();
   </script>
+
+  <!-- Admin Portal Modal -->
+  <div id="adminPortalModal" class="modal-overlay">
+    <div class="modal-content admin-portal-content">
+      <div class="modal-header">
+        <h2>🎛️ Admin Portal</h2>
+        <button onclick="closeAdminPortal()" class="close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="sticky-admin-header">
+          <p class="admin-subtitle">Manage food stalls, float trucks, and artists for the festival</p>
+
+          <div class="admin-tabs">
+            <button class="admin-tab active" data-tab="food-stalls" onclick="switchAdminTab('food-stalls')">
+              🍔 Food Stalls
+              <span class="tab-count" id="foodStallsCount">0</span>
+            </button>
+            <button class="admin-tab" data-tab="float-trucks" onclick="switchAdminTab('float-trucks')">
+              🚚 Float Trucks
+              <span class="tab-count" id="floatTrucksCount">0</span>
+            </button>
+            <button class="admin-tab" data-tab="artists" onclick="switchAdminTab('artists')">
+              🎵 Artists & Bands
+              <span class="tab-count" id="artistsCount">0</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="sticky-admin-controls">
+          <div class="admin-controls">
+            <input type="text" class="admin-search" placeholder="Search..." id="adminSearch">
+            <button class="add-btn" onclick="addAdminItem(getCurrentAdminTab())">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+              </svg>
+              Add New
+            </button>
+          </div>
+        </div>
+
+        <div class="admin-table-container">
+          <!-- Food Stalls Tab -->
+          <div id="food-stallsContent" class="admin-tab-content" style="display: block;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Name & Description</th>
+                  <th>Category</th>
+                  <th>Location</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="food-stallsTableBody">
+                <!-- Data will be loaded here -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Float Trucks Tab -->
+          <div id="float-trucksContent" class="admin-tab-content" style="display: none;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Name & Description</th>
+                  <th>Category</th>
+                  <th>Location</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="float-trucksTableBody">
+                <!-- Data will be loaded here -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Artists Tab -->
+          <div id="artistsContent" class="admin-tab-content" style="display: none;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Name & Description</th>
+                  <th>Genre</th>
+                  <th>Stage</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="artistsTableBody">
+                <!-- Data will be loaded here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Form Modal -->
+  <div id="adminFormModal" class="modal-overlay">
+    <div class="modal-content admin-form-content">
+      <div class="modal-header">
+        <h2 id="adminFormTitle">Add New Item</h2>
+        <button onclick="closeAdminForm()" class="close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="adminForm" onsubmit="saveAdminItem(event)" class="admin-form">
+          <div class="form-grid">
+            <!-- Common Fields -->
+            <div class="form-field" data-field="name">
+              <label class="form-label">Name <span class="required">*</span></label>
+              <input type="text" name="name" class="form-input" required>
+            </div>
+
+            <div class="form-field full-width" data-field="description">
+              <label class="form-label">Description</label>
+              <textarea name="description" class="form-input" rows="3"></textarea>
+            </div>
+
+            <div class="form-field" data-field="category">
+              <label class="form-label">Category</label>
+              <input type="text" name="category" class="form-input">
+            </div>
+
+            <div class="form-field" data-field="location">
+              <label class="form-label">Location</label>
+              <input type="text" name="location" class="form-input">
+            </div>
+
+            <div class="form-field" data-field="coordinates">
+              <label class="form-label">Coordinates</label>
+              <div class="coordinates-input-group">
+                <input type="number" name="coordinates_lat" class="form-input" placeholder="Latitude" step="any">
+                <input type="number" name="coordinates_lng" class="form-input" placeholder="Longitude" step="any">
+                <button type="button" class="coordinate-picker-btn" onclick="pickCoordinates()">📍</button>
+              </div>
+            </div>
+
+            <div class="form-field" data-field="contact">
+              <label class="form-label">Contact Person</label>
+              <input type="text" name="contact" class="form-input">
+            </div>
+
+            <div class="form-field" data-field="phone">
+              <label class="form-label">Phone</label>
+              <input type="tel" name="phone" class="form-input">
+            </div>
+
+            <div class="form-field" data-field="email">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-input">
+            </div>
+
+            <div class="form-field" data-field="hours">
+              <label class="form-label">Operating Hours</label>
+              <input type="text" name="hours" class="form-input" placeholder="e.g., 9 AM - 6 PM">
+            </div>
+
+            <div class="form-field" data-field="schedule">
+              <label class="form-label">Schedule</label>
+              <input type="text" name="schedule" class="form-input" placeholder="e.g., Daily 10 AM - 8 PM">
+            </div>
+
+            <div class="form-field" data-field="tracking">
+              <label class="form-label">Tracking Method</label>
+              <select name="tracking_method" class="form-input">
+                <option value="gps">GPS Tracker</option>
+                <option value="manual">Manual Update</option>
+                <option value="app">Mobile App</option>
+              </select>
+            </div>
+
+            <div class="form-field" data-field="driver">
+              <label class="form-label">Driver Phone</label>
+              <input type="tel" name="driver_phone" class="form-input">
+            </div>
+
+            <div class="form-field" data-field="genre">
+              <label class="form-label">Genre</label>
+              <input type="text" name="genre" class="form-input" placeholder="e.g., Rock, Pop, Electronic">
+            </div>
+
+            <div class="form-field" data-field="stage">
+              <label class="form-label">Stage</label>
+              <input type="text" name="stage" class="form-input" placeholder="e.g., Main Stage, Acoustic Tent">
+            </div>
+
+            <div class="form-field" data-field="social">
+              <label class="form-label">Social Media</label>
+              <input type="text" name="social_media" class="form-input" placeholder="e.g., @artistname">
+            </div>
+
+            <div class="form-field" data-field="rating">
+              <label class="form-label">Rating</label>
+              <select name="rating" class="form-input">
+                <option value="">Select Rating</option>
+                <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                <option value="4">⭐⭐⭐⭐ (4)</option>
+                <option value="3">⭐⭐⭐ (3)</option>
+                <option value="2">⭐⭐ (2)</option>
+                <option value="1">⭐ (1)</option>
+              </select>
+            </div>
+
+            <div class="form-field" data-field="status">
+              <label class="form-label">Status</label>
+              <select name="status" class="form-input" required>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="pending">Pending</option>
+              </select>
+            </div>
+
+            <div class="form-field full-width" data-field="image">
+              <label class="form-label">Image URL</label>
+              <input type="url" name="image" class="form-input" placeholder="https://example.com/image.jpg">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" onclick="closeAdminForm()" class="btn-secondary">Cancel</button>
+            <button type="submit" class="btn-primary">Save Item</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>
