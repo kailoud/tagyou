@@ -15463,7 +15463,7 @@
       }
 
       // Initialize filtered stalls
-      filteredStalls = window.stallsData;
+      window.filteredStalls = window.stallsData;
 
       // Test Firebase connectivity first
       testFirebaseConnection().then(() => {
@@ -15474,7 +15474,7 @@
       // Remove all demo data - only show admin data
       console.log('Stalls data loaded, calling renderStalls...');
       console.log('Stalls data:', window.stallsData);
-      console.log('Filtered stalls:', filteredStalls);
+      console.log('Filtered stalls:', window.filteredStalls);
       renderStalls();
       console.log('=== loadStallsData completed ===');
     }
@@ -15960,9 +15960,9 @@
       }
 
       console.log('isProUser status:', isProUser);
-      console.log('Total stalls to render:', filteredStalls.length);
+      console.log('Total stalls to render:', window.filteredStalls.length);
 
-      stallsGrid.innerHTML = filteredStalls.map((stall, index) => {
+      stallsGrid.innerHTML = window.filteredStalls.map((stall, index) => {
         const clickHandler = `openStallModal(${stall.id})`;
 
         return `
@@ -16004,7 +16004,7 @@
       const countryFilter = document.getElementById('countryFilter').value;
       const foodTypeFilter = document.getElementById('foodTypeFilter').value;
 
-      filteredStalls = stallsData.filter(stall => {
+      window.filteredStalls = window.stallsData.filter(stall => {
         const countryMatch = countryFilter === 'all' || stall.origin.toLowerCase() === countryFilter.toLowerCase();
         const foodMatch = foodTypeFilter === 'all' ||
           stall.categories.some(cat => cat.toLowerCase().includes(foodTypeFilter.toLowerCase()));
