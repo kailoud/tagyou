@@ -6667,11 +6667,16 @@
           <label for="loginPassword">Password</label>
           <input type="password" id="loginPassword" name="password" value="demo123" required>
         </div>
-        <button type="submit" class="auth-btn" onclick="console.log('Sign In button clicked!'); alert('Button clicked!');">Sign In</button>
+        <button type="submit" class="auth-btn"
+          onclick="console.log('Sign In button clicked!'); alert('Button clicked!');">Sign In</button>
 
         <div class="auth-links">
           <a href="#" onclick="switchAuthTab('forgot')">Forgot Password?</a>
         </div>
+
+        <!-- Test button outside form -->
+        <button type="button" style="background: blue; color: white; padding: 10px; margin: 10px 0; cursor: pointer;"
+          onclick="alert('Test button works!')">Test Button</button>
       </form>
 
       <!-- Register Form -->
