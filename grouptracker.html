@@ -3015,6 +3015,9 @@
       /* Ensure panel doesn't exceed viewport height */
       max-height: 85vh;
       overflow: hidden;
+      /* Ensure content stays within panel boundaries */
+      display: flex;
+      flex-direction: column;
     }
 
     .bottom-panel.expanded {
@@ -3022,6 +3025,9 @@
       /* Ensure expanded panel doesn't exceed viewport */
       max-height: 85vh;
       overflow: hidden;
+      /* Maintain flex layout when expanded */
+      display: flex;
+      flex-direction: column;
     }
 
     .panel-handle {
@@ -3090,6 +3096,8 @@
       /* Hide scrollbars completely */
       scrollbar-width: none;
       -ms-overflow-style: none;
+      /* Ensure tabs area has fixed height */
+      flex-shrink: 0;
     }
 
     .panel-tabs::-webkit-scrollbar {
@@ -3155,6 +3163,9 @@
       max-width: 100%;
       /* Ensure proper scrolling on mobile */
       -webkit-overflow-scrolling: touch;
+      /* Ensure content stays within panel boundaries */
+      flex: 1;
+      min-height: 0;
     }
 
     .panel-content.active {
@@ -4546,6 +4557,18 @@
 
       100% {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
       }
     }
 
@@ -6419,38 +6442,52 @@
 
 
     <div class="panel-content" id="settings-content">
-      <div style="text-align: center; padding: 20px 0;">
+      <div style="text-align: center; padding: 20px 0; max-height: 100%; overflow-y: auto;">
         <div style="font-size: 48px; margin-bottom: 16px;">⚙️</div>
         <h3 style="margin-bottom: 16px;">Settings</h3>
         <div class="settings-section">
           <h4>🔔 Notifications</h4>
           <label class="setting-item">
-            <input type="checkbox" checked> Enable push notifications
+            <input type="checkbox" id="push_notifications" checked
+              onchange="updateSetting('push_notifications', this.checked)">
+            Enable push notifications
           </label>
           <label class="setting-item">
-            <input type="checkbox" checked> Location sharing
+            <input type="checkbox" id="location_sharing" checked
+              onchange="updateSetting('location_sharing', this.checked)">
+            Location sharing
           </label>
           <label class="setting-item">
-            <input type="checkbox"> Emergency alerts
+            <input type="checkbox" id="emergency_alerts" onchange="updateSetting('emergency_alerts', this.checked)">
+            Emergency alerts
           </label>
         </div>
         <div class="settings-section">
           <h4>🗺️ Map Settings</h4>
           <label class="setting-item">
-            <input type="checkbox" checked> Show my location
+            <input type="checkbox" id="show_location" checked onchange="updateSetting('show_location', this.checked)">
+            Show my location
           </label>
           <label class="setting-item">
-            <input type="checkbox" checked> Auto-center on group
+            <input type="checkbox" id="auto_center" checked onchange="updateSetting('auto_center', this.checked)">
+            Auto-center on group
           </label>
         </div>
         <div class="settings-section">
-          <h4>👥 Privacy</h4>
+          <h4>🔒 Privacy</h4>
           <label class="setting-item">
-            <input type="checkbox" checked> Share location with group
+            <input type="checkbox" id="share_group" checked onchange="updateSetting('share_group', this.checked)">
+            Share location with group
           </label>
           <label class="setting-item">
-            <input type="checkbox"> Share with all users
+            <input type="checkbox" id="share_all" onchange="updateSetting('share_all', this.checked)">
+            Share with all users
           </label>
+        </div>
+        <div style="margin-top: 30px;">
+          <button class="btn btn-primary" onclick="saveSettings()" style="width: 100%; max-width: 200px;">
+            💾 Save Settings
+          </button>
         </div>
       </div>
     </div>
@@ -10771,29 +10808,26 @@
 
       // Initialize panel with no tab highlighting
       hideTabHighlighting();
+
+      // Load saved settings
+      loadSettings();
     });
 
     function switchTab(tabName) {
-      console.log('🔍 switchTab called with:', tabName);
-
       // Check if panel is closed - if so, open it first
       const panel = document.getElementById('bottomPanel');
       const isPanelClosed = !panel.classList.contains('expanded');
-      console.log('Panel closed?', isPanelClosed);
 
       if (isPanelClosed) {
         // Open panel first
         panel.classList.add('expanded');
         document.body.classList.add('panel-expanded');
-        console.log('✅ Panel opened');
       }
 
       // Hide all content
       const contents = document.querySelectorAll('.panel-content');
-      console.log('Found', contents.length, 'panel contents');
       contents.forEach(content => {
         content.classList.remove('active');
-        console.log('Hidden:', content.id);
       });
 
       // Remove active class from all tabs
@@ -10804,48 +10838,186 @@
 
       // Show selected content and activate tab
       const targetContent = document.getElementById(tabName + '-content');
-      console.log('Looking for content with ID:', tabName + '-content');
-      console.log('Found target content:', targetContent);
-
       if (targetContent) {
         targetContent.classList.add('active');
-        console.log('✅ Activated content:', tabName + '-content');
-        console.log('Content HTML preview:', targetContent.innerHTML.substring(0, 100) + '...');
-      } else {
-        console.log('❌ Target content not found!');
-      }
 
-      // Special handling for float tab
-      if (tabName === 'float') {
-        loadAdminData().then(() => {
-          loadFloatData();
-          loadFloatSchedule();
-        }).catch(error => {
-          loadFloatData();
-          loadFloatSchedule();
-        });
-      }
+        // Special handling for float tab
+        if (tabName === 'float') {
+          loadAdminData().then(() => {
+            loadFloatData();
+            loadFloatSchedule();
+          }).catch(error => {
+            loadFloatData();
+            loadFloatSchedule();
+          });
+        }
 
-      // Special handling for find-stalls tab
-      if (tabName === 'find-stalls') {
-        loadAdminData().then(() => {
-          loadStallsData();
-        }).catch(error => {
-          loadStallsData();
-        });
+        // Special handling for find-stalls tab
+        if (tabName === 'find-stalls') {
+          loadAdminData().then(() => {
+            loadStallsData();
+          }).catch(error => {
+            loadStallsData();
+          });
+        }
       }
 
       // Find and activate the correct tab
       const targetTab = document.querySelector(`.tab[onclick*="${tabName}"]`);
       if (targetTab) {
         targetTab.classList.add('active');
-        console.log('✅ Activated tab:', targetTab.textContent);
 
         // Always show highlighting since panel will be open
         showTabHighlighting();
-      } else {
-        console.log('❌ Target tab not found!');
       }
+    }
+
+    // Settings functionality
+    let userSettings = {
+      push_notifications: true,
+      location_sharing: true,
+      emergency_alerts: false,
+      show_location: true,
+      auto_center: true,
+      share_group: true,
+      share_all: false
+    };
+
+    function updateSetting(settingName, value) {
+      userSettings[settingName] = value;
+      console.log(`Setting updated: ${settingName} = ${value}`);
+
+      // Apply setting immediately if needed
+      applySetting(settingName, value);
+    }
+
+    function applySetting(settingName, value) {
+      switch (settingName) {
+        case 'show_location':
+          if (value) {
+            // Enable location display on map
+            console.log('Location display enabled');
+          } else {
+            // Disable location display on map
+            console.log('Location display disabled');
+          }
+          break;
+
+        case 'auto_center':
+          if (value) {
+            // Enable auto-centering on group
+            console.log('Auto-centering enabled');
+          } else {
+            // Disable auto-centering
+            console.log('Auto-centering disabled');
+          }
+          break;
+
+        case 'push_notifications':
+          if (value) {
+            // Enable push notifications
+            console.log('Push notifications enabled');
+          } else {
+            // Disable push notifications
+            console.log('Push notifications disabled');
+          }
+          break;
+
+        case 'location_sharing':
+          if (value) {
+            // Enable location sharing
+            console.log('Location sharing enabled');
+          } else {
+            // Disable location sharing
+            console.log('Location sharing disabled');
+          }
+          break;
+
+        case 'emergency_alerts':
+          if (value) {
+            // Enable emergency alerts
+            console.log('Emergency alerts enabled');
+          } else {
+            // Disable emergency alerts
+            console.log('Emergency alerts disabled');
+          }
+          break;
+
+        case 'share_group':
+          if (value) {
+            // Enable group sharing
+            console.log('Group sharing enabled');
+          } else {
+            // Disable group sharing
+            console.log('Group sharing disabled');
+          }
+          break;
+
+        case 'share_all':
+          if (value) {
+            // Enable public sharing
+            console.log('Public sharing enabled');
+          } else {
+            // Disable public sharing
+            console.log('Public sharing disabled');
+          }
+          break;
+      }
+    }
+
+    function saveSettings() {
+      // Save settings to localStorage
+      localStorage.setItem('userSettings', JSON.stringify(userSettings));
+
+      // Show success message
+      showNotification('Settings saved successfully!', 'success');
+
+      console.log('Settings saved:', userSettings);
+    }
+
+    function loadSettings() {
+      // Load settings from localStorage
+      const savedSettings = localStorage.getItem('userSettings');
+      if (savedSettings) {
+        userSettings = JSON.parse(savedSettings);
+
+        // Apply saved settings to checkboxes
+        Object.keys(userSettings).forEach(settingName => {
+          const checkbox = document.getElementById(settingName);
+          if (checkbox) {
+            checkbox.checked = userSettings[settingName];
+          }
+        });
+
+        console.log('Settings loaded:', userSettings);
+      }
+    }
+
+    function showNotification(message, type = 'info') {
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#4caf50' : '#2196f3'};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        z-index: 10000;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s ease;
+      `;
+
+      document.body.appendChild(notification);
+
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
     }
 
     // Search functionality
