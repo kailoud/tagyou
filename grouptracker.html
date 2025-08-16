@@ -3125,12 +3125,19 @@
       transition: all 0.3s ease;
       opacity: 0.5;
       /* Default dimmed state */
+      pointer-events: auto;
+      /* Always clickable */
     }
 
     .tab.active {
       color: #ff6b35;
       border-bottom-color: #ff6b35;
       opacity: 1;
+    }
+
+    .tab:hover {
+      opacity: 0.8;
+      color: #333;
     }
 
     .panel-content {
@@ -10714,10 +10721,20 @@
         tab.style.opacity = '0.5';
         tab.style.color = '#666';
         tab.style.borderBottomColor = 'transparent';
+        tab.style.pointerEvents = 'auto'; // Ensure tabs remain clickable
       });
     }
 
     function showTabHighlighting() {
+      // First, dim all tabs
+      const allTabs = document.querySelectorAll('.tab');
+      allTabs.forEach(tab => {
+        tab.style.opacity = '0.5';
+        tab.style.color = '#666';
+        tab.style.borderBottomColor = 'transparent';
+      });
+
+      // Then highlight only the active tab
       const activeTab = document.querySelector('.tab.active');
       if (activeTab) {
         activeTab.style.opacity = '1';
@@ -10757,6 +10774,16 @@
     });
 
     function switchTab(tabName) {
+      // Check if panel is closed - if so, open it first
+      const panel = document.getElementById('bottomPanel');
+      const isPanelClosed = !panel.classList.contains('expanded');
+
+      if (isPanelClosed) {
+        // Open panel first
+        panel.classList.add('expanded');
+        document.body.classList.add('panel-expanded');
+      }
+
       // Hide all content
       const contents = document.querySelectorAll('.panel-content');
       contents.forEach(content => {
@@ -10800,11 +10827,8 @@
       if (targetTab) {
         targetTab.classList.add('active');
 
-        // Update highlighting if panel is open
-        const panel = document.getElementById('bottomPanel');
-        if (panel.classList.contains('expanded')) {
-          showTabHighlighting();
-        }
+        // Always show highlighting since panel will be open
+        showTabHighlighting();
       }
     }
 
