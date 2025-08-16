@@ -10933,53 +10933,7 @@
       return true;
     }
 
-    // Function to add Judging Zone Marker - Static
-    function addJudgingZoneMarker() {
-      console.log('addJudgingZoneMarker function called');
 
-      if (!map) {
-        console.log('Map not available');
-        return;
-      }
-
-      // Judging Zone coordinates (Great Western Rd)
-      const judgingZoneCoords = [51.519641, -0.199409];
-      console.log('Creating marker at coordinates:', judgingZoneCoords);
-
-      // Create static icon for judging zone
-      const judgingZoneIcon = L.divIcon({
-        className: 'judging-zone-marker',
-        html: 'JUDGING<br>ZONE',
-        iconSize: [25, 25],
-        iconAnchor: [12.5, 28], // Center horizontally, bottom vertically to account for the tail
-        popupAnchor: [0, -30]
-      });
-
-      // Add marker to map
-      const judgingZoneMarker = L.marker(judgingZoneCoords, {
-        icon: judgingZoneIcon,
-        zIndexOffset: 9999
-      }).addTo(map);
-
-      console.log('Marker added to map:', judgingZoneMarker);
-
-      // Add popup with information
-      judgingZoneMarker.bindPopup(`
-        <div style="text-align: center; padding: 8px;">
-          <h3 style="margin: 0 0 8px 0; color: #ff8c00;">🏆 JUDGING ZONE</h3>
-          <p style="margin: 0 0 8px 0; font-weight: bold;">Great Western Road</p>
-          <p style="margin: 0; font-size: 12px; color: #666;">
-            Float parade judging area<br>
-            Coordinates: 51.519641, -0.199409
-          </p>
-        </div>
-      `);
-
-      // Store reference for later use
-      window.judgingZoneMarker = judgingZoneMarker;
-
-      console.log('Static Judging Zone marker added at:', judgingZoneCoords);
-    }
 
     // Simple map initialization - just make it work!
     function initializeMap() {
@@ -11099,7 +11053,7 @@
         scrollWheelZoom: !isMobile,
         tap: !isMobile,
         touchZoom: true
-      }).setView([51.519641, -0.199409], 15);
+      }).setView([51.5074, -0.1278], 15);
 
       // Mobile-optimized tile settings for fast loading
       const tileOptions = {
@@ -11339,11 +11293,6 @@
     console.log('Map center:', map.getCenter());
     console.log('Map zoom:', map.getZoom());
     console.log('=== MAP INITIALIZATION COMPLETE ===');
-
-    // Add judging zone marker after map is fully initialized
-    setTimeout(() => {
-      addJudgingZoneMarker();
-    }, 1000);
   }
 
     // EMERGENCY MAP SHOW - Run immediately
