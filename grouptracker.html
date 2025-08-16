@@ -7796,6 +7796,15 @@
         // Clean up any invalid markers
         cleanupInvalidMarkers();
 
+        // Set a flag to prevent marker creation during initialization
+        window.mapReady = true;
+
+        // Delay any marker creation to ensure map is fully ready
+        setTimeout(() => {
+          console.log('Map fully ready for marker creation');
+          window.mapFullyReady = true;
+        }, 1000);
+
         // Initialize location services for live updates
         initializeLocationServices();
 
@@ -7816,6 +7825,40 @@
           return false;
         }
       });
+
+      // Safe marker creation function
+      function createSafeMarker(coordinates, options = {}) {
+        try {
+          // Validate coordinates first
+          if (!validateMapAndCoordinates(coordinates, 'safe marker creation')) {
+            console.error('Invalid coordinates for safe marker creation:', coordinates);
+            return null;
+          }
+
+          return L.marker([coordinates.lat, coordinates.lng], options);
+        } catch (error) {
+          console.error('Error creating safe marker:', error);
+          return null;
+        }
+      }
+
+      // Override L.marker to catch invalid coordinates
+      if (typeof L !== 'undefined' && L.marker) {
+        const originalMarker = L.marker;
+        L.marker = function (coords, options) {
+          try {
+            // Check if coordinates are valid
+            if (Array.isArray(coords) && (isNaN(coords[0]) || isNaN(coords[1]))) {
+              console.error('Invalid coordinates passed to L.marker:', coords);
+              return null;
+            }
+            return originalMarker.call(this, coords, options);
+          } catch (error) {
+            console.error('Error in L.marker override:', error);
+            return null;
+          }
+        };
+      }
 
       // Function to clean up invalid markers
       function cleanupInvalidMarkers() {
@@ -8489,6 +8532,11 @@
       function validateMapAndCoordinates(coordinates, context = '') {
         if (!map) {
           console.error(`Map not available for ${context}`);
+          return false;
+        }
+
+        if (!window.mapReady) {
+          console.error(`Map not ready for ${context}`);
           return false;
         }
 
