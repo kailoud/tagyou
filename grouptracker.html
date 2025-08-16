@@ -2551,29 +2551,11 @@
         flex-shrink: 0;
       }
 
-      /* Full bleed mobile design */
-      .bottom-panel {
-        left: 0;
-        right: 0;
-        width: 100%;
-        border-radius: 20px 20px 0 0;
-        overflow-x: hidden;
-        /* Ensure panel doesn't exceed viewport on mobile */
-        max-height: 100vh;
-      }
+      /* Full bleed mobile design - removed duplicate */
 
 
 
-      .panel-content {
-        padding: 0 16px 32px;
-        margin: 0;
-        width: 100%;
-        box-sizing: border-box;
-        /* Ensure content doesn't get cut off on mobile */
-        max-height: calc(85vh - 100px);
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-      }
+      /* Panel content styles - removed duplicate */
 
       .panel-tabs {
         margin: 0;
@@ -4720,17 +4702,7 @@
         padding: 0 12px;
       }
 
-      /* Extra full bleed for small mobile */
-      .bottom-panel {
-        left: 0;
-        right: 0;
-        width: 100vw;
-        margin: 0;
-        border-radius: 16px 16px 0 0;
-        /* Mobile-specific touch handling */
-        touch-action: pan-y;
-        overflow-x: hidden;
-      }
+      /* Extra full bleed for small mobile - removed duplicate */
 
       .panel-content {
         padding: 0 12px 24px;
@@ -6438,8 +6410,6 @@
         <!-- Schedule items will be dynamically generated -->
       </div>
     </div>
-
-
 
     <div class="panel-content" id="settings-content">
       <div style="text-align: center; padding: 20px 0; max-height: 100%; overflow-y: auto;">
