@@ -64,6 +64,15 @@
       cursor: auto;
     }
 
+    /* FORCE POINTER ON ALL CLICKABLE ELEMENTS */
+    button,
+    a,
+    [onclick],
+    .clickable {
+      cursor: pointer !important;
+      pointer-events: auto !important;
+    }
+
     button:hover,
     input[type="submit"]:hover,
     input[type="button"]:hover,
@@ -6677,6 +6686,12 @@
         <!-- Test button outside form -->
         <button type="button" style="background: blue; color: white; padding: 10px; margin: 10px 0; cursor: pointer;"
           onclick="alert('Test button works!')">Test Button</button>
+
+        <!-- Emergency test button -->
+        <button type="button"
+          style="background: red; color: white; padding: 15px; margin: 15px 0; cursor: pointer !important; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; position: relative; z-index: 99999;"
+          onclick="console.log('EMERGENCY BUTTON CLICKED'); alert('EMERGENCY BUTTON WORKS!');">🚨 EMERGENCY
+          TEST</button>
       </form>
 
       <!-- Register Form -->
@@ -7528,6 +7543,25 @@
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage-compat.js"></script>
   <script src="firebase-config.js"></script>
   <script>
+    // Test if JavaScript is working
+    console.log('🔧 JavaScript is loading...');
+
+    // Test click functionality
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log('🔧 DOM loaded, testing clicks...');
+
+      // Force enable all buttons
+      setTimeout(function () {
+        const allButtons = document.querySelectorAll('button, a, [onclick]');
+        allButtons.forEach(function (btn) {
+          btn.style.cursor = 'pointer !important';
+          btn.style.pointerEvents = 'auto !important';
+          btn.onclick = btn.onclick || function () { console.log('Button clicked:', this.textContent); };
+        });
+        console.log('🔧 Applied click fixes to', allButtons.length, 'elements');
+      }, 1000);
+    });
+
     // Define switchAuthTab function immediately for global access
     window.switchAuthTab = function (tab) {
       console.log('switchAuthTab called with:', tab);
