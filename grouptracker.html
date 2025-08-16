@@ -2459,6 +2459,32 @@
       box-shadow: 0 4px 12px rgba(255, 140, 0, 0.4);
       position: relative;
       z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    /* Dynamic font sizes for different zoom levels */
+    .judging-zone-marker.zoom-small {
+      font-size: 10px;
+      width: 80px;
+      height: 80px;
+    }
+
+    .judging-zone-marker.zoom-medium {
+      font-size: 12px;
+      width: 100px;
+      height: 100px;
+    }
+
+    .judging-zone-marker.zoom-large {
+      font-size: 16px;
+      width: 140px;
+      height: 140px;
+    }
+
+    .judging-zone-marker.zoom-xlarge {
+      font-size: 18px;
+      width: 160px;
+      height: 160px;
     }
 
     .judging-zone-marker::after {
@@ -2473,6 +2499,7 @@
       border-right: 15px solid transparent;
       border-top: 15px solid #ff8c00;
       z-index: 999;
+      transition: all 0.3s ease;
     }
 
     .judging-zone-marker::before {
@@ -2487,6 +2514,64 @@
       border-right: 18px solid transparent;
       border-top: 18px solid #e67e00;
       z-index: 998;
+      transition: all 0.3s ease;
+    }
+
+    /* Scale tail for different zoom levels */
+    .judging-zone-marker.zoom-small::after {
+      bottom: -10px;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 10px solid #ff8c00;
+    }
+
+    .judging-zone-marker.zoom-small::before {
+      bottom: -12px;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-top: 12px solid #e67e00;
+    }
+
+    .judging-zone-marker.zoom-medium::after {
+      bottom: -12px;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-top: 12px solid #ff8c00;
+    }
+
+    .judging-zone-marker.zoom-medium::before {
+      bottom: -15px;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-top: 15px solid #e67e00;
+    }
+
+    .judging-zone-marker.zoom-large::after {
+      bottom: -18px;
+      border-left: 18px solid transparent;
+      border-right: 18px solid transparent;
+      border-top: 18px solid #ff8c00;
+    }
+
+    .judging-zone-marker.zoom-large::before {
+      bottom: -21px;
+      border-left: 21px solid transparent;
+      border-right: 21px solid transparent;
+      border-top: 21px solid #e67e00;
+    }
+
+    .judging-zone-marker.zoom-xlarge::after {
+      bottom: -20px;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-top: 20px solid #ff8c00;
+    }
+
+    .judging-zone-marker.zoom-xlarge::before {
+      bottom: -23px;
+      border-left: 23px solid transparent;
+      border-right: 23px solid transparent;
+      border-top: 23px solid #e67e00;
     }
 
     .leaflet-tile-pane {
@@ -11171,6 +11256,28 @@
         // Judging Zone coordinates (Great Western Rd)
         const judgingZoneCoords = [51.519641, -0.199409];
 
+        // Function to update marker size based on zoom level
+        function updateJudgingZoneSize() {
+          const currentZoom = map.getZoom();
+          const markerElement = document.querySelector('.judging-zone-marker');
+
+          if (!markerElement) return;
+
+          // Remove all zoom classes
+          markerElement.classList.remove('zoom-small', 'zoom-medium', 'zoom-large', 'zoom-xlarge');
+
+          // Apply appropriate class based on zoom level
+          if (currentZoom <= 12) {
+            markerElement.classList.add('zoom-small');
+          } else if (currentZoom <= 14) {
+            markerElement.classList.add('zoom-medium');
+          } else if (currentZoom <= 16) {
+            markerElement.classList.add('zoom-large');
+          } else {
+            markerElement.classList.add('zoom-xlarge');
+          }
+        }
+
         // Create custom icon for judging zone
         const judgingZoneIcon = L.divIcon({
           className: 'judging-zone-marker',
@@ -11198,8 +11305,15 @@
           </div>
         `);
 
+        // Add zoom event listener to update marker size
+        map.on('zoomend', updateJudgingZoneSize);
+
+        // Initial size update
+        setTimeout(updateJudgingZoneSize, 100);
+
         // Store reference for later use
         window.judgingZoneMarker = judgingZoneMarker;
+        window.updateJudgingZoneSize = updateJudgingZoneSize;
 
         console.log('Judging Zone marker added at:', judgingZoneCoords);
       }
