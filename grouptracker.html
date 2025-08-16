@@ -58,6 +58,8 @@
       max-width: 400px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
       text-align: center;
+      position: relative;
+      z-index: 10001;
     }
 
     .auth-logo {
@@ -143,15 +145,17 @@
       color: white;
       font-size: 16px;
       font-weight: 600;
-      cursor: pointer;
+      cursor: pointer !important;
       transition: all 0.3s ease;
       margin-bottom: 16px;
+      pointer-events: auto !important;
     }
 
     .auth-btn:hover {
       background: #e55a2b;
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+      cursor: pointer !important;
     }
 
     .auth-btn:disabled {
@@ -6595,13 +6599,14 @@
       <form id="loginForm" class="auth-form">
         <div class="form-group">
           <label for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" value="demo@tagyou.com" required>
+          <input type="email" id="loginEmail" name="email" value="demo@tagyou.com" required>
         </div>
         <div class="form-group">
           <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" value="demo123" required>
+          <input type="password" id="loginPassword" name="password" value="demo123" required>
         </div>
-        <button type="submit" class="auth-btn">Sign In</button>
+        <button type="submit" class="auth-btn"
+          onclick="console.log('Sign In button clicked'); alert('Button clicked!')">Sign In</button>
         <div class="auth-links">
           <a href="#" onclick="switchAuthTab('forgot')">Forgot Password?</a>
         </div>
@@ -6611,23 +6616,24 @@
       <form id="registerForm" class="auth-form" style="display: none;">
         <div class="form-group">
           <label for="registerName">Full Name</label>
-          <input type="text" id="registerName" required>
+          <input type="text" id="registerName" name="name" required>
         </div>
         <div class="form-group">
           <label for="registerEmail">Email</label>
-          <input type="email" id="registerEmail" required>
+          <input type="email" id="registerEmail" name="email" required>
         </div>
         <div class="form-group">
           <label for="registerPassword">Password</label>
-          <input type="password" id="registerPassword" required>
+          <input type="password" id="registerPassword" name="password" required>
           <div class="password-strength" id="passwordStrength"></div>
         </div>
         <div class="form-group">
           <label for="confirmPassword">Confirm Password</label>
-          <input type="password" id="confirmPassword" required>
+          <input type="password" id="confirmPassword" name="confirmPassword" required>
           <div class="password-match" id="passwordMatch"></div>
         </div>
-        <button type="submit" class="auth-btn">Create Account</button>
+        <button type="submit" class="auth-btn" onclick="console.log('Create Account button clicked')">Create
+          Account</button>
         <div class="auth-links">
           <a href="#" onclick="switchAuthTab('login')">Already have an account? Sign In</a>
         </div>
@@ -6637,9 +6643,10 @@
       <form id="forgotForm" class="auth-form" style="display: none;">
         <div class="form-group">
           <label for="forgotEmail">Email</label>
-          <input type="email" id="forgotEmail" required>
+          <input type="email" id="forgotEmail" name="email" required>
         </div>
-        <button type="submit" class="auth-btn">Reset Password</button>
+        <button type="submit" class="auth-btn" onclick="console.log('Reset Password button clicked')">Reset
+          Password</button>
         <div class="auth-links">
           <a href="#" onclick="switchAuthTab('login')">Back to Sign In</a>
         </div>
@@ -7640,6 +7647,7 @@
       }
 
       async function handleLogin(event) {
+        console.log('handleLogin called with event:', event);
         event.preventDefault();
 
         const email = document.getElementById('loginEmail').value;
@@ -15794,6 +15802,24 @@
 
     // Call this function after user authentication
     updateAdminPortalVisibility();
+
+    // Manual login function for testing
+    window.testLogin = async function () {
+      console.log('Testing manual login...');
+      try {
+        const userCredential = await window.firebaseAuth.signInWithEmailAndPassword('demo@tagyou.com', 'demo123');
+        console.log('Manual login successful:', userCredential);
+        checkAuthStatus();
+      } catch (error) {
+        console.error('Manual login failed:', error);
+      }
+    };
+
+    // Test button click function
+    window.testButtonClick = function () {
+      console.log('Button click test function called');
+      alert('Button click test successful!');
+    };
   </script>
 
   <!-- Admin Portal Modal -->
