@@ -1922,9 +1922,18 @@
     }
 
     #map {
-      height: 100vh;
-      width: 100vw;
+      height: 100vh !important;
+      width: 100vw !important;
+      min-height: 400px !important;
       z-index: 1;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
     }
 
     .top-bar {
@@ -2338,6 +2347,31 @@
 
     .festival-item:hover {
       background-color: #f8f9fa;
+    }
+
+    .festival-item.coming-soon {
+      opacity: 0.6;
+      position: relative;
+      filter: blur(1px);
+      pointer-events: none;
+    }
+
+    .festival-item.coming-soon::after {
+      content: "Coming Soon";
+      position: absolute;
+      top: 50%;
+      right: 16px;
+      transform: translateY(-50%);
+      background: #ff6b35;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      filter: blur(0);
+      z-index: 10;
     }
 
     .festival-name {
@@ -4501,43 +4535,43 @@
           <span class="dropdown-arrow">▼</span>
         </button>
         <div class="festival-list" id="festivalList">
-          <div class="festival-item" onclick="selectFestival('Glastonbury Festival')">
+          <div class="festival-item coming-soon" onclick="selectFestival('Glastonbury Festival')">
             <span class="festival-name">Glastonbury Festival</span>
             <span class="festival-location">Somerset</span>
           </div>
-          <div class="festival-item" onclick="selectFestival('Reading & Leeds Festival')">
+          <div class="festival-item coming-soon" onclick="selectFestival('Reading & Leeds Festival')">
             <span class="festival-name">Reading & Leeds Festival</span>
             <span class="festival-location">Berkshire & West Yorkshire</span>
           </div>
-          <div class="festival-item" onclick="selectFestival('Download Festival')">
+          <div class="festival-item coming-soon" onclick="selectFestival('Download Festival')">
             <span class="festival-name">Download Festival</span>
             <span class="festival-location">Derbyshire</span>
           </div>
-          <div class="festival-item" onclick="selectFestival('Isle of Wight Festival')">
+          <div class="festival-item coming-soon" onclick="selectFestival('Isle of Wight Festival')">
             <span class="festival-name">Isle of Wight Festival</span>
             <span class="festival-location">Isle of Wight</span>
           </div>
-          <div class="festival-item" onclick="selectFestival('Latitude Festival')">
+          <div class="festival-item coming-soon" onclick="selectFestival('Latitude Festival')">
             <span class="festival-name">Latitude Festival</span>
             <span class="festival-location">Suffolk</span>
           </div>
-          <div class="festival-item" onclick="selectFestival('Boomtown Fair')">
+          <div class="festival-item coming-soon" onclick="selectFestival('Boomtown Fair')">
             <span class="festival-name">Boomtown Fair</span>
             <span class="festival-location">Hampshire</span>
           </div>
-          <div class="festival-item" onclick="selectFestival('Creamfields')">
+          <div class="festival-item coming-soon" onclick="selectFestival('Creamfields')">
             <span class="festival-name">Creamfields</span>
             <span class="festival-location">Cheshire</span>
           </div>
-          <div class="festival-item" onclick="selectFestival('Parklife Festival')">
+          <div class="festival-item coming-soon" onclick="selectFestival('Parklife Festival')">
             <span class="festival-name">Parklife Festival</span>
             <span class="festival-location">Manchester</span>
           </div>
-          <div class="festival-item" onclick="selectFestival('Wireless Festival')">
+          <div class="festival-item coming-soon" onclick="selectFestival('Wireless Festival')">
             <span class="festival-name">Wireless Festival</span>
             <span class="festival-location">London</span>
           </div>
-          <div class="festival-item" onclick="selectFestival('Boardmasters')">
+          <div class="festival-item coming-soon" onclick="selectFestival('Boardmasters')">
             <span class="festival-name">Boardmasters</span>
             <span class="festival-location">Cornwall</span>
           </div>
@@ -5927,9 +5961,24 @@
       }
 
       window.hideAuthOverlay = function () {
-        document.getElementById('authOverlay').style.display = 'none';
-        document.getElementById('appContent').classList.add('authenticated');
-        document.getElementById('userProfile').style.display = 'flex';
+        const authOverlay = document.getElementById('authOverlay');
+        const appContent = document.getElementById('appContent');
+        const userProfile = document.getElementById('userProfile');
+
+        if (authOverlay) {
+          authOverlay.style.display = 'none';
+          console.log('Auth overlay hidden');
+        }
+
+        if (appContent) {
+          appContent.classList.add('authenticated');
+          console.log('App content marked as authenticated');
+        }
+
+        if (userProfile) {
+          userProfile.style.display = 'flex';
+          console.log('User profile shown');
+        }
 
         // Ensure map is visible and properly sized
         if (map) {
@@ -7508,6 +7557,14 @@
         console.log('Initializing map in background...');
         setTimeout(() => {
           initializeMap();
+          // Force map container to have proper dimensions
+          const mapContainer = document.getElementById('map');
+          if (mapContainer) {
+            mapContainer.style.width = '100vw';
+            mapContainer.style.height = '100vh';
+            mapContainer.style.minHeight = '400px';
+            console.log('Forced map container dimensions');
+          }
         }, 100);
 
         // Check map visibility after a delay
@@ -7588,15 +7645,21 @@
               // Update Admin Portal visibility
               updateAdminPortalVisibility();
 
-              // Hide auth overlay if it's showing
-              const authOverlay = document.getElementById('authOverlay');
-              if (authOverlay && authOverlay.style.display === 'flex') {
-                hideAuthOverlay();
-                console.log('Auth overlay hidden due to auth state change');
+              // Hide auth overlay immediately
+              hideAuthOverlay();
+              console.log('Auth overlay hidden due to auth state change');
 
-                // Initialize app after successful auth
+              // Initialize app after successful auth
+              setTimeout(() => {
                 initializeApp();
-              }
+                console.log('App initialized after auth');
+
+                // Force refresh the page to ensure clean state
+                setTimeout(() => {
+                  console.log('Forcing page refresh for clean state');
+                  window.location.reload();
+                }, 500);
+              }, 100);
             } else {
               // User is signed out
               currentUser = null;
@@ -9115,6 +9178,13 @@
       }
 
       function selectFestival(festivalName) {
+        // Check if this is a coming soon festival
+        const festivalItem = event.target.closest('.festival-item');
+        if (festivalItem && festivalItem.classList.contains('coming-soon')) {
+          showNotification(`${festivalName} - Coming Soon! 🚧`);
+          return; // Don't proceed with selection
+        }
+
         // Update the button text to show selected festival
         const festivalBtn = document.querySelector('.festival-btn');
         festivalBtn.innerHTML = `🎪 ${festivalName} <span class="dropdown-arrow">▼</span>`;
@@ -9130,7 +9200,7 @@
           showNotification(`Loaded ${festivalName} stalls data and parade route!`);
         } else {
           console.log(`Selected festival: ${festivalName}`);
-          showNotification(`Selected: ${festivalName}`);
+          showNotification(`${festivalName} - Coming Soon! 🚧`);
           // Remove carnival route if switching to different festival
           removeCarnivalFloatRoute();
         }
