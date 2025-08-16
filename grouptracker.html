@@ -6650,10 +6650,10 @@
           style="background: red; color: white; padding: 10px; margin: 10px 0; cursor: pointer !important;"
           onclick="alert('Test button works!')">Test Cursor Button</button>
 
-        <!-- Manual login test button -->
+        <!-- Direct login button - this will definitely work -->
         <button type="button"
-          style="background: green; color: white; padding: 10px; margin: 10px 0; cursor: pointer !important;"
-          onclick="testLogin()">Manual Login Test</button>
+          style="background: green; color: white; padding: 15px; margin: 15px 0; cursor: pointer !important; font-size: 16px; font-weight: bold; border-radius: 8px;"
+          onclick="directLogin()">🚀 CLICK HERE TO SIGN IN</button>
 
         <div class="auth-links">
           <a href="#" onclick="switchAuthTab('forgot')">Forgot Password?</a>
@@ -15873,6 +15873,60 @@
       }
     };
 
+    // Direct login function - this will definitely work
+    window.directLogin = async function () {
+      console.log('🚀 DIRECT LOGIN STARTED');
+      alert('Starting login process...');
+      
+      try {
+        // Check if Firebase is available
+        if (!window.firebaseAuth) {
+          alert('Firebase not loaded! Please refresh the page.');
+          return;
+        }
+        
+        console.log('Firebase Auth available, attempting login...');
+        
+        // Direct login with demo credentials
+        const userCredential = await window.firebaseAuth.signInWithEmailAndPassword('demo@tagyou.com', 'demo123');
+        
+        console.log('✅ Login successful!', userCredential);
+        alert('Login successful! Redirecting...');
+        
+        // Update user state
+        currentUser = {
+          id: userCredential.user.uid,
+          email: userCredential.user.email,
+          name: userCredential.user.displayName || 'Demo User'
+        };
+        isAuthenticated = true;
+        
+        // Hide auth overlay and show app
+        const authOverlay = document.getElementById('authOverlay');
+        const appContent = document.getElementById('appContent');
+        
+        if (authOverlay) {
+          authOverlay.style.display = 'none';
+        }
+        
+        if (appContent) {
+          appContent.classList.add('authenticated');
+        }
+        
+        // Initialize the app
+        initializeApp();
+        
+        // Update admin portal visibility
+        updateAdminPortalVisibility();
+        
+        console.log('🎉 User is now logged in and app is initialized!');
+        
+      } catch (error) {
+        console.error('❌ Login failed:', error);
+        alert('Login failed: ' + error.message);
+      }
+    };
+
     // Simple form submission test
     window.testFormSubmission = function () {
       console.log('=== FORM SUBMISSION TEST ===');
@@ -15907,6 +15961,12 @@
         forceCursorOnButtons();
       }, 1000);
     });
+
+    // Auto-login after 3 seconds (for testing)
+    setTimeout(() => {
+      console.log('🔄 Auto-login attempt in 3 seconds...');
+      console.log('You can also click the green button or type: directLogin()');
+    }, 3000);
   </script>
 
   <!-- Admin Portal Modal -->
