@@ -5137,7 +5137,14 @@
         try {
           console.log('Checking auth status...'); // Debug log
 
-          // Get current user from Firebase Auth
+          // Wait for Firebase Auth to be ready
+          await new Promise(resolve => {
+            const unsubscribe = auth.onAuthStateChanged((user) => {
+              unsubscribe(); // Stop listening after first check
+              resolve(user);
+            });
+          });
+
           const user = auth.currentUser;
           console.log('Auth check result:', { user: !!user }); // Debug log
 
@@ -7427,6 +7434,24 @@
         console.log('Initializing map...');
         initializeMap();
 
+        // Check map visibility after a delay
+        setTimeout(() => {
+          const mapContainer = document.getElementById('map');
+          if (mapContainer) {
+            console.log('Map container visibility check:');
+            console.log('- Display:', mapContainer.style.display);
+            console.log('- Visibility:', mapContainer.style.visibility);
+            console.log('- Opacity:', mapContainer.style.opacity);
+            console.log('- Dimensions:', mapContainer.offsetWidth, 'x', mapContainer.offsetHeight);
+            console.log('- Z-index:', mapContainer.style.zIndex);
+          }
+          if (map) {
+            console.log('Map object check:', !!map);
+            console.log('Map size:', map.getSize());
+            console.log('Map center:', map.getCenter());
+          }
+        }, 2000);
+
         // Initialize Firebase services
         try {
           // Wait for Firebase to be available
@@ -7454,7 +7479,40 @@
 
           console.log('Firebase services initialized successfully');
 
-          // Check authentication status
+          // Set up auth state listener to prevent repeated popups
+          auth.onAuthStateChanged((user) => {
+            console.log('Auth state changed:', { user: !!user });
+            if (user) {
+              // User is signed in
+              currentUser = {
+                id: user.uid,
+                email: user.email,
+                name: user.displayName || user.email.split('@')[0]
+              };
+              isAuthenticated = true;
+
+              // Hide auth overlay if it's showing
+              const authOverlay = document.getElementById('authOverlay');
+              if (authOverlay && authOverlay.style.display === 'flex') {
+                hideAuthOverlay();
+                console.log('Auth overlay hidden due to auth state change');
+              }
+            } else {
+              // User is signed out
+              currentUser = null;
+              isAuthenticated = false;
+              isProUser = false;
+
+              // Show auth overlay only if not already showing
+              const authOverlay = document.getElementById('authOverlay');
+              if (!authOverlay || authOverlay.style.display !== 'flex') {
+                showAuthOverlay();
+                console.log('Auth overlay shown due to auth state change');
+              }
+            }
+          });
+
+          // Initial auth check
           checkAuthStatus();
         } catch (error) {
           console.error('Error initializing Firebase services:', error);
@@ -7541,6 +7599,10 @@
             width: 100vw !important;
             height: 100vh !important;
             z-index: 1 !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            background: #f0f0f0 !important;
           `;
 
         console.log('Map container styled and ready');
@@ -7729,10 +7791,28 @@
         // Set a flag to prevent marker creation during initialization
         window.mapReady = true;
 
+        // Force map to be visible
+        if (map) {
+          map.invalidateSize();
+          console.log('Map size invalidated after initialization');
+
+          // Force a repaint
+          setTimeout(() => {
+            map.invalidateSize();
+            console.log('Map size invalidated again after delay');
+          }, 500);
+        }
+
         // Delay any marker creation to ensure map is fully ready
         setTimeout(() => {
           console.log('Map fully ready for marker creation');
           window.mapFullyReady = true;
+
+          // Final map validation
+          if (map) {
+            map.invalidateSize();
+            console.log('Final map size validation');
+          }
         }, 1000);
 
         // Initialize location services for live updates
