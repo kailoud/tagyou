@@ -6658,6 +6658,9 @@
     style="position: fixed; top: 10px; left: 10px; z-index: 999999; background: yellow; padding: 20px; border: 3px solid red;">
     <button onclick="alert('MINIMAL TEST WORKS!')"
       style="background: red; color: white; padding: 10px; cursor: pointer;">MINIMAL TEST</button>
+    <br><br>
+    <button onclick="testFirebase()" style="background: blue; color: white; padding: 10px; cursor: pointer;">TEST
+      FIREBASE</button>
   </div>
 
   <!-- Authentication Overlay -->
@@ -7554,6 +7557,46 @@
     alert('JavaScript is working!');
   </script>
   <script src="firebase-config.js"></script>
+  <script>
+    // FIREBASE CONNECTION TEST
+    console.log('🔥 TESTING FIREBASE CONNECTION...');
+
+    // Check if Firebase is loaded
+    if (typeof firebase !== 'undefined') {
+      console.log('✅ Firebase SDK loaded');
+
+      // Check if auth is available
+      if (window.firebaseAuth) {
+        console.log('✅ Firebase Auth available');
+
+        // Test auth state
+        window.firebaseAuth.onAuthStateChanged(function (user) {
+          console.log('🔥 Auth state changed:', user ? 'User logged in' : 'No user');
+        });
+
+        console.log('✅ Firebase Auth listener added');
+      } else {
+        console.error('❌ Firebase Auth not available');
+        alert('❌ FIREBASE AUTH NOT AVAILABLE!');
+      }
+    } else {
+      console.error('❌ Firebase SDK not loaded');
+      alert('❌ FIREBASE SDK NOT LOADED!');
+    }
+
+    // Firebase test function
+    window.testFirebase = function () {
+      console.log('🔥 TESTING FIREBASE FUNCTION...');
+
+      if (window.firebaseAuth) {
+        console.log('✅ Firebase Auth is available in function');
+        alert('✅ FIREBASE AUTH IS WORKING!\n\nProject: tagyouapp-b0d30\n\nYou can now try logging in!');
+      } else {
+        console.error('❌ Firebase Auth not available in function');
+        alert('❌ FIREBASE AUTH NOT WORKING!');
+      }
+    };
+  </script>
   <script>
     // Test if JavaScript is working
     console.log('🔧 JavaScript is loading...');
