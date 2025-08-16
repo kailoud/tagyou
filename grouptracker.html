@@ -8,11 +8,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>Tagyou - Festival Group Tracker</title>
-  
+
   <!-- Preload critical resources -->
   <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style">
   <link rel="preload" href="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js" as="script">
-  
+
   <!-- Load critical CSS immediately -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
@@ -74,7 +74,7 @@
       transform: translateZ(0);
       will-change: transform;
     }
-    
+
     /* Mobile optimizations */
     @media (max-width: 768px) {
       .auth-container {
@@ -82,16 +82,21 @@
         margin: 10px;
         border-radius: 16px;
       }
-      
+
       .auth-overlay {
         padding: 10px;
       }
     }
-    
+
     /* Loading animation */
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     .auth-logo {
@@ -4348,7 +4353,9 @@
   <div id="authOverlay" class="auth-overlay">
     <div class="auth-container">
       <div id="authLoading" style="display: none; margin-bottom: 20px;">
-        <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #ff6b35; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+        <div
+          style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #ff6b35; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;">
+        </div>
         <p style="margin-top: 10px; color: #666;">Loading...</p>
       </div>
       <div class="auth-header">
@@ -5098,7 +5105,7 @@
 
     <!-- Load Leaflet immediately for map functionality -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
+
     <!-- Load Firebase SDKs efficiently -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
@@ -5907,6 +5914,16 @@
         document.getElementById('authOverlay').style.display = 'flex';
         document.getElementById('appContent').classList.remove('authenticated');
         document.getElementById('userProfile').style.display = 'none';
+
+        // Show loading indicator on mobile for better UX
+        const loadingIndicator = document.getElementById('authLoading');
+        if (loadingIndicator) {
+          loadingIndicator.style.display = 'block';
+          // Hide loading after 2 seconds
+          setTimeout(() => {
+            loadingIndicator.style.display = 'none';
+          }, 2000);
+        }
       }
 
       window.hideAuthOverlay = function () {
@@ -7483,16 +7500,16 @@
 
         console.log('Body and HTML forced to have proper dimensions');
 
-                // Show auth overlay immediately on mobile for better UX
+        // Show auth overlay immediately on mobile for better UX
         showAuthOverlay();
         console.log('Auth overlay shown immediately for mobile optimization');
-        
+
         // Initialize map in background (lower priority on mobile)
         console.log('Initializing map in background...');
         setTimeout(() => {
           initializeMap();
         }, 100);
-        
+
         // Check map visibility after a delay
         setTimeout(() => {
           const mapContainer = document.getElementById('map');
