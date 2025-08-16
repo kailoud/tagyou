@@ -8882,22 +8882,8 @@
         'artists': false
       };
 
-      // Make adminData globally accessible for map markers
-      window.adminData = adminData;
+      // Make userData globally accessible for map markers
       window.userData = userData;
-
-      // Load admin data on page load
-      document.addEventListener('DOMContentLoaded', function () {
-        // Load admin data first
-        loadAdminData().then(() => {
-          // Initialize artist categories after admin data is loaded
-          setTimeout(() => {
-            updateArtistCategoriesFromAdminData();
-          }, 100);
-        }).catch(error => {
-          console.error('Error loading admin data on page load:', error);
-        });
-      });
 
       // Firebase Database Functions - OPTIMIZED FOR COST REDUCTION
       let lastDataLoad = 0;
