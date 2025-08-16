@@ -5229,9 +5229,13 @@
           const user = userCredential.user;
 
           showAuthMessage('Login successful! Redirecting...', 'success');
+
+          // The auth state listener will automatically handle the transition
+          // Add a small delay for better UX
           setTimeout(() => {
-            checkAuthStatus();
-          }, 1000);
+            // The auth state listener should have already triggered by now
+            console.log('Login transition delay completed');
+          }, 500);
 
         } catch (error) {
           console.error('Login error:', error);
@@ -7480,8 +7484,9 @@
           console.log('Firebase services initialized successfully');
 
           // Set up auth state listener to prevent repeated popups
-          auth.onAuthStateChanged((user) => {
-            console.log('Auth state changed:', { user: !!user });
+          auth.onAuthStateChanged(async (user) => {
+            console.log('Auth state changed:', { user: !!user, email: user?.email });
+
             if (user) {
               // User is signed in
               currentUser = {
@@ -7491,11 +7496,34 @@
               };
               isAuthenticated = true;
 
+              // Check admin status immediately
+              try {
+                const userDoc = await db.collection('user_profiles').doc(user.uid).get();
+                if (userDoc.exists) {
+                  const profileData = userDoc.data();
+                  isProUser = profileData.is_admin || profileData.role === 'admin' || profileData.role === 'super_admin';
+                  console.log('Admin status from database:', { is_admin: profileData.is_admin, role: profileData.role, isProUser });
+                } else {
+                  // Fallback to email-based check
+                  isProUser = user.email.endsWith('@admin.com') || user.email === 'demo@tagyou.com' || user.email === 'kailoud639@gmail.com';
+                }
+              } catch (error) {
+                console.error('Error checking admin status:', error);
+                // Fallback to email-based check
+                isProUser = user.email.endsWith('@admin.com') || user.email === 'demo@tagyou.com' || user.email === 'kailoud639@gmail.com';
+              }
+
+              // Update Admin Portal visibility
+              updateAdminPortalVisibility();
+
               // Hide auth overlay if it's showing
               const authOverlay = document.getElementById('authOverlay');
               if (authOverlay && authOverlay.style.display === 'flex') {
                 hideAuthOverlay();
                 console.log('Auth overlay hidden due to auth state change');
+
+                // Initialize app after successful auth
+                initializeApp();
               }
             } else {
               // User is signed out
@@ -7512,8 +7540,8 @@
             }
           });
 
-          // Initial auth check
-          checkAuthStatus();
+          // Initial auth check - auth state listener will handle this automatically
+          console.log('Firebase auth state listener set up - waiting for auth state...');
         } catch (error) {
           console.error('Error initializing Firebase services:', error);
           showAuthOverlay();
