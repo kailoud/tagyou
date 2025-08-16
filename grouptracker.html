@@ -10819,6 +10819,19 @@
         targetContent.classList.add('active');
         console.log('✅ Content activated:', tabName + '-content');
 
+        // Special handling for float tab
+        if (tabName === 'float') {
+          console.log('Float tab activated, loading float data...');
+          // Ensure admin data is loaded first
+          loadAdminData().then(() => {
+            loadFloatData();
+            loadFloatSchedule();
+          }).catch(error => {
+            console.error('Error loading admin data for float tab:', error);
+            loadFloatData();
+            loadFloatSchedule();
+          });
+        }
 
       } else {
         console.error('❌ Content not found:', tabName + '-content');
@@ -12599,32 +12612,58 @@
       // Use admin data for testing if user is admin, otherwise use user data
       const dataSource = (window.firebaseAuth?.currentUser && isUserAdmin(window.firebaseAuth.currentUser)) ? window.adminData : window.userData;
 
+      console.log('Data source:', dataSource);
+      console.log('Float trucks data:', dataSource?.['float-trucks']);
+
       if (dataSource && dataSource['float-trucks'] && dataSource['float-trucks'].length > 0) {
-        floats = dataSource['float-trucks'].map(truck => ({
-          id: truck.id,
-          name: truck.name || truck.truck_name,
-          status: truck.status || 'upcoming',
-          category: truck.category || 'general',
-          description: truck.description || 'Float truck for the carnival parade',
-          location: truck.location || 'Parade Route',
-          time: truck.parade_time || 'TBA',
-          image: truck.image || '🚚'
-        }));
+        floats = dataSource['float-trucks'].map(truck => {
+          console.log('Processing float truck:', truck);
+          return {
+            id: truck.id,
+            name: truck.name || truck.truck_name || 'Unnamed Float',
+            status: truck.status || 'upcoming',
+            category: truck.category || 'general',
+            description: truck.description || 'Float truck for the carnival parade',
+            location: truck.location || truck.current_location || 'Parade Route',
+            time: truck.parade_time || truck.estimated_arrival || 'TBA',
+            image: truck.image || '🚚'
+          };
+        });
+        console.log('Processed floats:', floats);
       }
 
       if (floats.length === 0) {
-        floatCards.innerHTML = `
-            <div class="empty-state">
-              <div class="empty-icon">🎪</div>
-              <h3>No Float Trucks Available</h3>
-              <p>Float trucks will appear here when they are added to the parade.</p>
-            </div>
-          `;
-      } else {
-        floatCards.innerHTML = floats.map((float, index) => {
-          const clickHandler = `selectFloat(${float.id})`;
+        console.log('No float data found, showing demo data for testing');
+        // Show demo data to test the card layout
+        floats = [
+          {
+            id: 'demo-1',
+            name: 'The Destroyer',
+            status: 'live',
+            category: 'Entertainment',
+            description: 'A spectacular float featuring amazing performances and music.',
+            location: 'Nottinghill',
+            time: '18:46',
+            image: '🎭'
+          },
+          {
+            id: 'demo-2',
+            name: 'Cultural Heritage',
+            status: 'upcoming',
+            category: 'Cultural',
+            description: 'Celebrating the rich cultural diversity of the carnival.',
+            location: 'Parade Route',
+            time: '19:30',
+            image: '🎪'
+          }
+        ];
+      }
 
-          return `
+      console.log(`Rendering ${floats.length} float cards`);
+      floatCards.innerHTML = floats.map((float, index) => {
+        const clickHandler = `selectFloat(${float.id})`;
+
+        return `
           <div class="float-card" onclick="${clickHandler}">
             <div class="float-image">
               <span style="font-size: 48px;">${float.image}</span>
@@ -12650,9 +12689,8 @@
             <div class="float-description">${float.description}</div>
           </div>
         `;
-        }).join('');
+      }).join('');
 
-      }
       updateRouteProgress();
       console.log('Float data loaded and route progress updated');
       console.log('=== loadFloatData completed ===');
