@@ -3123,6 +3123,8 @@
       line-height: 1.2;
       box-sizing: border-box;
       transition: all 0.3s ease;
+      opacity: 0.5;
+      /* Default dimmed state */
     }
 
     .tab.active {
@@ -6177,9 +6179,6 @@
     <div class="bottom-panel" id="bottomPanel">
       <div class="panel-handle" onclick="togglePanel()">
         <div class="handle-bar"></div>
-        <!-- Test button for debugging -->
-        <button onclick="testPanelFunctions()"
-          style="position: absolute; right: 10px; top: 5px; background: red; color: white; border: none; border-radius: 4px; padding: 2px 6px; font-size: 10px;">TEST</button>
       </div>
       <div class="panel-tabs">
         <div class="tab active" onclick="switchTab('members')">Group</div>
@@ -10690,263 +10689,83 @@
 
 
 
-    // Panel controls
+    // Simple panel controls
     function togglePanel() {
-      console.log('togglePanel called');
       const panel = document.getElementById('bottomPanel');
       const isExpanded = panel.classList.contains('expanded');
 
-      console.log('Panel expanded before toggle:', isExpanded);
-
       if (isExpanded) {
-        // Close panel
-        console.log('Closing panel...');
+        // Close panel - hide all tab highlighting
         panel.classList.remove('expanded');
         document.body.classList.remove('panel-expanded');
         resetAllButtonStates();
-        updateTabHighlighting(false);
+        hideTabHighlighting();
       } else {
-        // Open panel
-        console.log('Opening panel...');
+        // Open panel - show tab highlighting
         panel.classList.add('expanded');
         document.body.classList.add('panel-expanded');
-        updateTabHighlighting(true);
+        showTabHighlighting();
       }
-
-      console.log('Panel expanded after toggle:', panel.classList.contains('expanded'));
     }
 
-    function updateTabHighlighting(panelOpen) {
-      console.log('updateTabHighlighting called with panelOpen:', panelOpen);
+    function hideTabHighlighting() {
       const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        tab.style.opacity = '0.5';
+        tab.style.color = '#666';
+        tab.style.borderBottomColor = 'transparent';
+      });
+    }
+
+    function showTabHighlighting() {
       const activeTab = document.querySelector('.tab.active');
-
-      console.log('Found tabs:', tabs.length);
-      console.log('Active tab:', activeTab);
-
-      if (panelOpen) {
-        // Show active tab highlighting when panel is open
-        if (activeTab) {
-          activeTab.style.opacity = '1';
-          activeTab.style.color = '#ff6b35';
-          activeTab.style.borderBottomColor = '#ff6b35';
-          console.log('Applied active tab highlighting');
-        }
-      } else {
-        // Hide all tab highlighting when panel is closed
-        tabs.forEach(tab => {
-          tab.style.opacity = '0.5';
-          tab.style.color = '#666';
-          tab.style.borderBottomColor = 'transparent';
-        });
-        console.log('Applied dimmed tab highlighting');
+      if (activeTab) {
+        activeTab.style.opacity = '1';
+        activeTab.style.color = '#ff6b35';
+        activeTab.style.borderBottomColor = '#ff6b35';
       }
     }
 
-    function testPanelFunctions() {
-      console.log('=== Testing Panel Functions ===');
-
-      // Test 1: Check if elements exist
-      const panel = document.getElementById('bottomPanel');
-      const handle = document.querySelector('.panel-handle');
-      const tabs = document.querySelectorAll('.tab');
-
-      console.log('Panel exists:', !!panel);
-      console.log('Handle exists:', !!handle);
-      console.log('Tabs found:', tabs.length);
-
-      // Test 2: Check panel state
-      const isExpanded = panel.classList.contains('expanded');
-      console.log('Panel expanded:', isExpanded);
-
-      // Test 3: Test toggle function
-      console.log('Testing togglePanel...');
-      togglePanel();
-
-      // Test 4: Test tab switching
-      console.log('Testing switchTab...');
-      switchTab('find-stalls');
-
-      // Test 5: Test tab highlighting
-      console.log('Testing updateTabHighlighting...');
-      updateTabHighlighting(true);
-
-      console.log('=== Test Complete ===');
-    }
-
-    // Swipe functionality for bottom panel
+    // Simple touch handling for panel
     let touchStartY = 0;
     let touchEndY = 0;
-    let touchStartX = 0;
-    let touchEndX = 0;
-    let isDragging = false;
-    let isVerticalSwipe = false;
 
     function handleTouchStart(e) {
       touchStartY = e.touches[0].clientY;
-      touchStartX = e.touches[0].clientX;
-      isDragging = true;
-      isVerticalSwipe = false;
-
-      // On mobile, be more restrictive about touch handling
-      if (window.innerWidth <= 480) {
-        // Only allow touches on the handle area, not the entire panel
-        const handle = e.currentTarget;
-        const rect = handle.getBoundingClientRect();
-        const touchX = e.touches[0].clientX;
-
-        // If touch is outside the handle area, don't start dragging
-        if (touchX < rect.left || touchX > rect.right) {
-          isDragging = false;
-          return;
-        }
-      }
-
-      e.preventDefault(); // Prevent default browser behavior
     }
 
-    function handleTouchMove(e) {
-      if (!isDragging) return;
-
-      e.preventDefault(); // Prevent default browser behavior (pull-to-refresh)
-      touchEndY = e.touches[0].clientY;
-      touchEndX = e.touches[0].clientX;
-
-      const diffY = touchEndY - touchStartY;
-      const diffX = touchEndX - touchStartX;
-
-      // Determine if this is a vertical or horizontal swipe
-      // Use smaller threshold for mobile devices
-      const isMobile = window.innerWidth <= 480;
-      const threshold = isMobile ? 5 : 10;
-
-      if (!isVerticalSwipe) {
-        if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > threshold) {
-          isVerticalSwipe = true;
-        } else if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
-          // This is a horizontal swipe, don't move the panel
-          isDragging = false;
-          return;
-        }
-      }
-
-      // Only proceed if this is a vertical swipe
-      if (!isVerticalSwipe) return;
-
-      const panel = document.getElementById('bottomPanel');
-      const currentTransform = panel.style.transform;
-      const currentY = currentTransform.includes('translateY') ?
-        parseInt(currentTransform.match(/translateY\(([^)]+)\)/)[1]) : 0;
-
-      // Limit the drag range
-      const maxDrag = -window.innerHeight * 0.6;
-      const newY = Math.max(maxDrag, Math.min(0, currentY + diffY));
-
-      panel.style.transform = `translateY(${newY}px)`;
-      touchStartY = touchEndY;
-    }
-
-    function handleTouchEnd() {
-      if (!isDragging) return;
-
-      const panel = document.getElementById('bottomPanel');
-      const currentTransform = panel.style.transform;
-      const currentY = currentTransform.includes('translateY') ?
-        parseInt(currentTransform.match(/translateY\(([^)]+)\)/)[1]) : 0;
-
-      // Calculate swipe distance and direction
+    function handleTouchEnd(e) {
+      touchEndY = e.changedTouches[0].clientY;
       const swipeDistance = touchEndY - touchStartY;
-      const swipeThreshold = 50; // Minimum distance for swipe to register
 
-      // Determine action based on swipe direction and distance
-      if (swipeDistance < -swipeThreshold) {
-        // Swipe up - open panel
-        panel.classList.add('expanded');
-        document.body.classList.add('panel-expanded');
-        updateTabHighlighting(true);
-        panel.style.transform = '';
-        showNotification('Panel opened', 'info');
-      } else if (swipeDistance > swipeThreshold) {
-        // Swipe down - close panel
-        panel.classList.remove('expanded');
-        document.body.classList.remove('panel-expanded');
-        panel.style.transform = '';
-        resetAllButtonStates();
-        updateTabHighlighting(false);
-        showNotification('Panel closed', 'info');
-      } else {
-        // Small swipe or tap - snap to nearest state
-        if (currentY < -100) {
-          panel.classList.add('expanded');
-          document.body.classList.add('panel-expanded');
-          updateTabHighlighting(true);
-        } else {
-          panel.classList.remove('expanded');
-          document.body.classList.remove('panel-expanded');
-          resetAllButtonStates();
-          updateTabHighlighting(false);
-        }
-        panel.style.transform = '';
+      if (Math.abs(swipeDistance) > 50) {
+        togglePanel(); // Simple toggle on any significant swipe
       }
-
-      isDragging = false;
-      isVerticalSwipe = false;
     }
 
-    // Add touch event listeners
+    // Add simple event listeners
     document.addEventListener('DOMContentLoaded', function () {
-      const panel = document.getElementById('bottomPanel');
       const handle = document.querySelector('.panel-handle');
 
-      console.log('Panel element:', panel);
-      console.log('Handle element:', handle);
-
       if (handle) {
-        // Add touch event listeners with mobile-specific handling
-        handle.addEventListener('touchstart', handleTouchStart, { passive: false });
-        handle.addEventListener('touchmove', handleTouchMove, { passive: false });
-        handle.addEventListener('touchend', handleTouchEnd, { passive: false });
-
-        // For mobile, also add touch events to the panel tabs to prevent panel movement
-        const panelTabs = document.querySelector('.panel-tabs');
-        if (panelTabs && window.innerWidth <= 480) {
-          panelTabs.addEventListener('touchstart', function (e) {
-            // Prevent panel movement when touching tabs on mobile
-            e.stopPropagation();
-          }, { passive: false });
-        }
+        handle.addEventListener('touchstart', handleTouchStart);
+        handle.addEventListener('touchend', handleTouchEnd);
       }
 
-      // Initialize tab highlighting based on panel state
-      const isPanelOpen = panel.classList.contains('expanded');
-      console.log('Initial panel state - expanded:', isPanelOpen);
-      updateTabHighlighting(isPanelOpen);
-
-      // Test panel functionality
-      console.log('Testing panel functionality...');
-      const tabs = document.querySelectorAll('.tab');
-      console.log('Found tabs:', tabs.length);
-      tabs.forEach((tab, index) => {
-        console.log(`Tab ${index}:`, tab.textContent, tab.onclick);
-      });
+      // Initialize panel with no tab highlighting
+      hideTabHighlighting();
     });
 
     function switchTab(tabName) {
-      console.log('=== switchTab called with:', tabName, '===');
-
       // Hide all content
       const contents = document.querySelectorAll('.panel-content');
-      console.log('Found', contents.length, 'panel contents');
       contents.forEach(content => {
-        console.log('Removing active from:', content.id);
         content.classList.remove('active');
       });
 
       // Remove active class from all tabs
       const tabs = document.querySelectorAll('.tab');
-      console.log('Found', tabs.length, 'tabs');
       tabs.forEach(tab => {
-        console.log('Removing active from tab:', tab.textContent);
         tab.classList.remove('active');
       });
 
@@ -10954,17 +10773,13 @@
       const targetContent = document.getElementById(tabName + '-content');
       if (targetContent) {
         targetContent.classList.add('active');
-        console.log('✅ Content activated:', tabName + '-content');
 
         // Special handling for float tab
         if (tabName === 'float') {
-          console.log('Float tab activated, loading float data...');
-          // Ensure admin data is loaded first
           loadAdminData().then(() => {
             loadFloatData();
             loadFloatSchedule();
           }).catch(error => {
-            console.error('Error loading admin data for float tab:', error);
             loadFloatData();
             loadFloatSchedule();
           });
@@ -10972,54 +10787,25 @@
 
         // Special handling for find-stalls tab
         if (tabName === 'find-stalls') {
-          console.log('Find stalls tab activated, loading stalls data...');
-          // Ensure admin data is loaded first
           loadAdminData().then(() => {
             loadStallsData();
           }).catch(error => {
-            console.error('Error loading admin data for find-stalls tab:', error);
             loadStallsData();
           });
         }
-
-      } else {
-        console.error('❌ Content not found:', tabName + '-content');
       }
 
       // Find and activate the correct tab
-      let targetTab = null;
-      const allTabs = document.querySelectorAll('.tab');
-
-      // Try to find the tab by checking onclick attribute
-      for (let tab of allTabs) {
-        const onclick = tab.getAttribute('onclick');
-        if (onclick && onclick.includes(`switchTab('${tabName}')`)) {
-          targetTab = tab;
-          break;
-        }
-      }
-
-      console.log('Looking for tab with onclick containing:', `switchTab('${tabName}')`);
-      console.log('Found target tab:', targetTab);
-
+      const targetTab = document.querySelector(`.tab[onclick*="${tabName}"]`);
       if (targetTab) {
         targetTab.classList.add('active');
-        console.log('✅ Tab activated:', tabName);
 
-        // Update tab highlighting based on panel state
+        // Update highlighting if panel is open
         const panel = document.getElementById('bottomPanel');
-        const isPanelOpen = panel.classList.contains('expanded');
-        updateTabHighlighting(isPanelOpen);
-      } else {
-        console.error('❌ Tab not found for:', tabName);
-        // Show all available tabs for debugging
-        console.log('All available tabs:');
-        allTabs.forEach((tab, index) => {
-          console.log(`Tab ${index}:`, tab.textContent, tab.getAttribute('onclick'));
-        });
+        if (panel.classList.contains('expanded')) {
+          showTabHighlighting();
+        }
       }
-
-      console.log('=== switchTab completed ===');
     }
 
     // Search functionality
