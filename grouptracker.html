@@ -7502,9 +7502,26 @@
 
       // Firebase Configuration - Already initialized in firebase-config.js
       // auth, db, storage are available from window.firebaseAuth, window.firebaseDB, window.firebaseStorage
+
+      // Initialize currentGroup with proper structure
       let currentGroup = {
         name: 'My Festival Group',
-        members: []
+        members: [],
+        id: null,
+        code: 'ABC123'
+      };
+
+      // Global safety check for currentGroup
+      window.getCurrentGroup = function () {
+        if (!currentGroup || !currentGroup.members) {
+          currentGroup = {
+            name: 'My Festival Group',
+            members: [],
+            id: null,
+            code: 'ABC123'
+          };
+        }
+        return currentGroup;
       };
 
       // Authentication Functions - Now globally available
@@ -8027,12 +8044,19 @@
       function initializeApp() {
         console.log('Initializing app with authentication...');
 
-        // Initialize Firebase services
+        // Check Firebase services availability
         try {
-          // Use window objects directly instead of reassigning
-          console.log('Firebase services initialized successfully');
+          if (!window.firebaseAuth || !window.firebaseDB || !window.firebaseStorage) {
+            console.error('Firebase services not properly initialized');
+            return;
+          }
+          console.log('Firebase services check passed');
+          console.log('window.firebaseAuth:', !!window.firebaseAuth);
+          console.log('window.firebaseDB:', !!window.firebaseDB);
+          console.log('window.firebaseStorage:', !!window.firebaseStorage);
         } catch (error) {
-          console.error('Error initializing Firebase services:', error);
+          console.error('Error checking Firebase services:', error);
+          return;
         }
 
         // Show user profile
@@ -8041,8 +8065,12 @@
           userProfile.style.display = 'flex';
         }
 
-        // Initialize map immediately
-        initializeMap();
+        // Initialize map after ensuring Leaflet is loaded
+        if (typeof L !== 'undefined') {
+          initializeMap();
+        } else {
+          console.error('Leaflet not loaded, cannot initialize map');
+        }
 
         console.log('App initialized successfully!');
       }
@@ -8166,7 +8194,7 @@
       }
 
       function checkGroupLimit() {
-        if (!isProUser && currentGroup.members.length >= 2) {
+        if (!isProUser && getCurrentGroup().members.length >= 2) {
           showUpgradePrompt();
           return false;
         }
@@ -8185,7 +8213,7 @@
         // Update group count display
         const groupCount = document.getElementById('groupCount');
         if (groupCount) {
-          groupCount.textContent = currentGroup.members.length;
+          groupCount.textContent = getCurrentGroup().members.length;
           groupCount.style.background = '#4caf50'; // Green for pro
         }
 
@@ -10267,10 +10295,12 @@
           console.log('window.firebaseDB:', !!window.firebaseDB);
           console.log('window.firebaseStorage:', !!window.firebaseStorage);
 
-          auth = window.firebaseAuth;
-          db = window.firebaseDB;
-          storage = window.firebaseStorage;
-          console.log('Firebase services initialized successfully');
+          // Use window objects directly instead of reassigning
+          if (!window.firebaseAuth || !window.firebaseDB || !window.firebaseStorage) {
+            throw new Error('Firebase services not properly loaded');
+          }
+
+          console.log('Firebase services check passed');
 
           // Check authentication status
           checkAuthStatus();
@@ -10475,22 +10505,29 @@
         // Initialize map with mobile-optimized settings
         const isMobile = window.innerWidth <= 768;
 
-        map = L.map('map', {
-          zoomControl: false,
-          preferCanvas: true,
-          renderer: L.canvas(),
-          fadeAnimation: false,
-          zoomAnimation: !isMobile,
-          markerZoomAnimation: false,
-          trackResize: false,
-          boxZoom: false,
-          doubleClickZoom: false,
-          dragging: true,
-          keyboard: false,
-          scrollWheelZoom: !isMobile,
-          tap: !isMobile,
-          touchZoom: true
-        }).setView([51.5074, -0.1278], 15);
+        try {
+          map = L.map('map', {
+            zoomControl: false,
+            preferCanvas: true,
+            renderer: L.canvas(),
+            fadeAnimation: false,
+            zoomAnimation: !isMobile,
+            markerZoomAnimation: false,
+            trackResize: false,
+            boxZoom: false,
+            doubleClickZoom: false,
+            dragging: true,
+            keyboard: false,
+            scrollWheelZoom: !isMobile,
+            tap: !isMobile,
+            touchZoom: true
+          }).setView([51.5074, -0.1278], 15);
+
+          console.log('Map initialized successfully');
+        } catch (mapError) {
+          console.error('Error initializing map:', mapError);
+          return;
+        }
 
         // Mobile-optimized tile settings for fast loading
         const tileOptions = {
@@ -10518,11 +10555,17 @@
         // }).addTo(map);
 
         // Option 2: High-zoom OpenStreetMap (Free)
-        tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          ...tileOptions,
-          subdomains: 'abc',
-          maxZoom: 19
-        }).addTo(map);
+        try {
+          tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            ...tileOptions,
+            subdomains: 'abc',
+            maxZoom: 19
+          }).addTo(map);
+          console.log('Tile layer added successfully');
+        } catch (tileError) {
+          console.error('Error adding tile layer:', tileError);
+          return;
+        }
 
         // Option 3: CartoDB High-DPI (Better quality, still free)
         // tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
