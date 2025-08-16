@@ -8895,7 +8895,7 @@
 
           // Check if we can use cached data
           const now = Date.now();
-          if (now - lastDataLoad < DATA_CACHE_DURATION && Object.keys(adminData).length > 0) {
+          if (now - lastDataLoad < DATA_CACHE_DURATION && Object.keys(userData).length > 0) {
             console.log('Using cached admin data (cache valid for 5 minutes)');
             return;
           }
@@ -8921,7 +8921,7 @@
 
             console.log(`Found ${foodStallsSnapshot.docs.length} total food stalls in Firebase`);
 
-            adminData['food-stalls'] = foodStallsSnapshot.docs.map(doc => {
+            userData['food-stalls'] = foodStallsSnapshot.docs.map(doc => {
               const data = doc.data();
               console.log(`Food stall ${doc.id}:`, { name: data.name, status: data.status });
               return {
@@ -8931,10 +8931,10 @@
             });
 
             logFirebaseUsage('reads', foodStallsSnapshot.docs.length);
-            console.log(`Loaded ${adminData['food-stalls'].length} food stalls (all statuses)`);
+            console.log(`Loaded ${userData['food-stalls'].length} food stalls (all statuses)`);
           } catch (error) {
             console.warn('Food stalls collection not found:', error);
-            adminData['food-stalls'] = [];
+            userData['food-stalls'] = [];
           }
 
           // Load float trucks - TEMPORARILY LOAD ALL ITEMS FOR DEBUGGING
