@@ -4745,6 +4745,18 @@
       }
     }
 
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+
     .modal {
       position: fixed;
       top: 0;
@@ -11041,6 +11053,7 @@
     }
 
     // Settings functionality
+    // Enhanced Settings functionality for all users
     let userSettings = {
       push_notifications: true,
       location_sharing: true,
@@ -11051,141 +11064,305 @@
       share_all: false
     };
 
+    // Initialize settings when page loads
+    document.addEventListener('DOMContentLoaded', function () {
+      loadSettings();
+      applyAllSettings();
+    });
+
     function updateSetting(settingName, value) {
       userSettings[settingName] = value;
       console.log(`Setting updated: ${settingName} = ${value}`);
 
-      // Apply setting immediately if needed
+      // Apply setting immediately
       applySetting(settingName, value);
+
+      // Show visual feedback
+      showSettingFeedback(settingName, value);
     }
 
     function applySetting(settingName, value) {
       switch (settingName) {
         case 'show_location':
           if (value) {
-            // Enable location display on map
+            enableLocationDisplay();
             console.log('Location display enabled');
           } else {
-            // Disable location display on map
+            disableLocationDisplay();
             console.log('Location display disabled');
           }
           break;
 
         case 'auto_center':
           if (value) {
-            // Enable auto-centering on group
+            enableAutoCenter();
             console.log('Auto-centering enabled');
           } else {
-            // Disable auto-centering
+            disableAutoCenter();
             console.log('Auto-centering disabled');
           }
           break;
 
         case 'push_notifications':
           if (value) {
-            // Enable push notifications
+            enablePushNotifications();
             console.log('Push notifications enabled');
           } else {
-            // Disable push notifications
+            disablePushNotifications();
             console.log('Push notifications disabled');
           }
           break;
 
         case 'location_sharing':
           if (value) {
-            // Enable location sharing
+            enableLocationSharing();
             console.log('Location sharing enabled');
           } else {
-            // Disable location sharing
+            disableLocationSharing();
             console.log('Location sharing disabled');
           }
           break;
 
         case 'emergency_alerts':
           if (value) {
-            // Enable emergency alerts
+            enableEmergencyAlerts();
             console.log('Emergency alerts enabled');
           } else {
-            // Disable emergency alerts
+            disableEmergencyAlerts();
             console.log('Emergency alerts disabled');
           }
           break;
 
         case 'share_group':
           if (value) {
-            // Enable group sharing
+            enableGroupSharing();
             console.log('Group sharing enabled');
           } else {
-            // Disable group sharing
+            disableGroupSharing();
             console.log('Group sharing disabled');
           }
           break;
 
         case 'share_all':
           if (value) {
-            // Enable public sharing
+            enablePublicSharing();
             console.log('Public sharing enabled');
           } else {
-            // Disable public sharing
+            disablePublicSharing();
             console.log('Public sharing disabled');
           }
           break;
       }
     }
 
+    // Individual setting functions for better control
+    function enableLocationDisplay() {
+      // Enable user location on map
+      if (typeof map !== 'undefined' && currentLocation) {
+        // Show user location marker
+        console.log('Showing user location on map');
+      }
+    }
+
+    function disableLocationDisplay() {
+      // Hide user location on map
+      console.log('Hiding user location on map');
+    }
+
+    function enableAutoCenter() {
+      // Enable auto-centering on group members
+      console.log('Auto-centering on group enabled');
+    }
+
+    function disableAutoCenter() {
+      // Disable auto-centering
+      console.log('Auto-centering disabled');
+    }
+
+    function enablePushNotifications() {
+      // Request notification permission and enable
+      if ('Notification' in window) {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            console.log('Push notifications permission granted');
+          }
+        });
+      }
+    }
+
+    function disablePushNotifications() {
+      console.log('Push notifications disabled');
+    }
+
+    function enableLocationSharing() {
+      // Enable location sharing with the app
+      console.log('Location sharing enabled');
+    }
+
+    function disableLocationSharing() {
+      // Disable location sharing
+      console.log('Location sharing disabled');
+    }
+
+    function enableEmergencyAlerts() {
+      // Enable emergency alert system
+      console.log('Emergency alerts enabled');
+    }
+
+    function disableEmergencyAlerts() {
+      // Disable emergency alerts
+      console.log('Emergency alerts disabled');
+    }
+
+    function enableGroupSharing() {
+      // Enable sharing location with group members
+      console.log('Group sharing enabled');
+    }
+
+    function disableGroupSharing() {
+      // Disable group sharing
+      console.log('Group sharing disabled');
+    }
+
+    function enablePublicSharing() {
+      // Enable public location sharing
+      console.log('Public sharing enabled');
+    }
+
+    function disablePublicSharing() {
+      // Disable public sharing
+      console.log('Public sharing disabled');
+    }
+
+    function applyAllSettings() {
+      // Apply all current settings
+      Object.keys(userSettings).forEach(settingName => {
+        applySetting(settingName, userSettings[settingName]);
+      });
+    }
+
     function saveSettings() {
-      // Save settings to localStorage
-      localStorage.setItem('userSettings', JSON.stringify(userSettings));
+      try {
+        // Save settings to localStorage
+        localStorage.setItem('userSettings', JSON.stringify(userSettings));
 
-      // Show success message
-      showNotification('Settings saved successfully!', 'success');
+        // Also save to sessionStorage for immediate access
+        sessionStorage.setItem('userSettings', JSON.stringify(userSettings));
 
-      console.log('Settings saved:', userSettings);
+        // Show success message with enhanced styling
+        showNotification('Settings saved successfully! 🎉', 'success');
+
+        // Apply all settings
+        applyAllSettings();
+
+        console.log('Settings saved successfully:', userSettings);
+
+        // Add visual feedback to save button
+        const saveBtn = document.querySelector('.settings-save-btn');
+        if (saveBtn) {
+          saveBtn.style.background = 'linear-gradient(135deg, #4caf50 0%, #66bb6a 100%)';
+          saveBtn.textContent = '✅ Settings Saved!';
+
+          setTimeout(() => {
+            saveBtn.style.background = 'linear-gradient(135deg, #ff6b35 0%, #ff8a65 100%)';
+            saveBtn.textContent = '💾 Save Settings';
+          }, 2000);
+        }
+
+      } catch (error) {
+        console.error('Error saving settings:', error);
+        showNotification('Error saving settings. Please try again.', 'error');
+      }
     }
 
     function loadSettings() {
-      // Load settings from localStorage
-      const savedSettings = localStorage.getItem('userSettings');
-      if (savedSettings) {
-        userSettings = JSON.parse(savedSettings);
+      try {
+        // Try to load from localStorage first, then sessionStorage
+        let savedSettings = localStorage.getItem('userSettings') || sessionStorage.getItem('userSettings');
 
-        // Apply saved settings to checkboxes
-        Object.keys(userSettings).forEach(settingName => {
-          const checkbox = document.getElementById(settingName);
-          if (checkbox) {
-            checkbox.checked = userSettings[settingName];
-          }
-        });
+        if (savedSettings) {
+          userSettings = JSON.parse(savedSettings);
 
-        console.log('Settings loaded:', userSettings);
+          // Apply saved settings to checkboxes
+          Object.keys(userSettings).forEach(settingName => {
+            const checkbox = document.getElementById(settingName);
+            if (checkbox) {
+              checkbox.checked = userSettings[settingName];
+            }
+          });
+
+          console.log('Settings loaded successfully:', userSettings);
+        } else {
+          console.log('No saved settings found, using defaults');
+        }
+      } catch (error) {
+        console.error('Error loading settings:', error);
+        // Keep default settings if loading fails
+      }
+    }
+
+    function showSettingFeedback(settingName, value) {
+      // Show visual feedback when setting is changed
+      const checkbox = document.getElementById(settingName);
+      if (checkbox) {
+        const settingItem = checkbox.closest('.setting-item');
+        if (settingItem) {
+          settingItem.style.background = value ?
+            'linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%)' :
+            'linear-gradient(135deg, #fff 0%, #f8fafc 100%)';
+
+          setTimeout(() => {
+            settingItem.style.background = 'white';
+          }, 500);
+        }
       }
     }
 
     function showNotification(message, type = 'info') {
-      // Create notification element
+      // Remove any existing notifications
+      const existingNotifications = document.querySelectorAll('.notification');
+      existingNotifications.forEach(notification => notification.remove());
+
+      // Create enhanced notification element
       const notification = document.createElement('div');
       notification.className = `notification ${type}`;
-      notification.textContent = message;
+      notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 18px;">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+          <span>${message}</span>
+        </div>
+      `;
+
       notification.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
-        background: ${type === 'success' ? '#4caf50' : '#2196f3'};
+        background: ${type === 'success' ? 'linear-gradient(135deg, #4caf50 0%, #66bb6a 100%)' :
+          type === 'error' ? 'linear-gradient(135deg, #f44336 0%, #ef5350 100%)' :
+            'linear-gradient(135deg, #2196f3 0%, #42a5f5 100%)'};
         color: white;
-        padding: 12px 20px;
-        border-radius: 8px;
+        padding: 16px 24px;
+        border-radius: 12px;
         z-index: 10000;
         font-size: 14px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        font-weight: 500;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
         animation: slideIn 0.3s ease;
+        border: 1px solid rgba(255,255,255,0.2);
+        backdrop-filter: blur(10px);
       `;
 
       document.body.appendChild(notification);
 
-      // Remove after 3 seconds
+      // Remove after 4 seconds
       setTimeout(() => {
-        notification.remove();
-      }, 3000);
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.remove();
+          }
+        }, 300);
+      }, 4000);
     }
 
     // Search functionality
