@@ -5054,6 +5054,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage-compat.js"></script>
     <script src="firebase-config.js"></script>
     <script>
       // Firebase Authentication System
@@ -5071,7 +5072,7 @@
 
       // Firebase Configuration
       // Firebase is initialized in firebase-config.js
-      let auth, db, storage; // Will be initialized after Firebase loads
+      // Variables will be initialized after Firebase loads
       let currentGroup = {
         name: 'Festival Squad 2025',
         members: [
@@ -5082,10 +5083,9 @@
         ]
       };
 
-      // Authentication Functions - REMOVED
-      // App now works without authentication
       // Authentication Functions
-      function switchAuthTab(tab) {
+      // Make functions globally accessible
+      window.switchAuthTab = function (tab) {
         // Update tab buttons
         document.querySelectorAll('.auth-tab').forEach(btn => btn.classList.remove('active'));
 
@@ -5111,29 +5111,29 @@
         clearAuthMessages();
       }
 
-      function clearAuthMessages() {
+      window.clearAuthMessages = function () {
         const messages = document.getElementById('authMessages');
         messages.innerHTML = '';
         messages.className = 'auth-messages';
       }
 
-      function showAuthMessage(message, type = 'error') {
+      window.showAuthMessage = function (message, type = 'error') {
         const messages = document.getElementById('authMessages');
         messages.innerHTML = message;
         messages.className = `auth-messages ${type}`;
       }
 
-      function showLoading(button) {
+      window.showLoading = function (button) {
         button.disabled = true;
         button.innerHTML = 'Loading...';
       }
 
-      function hideLoading(button, originalText) {
+      window.hideLoading = function (button, originalText) {
         button.disabled = false;
         button.innerHTML = originalText;
       }
 
-      async function checkAuthStatus() {
+      window.checkAuthStatus = async function () {
         try {
           console.log('Checking auth status...'); // Debug log
 
@@ -5206,7 +5206,7 @@
         document.getElementById('appContent').classList.remove('authenticated');
       }
 
-      async function handleLogin(event) {
+      window.handleLogin = async function (event) {
         event.preventDefault();
 
         const email = document.getElementById('loginEmail').value;
@@ -5244,7 +5244,7 @@
         }
       }
 
-      async function handleRegister(event) {
+      window.handleRegister = async function (event) {
         console.log('handleRegister called'); // Debug log
         event.preventDefault();
 
@@ -5310,7 +5310,7 @@
         }
       }
 
-      async function handleForgotPassword(event) {
+      window.handleForgotPassword = async function (event) {
         event.preventDefault();
 
         const email = document.getElementById('forgotEmail').value;
@@ -5346,7 +5346,7 @@
         }
       }
 
-      async function handleLogout() {
+      window.handleLogout = async function () {
         try {
           console.log('Starting logout process...');
 
@@ -7419,9 +7419,15 @@
             return;
           }
 
-          auth = window.firebaseAuth;
-          db = window.firebaseDB;
-          storage = window.firebaseStorage;
+          // Declare variables globally
+          window.auth = window.firebaseAuth;
+          window.db = window.firebaseDB;
+          window.storage = window.firebaseStorage;
+
+          // Set local references
+          auth = window.auth;
+          db = window.db;
+          storage = window.storage;
 
           if (!auth || !db) {
             console.error('Firebase services not properly initialized');
