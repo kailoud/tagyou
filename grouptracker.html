@@ -7632,6 +7632,21 @@
           zoomControl: false
         }).setView([51.5074, -0.1278], 16);
 
+        // Try to center map on user's current location
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function (position) {
+            const userLocation = [position.coords.latitude, position.coords.longitude];
+            map.setView(userLocation, 16);
+            console.log('Map centered on user location:', userLocation);
+          }, function (error) {
+            console.log('Could not get user location, using default center:', error);
+          }, {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 60000
+          });
+        }
+
         // Add modern colorful tiles with fallback
         const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
           attribution: '© OpenStreetMap contributors, © Humanitarian OpenStreetMap Team',
@@ -7713,9 +7728,26 @@
           iconAnchor: [20, 50]
         });
 
-        const userMarker = L.marker([51.5074, -0.1278], { icon: avatarIcon })
+        // Create user marker at a default location first
+        let userMarker = L.marker([51.5074, -0.1278], { icon: avatarIcon })
           .addTo(map)
-          .bindPopup(`<strong>${userName}</strong><br>You are here (London)`);
+          .bindPopup(`<strong>${userName}</strong><br>You are here`);
+
+        // Update marker position when user location is available
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function (position) {
+            const userLocation = [position.coords.latitude, position.coords.longitude];
+            userMarker.setLatLng(userLocation);
+            userMarker.getPopup().setContent(`<strong>${userName}</strong><br>You are here`);
+            console.log('User marker updated to current location:', userLocation);
+          }, function (error) {
+            console.log('Could not get user location for marker:', error);
+          }, {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 60000
+          });
+        }
 
         // Store reference to user marker for updates
         window.userMarker = userMarker;
