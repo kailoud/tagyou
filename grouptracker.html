@@ -4463,31 +4463,222 @@
       border-color: #8b5cf6;
     }
 
-    /* Settings Styles */
+    /* Professional Settings Panel Styles */
     .settings-section {
-      margin: 20px 0;
+      margin: 24px 0;
       text-align: left;
-      padding: 0 20px;
+      padding: 0 24px;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s ease;
+    }
+
+    .settings-section:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      transform: translateY(-1px);
     }
 
     .settings-section h4 {
-      margin-bottom: 12px;
-      color: #333;
-      font-size: 16px;
+      margin: 20px 0 16px 0;
+      color: #1e293b;
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .settings-section h4::before {
+      content: '';
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(135deg, #ff6b35 0%, #ff8a65 100%);
+      border-radius: 2px;
     }
 
     .setting-item {
       display: flex;
       align-items: center;
-      margin: 8px 0;
+      margin: 12px 0;
+      padding: 12px 16px;
       cursor: pointer;
-      font-size: 14px;
-      color: #666;
+      font-size: 15px;
+      color: #475569;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .setting-item:hover {
+      background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+      border-color: #cbd5e1;
+      transform: translateX(4px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .setting-item:active {
+      transform: translateX(2px) scale(0.98);
     }
 
     .setting-item input[type="checkbox"] {
-      margin-right: 12px;
-      transform: scale(1.2);
+      margin-right: 16px;
+      transform: scale(1.3);
+      accent-color: #ff6b35;
+      cursor: pointer;
+    }
+
+    .setting-item input[type="checkbox"]:checked {
+      animation: checkboxPop 0.3s ease;
+    }
+
+    @keyframes checkboxPop {
+      0% {
+        transform: scale(1.3);
+      }
+
+      50% {
+        transform: scale(1.5);
+      }
+
+      100% {
+        transform: scale(1.3);
+      }
+    }
+
+    /* Settings Header Styling */
+    .settings-header {
+      text-align: center;
+      padding: 32px 24px 24px;
+      background: linear-gradient(135deg, #ff6b35 0%, #ff8a65 100%);
+      margin: -20px -20px 0 -20px;
+      border-radius: 16px 16px 0 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .settings-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="10" cy="60" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="40" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .settings-icon {
+      font-size: 56px;
+      margin-bottom: 16px;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+      animation: settingsFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes settingsFloat {
+
+      0%,
+      100% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-4px);
+      }
+    }
+
+    .settings-title {
+      color: white;
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Save Button Styling */
+    .settings-save-btn {
+      background: linear-gradient(135deg, #ff6b35 0%, #ff8a65 100%);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+      position: relative;
+      overflow: hidden;
+      margin: 32px auto 24px;
+      display: block;
+      width: 100%;
+      max-width: 240px;
+    }
+
+    .settings-save-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .settings-save-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+    }
+
+    .settings-save-btn:hover::before {
+      left: 100%;
+    }
+
+    .settings-save-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Settings Container */
+    .settings-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      margin: 0 4px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .settings-section {
+        margin: 16px 0;
+        padding: 0 16px;
+      }
+
+      .settings-section h4 {
+        font-size: 16px;
+      }
+
+      .setting-item {
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+
+      .settings-header {
+        padding: 24px 16px 20px;
+      }
+
+      .settings-icon {
+        font-size: 48px;
+      }
+
+      .settings-title {
+        font-size: 20px;
+      }
     }
 
     /* Custom scrollbar for artists cards */
@@ -6412,50 +6603,57 @@
 
 
       <div class="panel-content" id="settings-content">
-        <div style="text-align: center; padding: 20px 0; max-height: 100%; overflow-y: auto;">
-          <div style="font-size: 48px; margin-bottom: 16px;">⚙️</div>
-          <h3 style="margin-bottom: 16px;">Settings</h3>
-          <div class="settings-section">
-            <h4>🔔 Notifications</h4>
-            <label class="setting-item">
-              <input type="checkbox" id="push_notifications" checked
-                onchange="updateSetting('push_notifications', this.checked)">
-              Enable push notifications
-            </label>
-            <label class="setting-item">
-              <input type="checkbox" id="location_sharing" checked
-                onchange="updateSetting('location_sharing', this.checked)">
-              Location sharing
-            </label>
-            <label class="setting-item">
-              <input type="checkbox" id="emergency_alerts" onchange="updateSetting('emergency_alerts', this.checked)">
-              Emergency alerts
-            </label>
+        <div class="settings-container" style="max-height: 100%; overflow-y: auto;">
+          <div class="settings-header">
+            <div class="settings-icon">⚙️</div>
+            <h3 class="settings-title">Settings</h3>
           </div>
-          <div class="settings-section">
-            <h4>🗺️ Map Settings</h4>
-            <label class="setting-item">
-              <input type="checkbox" id="show_location" checked onchange="updateSetting('show_location', this.checked)">
-              Show my location
-            </label>
-            <label class="setting-item">
-              <input type="checkbox" id="auto_center" checked onchange="updateSetting('auto_center', this.checked)">
-              Auto-center on group
-            </label>
-          </div>
-          <div class="settings-section">
-            <h4>🔒 Privacy</h4>
-            <label class="setting-item">
-              <input type="checkbox" id="share_group" checked onchange="updateSetting('share_group', this.checked)">
-              Share location with group
-            </label>
-            <label class="setting-item">
-              <input type="checkbox" id="share_all" onchange="updateSetting('share_all', this.checked)">
-              Share with all users
-            </label>
-          </div>
-          <div style="margin-top: 30px;">
-            <button class="btn btn-primary" onclick="saveSettings()" style="width: 100%; max-width: 200px;">
+
+          <div style="padding: 24px;">
+            <div class="settings-section">
+              <h4>🔔 Notifications</h4>
+              <label class="setting-item">
+                <input type="checkbox" id="push_notifications" checked
+                  onchange="updateSetting('push_notifications', this.checked)">
+                Enable push notifications
+              </label>
+              <label class="setting-item">
+                <input type="checkbox" id="location_sharing" checked
+                  onchange="updateSetting('location_sharing', this.checked)">
+                Location sharing
+              </label>
+              <label class="setting-item">
+                <input type="checkbox" id="emergency_alerts" onchange="updateSetting('emergency_alerts', this.checked)">
+                Emergency alerts
+              </label>
+            </div>
+
+            <div class="settings-section">
+              <h4>🗺️ Map Settings</h4>
+              <label class="setting-item">
+                <input type="checkbox" id="show_location" checked
+                  onchange="updateSetting('show_location', this.checked)">
+                Show my location
+              </label>
+              <label class="setting-item">
+                <input type="checkbox" id="auto_center" checked onchange="updateSetting('auto_center', this.checked)">
+                Auto-center on group
+              </label>
+            </div>
+
+            <div class="settings-section">
+              <h4>🔒 Privacy</h4>
+              <label class="setting-item">
+                <input type="checkbox" id="share_group" checked onchange="updateSetting('share_group', this.checked)">
+                Share location with group
+              </label>
+              <label class="setting-item">
+                <input type="checkbox" id="share_all" onchange="updateSetting('share_all', this.checked)">
+                Share with all users
+              </label>
+            </div>
+
+            <button class="settings-save-btn" onclick="saveSettings()">
               💾 Save Settings
             </button>
           </div>
