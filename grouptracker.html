@@ -6332,19 +6332,7 @@
         </svg>
       </button>
 
-      <button class="control-btn display-all-btn" onclick="toggleDisplayAll()" title="Display All Markers">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-        </svg>
-      </button>
 
-      <button class="control-btn display-selected-btn" onclick="toggleDisplaySelected()"
-        title="Display Selected Categories">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-        </svg>
-      </button>
 
 
 
@@ -12299,108 +12287,9 @@
       }
     }
 
-    function toggleDisplayAll() {
-      console.log('toggleDisplayAll called');
-
-      const displayAllBtn = document.querySelector('.display-all-btn');
-      const displaySelectedBtn = document.querySelector('.display-selected-btn');
-
-      // Toggle display all button state
-      const displayAllActive = displayAllBtn.classList.toggle('active');
-      console.log('Display all active:', displayAllActive);
-
-      // Deactivate display selected button
-      displaySelectedBtn.classList.remove('active');
-
-      if (displayAllActive) {
-        console.log('Activating display all markers');
-
-        // Show all markers
-        addFoodStallMarkers();
-        addTruckFloatMarkers();
-
-        // Update search placeholder
-        const searchInput = document.getElementById('searchInput');
-        searchInput.placeholder = 'Find food, floats, or artists...';
-        searchInput.value = '';
-
-        showNotification('All markers displayed on map');
-      } else {
-        console.log('Deactivating display all markers');
-
-        // Hide all markers
-        removeFoodStallMarkers();
-        removeTruckFloatMarkers();
-
-        // Reset search placeholder
-        const searchInput = document.getElementById('searchInput');
-        searchInput.placeholder = 'Find group member by phone...';
-        searchInput.value = '';
-
-        showNotification('All markers hidden from map');
-      }
-    }
-
-    function toggleDisplaySelected() {
-      console.log('toggleDisplaySelected called');
-
-      const displaySelectedBtn = document.querySelector('.display-selected-btn');
-      const displayAllBtn = document.querySelector('.display-all-btn');
-      const foodStallsBtn = document.querySelector('.food-stalls-btn');
-      const truckFloatsBtn = document.querySelector('.truck-floats-btn');
-
-      // Toggle display selected button state
-      const displaySelectedActive = displaySelectedBtn.classList.toggle('active');
-      console.log('Display selected active:', displaySelectedActive);
-
-      // Deactivate display all button
-      displayAllBtn.classList.remove('active');
-
-      if (displaySelectedActive) {
-        console.log('Activating display selected markers');
-
-        // Clear all markers first
-        removeFoodStallMarkers();
-        removeTruckFloatMarkers();
-
-        // Show markers only for active buttons
-        if (foodStallsBtn.classList.contains('active')) {
-          addFoodStallMarkers();
-        }
-        if (truckFloatsBtn.classList.contains('active')) {
-          addTruckFloatMarkers();
-        }
 
 
-        // Update search placeholder based on active categories
-        const searchInput = document.getElementById('searchInput');
-        const activeCategories = [];
-        if (foodStallsBtn.classList.contains('active')) activeCategories.push('food');
-        if (truckFloatsBtn.classList.contains('active')) activeCategories.push('floats');
 
-        if (activeCategories.length > 0) {
-          searchInput.placeholder = `Find ${activeCategories.join(', ')}...`;
-        } else {
-          searchInput.placeholder = 'Select categories first...';
-        }
-        searchInput.value = '';
-
-        showNotification(`Displaying selected categories: ${activeCategories.join(', ')}`);
-      } else {
-        console.log('Deactivating display selected markers');
-
-        // Hide all markers
-        removeFoodStallMarkers();
-        removeTruckFloatMarkers();
-
-        // Reset search placeholder
-        const searchInput = document.getElementById('searchInput');
-        searchInput.placeholder = 'Find group member by phone...';
-        searchInput.value = '';
-
-        showNotification('Selected markers hidden from map');
-      }
-    }
 
 
 
