@@ -36,17 +36,41 @@
       cursor: default;
     }
 
-    /* Ensure all buttons have proper cursor */
-    button {
+    /* FORCE ALL BUTTONS TO HAVE POINTER CURSOR */
+    button,
+    input[type="submit"],
+    input[type="button"],
+    .auth-btn,
+    .btn-primary,
+    .btn-secondary,
+    [onclick] {
       cursor: pointer !important;
+      pointer-events: auto !important;
     }
 
-    /* Ensure all clickable elements have proper cursor */
+    /* FORCE ALL CLICKABLE ELEMENTS TO HAVE POINTER CURSOR */
     a,
     button,
     input[type="submit"],
     input[type="button"],
-    .clickable {
+    .clickable,
+    [onclick] {
+      cursor: pointer !important;
+      pointer-events: auto !important;
+    }
+
+    /* OVERRIDE ANY OTHER CURSOR SETTINGS */
+    * {
+      cursor: auto;
+    }
+
+    button:hover,
+    input[type="submit"]:hover,
+    input[type="button"]:hover,
+    .auth-btn:hover,
+    .btn-primary:hover,
+    .btn-secondary:hover,
+    [onclick]:hover {
       cursor: pointer !important;
     }
 
@@ -16024,6 +16048,23 @@
 
       console.log('❌ All common passwords failed');
       alert('❌ All common passwords failed!\n\nThe demo account password is not one of the common ones.\n\nYou need to reset the password manually.');
+    };
+
+    // FORCE CURSOR ON ALL BUTTONS
+    window.forceCursorOnButtons = function() {
+      console.log('🔧 FORCING CURSOR ON ALL BUTTONS');
+      
+      // Force cursor on all buttons
+      const allButtons = document.querySelectorAll('button, input[type="submit"], input[type="button"], [onclick]');
+      allButtons.forEach(button => {
+        button.style.cursor = 'pointer !important';
+        button.style.pointerEvents = 'auto !important';
+        button.onmouseenter = function() {
+          this.style.cursor = 'pointer !important';
+        };
+      });
+      
+      console.log('🔧 Applied cursor to', allButtons.length, 'buttons');
     };
 
     // NUCLEAR OPTION - Force login with hardcoded credentials
