@@ -1309,11 +1309,6 @@
       background: #7c3aed;
     }
 
-    color: #374151;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    }
-
     .admin-table td {
       padding: 16px;
       border-top: 1px solid #e5e7eb;
@@ -2441,7 +2436,6 @@
 
     .admin-portal-content.expanded .admin-table tbody tr:last-child {
       border-bottom: none;
-    }
     }
 
     @media (max-width: 480px) {
@@ -7770,6 +7764,9 @@
           if (isUserAdmin(userCredential.user)) {
             showNotification('Welcome, Admin! You have access to the Admin Portal.', 'success');
           }
+
+          // Update admin portal visibility
+          updateAdminPortalVisibility();
 
           // Hide auth overlay and show app
           document.getElementById('authOverlay').style.display = 'none';
