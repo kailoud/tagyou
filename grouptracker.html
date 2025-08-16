@@ -3033,6 +3033,20 @@
       background: rgba(255, 255, 255, 0.9);
       border-radius: 16px 16px 0 0;
       position: relative;
+      transition: all 0.2s ease;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    .panel-handle:hover {
+      background: rgba(255, 255, 255, 1);
+      transform: translateY(-1px);
+    }
+
+    .panel-handle:active {
+      transform: translateY(0px);
+      background: rgba(240, 240, 240, 1);
     }
 
     .panel-handle::after {
@@ -3045,6 +3059,11 @@
       height: 4px;
       background: #ccc;
       border-radius: 2px;
+      transition: background-color 0.2s ease;
+    }
+
+    .panel-handle:hover::after {
+      background: #999;
     }
 
     .handle-bar {
@@ -3103,11 +3122,13 @@
       height: auto;
       line-height: 1.2;
       box-sizing: border-box;
+      transition: all 0.3s ease;
     }
 
     .tab.active {
       color: #ff6b35;
       border-bottom-color: #ff6b35;
+      opacity: 1;
     }
 
     .panel-content {
@@ -10669,15 +10690,39 @@
     // Panel controls
     function togglePanel() {
       const panel = document.getElementById('bottomPanel');
-      panel.classList.toggle('expanded');
+      const isExpanded = panel.classList.contains('expanded');
 
-      // Update body class for z-index control
-      if (panel.classList.contains('expanded')) {
-        document.body.classList.add('panel-expanded');
-      } else {
+      if (isExpanded) {
+        // Close panel
+        panel.classList.remove('expanded');
         document.body.classList.remove('panel-expanded');
-        // Reset all button states when panel is manually closed
         resetAllButtonStates();
+        updateTabHighlighting(false);
+      } else {
+        // Open panel
+        panel.classList.add('expanded');
+        document.body.classList.add('panel-expanded');
+        updateTabHighlighting(true);
+      }
+    }
+
+    function updateTabHighlighting(panelOpen) {
+      const tabs = document.querySelectorAll('.tab');
+      const activeTab = document.querySelector('.tab.active');
+
+      if (panelOpen) {
+        // Show active tab highlighting when panel is open
+        if (activeTab) {
+          activeTab.style.opacity = '1';
+          activeTab.style.color = '#ff6b35';
+        }
+      } else {
+        // Hide all tab highlighting when panel is closed
+        tabs.forEach(tab => {
+          tab.style.opacity = '0.5';
+          tab.style.color = '#666';
+          tab.style.borderBottomColor = 'transparent';
+        });
       }
     }
 
@@ -10761,17 +10806,39 @@
       const currentY = currentTransform.includes('translateY') ?
         parseInt(currentTransform.match(/translateY\(([^)]+)\)/)[1]) : 0;
 
-      // Snap to expanded or collapsed state
-      if (currentY < -100) {
+      // Calculate swipe distance and direction
+      const swipeDistance = touchEndY - touchStartY;
+      const swipeThreshold = 50; // Minimum distance for swipe to register
+
+      // Determine action based on swipe direction and distance
+      if (swipeDistance < -swipeThreshold) {
+        // Swipe up - open panel
         panel.classList.add('expanded');
         document.body.classList.add('panel-expanded');
+        updateTabHighlighting(true);
         panel.style.transform = '';
-      } else {
+        showNotification('Panel opened', 'info');
+      } else if (swipeDistance > swipeThreshold) {
+        // Swipe down - close panel
         panel.classList.remove('expanded');
         document.body.classList.remove('panel-expanded');
         panel.style.transform = '';
-        // Reset button states when panel is closed via swipe
         resetAllButtonStates();
+        updateTabHighlighting(false);
+        showNotification('Panel closed', 'info');
+      } else {
+        // Small swipe or tap - snap to nearest state
+        if (currentY < -100) {
+          panel.classList.add('expanded');
+          document.body.classList.add('panel-expanded');
+          updateTabHighlighting(true);
+        } else {
+          panel.classList.remove('expanded');
+          document.body.classList.remove('panel-expanded');
+          resetAllButtonStates();
+          updateTabHighlighting(false);
+        }
+        panel.style.transform = '';
       }
 
       isDragging = false;
@@ -10798,6 +10865,10 @@
           }, { passive: false });
         }
       }
+
+      // Initialize tab highlighting based on panel state
+      const isPanelOpen = panel.classList.contains('expanded');
+      updateTabHighlighting(isPanelOpen);
     });
 
     function switchTab(tabName) {
@@ -10860,6 +10931,11 @@
       if (targetTab) {
         targetTab.classList.add('active');
         console.log('✅ Tab activated:', tabName);
+
+        // Update tab highlighting based on panel state
+        const panel = document.getElementById('bottomPanel');
+        const isPanelOpen = panel.classList.contains('expanded');
+        updateTabHighlighting(isPanelOpen);
       } else {
         console.error('❌ Tab not found for:', tabName);
       }
