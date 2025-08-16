@@ -2440,6 +2440,55 @@
       display: none !important;
     }
 
+    /* Judging Zone Marker Styles */
+    .judging-zone-marker {
+      background: #ff8c00;
+      border: 3px solid #e67e00;
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: bold;
+      font-size: 14px;
+      text-align: center;
+      line-height: 1.2;
+      text-transform: uppercase;
+      box-shadow: 0 4px 12px rgba(255, 140, 0, 0.4);
+      position: relative;
+      z-index: 1000;
+    }
+
+    .judging-zone-marker::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-top: 15px solid #ff8c00;
+      z-index: 999;
+    }
+
+    .judging-zone-marker::before {
+      content: '';
+      position: absolute;
+      bottom: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 18px solid transparent;
+      border-right: 18px solid transparent;
+      border-top: 18px solid #e67e00;
+      z-index: 998;
+    }
+
     .leaflet-tile-pane {
       width: 100% !important;
       height: 100% !important;
@@ -11071,6 +11120,9 @@
             map.setZoom(map.getZoom(), { animate: false });
           }
 
+          // Add Judging Zone Marker
+          addJudgingZoneMarker();
+
           // Additional refresh to ensure tiles load
           setTimeout(() => {
             if (map) {
@@ -11111,6 +11163,46 @@
           console.log('Map forced to full viewport');
         }
       }, 200);
+
+      // Function to add Judging Zone Marker
+      function addJudgingZoneMarker() {
+        if (!map) return;
+
+        // Judging Zone coordinates (Great Western Rd)
+        const judgingZoneCoords = [51.519641, -0.199409];
+
+        // Create custom icon for judging zone
+        const judgingZoneIcon = L.divIcon({
+          className: 'judging-zone-marker',
+          html: 'JUDGING<br>ZONE',
+          iconSize: [120, 120],
+          iconAnchor: [60, 135], // Center horizontally, bottom vertically to account for the tail
+          popupAnchor: [0, -140]
+        });
+
+        // Add marker to map
+        const judgingZoneMarker = L.marker(judgingZoneCoords, {
+          icon: judgingZoneIcon,
+          zIndexOffset: 1000
+        }).addTo(map);
+
+        // Add popup with information
+        judgingZoneMarker.bindPopup(`
+          <div style="text-align: center; padding: 8px;">
+            <h3 style="margin: 0 0 8px 0; color: #ff8c00;">🏆 JUDGING ZONE</h3>
+            <p style="margin: 0 0 8px 0; font-weight: bold;">Great Western Road</p>
+            <p style="margin: 0; font-size: 12px; color: #666;">
+              Float parade judging area<br>
+              Coordinates: 51.519641, -0.199409
+            </p>
+          </div>
+        `);
+
+        // Store reference for later use
+        window.judgingZoneMarker = judgingZoneMarker;
+
+        console.log('Judging Zone marker added at:', judgingZoneCoords);
+      }
 
       // Add user marker with avatar
       const userAvatar = currentUser?.avatar || '👤';
