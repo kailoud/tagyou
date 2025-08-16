@@ -7793,6 +7793,9 @@
         // Mark map as initialized
         window.mapInitialized = true;
 
+        // Clean up any invalid markers
+        cleanupInvalidMarkers();
+
         // Initialize location services for live updates
         initializeLocationServices();
 
@@ -7803,6 +7806,33 @@
         console.log('Map center:', map.getCenter());
         console.log('Map zoom:', map.getZoom());
         console.log('=== MAP INITIALIZATION COMPLETE ===');
+      }
+
+      // Global error handler for LatLng errors
+      window.addEventListener('error', function (event) {
+        if (event.error && event.error.message && event.error.message.includes('Invalid LatLng object')) {
+          console.error('LatLng Error caught by global handler:', event.error);
+          event.preventDefault();
+          return false;
+        }
+      });
+
+      // Function to clean up invalid markers
+      function cleanupInvalidMarkers() {
+        if (!map) return;
+
+        console.log('Cleaning up invalid markers...');
+
+        // Remove any markers with invalid coordinates
+        map.eachLayer(layer => {
+          if (layer instanceof L.Marker) {
+            const latlng = layer.getLatLng();
+            if (isNaN(latlng.lat) || isNaN(latlng.lng)) {
+              console.log('Removing invalid marker:', latlng);
+              map.removeLayer(layer);
+            }
+          }
+        });
       }
 
       // EMERGENCY MAP SHOW - Run immediately
@@ -8364,6 +8394,12 @@
       }
 
       function updateMemberMarker(member) {
+        // Validate coordinates before creating marker
+        if (!validateMapAndCoordinates(member.location, `member ${member.id}`)) {
+          console.error('Skipping marker creation for member:', member.id);
+          return;
+        }
+
         // Remove existing marker for this member
         if (window.memberMarkers && window.memberMarkers[member.id]) {
           map.removeLayer(window.memberMarkers[member.id]);
@@ -8402,13 +8438,28 @@
         // Simulate other members moving around
         currentGroup.members.forEach(member => {
           if (member.id !== currentUser?.id && Math.random() < 0.3) { // 30% chance
+            // Validate current location before simulating movement
+            if (!member.location || isNaN(member.location.lat) || isNaN(member.location.lng)) {
+              console.error('Invalid member location for simulation:', member.id, member.location);
+              return;
+            }
+
             // Simulate small movement
             const latOffset = (Math.random() - 0.5) * 0.001; // Small random movement
             const lngOffset = (Math.random() - 0.5) * 0.001;
 
+            const newLat = member.location.lat + latOffset;
+            const newLng = member.location.lng + lngOffset;
+
+            // Validate new coordinates
+            if (isNaN(newLat) || isNaN(newLng)) {
+              console.error('Invalid new coordinates after simulation:', newLat, newLng);
+              return;
+            }
+
             member.location = {
-              lat: member.location.lat + latOffset,
-              lng: member.location.lng + lngOffset
+              lat: newLat,
+              lng: newLng
             };
             member.lastUpdated = new Date().toISOString();
 
@@ -8432,6 +8483,39 @@
 
         const diffDays = Math.floor(diffHours / 24);
         return `${diffDays}d ago`;
+      }
+
+      // Validation function for coordinates
+      function validateMapAndCoordinates(coordinates, context = '') {
+        if (!map) {
+          console.error(`Map not available for ${context}`);
+          return false;
+        }
+
+        if (!coordinates || typeof coordinates !== 'object') {
+          console.error(`Invalid coordinates object for ${context}:`, coordinates);
+          return false;
+        }
+
+        const lat = parseFloat(coordinates.lat);
+        const lng = parseFloat(coordinates.lng);
+
+        if (isNaN(lat) || isNaN(lng)) {
+          console.error(`Invalid coordinates for ${context}: lat=${coordinates.lat}, lng=${coordinates.lng}`);
+          return false;
+        }
+
+        if (lat < -90 || lat > 90) {
+          console.error(`Invalid latitude for ${context}: ${lat} (must be between -90 and 90)`);
+          return false;
+        }
+
+        if (lng < -180 || lng > 180) {
+          console.error(`Invalid longitude for ${context}: ${lng} (must be between -180 and 180)`);
+          return false;
+        }
+
+        return true;
       }
 
       // Member location functions
@@ -8611,6 +8695,12 @@
 
       function addEmergencyMarker(emergency) {
         if (!emergency.location) return;
+
+        // Validate coordinates before creating marker
+        if (!validateMapAndCoordinates(emergency.location, `emergency ${emergency.id}`)) {
+          console.error('Skipping emergency marker creation for:', emergency.id);
+          return;
+        }
 
         const marker = L.marker([emergency.location.lat, emergency.location.lng], {
           icon: L.divIcon({
