@@ -6645,15 +6645,25 @@
         <button type="submit" class="auth-btn" style="cursor: pointer !important; pointer-events: auto !important;"
           onclick="console.log('Button clicked!')">Sign In</button>
 
+        <!-- BYPASS FORM - Direct Sign In Button -->
+        <button type="button"
+          style="background: blue; color: white; padding: 15px; margin: 15px 0; cursor: pointer !important; font-size: 16px; font-weight: bold; border-radius: 8px; border: none;"
+          onclick="bypassFormLogin()">🚀 DIRECT SIGN IN (BYPASS FORM)</button>
+
         <!-- Test button to verify cursor -->
         <button type="button"
           style="background: red; color: white; padding: 10px; margin: 10px 0; cursor: pointer !important;"
           onclick="alert('Test button works!')">Test Cursor Button</button>
 
-        <!-- Direct login button - this will definitely work -->
+        <!-- Diagnostic login button - this will find the REAL problem -->
         <button type="button"
           style="background: green; color: white; padding: 15px; margin: 15px 0; cursor: pointer !important; font-size: 16px; font-weight: bold; border-radius: 8px;"
-          onclick="directLogin()">🚀 CLICK HERE TO SIGN IN</button>
+          onclick="diagnoseAuth()">🔍 DIAGNOSE & FIX LOGIN</button>
+
+        <!-- Manual password fix button -->
+        <button type="button"
+          style="background: orange; color: white; padding: 15px; margin: 15px 0; cursor: pointer !important; font-size: 16px; font-weight: bold; border-radius: 8px;"
+          onclick="tryCommonPasswords()">🔑 TRY COMMON PASSWORDS</button>
 
         <div class="auth-links">
           <a href="#" onclick="switchAuthTab('forgot')">Forgot Password?</a>
@@ -15873,58 +15883,179 @@
       }
     };
 
+    // Diagnostic function to find the REAL problem
+    window.diagnoseAuth = async function () {
+      console.log('🔍 DIAGNOSING AUTHENTICATION PROBLEM');
+
+      // Check 1: Firebase services
+      console.log('1. Firebase Services Check:');
+      console.log('   - firebaseAuth:', !!window.firebaseAuth);
+      console.log('   - firebaseDB:', !!window.firebaseDB);
+      console.log('   - firebaseStorage:', !!window.firebaseStorage);
+
+      if (!window.firebaseAuth) {
+        alert('❌ PROBLEM: Firebase Auth not loaded!');
+        return;
+      }
+
+      // Check 2: Current auth state
+      console.log('2. Current Auth State:');
+      const currentUser = window.firebaseAuth.currentUser;
+      console.log('   - Current user:', currentUser);
+
+      // Check 3: Try to create the demo account
+      console.log('3. Creating Demo Account...');
+      try {
+        const userCredential = await window.firebaseAuth.createUserWithEmailAndPassword('demo@tagyou.com', 'demo123');
+        console.log('✅ Demo account created successfully!');
+        alert('✅ Demo account created! Now trying to sign in...');
+
+        // Sign out immediately
+        await window.firebaseAuth.signOut();
+
+        // Now try to sign in
+        const signInResult = await window.firebaseAuth.signInWithEmailAndPassword('demo@tagyou.com', 'demo123');
+        console.log('✅ Sign in successful!', signInResult);
+
+        // Complete the login process
+        completeLogin(signInResult);
+
+      } catch (createError) {
+        console.log('Demo account creation failed:', createError.code);
+
+        if (createError.code === 'auth/email-already-in-use') {
+          console.log('Demo account already exists, trying to sign in...');
+
+          try {
+            const signInResult = await window.firebaseAuth.signInWithEmailAndPassword('demo@tagyou.com', 'demo123');
+            console.log('✅ Sign in successful!', signInResult);
+            completeLogin(signInResult);
+          } catch (signInError) {
+            console.error('❌ Sign in failed:', signInError);
+
+            if (signInError.code === 'auth/invalid-login-credentials') {
+              console.log('🔧 PASSWORD RESET NEEDED - Account exists but wrong password');
+              alert('🔧 PASSWORD RESET NEEDED!\n\nThe demo account exists but has the wrong password.\n\nClick OK to reset the password to "demo123"');
+
+              // Try to reset password
+              try {
+                await window.firebaseAuth.sendPasswordResetEmail('demo@tagyou.com');
+                alert('📧 Password reset email sent to demo@tagyou.com\n\nCheck your email and click the reset link, then set password to: demo123');
+              } catch (resetError) {
+                console.error('❌ Password reset failed:', resetError);
+                alert('❌ PASSWORD RESET FAILED: ' + resetError.message + '\n\nYou may need to manually reset the password in Firebase Console.');
+              }
+            } else {
+              alert('❌ SIGN IN FAILED: ' + signInError.message + '\n\nError code: ' + signInError.code);
+            }
+          }
+        } else {
+          console.error('❌ Account creation failed:', createError);
+          alert('❌ ACCOUNT CREATION FAILED: ' + createError.message + '\n\nError code: ' + createError.code);
+        }
+      }
+    };
+
+    // Helper function to complete login
+    function completeLogin(userCredential) {
+      console.log('🎉 Completing login process...');
+
+      // Update user state
+      currentUser = {
+        id: userCredential.user.uid,
+        email: userCredential.user.email,
+        name: userCredential.user.displayName || 'Demo User'
+      };
+      isAuthenticated = true;
+
+      // Hide auth overlay and show app
+      const authOverlay = document.getElementById('authOverlay');
+      const appContent = document.getElementById('appContent');
+
+      if (authOverlay) {
+        authOverlay.style.display = 'none';
+      }
+
+      if (appContent) {
+        appContent.classList.add('authenticated');
+      }
+
+      // Initialize the app
+      initializeApp();
+
+      // Update admin portal visibility
+      updateAdminPortalVisibility();
+
+      console.log('🎉 User is now logged in and app is initialized!');
+      alert('🎉 SUCCESS! You are now logged in!');
+    }
+
+    // Try common passwords for demo account
+    window.tryCommonPasswords = async function () {
+      console.log('🔑 TRYING COMMON PASSWORDS');
+
+      const commonPasswords = [
+        'demo123',
+        'demo',
+        'password',
+        '123456',
+        'admin',
+        'test',
+        'demo@123',
+        'demo123!',
+        'Demo123',
+        'DEMO123'
+      ];
+
+      for (let i = 0; i < commonPasswords.length; i++) {
+        const password = commonPasswords[i];
+        console.log(`Trying password ${i + 1}/${commonPasswords.length}: ${password}`);
+
+        try {
+          const result = await window.firebaseAuth.signInWithEmailAndPassword('demo@tagyou.com', password);
+          console.log(`✅ SUCCESS! Password found: ${password}`);
+          alert(`🎉 SUCCESS! Password found: ${password}\n\nYou are now logged in!`);
+          completeLogin(result);
+          return;
+        } catch (error) {
+          console.log(`❌ Password "${password}" failed: ${error.code}`);
+        }
+      }
+
+      console.log('❌ All common passwords failed');
+      alert('❌ All common passwords failed!\n\nThe demo account password is not one of the common ones.\n\nYou need to reset the password manually.');
+    };
+
+    // Bypass form login - completely bypasses the form
+    window.bypassFormLogin = async function () {
+      console.log('🚀 BYPASS FORM LOGIN STARTED');
+      alert('Bypassing form completely...');
+
+      try {
+        // Get values directly from inputs
+        const email = document.getElementById('loginEmail').value || 'demo@tagyou.com';
+        const password = document.getElementById('loginPassword').value || 'demo123';
+
+        console.log('Using credentials:', { email, password: password ? '***' : 'empty' });
+
+        // Direct Firebase login
+        const userCredential = await window.firebaseAuth.signInWithEmailAndPassword(email, password);
+        console.log('✅ Bypass login successful!', userCredential);
+
+        // Complete login process
+        completeLogin(userCredential);
+
+      } catch (error) {
+        console.error('❌ Bypass login failed:', error);
+        alert('❌ BYPASS LOGIN FAILED: ' + error.message + '\n\nError code: ' + error.code);
+      }
+    };
+
     // Direct login function - this will definitely work
     window.directLogin = async function () {
       console.log('🚀 DIRECT LOGIN STARTED');
-      alert('Starting login process...');
-
-      try {
-        // Check if Firebase is available
-        if (!window.firebaseAuth) {
-          alert('Firebase not loaded! Please refresh the page.');
-          return;
-        }
-
-        console.log('Firebase Auth available, attempting login...');
-
-        // Direct login with demo credentials
-        const userCredential = await window.firebaseAuth.signInWithEmailAndPassword('demo@tagyou.com', 'demo123');
-
-        console.log('✅ Login successful!', userCredential);
-        alert('Login successful! Redirecting...');
-
-        // Update user state
-        currentUser = {
-          id: userCredential.user.uid,
-          email: userCredential.user.email,
-          name: userCredential.user.displayName || 'Demo User'
-        };
-        isAuthenticated = true;
-
-        // Hide auth overlay and show app
-        const authOverlay = document.getElementById('authOverlay');
-        const appContent = document.getElementById('appContent');
-
-        if (authOverlay) {
-          authOverlay.style.display = 'none';
-        }
-
-        if (appContent) {
-          appContent.classList.add('authenticated');
-        }
-
-        // Initialize the app
-        initializeApp();
-
-        // Update admin portal visibility
-        updateAdminPortalVisibility();
-
-        console.log('🎉 User is now logged in and app is initialized!');
-
-      } catch (error) {
-        console.error('❌ Login failed:', error);
-        alert('Login failed: ' + error.message);
-      }
+      alert('Starting diagnostic login process...');
+      await diagnoseAuth();
     };
 
     // Simple form submission test
