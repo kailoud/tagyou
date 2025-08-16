@@ -14823,11 +14823,18 @@
       if (isActive) {
         console.log('toggleParadeRoute: adminData available:', adminData);
         console.log('toggleParadeRoute: float-routes available:', adminData?.['float-routes']);
+        console.log('toggleParadeRoute: window.adminData available:', window.adminData);
 
-        // Show main parade route
-        const mainRoute = adminData['float-routes']?.find(route =>
+        // Show main parade route - try both adminData and window.adminData
+        let mainRoute = adminData?.['float-routes']?.find(route =>
           route.route_type === 'Main Parade Route' && route.status === 'active'
         );
+
+        if (!mainRoute && window.adminData) {
+          mainRoute = window.adminData['float-routes']?.find(route =>
+            route.route_type === 'Main Parade Route' && route.status === 'active'
+          );
+        }
 
         console.log('toggleParadeRoute: mainRoute found:', mainRoute);
 
@@ -14945,17 +14952,25 @@
             status: 'active'
           };
 
+          console.log('About to display default route:', defaultRoute);
           displayMainFloatRoute(defaultRoute);
 
           // Center map on the carnival area
           setTimeout(() => {
             console.log('Centering map on carnival area (fallback)...');
+            console.log('Map object available:', !!map);
+            console.log('Map center before:', map?.getCenter());
             const carnivalBounds = L.latLngBounds([
               [51.5120, -0.2160], // Southwest
               [51.5270, -0.1950]  // Northeast
             ]);
-            map.fitBounds(carnivalBounds, { padding: [20, 20] });
-            console.log('Map centered on carnival area (fallback)');
+            if (map) {
+              map.fitBounds(carnivalBounds, { padding: [20, 20] });
+              console.log('Map centered on carnival area (fallback)');
+              console.log('Map center after:', map.getCenter());
+            } else {
+              console.error('Map not available for centering');
+            }
           }, 500);
 
           showNotification('🎪 Carnival route displayed • Click ⭐ to go to your location', 'success');
