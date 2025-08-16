@@ -6653,6 +6653,13 @@
 
 
   <!-- Main App Content -->
+  <!-- MINIMAL TEST - This should definitely work -->
+  <div
+    style="position: fixed; top: 10px; left: 10px; z-index: 999999; background: yellow; padding: 20px; border: 3px solid red;">
+    <button onclick="alert('MINIMAL TEST WORKS!')"
+      style="background: red; color: white; padding: 10px; cursor: pointer;">MINIMAL TEST</button>
+  </div>
+
   <!-- Authentication Overlay -->
   <div id="authOverlay" class="auth-overlay">
     <div class="auth-container">
@@ -7541,6 +7548,11 @@
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage-compat.js"></script>
+  <script>
+    // IMMEDIATE TEST - This should run first
+    console.log('🚨 IMMEDIATE JAVASCRIPT TEST');
+    alert('JavaScript is working!');
+  </script>
   <script src="firebase-config.js"></script>
   <script>
     // Test if JavaScript is working
