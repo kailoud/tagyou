@@ -6581,21 +6581,7 @@
             </svg>
             Go Pro - £9.99/3mo
           </div>
-          <div class="user-menu-item admin-portal" id="adminPortalMenuItem" onclick="showAdminPortal()"
-            style="color: #1e40af; font-weight: 600; border-top: 1px solid #e5e7eb; margin-top: 8px; padding-top: 8px; display: none;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-            </svg>
-            Admin Portal
-          </div>
-          <div class="user-menu-item admin-only" id="sendToUsersMenuItem" onclick="sendToUsersFromMain()"
-            style="color: #059669; font-weight: 600; display: none;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-            </svg>
-            Send to Users
-          </div>
+
           <div class="user-menu-item danger" onclick="handleLogoutClick(event)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path
@@ -7478,8 +7464,7 @@
 
             console.log('User authenticated:', currentUser); // Debug log
 
-            // Update Admin Portal visibility
-            updateAdminPortalVisibility();
+
 
             // Hide auth overlay and show app
             const authOverlay = document.getElementById('authOverlay');
@@ -7658,8 +7643,7 @@
             isProUser = email.endsWith('@admin.com') || email === 'demo@tagyou.com';
           }
 
-          // Update Admin Portal visibility
-          updateAdminPortalVisibility();
+
 
           // Check if user is admin and show notification
           if (isUserAdmin(userCredential.user)) {
@@ -7745,7 +7729,7 @@
           isProUser = false;
 
           // Hide Admin Portal
-          updateAdminPortalVisibility();
+
 
           // Show auth overlay
           showAuthOverlay();
@@ -7776,7 +7760,7 @@
         console.log('User state reset');
 
         // Hide Admin Portal
-        updateAdminPortalVisibility();
+
         console.log('Admin portal visibility updated');
 
         // Show auth overlay
@@ -7918,37 +7902,7 @@
         }
       }
 
-      // Admin email list - add your admin emails here
-      const ADMIN_EMAILS = [
-        'kailoud639@gmail.com',
-        // Replace with your email
-        // Add more admin emails as needed
-      ];
 
-      // Function to check if user is admin
-      function isUserAdmin(user) {
-        if (!user || !user.email) return false;
-        return ADMIN_EMAILS.includes(user.email.toLowerCase());
-      }
-
-      // Function to update Admin Portal visibility
-      function updateAdminPortalVisibility() {
-        const adminPortalMenuItem = document.getElementById('adminPortalMenuItem');
-        if (adminPortalMenuItem) {
-          const currentUser = window.firebaseAuth?.currentUser;
-          if (currentUser && isUserAdmin(currentUser)) {
-            adminPortalMenuItem.style.display = 'block';
-            document.getElementById('sendToUsersMenuItem').style.display = 'block';
-            document.getElementById('userInitials').textContent = 'A';
-            console.log('Admin Portal: SHOWN (User has admin privileges)');
-          } else {
-            adminPortalMenuItem.style.display = 'none';
-            document.getElementById('sendToUsersMenuItem').style.display = 'none';
-            document.getElementById('userInitials').textContent = 'U';
-            console.log('Admin Portal: HIDDEN (User does not have admin privileges)');
-          }
-        }
-      }
 
       // Demo login function removed
 
@@ -8898,295 +8852,15 @@
         }, 2000);
       }
 
-      // Admin Portal Functions
-      async function showAdminPortal() {
-        console.log('showAdminPortal called');
-        const currentUser = window.firebaseAuth?.currentUser;
-        console.log('Current user:', currentUser);
-        console.log('isUserAdmin check:', isUserAdmin(currentUser));
-
-        // Check if user has admin privileges
-        if (!currentUser || !isUserAdmin(currentUser)) {
-          console.log('Access denied - user is not admin');
-          showNotification('Access denied. Admin privileges required.', 'error');
-          return;
-        }
-
-        // Show loading state
-        showNotification('Loading admin data...', 'info');
-
-        try {
-          // Load data from Firebase
-          await loadAdminData();
-
-          // Create admin portal modal
-          const adminModal = document.createElement('div');
-          adminModal.className = 'modal-overlay';
-          adminModal.id = 'adminModal';
-          adminModal.innerHTML = `
-            <div class="modal-content admin-portal-content">
-              <div class="modal-header">
-                <h2>🔧 Admin Portal</h2>
-                <div class="header-actions">
-                  <button onclick="testFirebaseConnection()" class="test-btn" title="Test Firebase Connection">🧪</button>
-                  <button onclick="forceRefreshAdminData()" class="test-btn" title="Force Refresh Data">🔄</button>
-                  <button onclick="debugDataDiscrepancy()" class="test-btn" title="Debug Data Discrepancy">🔍</button>
-                  <button onclick="forceProcessBatchOperations()" class="test-btn" title="Process Pending Operations">⚡</button>
-                  <button onclick="cleanupOrphanedDocuments()" class="test-btn" title="Cleanup Orphaned Documents">🧹</button>
-                  <button onclick="cleanupMockData()" class="test-btn" title="Cleanup Mock Data">🎭</button>
-                  <button onclick="toggleAdminPortalSize()" class="expand-btn" title="Expand/Minimize">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
-                    </svg>
-                  </button>
-                  <button onclick="closeAdminPortal()" class="close-btn">&times;</button>
-                </div>
-              </div>
-              <div class="modal-body">
-                <!-- Admin Tabs -->
-                <div class="admin-tabs sticky-admin-header">
-                  <button class="admin-tab active" onclick="switchAdminTab('food-stalls')">
-                    🍔 Food Stalls
-                    <span class="tab-count">${adminData['food-stalls'].length}</span>
-                  </button>
-                  <button class="admin-tab" onclick="switchAdminTab('float-trucks')">
-                    🚚 Float Trucks
-                    <span class="tab-count">${adminData['float-trucks'].length}</span>
-                  </button>
-                  <button class="admin-tab" onclick="switchAdminTab('groups')">
-                    👥 Groups
-                    <span class="tab-count">${adminData['groups'].length}</span>
-                  </button>
-                  <button class="admin-tab" onclick="switchAdminTab('friends')">
-                    👤 Friends
-                    <span class="tab-count">${adminData['friends'].length}</span>
-                  </button>
-                  <button class="admin-tab" onclick="switchAdminTab('artists')">
-                    🎵 Artists
-                    <span class="tab-count">${adminData['artists'].length}</span>
-                  </button>
-                </div>
-
-                <!-- Loading indicator -->
-                <div id="adminLoadingIndicator" class="admin-loading" style="display: none;">
-                  <div class="loading-spinner"></div>
-                  <p>Loading data...</p>
-                </div>
-
-                <!-- Search and Add -->
-                <div class="admin-controls sticky-admin-controls">
-                  <div class="search-container">
-                    <input type="text" id="adminSearch" placeholder="Search..." class="admin-search">
-                  </div>
-                  <button onclick="showAdminAddForm()" class="add-btn">
-                    ➕ Add ${adminTabConfig[activeAdminTab].title.slice(0, -1)}
-                  </button>
-                </div>
-
-                <!-- Admin Data Table -->
-                <div class="admin-table-container">
-                  <table class="admin-table">
-                    <thead>
-                      <tr>
-                        <th>Image</th>
-                        <th>Name</th>
-                        <th>Details</th>
-                        <th>Contact</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody id="adminTableBody">
-                      ${renderAdminTableData()}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          `;
-
-          document.body.appendChild(adminModal);
-          setTimeout(() => adminModal.classList.add('show'), 10);
-          document.getElementById('userMenu').classList.remove('show');
-
-          // Hide loading indicator after modal is shown
-          setTimeout(() => {
-            const loadingIndicator = document.getElementById('adminLoadingIndicator');
-            if (loadingIndicator) {
-              loadingIndicator.style.display = 'none';
-            }
-
-            // Update tab counts after modal is shown
-            updateAdminTabCounts();
-          }, 100);
-        } catch (error) {
-          console.error('Error loading admin portal:', error);
-          showNotification('Error loading admin data from database', 'error');
-        }
-      }
-
-      function closeAdminPortal() {
-        const modal = document.getElementById('adminModal');
-        if (modal) {
-          modal.classList.remove('show');
-          setTimeout(() => {
-            modal.remove();
-
-            // Refresh artists data if artists button is active
-            const artistBandsBtn = document.querySelector('.artist-bands-btn');
-            if (artistBandsBtn && artistBandsBtn.classList.contains('active')) {
-              // Refresh map markers
-              removeArtistBandMarkers();
-              addArtistBandMarkers();
-
-              // Refresh panel data
-              const artistsContent = document.getElementById('artists-content');
-              if (artistsContent && artistsContent.classList.contains('active')) {
-                loadArtistsData();
-              }
-            }
-          }, 300);
-        }
-      }
 
 
 
-      // Send changes to users function (from Main Interface)
-      async function sendToUsersFromMain() {
-        console.log('Sending changes to users from main interface...');
 
-        const sendMenuItem = document.getElementById('sendToUsersMenuItem');
-        if (!sendMenuItem) return;
 
-        // Check if there are any pending changes
-        const hasPendingChanges = Object.values(pendingChanges).some(hasChanges => hasChanges);
 
-        if (!hasPendingChanges) {
-          showNotification('No changes to send to users', 'info');
-          return;
-        }
 
-        try {
-          // Show loading state
-          sendMenuItem.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-          </svg>
-          Sending...
-        `;
-          sendMenuItem.style.pointerEvents = 'none';
 
-          // Copy admin data to user data for all changed categories
-          for (const [category, hasChanges] of Object.entries(pendingChanges)) {
-            if (hasChanges) {
-              console.log(`Updating user data for ${category}`);
-              userData[category] = JSON.parse(JSON.stringify(adminData[category])); // Deep copy
-              pendingChanges[category] = false;
-            }
-          }
 
-          // Update user-facing displays
-          updateUserDisplays();
-
-          // Show success state
-          sendMenuItem.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-          </svg>
-          ✅ Sent to Users
-        `;
-          sendMenuItem.style.color = '#10b981';
-          showNotification('Changes sent to users successfully!', 'success');
-
-          // Reset button after 3 seconds
-          setTimeout(() => {
-            sendMenuItem.innerHTML = `
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-            </svg>
-            Send to Users
-          `;
-            sendMenuItem.style.color = '#059669';
-            sendMenuItem.style.pointerEvents = 'auto';
-          }, 3000);
-
-        } catch (error) {
-          console.error('Error sending changes to users:', error);
-          sendMenuItem.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-          </svg>
-          Send to Users
-        `;
-          sendMenuItem.style.pointerEvents = 'auto';
-          showNotification('Error sending changes to users', 'error');
-        }
-      }
-
-      // Update user-facing displays
-      function updateUserDisplays() {
-        console.log('Updating user displays...');
-
-        // Update map markers
-        removeArtistMarkers();
-        addArtistMarkers();
-
-        // Update panel data
-        const artistsContent = document.getElementById('artists-content');
-        if (artistsContent && artistsContent.classList.contains('active')) {
-          loadArtistsData();
-          loadArtistsSchedule();
-        }
-
-        // Update categories
-        updateArtistCategoriesFromUserData();
-
-        // Update other panels
-        const stallsContent = document.getElementById('find-stalls-content');
-        if (stallsContent && stallsContent.classList.contains('active')) {
-          loadStallsData();
-        }
-
-        // Load artists data
-        loadArtistsData();
-
-        const floatContent = document.getElementById('float-content');
-        if (floatContent && floatContent.classList.contains('active')) {
-          loadFloatData();
-          loadFloatSchedule();
-        }
-
-        console.log('User displays updated');
-      }
-
-      // Update send button state based on pending changes
-      function updateSendButtonState() {
-        const sendMenuItem = document.getElementById('sendToUsersMenuItem');
-
-        const hasPendingChanges = Object.values(pendingChanges).some(hasChanges => hasChanges);
-
-        // Update Main Interface menu item
-        if (sendMenuItem) {
-          if (hasPendingChanges) {
-            sendMenuItem.style.color = '#dc2626'; // Red to indicate pending changes
-            sendMenuItem.title = 'Send changes to users (changes pending)';
-          } else {
-            sendMenuItem.style.color = '#059669'; // Green when no pending changes
-            sendMenuItem.title = 'Send changes to users';
-          }
-        }
-      }
-
-      // Admin data and configuration
-      let activeAdminTab = 'food-stalls';
-      let adminData = {
-        'food-stalls': [],
-        'float-trucks': [],
-        'float-routes': [],
-        'groups': [],
-        'friends': [],
-        'artists': []
-      };
 
       // User-facing data (what users see)
       let userData = {
