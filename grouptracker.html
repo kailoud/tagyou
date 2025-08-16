@@ -5174,18 +5174,8 @@
             updateAdminPortalVisibility();
 
             // Hide auth overlay and show app
-            const authOverlay = document.getElementById('authOverlay');
-            const appContent = document.getElementById('appContent');
-
-            if (authOverlay) {
-              authOverlay.style.display = 'none';
-              console.log('Auth overlay hidden'); // Debug log
-            }
-
-            if (appContent) {
-              appContent.classList.add('authenticated');
-              console.log('App content authenticated class added'); // Debug log
-            }
+            hideAuthOverlay();
+            console.log('Auth overlay hidden and app content shown'); // Debug log
 
             // Initialize app
             initializeApp();
@@ -5580,8 +5570,17 @@
           userProfile.style.display = 'flex';
         }
 
-        // Initialize map immediately
-        initializeMap();
+        // Ensure map is properly displayed after authentication
+        if (map) {
+          console.log('Ensuring map is properly displayed...');
+          map.invalidateSize();
+
+          // Center map on user location if available
+          if (currentLocation && currentLocation.lat && currentLocation.lng) {
+            map.setView([currentLocation.lat, currentLocation.lng], 16);
+            console.log('Map centered on user location:', currentLocation);
+          }
+        }
 
         console.log('App initialized successfully!');
       }
@@ -5844,10 +5843,24 @@
         }
       }
 
-      function showAuthOverlay() {
+      window.showAuthOverlay = function () {
         document.getElementById('authOverlay').style.display = 'flex';
         document.getElementById('appContent').classList.remove('authenticated');
         document.getElementById('userProfile').style.display = 'none';
+      }
+
+      window.hideAuthOverlay = function () {
+        document.getElementById('authOverlay').style.display = 'none';
+        document.getElementById('appContent').classList.add('authenticated');
+        document.getElementById('userProfile').style.display = 'flex';
+
+        // Ensure map is visible and properly sized
+        if (map) {
+          setTimeout(() => {
+            map.invalidateSize();
+            console.log('Map size invalidated after auth overlay hidden');
+          }, 100);
+        }
       }
 
       function updateUserAvatar() {
@@ -7410,7 +7423,11 @@
 
         console.log('Body and HTML forced to have proper dimensions');
 
-        // Initialize Firebase services first
+        // Initialize map immediately (regardless of auth status)
+        console.log('Initializing map...');
+        initializeMap();
+
+        // Initialize Firebase services
         try {
           // Wait for Firebase to be available
           if (typeof firebase === 'undefined') {
@@ -7489,7 +7506,7 @@
       }
 
       // Simple map initialization - just make it work!
-      function initializeMap() {
+      window.initializeMap = function () {
         // Prevent duplicate initialization
         if (window.mapInitialized || map) {
           console.log('Map already initialized, skipping...');
