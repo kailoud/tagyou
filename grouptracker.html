@@ -144,8 +144,9 @@
       display: none;
     }
 
-    .auth-form.active {
-      display: block;
+    .auth-form.active,
+    #loginForm {
+      display: block !important;
     }
 
     .auth-input-group {
@@ -6657,7 +6658,7 @@
       </div>
 
       <!-- Login Form -->
-      <form id="loginForm" class="auth-form">
+      <form id="loginForm" class="auth-form" style="display: block;">
         <div class="form-group">
           <label for="loginEmail">Email</label>
           <input type="email" id="loginEmail" name="email" value="demo@tagyou.com" required>
@@ -6667,7 +6668,7 @@
           <input type="password" id="loginPassword" name="password" value="demo123" required>
         </div>
         <button type="submit" class="auth-btn" style="cursor: pointer !important; pointer-events: auto !important;"
-          onclick="console.log('Button clicked!')">Sign In</button>
+          onclick="console.log('Sign In button clicked!'); return true;">Sign In</button>
 
         <!-- NUCLEAR OPTION - This WILL work -->
         <button type="button"
@@ -16051,19 +16052,19 @@
     };
 
     // FORCE CURSOR ON ALL BUTTONS
-    window.forceCursorOnButtons = function() {
+    window.forceCursorOnButtons = function () {
       console.log('🔧 FORCING CURSOR ON ALL BUTTONS');
-      
+
       // Force cursor on all buttons
       const allButtons = document.querySelectorAll('button, input[type="submit"], input[type="button"], [onclick]');
       allButtons.forEach(button => {
         button.style.cursor = 'pointer !important';
         button.style.pointerEvents = 'auto !important';
-        button.onmouseenter = function() {
+        button.onmouseenter = function () {
           this.style.cursor = 'pointer !important';
         };
       });
-      
+
       console.log('🔧 Applied cursor to', allButtons.length, 'buttons');
     };
 
