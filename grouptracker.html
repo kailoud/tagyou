@@ -10833,6 +10833,18 @@
           });
         }
 
+        // Special handling for find-stalls tab
+        if (tabName === 'find-stalls') {
+          console.log('Find stalls tab activated, loading stalls data...');
+          // Ensure admin data is loaded first
+          loadAdminData().then(() => {
+            loadStallsData();
+          }).catch(error => {
+            console.error('Error loading admin data for find-stalls tab:', error);
+            loadStallsData();
+          });
+        }
+
       } else {
         console.error('❌ Content not found:', tabName + '-content');
       }
@@ -14314,10 +14326,39 @@
         }));
       }
 
-      // If no data available, show empty state
+      // If no data available, show demo data for testing
       if (stallsData.length === 0) {
-        console.log('No stalls data found in Firebase - showing empty state');
-        stallsData = [];
+        console.log('No stalls data found in Firebase - showing demo data for testing');
+        stallsData = [
+          {
+            id: 'demo-1',
+            name: 'leisi',
+            origin: 'Unknown',
+            description: 'dddd',
+            image: '🍽️',
+            rating: 4.8,
+            priceRange: '£',
+            categories: ['Food'],
+            location: null,
+            menu: ['Various items'],
+            hours: 'TBA',
+            contact: 'N/A'
+          },
+          {
+            id: 'demo-2',
+            name: 'Caribbean Delights',
+            origin: 'Jamaica',
+            description: 'Authentic Caribbean cuisine with jerk chicken and rice & peas',
+            image: '🍗',
+            rating: 4.5,
+            priceRange: '££',
+            categories: ['Caribbean', 'Chicken', 'Rice'],
+            location: null,
+            menu: ['Jerk Chicken', 'Rice & Peas', 'Plantains'],
+            hours: '10:00 - 22:00',
+            contact: 'N/A'
+          }
+        ];
       }
 
       // Initialize filtered stalls
