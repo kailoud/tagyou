@@ -33,6 +33,21 @@
       position: relative;
       margin: 0;
       padding: 0;
+      cursor: default;
+    }
+
+    /* Ensure all buttons have proper cursor */
+    button {
+      cursor: pointer !important;
+    }
+
+    /* Ensure all clickable elements have proper cursor */
+    a,
+    button,
+    input[type="submit"],
+    input[type="button"],
+    .clickable {
+      cursor: pointer !important;
     }
 
     /* Authentication Styles */
@@ -48,6 +63,8 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      cursor: default;
+      pointer-events: auto;
     }
 
     .auth-container {
@@ -149,6 +166,26 @@
       transition: all 0.3s ease;
       margin-bottom: 16px;
       pointer-events: auto !important;
+      position: relative;
+      z-index: 10002;
+    }
+
+    /* Force cursor pointer on all auth buttons */
+    button.auth-btn,
+    input[type="submit"].auth-btn,
+    .auth-btn[type="submit"] {
+      cursor: pointer !important;
+      pointer-events: auto !important;
+    }
+
+    /* Force cursor on hover */
+    .auth-btn:hover,
+    button.auth-btn:hover,
+    input[type="submit"].auth-btn:hover {
+      cursor: pointer !important;
+      background: #e55a2b !important;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
     }
 
     .auth-btn:hover {
@@ -6605,8 +6642,14 @@
           <label for="loginPassword">Password</label>
           <input type="password" id="loginPassword" name="password" value="demo123" required>
         </div>
-        <button type="submit" class="auth-btn"
+        <button type="submit" class="auth-btn" style="cursor: pointer !important; pointer-events: auto !important;"
           onclick="console.log('Sign In button clicked'); alert('Button clicked!')">Sign In</button>
+
+        <!-- Test button to verify cursor -->
+        <button type="button"
+          style="background: red; color: white; padding: 10px; margin: 10px 0; cursor: pointer !important;"
+          onclick="alert('Test button works!')">Test Cursor Button</button>
+
         <div class="auth-links">
           <a href="#" onclick="switchAuthTab('forgot')">Forgot Password?</a>
         </div>
@@ -15820,6 +15863,23 @@
       console.log('Button click test function called');
       alert('Button click test successful!');
     };
+
+    // Force cursor on all buttons
+    window.forceCursorOnButtons = function () {
+      const buttons = document.querySelectorAll('button');
+      buttons.forEach(button => {
+        button.style.cursor = 'pointer';
+        button.style.pointerEvents = 'auto';
+      });
+      console.log('Forced cursor on', buttons.length, 'buttons');
+    };
+
+    // Run cursor fix on page load
+    document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(() => {
+        forceCursorOnButtons();
+      }, 1000);
+    });
   </script>
 
   <!-- Admin Portal Modal -->
