@@ -151,30 +151,24 @@ function showFoodStalls() {
   // Add markers for food stalls
   foodStalls.forEach(stall => {
     const popupContent = `
-      <div style="max-width: 280px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="margin-bottom: 12px;">
-          <img src="${stall.image}" alt="${stall.name}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;">
+      <div style="max-width: 200px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 8px;">
+        <h3 style="margin: 0 0 6px 0; color: #1f2937; font-size: 14px; font-weight: 700;">🍽️ ${stall.name}</h3>
+        <p style="margin: 0 0 6px 0; color: #6b7280; font-size: 11px; line-height: 1.3;">${stall.description}</p>
+        <div style="margin-bottom: 6px;">
+          <span style="background: #10b981; color: white; padding: 1px 4px; border-radius: 3px; font-size: 10px; font-weight: 600;">⭐ ${stall.rating}</span>
+          <span style="background: #f59e0b; color: white; padding: 1px 4px; border-radius: 3px; font-size: 10px; font-weight: 600; margin-left: 3px;">${stall.priceRange}</span>
         </div>
-        <h3 style="margin: 0 0 8px 0; color: #1f2937; font-size: 16px; font-weight: 700;">${stall.name}</h3>
-        <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px; line-height: 1.4;">${stall.description}</p>
-        <div style="margin-bottom: 8px;">
-          <span style="background: #10b981; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">⭐ ${stall.rating}</span>
-          <span style="background: #f59e0b; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 4px;">${stall.priceRange}</span>
+        <div style="margin-bottom: 4px;">
+          <span style="color: #374151; font-size: 10px;">📍 ${stall.location}</span>
         </div>
-        <div style="margin-bottom: 8px;">
-          <strong style="color: #374151; font-size: 12px;">📍 ${stall.location}</strong>
+        <div style="margin-bottom: 4px;">
+          <span style="color: #374151; font-size: 10px;">🕒 ${stall.hours}</span>
         </div>
-        <div style="margin-bottom: 8px;">
-          <strong style="color: #374151; font-size: 12px;">🕒 ${stall.hours}</strong>
+        <div style="margin-bottom: 4px;">
+          <span style="color: #374151; font-size: 10px;">📞 ${stall.phone}</span>
         </div>
-        <div style="margin-bottom: 8px;">
-          <strong style="color: #374151; font-size: 12px;">📞 ${stall.phone}</strong>
-        </div>
-        <div style="margin-bottom: 8px;">
-          <strong style="color: #374151; font-size: 12px;">🍽️ Specialties:</strong>
-          <div style="margin-top: 4px;">
-            ${stall.specialties.map(item => `<span style="background: #f3f4f6; color: #374151; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 4px; margin-bottom: 4px; display: inline-block;">${item}</span>`).join('')}
-          </div>
+        <div style="margin-top: 6px;">
+          <span style="color: #374151; font-size: 10px; font-weight: 600;">🍽️ ${stall.specialties.slice(0, 2).join(', ')}</span>
         </div>
       </div>
     `;
@@ -266,36 +260,27 @@ function showArtists() {
   // Add markers for artists
   artists.forEach(artist => {
     const popupContent = `
-      <div style="max-width: 280px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="margin-bottom: 12px;">
-          <img src="${artist.image}" alt="${artist.name}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;">
+      <div style="max-width: 200px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 8px;">
+        <h3 style="margin: 0 0 6px 0; color: #1f2937; font-size: 14px; font-weight: 700;">🎵 ${artist.name}</h3>
+        <p style="margin: 0 0 6px 0; color: #6b7280; font-size: 11px; line-height: 1.3;">${artist.description}</p>
+        <div style="margin-bottom: 6px;">
+          <span style="background: #8b5cf6; color: white; padding: 1px 4px; border-radius: 3px; font-size: 10px; font-weight: 600;">⭐ ${artist.rating}</span>
+          <span style="background: #f59e0b; color: white; padding: 1px 4px; border-radius: 3px; font-size: 10px; font-weight: 600; margin-left: 3px;">🎵 Live</span>
         </div>
-        <h3 style="margin: 0 0 8px 0; color: #1f2937; font-size: 16px; font-weight: 700;">${artist.name}</h3>
-        <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px; line-height: 1.4;">${artist.description}</p>
-        <div style="margin-bottom: 8px;">
-          <span style="background: #8b5cf6; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">⭐ ${artist.rating}</span>
-          <span style="background: #f59e0b; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 4px;">🎵 Live</span>
+        <div style="margin-bottom: 4px;">
+          <span style="color: #374151; font-size: 10px;">📍 ${artist.location}</span>
         </div>
-        <div style="margin-bottom: 8px;">
-          <strong style="color: #374151; font-size: 12px;">📍 ${artist.location}</strong>
+        <div style="margin-bottom: 4px;">
+          <span style="color: #374151; font-size: 10px;">🕒 ${artist.performanceTime}</span>
         </div>
-        <div style="margin-bottom: 8px;">
-          <strong style="color: #374151; font-size: 12px;">🕒 ${artist.performanceTime}</strong>
+        <div style="margin-bottom: 4px;">
+          <span style="color: #374151; font-size: 10px;">🎪 ${artist.stage}</span>
         </div>
-        <div style="margin-bottom: 8px;">
-          <strong style="color: #374151; font-size: 12px;">🎪 ${artist.stage}</strong>
+        <div style="margin-bottom: 4px;">
+          <span style="color: #374151; font-size: 10px;">📞 ${artist.phone}</span>
         </div>
-        <div style="margin-bottom: 8px;">
-          <strong style="color: #374151; font-size: 12px;">📞 ${artist.phone}</strong>
-        </div>
-        <div style="margin-bottom: 8px;">
-          <strong style="color: #374151; font-size: 12px;">🎵 Genres:</strong>
-          <div style="margin-top: 4px;">
-            ${artist.genres.map(genre => `<span style="background: #f3f4f6; color: #374151; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 4px; margin-bottom: 4px; display: inline-block;">${genre}</span>`).join('')}
-          </div>
-        </div>
-        <div style="margin-bottom: 8px;">
-          <strong style="color: #374151; font-size: 12px;">⭐ Experience: ${artist.experience}</strong>
+        <div style="margin-top: 6px;">
+          <span style="color: #374151; font-size: 10px; font-weight: 600;">🎵 ${artist.genres.slice(0, 2).join(', ')}</span>
         </div>
       </div>
     `;
