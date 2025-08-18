@@ -150,7 +150,20 @@ function showFoodStalls() {
 
   // Add markers for food stalls
   foodStalls.forEach(stall => {
-    const popupContent = `<div style="padding: 10px;"><h3>🍽️ ${stall.name}</h3><p>${stall.description}</p><p>📍 ${stall.location}</p><p>🕒 ${stall.hours}</p></div>`;
+    const popupContent = `
+      <div style="padding: 10px; max-width: 180px;">
+        <div style="display: flex; align-items: center; margin-bottom: 8px;">
+          <img src="${stall.image}" alt="${stall.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 8px;">
+          <div>
+            <h3 style="margin: 0; font-size: 14px; font-weight: 600;">🍽️ ${stall.name}</h3>
+            <span style="background: #10b981; color: white; padding: 1px 4px; border-radius: 3px; font-size: 9px;">⭐ ${stall.rating}</span>
+          </div>
+        </div>
+        <p style="margin: 0 0 6px 0; font-size: 11px; color: #666;">${stall.description}</p>
+        <p style="margin: 0 0 4px 0; font-size: 10px;">📍 ${stall.location}</p>
+        <p style="margin: 0; font-size: 10px;">🕒 ${stall.hours}</p>
+      </div>
+    `;
 
     const marker = L.marker([stall.lat, stall.lng], { icon: foodStallIcon })
       .addTo(map);
@@ -247,7 +260,20 @@ function showArtists() {
 
   // Add markers for artists
   artists.forEach(artist => {
-    const popupContent = `<div style="padding: 10px;"><h3>🎵 ${artist.name}</h3><p>${artist.description}</p><p>📍 ${artist.location}</p><p>🕒 ${artist.performanceTime}</p></div>`;
+    const popupContent = `
+      <div style="padding: 10px; max-width: 180px;">
+        <div style="display: flex; align-items: center; margin-bottom: 8px;">
+          <img src="${artist.image}" alt="${artist.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 8px;">
+          <div>
+            <h3 style="margin: 0; font-size: 14px; font-weight: 600;">🎵 ${artist.name}</h3>
+            <span style="background: #8b5cf6; color: white; padding: 1px 4px; border-radius: 3px; font-size: 9px;">⭐ ${artist.rating}</span>
+          </div>
+        </div>
+        <p style="margin: 0 0 6px 0; font-size: 11px; color: #666;">${artist.description}</p>
+        <p style="margin: 0 0 4px 0; font-size: 10px;">📍 ${artist.location}</p>
+        <p style="margin: 0; font-size: 10px;">🕒 ${artist.performanceTime}</p>
+      </div>
+    `;
 
     const marker = L.marker([artist.lat, artist.lng], { icon: artistIcon })
       .addTo(map);
