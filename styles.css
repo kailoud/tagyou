@@ -1572,6 +1572,42 @@ input:checked+.slider:before {
   display: none !important;
 }
 
+/* Basic Speech Bubble Effect for Markers */
+.leaflet-marker-icon.food-stall-marker,
+.leaflet-marker-icon.artist-marker,
+.food-stall-marker,
+.artist-marker {
+  animation: bounce 1s ease-in-out infinite !important;
+}
+
+/* Simple bounce animation */
+@keyframes bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+
+
+
+
+/* Simple hover effect */
+.leaflet-marker-icon.food-stall-marker:hover,
+.leaflet-marker-icon.artist-marker:hover,
+.food-stall-marker:hover,
+.artist-marker:hover {
+  transform: scale(1.2) !important;
+  z-index: 1000 !important;
+}
+
+
+
 /* Large Desktop Dropdown */
 @media (min-width: 1001px) {
   .festivals-dropdown {

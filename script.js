@@ -94,8 +94,8 @@ const foodStalls = [
   {
     id: 1,
     name: "Caribbean Spice Kitchen",
-    lat: 51.5198,
-    lng: -0.2015,
+    lat: 51.517871,
+    lng: -0.205163,
     location: "Ladbroke Grove",
     description: "Authentic Jamaican jerk chicken and Caribbean cuisine",
     specialties: ["Jerk Chicken", "Curry Goat", "Rice & Peas", "Plantain"],
@@ -108,8 +108,8 @@ const foodStalls = [
   {
     id: 2,
     name: "Notting Hill Jerk House",
-    lat: 51.5212,
-    lng: -0.1987,
+    lat: 51.515638,
+    lng: -0.201236,
     location: "Portobello Road",
     description: "Traditional jerk chicken with secret family recipe",
     specialties: ["Jerk Chicken", "Jerk Pork", "Ackee & Saltfish", "Callaloo"],
@@ -122,8 +122,8 @@ const foodStalls = [
   {
     id: 3,
     name: "Island Flavours",
-    lat: 51.5185,
-    lng: -0.2043,
+    lat: 51.516875,
+    lng: -0.200021,
     location: "Westbourne Grove",
     description: "Fresh Caribbean street food and traditional dishes",
     specialties: ["Jerk Chicken", "Roti", "Doubles", "Sorrel Drink"],
@@ -143,7 +143,7 @@ function showFoodStalls() {
   // Custom food stall icon
   const foodStallIcon = L.divIcon({
     className: 'food-stall-marker',
-    html: '<div style="background: linear-gradient(135deg, #4ade80, #22c55e); width: 20px; height: 20px; border-radius: 50%; box-shadow: 0 3px 10px rgba(74, 222, 128, 0.6); display: flex; align-items: center; justify-content: center; border: 2px solid #fff;"><i class="fas fa-utensils" style="color: #fff; font-size: 10px;"></i></div>',
+    html: '<div style="background: linear-gradient(135deg, #4ade80, #22c55e); width: 20px; height: 20px; border-radius: 50%; box-shadow: 0 4px 20px rgba(74, 222, 128, 0.6); display: flex; align-items: center; justify-content: center; border: 2px solid #fff;"><i class="fas fa-utensils" style="color: #fff; font-size: 10px;"></i></div>',
     iconSize: [20, 20],
     iconAnchor: [10, 10]
   });
@@ -206,8 +206,8 @@ const artists = [
   {
     id: 1,
     name: "DJ Shy FX",
-    lat: 51.5198,
-    lng: -0.2015,
+    lat: 51.517674,
+    lng: -0.200438,
     location: "Ladbroke Grove",
     description: "Legendary drum & bass and jungle pioneer",
     genres: ["Drum & Bass", "Jungle", "UK Garage", "Reggae"],
@@ -221,8 +221,8 @@ const artists = [
   {
     id: 2,
     name: "Steel Pulse",
-    lat: 51.5212,
-    lng: -0.1987,
+    lat: 51.522428,
+    lng: -0.203347,
     location: "Portobello Road",
     description: "Grammy-winning reggae legends from Birmingham",
     genres: ["Reggae", "Roots", "Conscious Music", "Political Lyrics"],
@@ -236,8 +236,8 @@ const artists = [
   {
     id: 3,
     name: "London Samba Collective",
-    lat: 51.5185,
-    lng: -0.2043,
+    lat: 51.518363,
+    lng: -0.210441,
     location: "Westbourne Grove",
     description: "Energetic Brazilian samba rhythms and percussion",
     genres: ["Samba", "Batucada", "Brazilian Rhythms", "Carnival Music"],
@@ -258,7 +258,7 @@ function showArtists() {
   // Custom artist icon
   const artistIcon = L.divIcon({
     className: 'artist-marker',
-    html: '<div style="background: linear-gradient(135deg, #8b5cf6, #a855f7); width: 20px; height: 20px; border-radius: 50%; box-shadow: 0 3px 10px rgba(139, 92, 246, 0.6); display: flex; align-items: center; justify-content: center; border: 2px solid #fff;"><i class="fas fa-music" style="color: #fff; font-size: 10px;"></i></div>',
+    html: '<div style="background: linear-gradient(135deg, #8b5cf6, #a855f7); width: 20px; height: 20px; border-radius: 50%; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.6); display: flex; align-items: center; justify-content: center; border: 2px solid #fff;"><i class="fas fa-music" style="color: #fff; font-size: 10px;"></i></div>',
     iconSize: [20, 20],
     iconAnchor: [10, 10]
   });
