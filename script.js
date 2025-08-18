@@ -198,6 +198,127 @@ function hideFoodStalls() {
   console.log('Food stalls hidden from map');
 }
 
+// Artists data and functionality
+let artistMarkers = [];
+
+// Artists data along Notting Hill Carnival float route
+const artists = [
+  {
+    id: 1,
+    name: "DJ Shy FX",
+    lat: 51.5198,
+    lng: -0.2015,
+    location: "Ladbroke Grove",
+    description: "Legendary drum & bass and jungle pioneer",
+    genres: ["Drum & Bass", "Jungle", "UK Garage", "Reggae"],
+    rating: 4.9,
+    performanceTime: "3:00 PM - 4:30 PM",
+    stage: "Main Float Route",
+    image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+    phone: "+44 20 7123 4570",
+    experience: "25+ years in UK dance music scene"
+  },
+  {
+    id: 2,
+    name: "Steel Pulse",
+    lat: 51.5212,
+    lng: -0.1987,
+    location: "Portobello Road",
+    description: "Grammy-winning reggae legends from Birmingham",
+    genres: ["Reggae", "Roots", "Conscious Music", "Political Lyrics"],
+    rating: 4.8,
+    performanceTime: "5:00 PM - 6:30 PM",
+    stage: "Cultural Stage",
+    image: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=400&h=300&fit=crop",
+    phone: "+44 20 7123 4571",
+    experience: "40+ years of reggae excellence"
+  },
+  {
+    id: 3,
+    name: "London Samba Collective",
+    lat: 51.5185,
+    lng: -0.2043,
+    location: "Westbourne Grove",
+    description: "Energetic Brazilian samba rhythms and percussion",
+    genres: ["Samba", "Batucada", "Brazilian Rhythms", "Carnival Music"],
+    rating: 4.7,
+    performanceTime: "2:00 PM - 3:30 PM",
+    stage: "Parade Route",
+    image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=300&fit=crop",
+    phone: "+44 20 7123 4572",
+    experience: "15+ years of carnival performances"
+  }
+];
+
+// Function to show artists
+function showArtists() {
+  // Clear existing artist markers
+  hideArtists();
+
+  // Custom artist icon
+  const artistIcon = L.divIcon({
+    className: 'artist-marker',
+    html: '<div style="background: linear-gradient(135deg, #8b5cf6, #a855f7); width: 20px; height: 20px; border-radius: 50%; box-shadow: 0 3px 10px rgba(139, 92, 246, 0.6); display: flex; align-items: center; justify-content: center; border: 2px solid #fff;"><i class="fas fa-music" style="color: #fff; font-size: 10px;"></i></div>',
+    iconSize: [20, 20],
+    iconAnchor: [10, 10]
+  });
+
+  // Add markers for artists
+  artists.forEach(artist => {
+    const popupContent = `
+      <div style="max-width: 280px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <div style="margin-bottom: 12px;">
+          <img src="${artist.image}" alt="${artist.name}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;">
+        </div>
+        <h3 style="margin: 0 0 8px 0; color: #1f2937; font-size: 16px; font-weight: 700;">${artist.name}</h3>
+        <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px; line-height: 1.4;">${artist.description}</p>
+        <div style="margin-bottom: 8px;">
+          <span style="background: #8b5cf6; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">⭐ ${artist.rating}</span>
+          <span style="background: #f59e0b; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 4px;">🎵 Live</span>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <strong style="color: #374151; font-size: 12px;">📍 ${artist.location}</strong>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <strong style="color: #374151; font-size: 12px;">🕒 ${artist.performanceTime}</strong>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <strong style="color: #374151; font-size: 12px;">🎪 ${artist.stage}</strong>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <strong style="color: #374151; font-size: 12px;">📞 ${artist.phone}</strong>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <strong style="color: #374151; font-size: 12px;">🎵 Genres:</strong>
+          <div style="margin-top: 4px;">
+            ${artist.genres.map(genre => `<span style="background: #f3f4f6; color: #374151; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 4px; margin-bottom: 4px; display: inline-block;">${genre}</span>`).join('')}
+          </div>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <strong style="color: #374151; font-size: 12px;">⭐ Experience: ${artist.experience}</strong>
+        </div>
+      </div>
+    `;
+
+    const marker = L.marker([artist.lat, artist.lng], { icon: artistIcon })
+      .bindPopup(popupContent, { maxWidth: 300 })
+      .addTo(map);
+
+    artistMarkers.push(marker);
+  });
+
+  console.log('Artists displayed on map');
+}
+
+// Function to hide artists
+function hideArtists() {
+  artistMarkers.forEach(marker => {
+    map.removeLayer(marker);
+  });
+  artistMarkers = [];
+  console.log('Artists hidden from map');
+}
+
 // Function to show judging zone
 function showJudgingZone() {
   // Add a marker for the judging zone label
@@ -693,7 +814,12 @@ function initMapToolbar() {
   artistBandBtn.addEventListener('click', function () {
     toggleButtonActive(this);
     console.log('Artists & Bands button clicked');
-    // Add functionality to show/hide artists/bands on map
+
+    if (this.classList.contains('active')) {
+      showArtists();
+    } else {
+      hideArtists();
+    }
   });
 
   // Festival button
