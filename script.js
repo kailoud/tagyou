@@ -101,7 +101,7 @@ const foodStalls = [
     specialties: ["Jerk Chicken", "Curry Goat", "Rice & Peas", "Plantain"],
     rating: 4.8,
     priceRange: "££",
-    image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop",
     hours: "11:00 AM - 8:00 PM",
     phone: "+44 20 7123 4567"
   },
@@ -115,7 +115,7 @@ const foodStalls = [
     specialties: ["Jerk Chicken", "Jerk Pork", "Ackee & Saltfish", "Callaloo"],
     rating: 4.9,
     priceRange: "££",
-    image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop",
     hours: "10:00 AM - 9:00 PM",
     phone: "+44 20 7123 4568"
   },
@@ -129,7 +129,7 @@ const foodStalls = [
     specialties: ["Jerk Chicken", "Roti", "Doubles", "Sorrel Drink"],
     rating: 4.7,
     priceRange: "£",
-    image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop",
     hours: "12:00 PM - 7:00 PM",
     phone: "+44 20 7123 4569"
   }
