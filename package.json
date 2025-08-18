@@ -1,0 +1,32 @@
+{
+  "name": "tagyou2-london-map",
+  "version": "1.0.0",
+  "description": "Clean London map application with zoom functionality",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server --port=5500 --open=/",
+    "dev": "live-server --port=5500 --open=/ --watch=.",
+    "build": "echo 'No build process needed for static site'",
+    "lint": "eslint script.js",
+    "format": "prettier --write '*.{js,css,html}'"
+  },
+  "keywords": [
+    "london",
+    "map",
+    "leaflet",
+    "interactive",
+    "zoom"
+  ],
+  "author": "TagYou2 Team",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "live-server": "^1.2.2",
+    "prettier": "^3.2.5"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

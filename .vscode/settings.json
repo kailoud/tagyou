@@ -1,0 +1,42 @@
+{
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "files.associations": {
+    "*.html": "html",
+    "*.css": "css",
+    "*.js": "javascript"
+  },
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact"
+  },
+  "liveServer.settings.port": 5500,
+  "liveServer.settings.root": "/",
+  "liveServer.settings.CustomBrowser": "chrome",
+  "liveServer.settings.https": false,
+  "liveServer.settings.useLocalIp": true,
+  "liveServer.settings.mount": [
+    [
+      "/",
+      "./"
+    ]
+  ],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/Thumbs.db": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true
+  },
+  "css.validate": true,
+  "html.validate.scripts": true,
+  "javascript.validate.enable": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
+}
