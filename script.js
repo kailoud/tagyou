@@ -168,14 +168,16 @@ function showFoodStalls() {
     const marker = L.marker([stall.lat, stall.lng], { icon: foodStallIcon })
       .addTo(map);
 
+    // Bind popup once on creation
+    marker.bindPopup(popupContent, {
+      maxWidth: 300,
+      closeButton: true,
+      autoClose: false
+    });
+
     // Add click event for debugging
     marker.on('click', function () {
       console.log('Food stall clicked:', stall.name);
-      marker.bindPopup(popupContent, {
-        maxWidth: 300,
-        closeButton: true,
-        autoClose: false
-      }).openPopup();
     });
 
     foodStallMarkers.push(marker);
@@ -278,14 +280,16 @@ function showArtists() {
     const marker = L.marker([artist.lat, artist.lng], { icon: artistIcon })
       .addTo(map);
 
+    // Bind popup once on creation
+    marker.bindPopup(popupContent, {
+      maxWidth: 300,
+      closeButton: true,
+      autoClose: false
+    });
+
     // Add click event for debugging
     marker.on('click', function () {
       console.log('Artist clicked:', artist.name);
-      marker.bindPopup(popupContent, {
-        maxWidth: 300,
-        closeButton: true,
-        autoClose: false
-      }).openPopup();
     });
 
     artistMarkers.push(marker);
