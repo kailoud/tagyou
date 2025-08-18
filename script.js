@@ -830,13 +830,40 @@ function initMapToolbar() {
   let medicalMarkers = [];
 
   // Location Center button
+  let userLocationMarker = null;
+
   locationCenterBtn.addEventListener('click', function () {
     console.log('Location Center button clicked');
-    // Add functionality to center map on user location
+    // Add functionality to center map on user location and show blue dot
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function (position) {
-        map.setView([position.coords.latitude, position.coords.longitude], 15);
-        console.log('Map centered on user location');
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+
+        // Remove existing user location marker
+        if (userLocationMarker) {
+          map.removeLayer(userLocationMarker);
+        }
+
+        // Create blue dot marker for user location
+        const userLocationIcon = L.divIcon({
+          className: 'user-location-marker',
+          html: '<div style="background: #3b82f6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.6);"></div>',
+          iconSize: [16, 16],
+          iconAnchor: [8, 8]
+        });
+
+        // Add user location marker
+        userLocationMarker = L.marker([userLat, userLng], { icon: userLocationIcon })
+          .bindPopup('<b>📍 Your Location</b><br>You are here!')
+          .addTo(map);
+
+        // Center map on user location
+        map.setView([userLat, userLng], 15);
+        console.log('Map centered on user location with blue dot');
+
+        // Toggle button active state
+        toggleButtonActive(locationCenterBtn);
       }, function (error) {
         console.log('Error getting location:', error);
         // Fallback to London center

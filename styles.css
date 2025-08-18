@@ -1598,6 +1598,27 @@ input:checked+.slider:before {
   background: white !important;
 }
 
+/* User location marker (blue dot) */
+.user-location-marker {
+  z-index: 1000 !important;
+}
+
+.user-location-marker div {
+  animation: pulse-blue 2s ease-in-out infinite;
+}
+
+@keyframes pulse-blue {
+
+  0%,
+  100% {
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.6);
+  }
+
+  50% {
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.8);
+  }
+}
+
 
 
 /* Large Desktop Dropdown */
