@@ -86,6 +86,118 @@ function showMedicalLocations() {
   console.log('Medical locations displayed permanently');
 }
 
+// Food stalls data and functionality
+let foodStallMarkers = [];
+
+// Food stalls data within Notting Hill Carnival boundaries
+const foodStalls = [
+  {
+    id: 1,
+    name: "Caribbean Spice Kitchen",
+    lat: 51.5198,
+    lng: -0.2015,
+    location: "Ladbroke Grove",
+    description: "Authentic Jamaican jerk chicken and Caribbean cuisine",
+    specialties: ["Jerk Chicken", "Curry Goat", "Rice & Peas", "Plantain"],
+    rating: 4.8,
+    priceRange: "££",
+    image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop",
+    hours: "11:00 AM - 8:00 PM",
+    phone: "+44 20 7123 4567"
+  },
+  {
+    id: 2,
+    name: "Notting Hill Jerk House",
+    lat: 51.5212,
+    lng: -0.1987,
+    location: "Portobello Road",
+    description: "Traditional jerk chicken with secret family recipe",
+    specialties: ["Jerk Chicken", "Jerk Pork", "Ackee & Saltfish", "Callaloo"],
+    rating: 4.9,
+    priceRange: "££",
+    image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop",
+    hours: "10:00 AM - 9:00 PM",
+    phone: "+44 20 7123 4568"
+  },
+  {
+    id: 3,
+    name: "Island Flavours",
+    lat: 51.5185,
+    lng: -0.2043,
+    location: "Westbourne Grove",
+    description: "Fresh Caribbean street food and traditional dishes",
+    specialties: ["Jerk Chicken", "Roti", "Doubles", "Sorrel Drink"],
+    rating: 4.7,
+    priceRange: "£",
+    image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop",
+    hours: "12:00 PM - 7:00 PM",
+    phone: "+44 20 7123 4569"
+  }
+];
+
+// Function to show food stalls
+function showFoodStalls() {
+  // Clear existing food stall markers
+  hideFoodStalls();
+
+  // Custom food stall icon
+  const foodStallIcon = L.divIcon({
+    className: 'food-stall-marker',
+    html: '<div style="background: linear-gradient(135deg, #4ade80, #22c55e); width: 20px; height: 20px; border-radius: 50%; box-shadow: 0 3px 10px rgba(74, 222, 128, 0.6); display: flex; align-items: center; justify-content: center; border: 2px solid #fff;"><i class="fas fa-utensils" style="color: #fff; font-size: 10px;"></i></div>',
+    iconSize: [20, 20],
+    iconAnchor: [10, 10]
+  });
+
+  // Add markers for food stalls
+  foodStalls.forEach(stall => {
+    const popupContent = `
+      <div style="max-width: 280px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <div style="margin-bottom: 12px;">
+          <img src="${stall.image}" alt="${stall.name}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;">
+        </div>
+        <h3 style="margin: 0 0 8px 0; color: #1f2937; font-size: 16px; font-weight: 700;">${stall.name}</h3>
+        <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px; line-height: 1.4;">${stall.description}</p>
+        <div style="margin-bottom: 8px;">
+          <span style="background: #10b981; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">⭐ ${stall.rating}</span>
+          <span style="background: #f59e0b; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 4px;">${stall.priceRange}</span>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <strong style="color: #374151; font-size: 12px;">📍 ${stall.location}</strong>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <strong style="color: #374151; font-size: 12px;">🕒 ${stall.hours}</strong>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <strong style="color: #374151; font-size: 12px;">📞 ${stall.phone}</strong>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <strong style="color: #374151; font-size: 12px;">🍽️ Specialties:</strong>
+          <div style="margin-top: 4px;">
+            ${stall.specialties.map(item => `<span style="background: #f3f4f6; color: #374151; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 4px; margin-bottom: 4px; display: inline-block;">${item}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+
+    const marker = L.marker([stall.lat, stall.lng], { icon: foodStallIcon })
+      .bindPopup(popupContent, { maxWidth: 300 })
+      .addTo(map);
+
+    foodStallMarkers.push(marker);
+  });
+
+  console.log('Food stalls displayed on map');
+}
+
+// Function to hide food stalls
+function hideFoodStalls() {
+  foodStallMarkers.forEach(marker => {
+    map.removeLayer(marker);
+  });
+  foodStallMarkers = [];
+  console.log('Food stalls hidden from map');
+}
+
 // Function to show judging zone
 function showJudgingZone() {
   // Add a marker for the judging zone label
@@ -562,7 +674,12 @@ function initMapToolbar() {
   foodStallBtn.addEventListener('click', function () {
     toggleButtonActive(this);
     console.log('Food Stalls button clicked');
-    // Add functionality to show/hide food stalls on map
+
+    if (this.classList.contains('active')) {
+      showFoodStalls();
+    } else {
+      hideFoodStalls();
+    }
   });
 
   // Float Trucks button
