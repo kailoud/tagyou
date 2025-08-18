@@ -150,32 +150,20 @@ function showFoodStalls() {
 
   // Add markers for food stalls
   foodStalls.forEach(stall => {
-    const popupContent = `
-      <div style="max-width: 200px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 8px;">
-        <h3 style="margin: 0 0 6px 0; color: #1f2937; font-size: 14px; font-weight: 700;">🍽️ ${stall.name}</h3>
-        <p style="margin: 0 0 6px 0; color: #6b7280; font-size: 11px; line-height: 1.3;">${stall.description}</p>
-        <div style="margin-bottom: 6px;">
-          <span style="background: #10b981; color: white; padding: 1px 4px; border-radius: 3px; font-size: 10px; font-weight: 600;">⭐ ${stall.rating}</span>
-          <span style="background: #f59e0b; color: white; padding: 1px 4px; border-radius: 3px; font-size: 10px; font-weight: 600; margin-left: 3px;">${stall.priceRange}</span>
-        </div>
-        <div style="margin-bottom: 4px;">
-          <span style="color: #374151; font-size: 10px;">📍 ${stall.location}</span>
-        </div>
-        <div style="margin-bottom: 4px;">
-          <span style="color: #374151; font-size: 10px;">🕒 ${stall.hours}</span>
-        </div>
-        <div style="margin-bottom: 4px;">
-          <span style="color: #374151; font-size: 10px;">📞 ${stall.phone}</span>
-        </div>
-        <div style="margin-top: 6px;">
-          <span style="color: #374151; font-size: 10px; font-weight: 600;">🍽️ ${stall.specialties.slice(0, 2).join(', ')}</span>
-        </div>
-      </div>
-    `;
+    const popupContent = `<div style="padding: 10px;"><h3>🍽️ ${stall.name}</h3><p>${stall.description}</p><p>📍 ${stall.location}</p><p>🕒 ${stall.hours}</p></div>`;
 
     const marker = L.marker([stall.lat, stall.lng], { icon: foodStallIcon })
-      .bindPopup(popupContent, { maxWidth: 300 })
       .addTo(map);
+
+    // Add click event for debugging
+    marker.on('click', function () {
+      console.log('Food stall clicked:', stall.name);
+      marker.bindPopup(popupContent, {
+        maxWidth: 300,
+        closeButton: true,
+        autoClose: false
+      }).openPopup();
+    });
 
     foodStallMarkers.push(marker);
   });
@@ -259,35 +247,20 @@ function showArtists() {
 
   // Add markers for artists
   artists.forEach(artist => {
-    const popupContent = `
-      <div style="max-width: 200px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 8px;">
-        <h3 style="margin: 0 0 6px 0; color: #1f2937; font-size: 14px; font-weight: 700;">🎵 ${artist.name}</h3>
-        <p style="margin: 0 0 6px 0; color: #6b7280; font-size: 11px; line-height: 1.3;">${artist.description}</p>
-        <div style="margin-bottom: 6px;">
-          <span style="background: #8b5cf6; color: white; padding: 1px 4px; border-radius: 3px; font-size: 10px; font-weight: 600;">⭐ ${artist.rating}</span>
-          <span style="background: #f59e0b; color: white; padding: 1px 4px; border-radius: 3px; font-size: 10px; font-weight: 600; margin-left: 3px;">🎵 Live</span>
-        </div>
-        <div style="margin-bottom: 4px;">
-          <span style="color: #374151; font-size: 10px;">📍 ${artist.location}</span>
-        </div>
-        <div style="margin-bottom: 4px;">
-          <span style="color: #374151; font-size: 10px;">🕒 ${artist.performanceTime}</span>
-        </div>
-        <div style="margin-bottom: 4px;">
-          <span style="color: #374151; font-size: 10px;">🎪 ${artist.stage}</span>
-        </div>
-        <div style="margin-bottom: 4px;">
-          <span style="color: #374151; font-size: 10px;">📞 ${artist.phone}</span>
-        </div>
-        <div style="margin-top: 6px;">
-          <span style="color: #374151; font-size: 10px; font-weight: 600;">🎵 ${artist.genres.slice(0, 2).join(', ')}</span>
-        </div>
-      </div>
-    `;
+    const popupContent = `<div style="padding: 10px;"><h3>🎵 ${artist.name}</h3><p>${artist.description}</p><p>📍 ${artist.location}</p><p>🕒 ${artist.performanceTime}</p></div>`;
 
     const marker = L.marker([artist.lat, artist.lng], { icon: artistIcon })
-      .bindPopup(popupContent, { maxWidth: 300 })
       .addTo(map);
+
+    // Add click event for debugging
+    marker.on('click', function () {
+      console.log('Artist clicked:', artist.name);
+      marker.bindPopup(popupContent, {
+        maxWidth: 300,
+        closeButton: true,
+        autoClose: false
+      }).openPopup();
+    });
 
     artistMarkers.push(marker);
   });
