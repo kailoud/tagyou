@@ -718,7 +718,7 @@ body {
 .festivals-dropdown {
   position: absolute;
   top: 100%;
-  left: 0;
+  left: 70px;
   right: 0;
   background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #f5576c);
   background-size: 300% 300%;
@@ -726,10 +726,10 @@ body {
   border-radius: 20px;
   box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
   margin-top: 8px;
-  max-height: 300px;
+  max-height: 200px;
   overflow-y: auto;
   display: none;
-  z-index: 9999;
+  z-index: 10000;
   backdrop-filter: blur(10px);
   animation: dropdownGradientShift 3s ease infinite;
 }
@@ -1556,6 +1556,13 @@ input:checked+.slider:before {
   display: none !important;
 }
 
+/* Large Desktop Dropdown */
+@media (min-width: 1001px) {
+  .festivals-dropdown {
+    max-height: 300px;
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 760px) and (min-width: 641px) {
   .festivals-container {
@@ -1746,6 +1753,17 @@ input:checked+.slider:before {
   .toggle-switch.enabled .toggle-thumb {
     transform: translateX(24px);
   }
+
+  .festivals-dropdown {
+    left: 70px !important;
+    max-height: 180px !important;
+  }
+
+  .festival-item {
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+    min-height: 32px !important;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1824,69 +1842,9 @@ input:checked+.slider:before {
   }
 }
 
-@media (max-width: 480px) and (min-width: 480px) {
-  .festivals-container {
-    width: 50%;
-    max-width: 150px;
-  }
 
-  .search-container {
-    width: 50%;
-    max-width: 150px;
-  }
 
-  .search-bar {
-    padding: 4px;
-    height: 28px;
-  }
 
-  .search-input {
-    padding: 4px 4px;
-    font-size: 11px;
-    height: 18px;
-  }
-
-  .search-button {
-    padding: 4px 8px;
-    font-size: 10px;
-    height: 28px;
-    min-height: 28px;
-    min-width: 28px;
-    width: auto;
-  }
-
-  .search-icon {
-    font-size: 10px;
-    margin-left: 6px;
-    margin-right: 4px;
-  }
-
-  .clear-button {
-    padding: 3px;
-    font-size: 9px;
-    min-height: 18px;
-    min-width: 18px;
-  }
-
-  .festivals-button {
-    padding: 4px 8px;
-    font-size: 11px;
-    height: 28px;
-  }
-
-  .festivals-text {
-    font-size: 11px;
-  }
-
-  .dropdown-icon {
-    font-size: 9px;
-  }
-
-  .profile-container {
-    flex-direction: column;
-    gap: 6px;
-  }
-}
 
 @media (max-width: 479px) and (min-width: 320px) {
   .controls-container {
@@ -1996,7 +1954,7 @@ input:checked+.slider:before {
   }
 
   .festivals-text {
-    font-size: 21px;
+    font-size: 11px;
     font-weight: 600;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
     position: relative;
@@ -2020,13 +1978,17 @@ input:checked+.slider:before {
     border-radius: 20px;
     margin-top: 10px;
     box-shadow: 0 10px 40px rgba(102, 126, 234, 0.2);
+    z-index: 10000;
+    left: 70px;
+    max-height: 200px;
   }
 
   .festival-item {
-    padding: 16px 20px;
-    font-size: 18px;
+    padding: 6px 10px;
+    font-size: 11px;
     font-weight: 500;
     letter-spacing: 0.3px;
+    min-height: 32px;
   }
 
   /* Enhanced blending and user experience for mobile */
@@ -2070,17 +2032,6 @@ input:checked+.slider:before {
 
   .dropdown-icon {
     font-size: 10px;
-  }
-
-  .festivals-dropdown {
-    max-height: 200px;
-    top: 46px;
-  }
-
-  .festival-item {
-    padding: 8px 12px;
-    font-size: 12px;
-    min-height: 36px;
   }
 }
 
@@ -2189,6 +2140,8 @@ input:checked+.slider:before {
   .festivals-dropdown {
     max-height: 180px;
     top: 42px;
+    z-index: 10000;
+    left: 40px;
   }
 
   .festival-item {
