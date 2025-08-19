@@ -1,4 +1,4 @@
-# TagYou2 - London Map with Firebase
+# TagYou2 - London Festival Map
 
 A modern, interactive London map application for festival-goers, featuring real-time data from Firebase.
 
@@ -97,6 +97,17 @@ This project uses Firebase for:
    ```bash
    firebase deploy
    ```
+
+## Admin Portal
+
+The admin portal for managing festival data is now in a separate repository for security reasons. The admin portal includes:
+
+- Real-time artist tracking
+- Pre-event setup and registration
+- Data management tools
+- Interactive mapping interface
+
+Contact the development team for access to the admin portal.
 
 ## Contributing
 

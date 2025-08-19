@@ -1,35 +1,40 @@
 {
-  "name": "tagyou2-london-map",
+  "name": "festival-admin-portal",
   "version": "1.0.0",
-  "description": "Clean London map application with zoom functionality",
-  "main": "index.html",
+  "description": "Comprehensive festival management admin portal with real-time tracking and pre-event setup",
+  "main": "admin/index.html",
   "scripts": {
-    "start": "live-server --port=5500 --open=/",
-    "dev": "live-server --port=5500 --open=/ --watch=.",
-    "build": "echo 'No build process needed for static site'",
-    "lint": "eslint script.js",
-    "format": "prettier --write '*.{js,css,html}'"
+    "start": "live-server --port=5501 --open=/admin/login.html",
+    "dev": "live-server --port=5501 --open=/admin/login.html",
+    "build": "echo 'Build process for admin portal'",
+    "test": "echo 'No tests specified'",
+    "lint": "echo 'No linter configured'",
+    "format": "echo 'No formatter configured'"
   },
   "keywords": [
-    "london",
-    "map",
-    "leaflet",
-    "interactive",
-    "zoom"
+    "festival",
+    "admin",
+    "management",
+    "real-time",
+    "tracking",
+    "firebase",
+    "carnival",
+    "events"
   ],
-  "author": "TagYou2 Team",
+  "author": "Festival Admin Team",
   "license": "MIT",
-  "devDependencies": {
-    "eslint": "^8.57.0",
-    "live-server": "^1.2.2",
-    "prettier": "^3.2.5"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ],
   "dependencies": {
-    "firebase": "^12.1.0"
-  }
+    "firebase": "^10.7.1"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/festival-admin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/festival-admin/issues"
+  },
+  "homepage": "https://github.com/yourusername/festival-admin#readme"
 }

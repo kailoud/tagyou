@@ -11,7 +11,8 @@ import {
   orderBy,
   onSnapshot,
   setDoc,
-  getDoc
+  getDoc,
+  serverTimestamp
 } from 'firebase/firestore';
 import { db } from './firebase-config.js';
 
@@ -236,6 +237,358 @@ export class RealtimeService {
         callback({ foodStalls: [], artists: [], festivals: [] });
       }
     });
+  }
+}
+
+// Artist Real-time Tracking Service
+export class ArtistTrackingService {
+  constructor() {
+    this.checkFirebaseConnection();
+  }
+
+  // Subscribe to real-time artist location updates
+  subscribeToArtistLocation(artistId, callback) {
+    try {
+      const artistLocationRef = doc(db, 'artistLocations', artistId);
+      return onSnapshot(artistLocationRef, (doc) => {
+        if (doc.exists()) {
+          const locationData = {
+            id: doc.id,
+            ...doc.data(),
+            timestamp: doc.data().timestamp?.toDate() || new Date()
+          };
+          callback(locationData);
+        } else {
+          callback(null);
+        }
+      }, (error) => {
+        console.error('Error listening to artist location:', error);
+        callback(null);
+      });
+    } catch (error) {
+      console.error('Error setting up artist location listener:', error);
+      return null;
+    }
+  }
+
+  // Subscribe to all artist locations
+  subscribeToAllArtistLocations(callback) {
+    try {
+      const locationsRef = collection(db, 'artistLocations');
+      return onSnapshot(locationsRef, (snapshot) => {
+        const locations = [];
+        snapshot.forEach((doc) => {
+          locations.push({
+            id: doc.id,
+            ...doc.data(),
+            timestamp: doc.data().timestamp?.toDate() || new Date()
+          });
+        });
+        callback(locations);
+      }, (error) => {
+        console.error('Error listening to all artist locations:', error);
+        callback([]);
+      });
+    } catch (error) {
+      console.error('Error setting up all artist locations listener:', error);
+      return null;
+    }
+  }
+
+  // Update artist location
+  async updateArtistLocation(artistId, locationData) {
+    try {
+      const locationRef = doc(db, 'artistLocations', artistId);
+      const updateData = {
+        ...locationData,
+        timestamp: serverTimestamp(),
+        lastUpdated: serverTimestamp()
+      };
+
+      await updateDoc(locationRef, updateData);
+      console.log(`Artist ${artistId} location updated successfully`);
+      return true;
+    } catch (error) {
+      console.error('Error updating artist location:', error);
+      throw error;
+    }
+  }
+
+  // Update artist schedule/status
+  async updateArtistSchedule(artistId, scheduleData) {
+    try {
+      const artistRef = doc(db, 'artists', artistId);
+      const updateData = {
+        ...scheduleData,
+        lastUpdated: serverTimestamp()
+      };
+
+      await updateDoc(artistRef, updateData);
+      console.log(`Artist ${artistId} schedule updated successfully`);
+      return true;
+    } catch (error) {
+      console.error('Error updating artist schedule:', error);
+      throw error;
+    }
+  }
+
+  // Get artist's current location
+  async getArtistLocation(artistId) {
+    try {
+      const locationRef = doc(db, 'artistLocations', artistId);
+      const locationDoc = await getDoc(locationRef);
+
+      if (locationDoc.exists()) {
+        return {
+          id: locationDoc.id,
+          ...locationDoc.data(),
+          timestamp: locationDoc.data().timestamp?.toDate() || new Date()
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting artist location:', error);
+      return null;
+    }
+  }
+
+  // Get all artist locations
+  async getAllArtistLocations() {
+    try {
+      const locationsRef = collection(db, 'artistLocations');
+      const snapshot = await getDocs(locationsRef);
+
+      const locations = [];
+      snapshot.forEach((doc) => {
+        locations.push({
+          id: doc.id,
+          ...doc.data(),
+          timestamp: doc.data().timestamp?.toDate() || new Date()
+        });
+      });
+
+      return locations;
+    } catch (error) {
+      console.error('Error getting all artist locations:', error);
+      return [];
+    }
+  }
+
+  // Create initial artist location document
+  async initializeArtistLocation(artistId, initialLocation) {
+    try {
+      const locationRef = doc(db, 'artistLocations', artistId);
+      const locationData = {
+        ...initialLocation,
+        timestamp: serverTimestamp(),
+        lastUpdated: serverTimestamp(),
+        status: 'active'
+      };
+
+      await setDoc(locationRef, locationData);
+      console.log(`Artist ${artistId} location initialized successfully`);
+      return true;
+    } catch (error) {
+      console.error('Error initializing artist location:', error);
+      throw error;
+    }
+  }
+
+  // Delete artist location
+  async deleteArtistLocation(artistId) {
+    try {
+      const locationRef = doc(db, 'artistLocations', artistId);
+      await deleteDoc(locationRef);
+      console.log(`Artist ${artistId} location deleted successfully`);
+      return true;
+    } catch (error) {
+      console.error('Error deleting artist location:', error);
+      throw error;
+    }
+  }
+}
+
+// Artist Schedule Service
+export class ArtistScheduleService {
+  constructor() {
+    this.checkFirebaseConnection();
+  }
+
+  // Subscribe to artist schedule changes
+  subscribeToArtistSchedule(artistId, callback) {
+    try {
+      const artistRef = doc(db, 'artists', artistId);
+      return onSnapshot(artistRef, (doc) => {
+        if (doc.exists()) {
+          const artistData = {
+            id: doc.id,
+            ...doc.data(),
+            lastUpdated: doc.data().lastUpdated?.toDate() || new Date()
+          };
+          callback(artistData);
+        } else {
+          callback(null);
+        }
+      }, (error) => {
+        console.error('Error listening to artist schedule:', error);
+        callback(null);
+      });
+    } catch (error) {
+      console.error('Error setting up artist schedule listener:', error);
+      return null;
+    }
+  }
+
+  // Subscribe to all artist schedules
+  subscribeToAllArtistSchedules(callback) {
+    try {
+      const artistsRef = collection(db, 'artists');
+      return onSnapshot(artistsRef, (snapshot) => {
+        const artists = [];
+        snapshot.forEach((doc) => {
+          artists.push({
+            id: doc.id,
+            ...doc.data(),
+            lastUpdated: doc.data().lastUpdated?.toDate() || new Date()
+          });
+        });
+        callback(artists);
+      }, (error) => {
+        console.error('Error listening to all artist schedules:', error);
+        callback([]);
+      });
+    } catch (error) {
+      console.error('Error setting up all artist schedules listener:', error);
+      return null;
+    }
+  }
+
+  // Update artist performance time
+  async updatePerformanceTime(artistId, performanceTime) {
+    try {
+      const artistRef = doc(db, 'artists', artistId);
+      await updateDoc(artistRef, {
+        performanceTime: performanceTime,
+        lastUpdated: serverTimestamp()
+      });
+      console.log(`Artist ${artistId} performance time updated successfully`);
+      return true;
+    } catch (error) {
+      console.error('Error updating artist performance time:', error);
+      throw error;
+    }
+  }
+
+  // Update artist stage/location
+  async updateArtistStage(artistId, stage, location) {
+    try {
+      const artistRef = doc(db, 'artists', artistId);
+      await updateDoc(artistRef, {
+        stage: stage,
+        location: location,
+        lastUpdated: serverTimestamp()
+      });
+      console.log(`Artist ${artistId} stage updated successfully`);
+      return true;
+    } catch (error) {
+      console.error('Error updating artist stage:', error);
+      throw error;
+    }
+  }
+
+  // Update artist status (on stage, backstage, etc.)
+  async updateArtistStatus(artistId, status) {
+    try {
+      const artistRef = doc(db, 'artists', artistId);
+      await updateDoc(artistRef, {
+        status: status,
+        lastUpdated: serverTimestamp()
+      });
+      console.log(`Artist ${artistId} status updated to ${status}`);
+      return true;
+    } catch (error) {
+      console.error('Error updating artist status:', error);
+      throw error;
+    }
+  }
+}
+
+// Real-time Notifications Service
+export class ArtistNotificationService {
+  constructor() {
+    this.checkFirebaseConnection();
+  }
+
+  // Subscribe to artist notifications
+  subscribeToArtistNotifications(callback) {
+    try {
+      const notificationsRef = collection(db, 'artistNotifications');
+      return onSnapshot(notificationsRef, (snapshot) => {
+        const notifications = [];
+        snapshot.forEach((doc) => {
+          notifications.push({
+            id: doc.id,
+            ...doc.data(),
+            timestamp: doc.data().timestamp?.toDate() || new Date()
+          });
+        });
+        callback(notifications);
+      }, (error) => {
+        console.error('Error listening to artist notifications:', error);
+        callback([]);
+      });
+    } catch (error) {
+      console.error('Error setting up artist notifications listener:', error);
+      return null;
+    }
+  }
+
+  // Create artist notification
+  async createArtistNotification(notificationData) {
+    try {
+      const notificationsRef = collection(db, 'artistNotifications');
+      const notification = {
+        ...notificationData,
+        timestamp: serverTimestamp(),
+        read: false
+      };
+
+      const docRef = await addDoc(notificationsRef, notification);
+      console.log('Artist notification created successfully');
+      return docRef.id;
+    } catch (error) {
+      console.error('Error creating artist notification:', error);
+      throw error;
+    }
+  }
+
+  // Mark notification as read
+  async markNotificationAsRead(notificationId) {
+    try {
+      const notificationRef = doc(db, 'artistNotifications', notificationId);
+      await updateDoc(notificationRef, {
+        read: true,
+        readAt: serverTimestamp()
+      });
+      console.log('Notification marked as read');
+      return true;
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+      throw error;
+    }
+  }
+
+  // Delete notification
+  async deleteNotification(notificationId) {
+    try {
+      const notificationRef = doc(db, 'artistNotifications', notificationId);
+      await deleteDoc(notificationRef);
+      console.log('Notification deleted successfully');
+      return true;
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+      throw error;
+    }
   }
 }
 

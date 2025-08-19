@@ -10,30 +10,35 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
-firebase.env
-
-# Secret configuration files
-firebase-config-secret.js
-firebase-config-secret.*
 
 # Firebase
+firebase-config-secret.js
+firebase-config-secret.*
 .firebase/
-firebase-debug.log
-firebase-debug.*.log
+firebase-debug.log*
+firebase-debug.*.log*
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
 # Build
 dist/
 build/
+*.tgz
+*.tar.gz
 
 # Logs
 logs
@@ -47,7 +52,25 @@ pids
 
 # Coverage directory used by tools like istanbul
 coverage/
+*.lcov
 
 # Temporary folders
 tmp/
 temp/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Firebase
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+
+# Local development
+.local/
