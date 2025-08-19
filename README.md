@@ -98,17 +98,6 @@ This project uses Firebase for:
    firebase deploy
    ```
 
-## Admin Portal
-
-The admin portal for managing festival data is now in a separate repository for security reasons. The admin portal includes:
-
-- Real-time artist tracking
-- Pre-event setup and registration
-- Data management tools
-- Interactive mapping interface
-
-Contact the development team for access to the admin portal.
-
 ## Contributing
 
 1. Fork the project
