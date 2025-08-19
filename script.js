@@ -1,31 +1,213 @@
-// TagYou2 London Map - Clean Version with Search
+// TagYou2 London Map - Firebase Integration
 let map;
+let currentUser = null; // Will be set when user authentication is implemented
+let foodStallsData = [];
+let artistsData = [];
+let firebaseInitialized = false;
 
 // Initialize the application
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
   console.log('TagYou2 London Map loaded successfully!');
 
-  // Initialize the map
+  // Always initialize the map first
   initMap();
-
-  // Initialize search functionality
   initSearch();
-
-  // Initialize festivals dropdown
   initFestivalsDropdown();
-
-  // Initialize profile button
   initProfileButton();
-
-  // Initialize map toolbar
   initMapToolbar();
-
-  // Initialize pull-up panel
   initPullUpPanel();
-
-  // Initialize responsive zoom functionality
   initResponsiveZoom();
+
+  // Then try to initialize Firebase (non-blocking)
+  initializeFirebase();
 });
+
+// Initialize Firebase (non-blocking)
+async function initializeFirebase() {
+  try {
+    // Dynamic import to avoid blocking the main app
+    const {
+      FoodStallsService,
+      ArtistsService,
+      UserFavoritesService,
+      RealtimeService,
+      initializeDefaultData
+    } = await import('./firebase-service.js');
+
+    console.log('Firebase modules loaded successfully');
+
+    // Initialize Firebase data
+    await initializeDefaultData();
+    firebaseInitialized = true;
+
+    // Load initial data
+    await loadInitialData(FoodStallsService, ArtistsService);
+
+    // Set up real-time listeners
+    setupRealtimeListeners(RealtimeService);
+
+    console.log('Firebase initialization complete!');
+
+  } catch (error) {
+    console.error('Firebase initialization failed:', error);
+    console.log('Continuing with hardcoded data...');
+
+    // Use hardcoded data as fallback
+    foodStallsData = getHardcodedFoodStalls();
+    artistsData = getHardcodedArtists();
+  }
+}
+
+// Load initial data from Firebase
+async function loadInitialData(FoodStallsService, ArtistsService) {
+  try {
+    console.log('Loading data from Firebase...');
+
+    // Load food stalls
+    foodStallsData = await FoodStallsService.getAllFoodStalls();
+    console.log('Loaded food stalls:', foodStallsData.length);
+
+    // Load artists
+    artistsData = await ArtistsService.getAllArtists();
+    console.log('Loaded artists:', artistsData.length);
+
+  } catch (error) {
+    console.error('Error loading data from Firebase:', error);
+    // Fallback to hardcoded data
+    foodStallsData = getHardcodedFoodStalls();
+    artistsData = getHardcodedArtists();
+  }
+}
+
+// Set up real-time listeners
+function setupRealtimeListeners(RealtimeService) {
+  try {
+    // Listen for food stalls changes
+    RealtimeService.subscribeToFoodStalls((foodStalls) => {
+      foodStallsData = foodStalls;
+      console.log('Food stalls updated in real-time:', foodStalls.length);
+
+      // Update UI if food stalls are currently shown
+      const foodStallBtn = document.getElementById('foodStallBtn');
+      if (foodStallBtn && foodStallBtn.classList.contains('active')) {
+        showFoodStalls();
+      }
+    });
+
+    // Listen for artists changes
+    RealtimeService.subscribeToArtists((artists) => {
+      artistsData = artists;
+      console.log('Artists updated in real-time:', artists.length);
+
+      // Update UI if artists are currently shown
+      const artistBandBtn = document.getElementById('artistBandBtn');
+      if (artistBandBtn && artistBandBtn.classList.contains('active')) {
+        showArtists();
+      }
+    });
+
+  } catch (error) {
+    console.error('Error setting up real-time listeners:', error);
+  }
+}
+
+// Fallback hardcoded data functions
+function getHardcodedFoodStalls() {
+  return [
+    {
+      id: 1,
+      name: "Caribbean Spice Kitchen",
+      lat: 51.517871,
+      lng: -0.205163,
+      location: "Ladbroke Grove",
+      description: "Authentic Jamaican jerk chicken and Caribbean cuisine",
+      specialties: ["Jerk Chicken", "Curry Goat", "Rice & Peas", "Plantain"],
+      rating: 4.8,
+      priceRange: "££",
+      image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop",
+      hours: "11:00 AM - 8:00 PM",
+      phone: "+44 20 7123 4567"
+    },
+    {
+      id: 2,
+      name: "Notting Hill Jerk House",
+      lat: 51.515638,
+      lng: -0.201236,
+      location: "Portobello Road",
+      description: "Traditional jerk chicken with secret family recipe",
+      specialties: ["Jerk Chicken", "Jerk Pork", "Ackee & Saltfish", "Callaloo"],
+      rating: 4.9,
+      priceRange: "££",
+      image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop",
+      hours: "10:00 AM - 9:00 PM",
+      phone: "+44 20 7123 4568"
+    },
+    {
+      id: 3,
+      name: "Island Flavours",
+      lat: 51.516875,
+      lng: -0.200021,
+      location: "Westbourne Grove",
+      description: "Fresh Caribbean street food and traditional dishes",
+      specialties: ["Jerk Chicken", "Roti", "Doubles", "Sorrel Drink"],
+      rating: 4.7,
+      priceRange: "£",
+      image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop",
+      hours: "12:00 PM - 7:00 PM",
+      phone: "+44 20 7123 4569"
+    }
+  ];
+}
+
+function getHardcodedArtists() {
+  return [
+    {
+      id: 1,
+      name: "DJ Shy FX",
+      lat: 51.517674,
+      lng: -0.200438,
+      location: "Ladbroke Grove",
+      description: "Legendary drum & bass and jungle pioneer",
+      genres: ["Drum & Bass", "Jungle", "UK Garage", "Reggae"],
+      rating: 4.9,
+      performanceTime: "3:00 PM - 4:30 PM",
+      stage: "Main Float Route",
+      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+      phone: "+44 20 7123 4570",
+      experience: "25+ years in UK dance music scene"
+    },
+    {
+      id: 2,
+      name: "Steel Pulse",
+      lat: 51.522428,
+      lng: -0.203347,
+      location: "Portobello Road",
+      description: "Grammy-winning reggae legends from Birmingham",
+      genres: ["Reggae", "Roots", "Conscious Music", "Political Lyrics"],
+      rating: 4.8,
+      performanceTime: "5:00 PM - 6:30 PM",
+      stage: "Cultural Stage",
+      image: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=400&h=300&fit=crop",
+      phone: "+44 20 7123 4571",
+      experience: "40+ years of reggae excellence"
+    },
+    {
+      id: 3,
+      name: "London Samba Collective",
+      lat: 51.518363,
+      lng: -0.210441,
+      location: "Westbourne Grove",
+      description: "Energetic Brazilian samba rhythms and percussion",
+      genres: ["Samba", "Batucada", "Brazilian Rhythms", "Carnival Music"],
+      rating: 4.7,
+      performanceTime: "2:00 PM - 3:30 PM",
+      stage: "Parade Route",
+      image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=300&fit=crop",
+      phone: "+44 20 7123 4572",
+      experience: "15+ years of carnival performances"
+    }
+  ];
+}
 
 // Initialize the map
 function initMap() {
@@ -86,59 +268,16 @@ function showMedicalLocations() {
   console.log('Medical locations displayed permanently');
 }
 
-// Food stalls data and functionality
+// Food stalls functionality
 let foodStallMarkers = [];
-
-// Food stalls data within Notting Hill Carnival boundaries
-const foodStalls = [
-  {
-    id: 1,
-    name: "Caribbean Spice Kitchen",
-    lat: 51.517871,
-    lng: -0.205163,
-    location: "Ladbroke Grove",
-    description: "Authentic Jamaican jerk chicken and Caribbean cuisine",
-    specialties: ["Jerk Chicken", "Curry Goat", "Rice & Peas", "Plantain"],
-    rating: 4.8,
-    priceRange: "££",
-    image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop",
-    hours: "11:00 AM - 8:00 PM",
-    phone: "+44 20 7123 4567"
-  },
-  {
-    id: 2,
-    name: "Notting Hill Jerk House",
-    lat: 51.515638,
-    lng: -0.201236,
-    location: "Portobello Road",
-    description: "Traditional jerk chicken with secret family recipe",
-    specialties: ["Jerk Chicken", "Jerk Pork", "Ackee & Saltfish", "Callaloo"],
-    rating: 4.9,
-    priceRange: "££",
-    image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop",
-    hours: "10:00 AM - 9:00 PM",
-    phone: "+44 20 7123 4568"
-  },
-  {
-    id: 3,
-    name: "Island Flavours",
-    lat: 51.516875,
-    lng: -0.200021,
-    location: "Westbourne Grove",
-    description: "Fresh Caribbean street food and traditional dishes",
-    specialties: ["Jerk Chicken", "Roti", "Doubles", "Sorrel Drink"],
-    rating: 4.7,
-    priceRange: "£",
-    image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop",
-    hours: "12:00 PM - 7:00 PM",
-    phone: "+44 20 7123 4569"
-  }
-];
 
 // Function to show food stalls
 function showFoodStalls() {
   // Clear existing food stall markers
   hideFoodStalls();
+
+  // Use Firebase data or fallback to hardcoded data
+  const stallsToShow = foodStallsData.length > 0 ? foodStallsData : getHardcodedFoodStalls();
 
   // Custom food stall icon
   const foodStallIcon = L.divIcon({
@@ -149,7 +288,7 @@ function showFoodStalls() {
   });
 
   // Add markers for food stalls
-  foodStalls.forEach(stall => {
+  stallsToShow.forEach(stall => {
     const popupContent = `
       <div style="padding: 10px; max-width: 180px;">
         <div style="display: flex; align-items: center; margin-bottom: 8px;">
@@ -162,6 +301,9 @@ function showFoodStalls() {
         <p style="margin: 0 0 6px 0; font-size: 11px; color: #666;">${stall.description}</p>
         <p style="margin: 0 0 4px 0; font-size: 10px;">📍 ${stall.location}</p>
         <p style="margin: 0; font-size: 10px;">🕒 ${stall.hours}</p>
+        <div style="margin-top: 8px; display: flex; gap: 4px;">
+          <button onclick="addToFavorites('foodStalls', '${stall.id}')" style="background: #3b82f6; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">❤️ Add to Favorites</button>
+        </div>
       </div>
     `;
 
@@ -183,7 +325,7 @@ function showFoodStalls() {
     foodStallMarkers.push(marker);
   });
 
-  console.log('Food stalls displayed on map');
+  console.log('Food stalls displayed on map:', stallsToShow.length);
 }
 
 // Function to hide food stalls
@@ -195,62 +337,16 @@ function hideFoodStalls() {
   console.log('Food stalls hidden from map');
 }
 
-// Artists data and functionality
+// Artists functionality
 let artistMarkers = [];
-
-// Artists data along Notting Hill Carnival float route
-const artists = [
-  {
-    id: 1,
-    name: "DJ Shy FX",
-    lat: 51.517674,
-    lng: -0.200438,
-    location: "Ladbroke Grove",
-    description: "Legendary drum & bass and jungle pioneer",
-    genres: ["Drum & Bass", "Jungle", "UK Garage", "Reggae"],
-    rating: 4.9,
-    performanceTime: "3:00 PM - 4:30 PM",
-    stage: "Main Float Route",
-    image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
-    phone: "+44 20 7123 4570",
-    experience: "25+ years in UK dance music scene"
-  },
-  {
-    id: 2,
-    name: "Steel Pulse",
-    lat: 51.522428,
-    lng: -0.203347,
-    location: "Portobello Road",
-    description: "Grammy-winning reggae legends from Birmingham",
-    genres: ["Reggae", "Roots", "Conscious Music", "Political Lyrics"],
-    rating: 4.8,
-    performanceTime: "5:00 PM - 6:30 PM",
-    stage: "Cultural Stage",
-    image: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=400&h=300&fit=crop",
-    phone: "+44 20 7123 4571",
-    experience: "40+ years of reggae excellence"
-  },
-  {
-    id: 3,
-    name: "London Samba Collective",
-    lat: 51.518363,
-    lng: -0.210441,
-    location: "Westbourne Grove",
-    description: "Energetic Brazilian samba rhythms and percussion",
-    genres: ["Samba", "Batucada", "Brazilian Rhythms", "Carnival Music"],
-    rating: 4.7,
-    performanceTime: "2:00 PM - 3:30 PM",
-    stage: "Parade Route",
-    image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=300&fit=crop",
-    phone: "+44 20 7123 4572",
-    experience: "15+ years of carnival performances"
-  }
-];
 
 // Function to show artists
 function showArtists() {
   // Clear existing artist markers
   hideArtists();
+
+  // Use Firebase data or fallback to hardcoded data
+  const artistsToShow = artistsData.length > 0 ? artistsData : getHardcodedArtists();
 
   // Custom artist icon
   const artistIcon = L.divIcon({
@@ -261,7 +357,7 @@ function showArtists() {
   });
 
   // Add markers for artists
-  artists.forEach(artist => {
+  artistsToShow.forEach(artist => {
     const popupContent = `
       <div style="padding: 10px; max-width: 180px;">
         <div style="display: flex; align-items: center; margin-bottom: 8px;">
@@ -274,6 +370,9 @@ function showArtists() {
         <p style="margin: 0 0 6px 0; font-size: 11px; color: #666;">${artist.description}</p>
         <p style="margin: 0 0 4px 0; font-size: 10px;">📍 ${artist.location}</p>
         <p style="margin: 0; font-size: 10px;">🕒 ${artist.performanceTime}</p>
+        <div style="margin-top: 8px; display: flex; gap: 4px;">
+          <button onclick="addToFavorites('artists', '${artist.id}')" style="background: #3b82f6; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">❤️ Add to Favorites</button>
+        </div>
       </div>
     `;
 
@@ -295,7 +394,7 @@ function showArtists() {
     artistMarkers.push(marker);
   });
 
-  console.log('Artists displayed on map');
+  console.log('Artists displayed on map:', artistsToShow.length);
 }
 
 // Function to hide artists
@@ -1298,6 +1397,71 @@ function handleStartFlagScaling(zoomLevel, screenWidth) {
   }
 
   console.log('Start flag scaling - Zoom:', zoomLevel, 'Screen width:', screenWidth, 'Scale:', scaleValue, 'Should scale:', shouldScale);
+}
+
+// Favorites functionality
+async function addToFavorites(type, itemId) {
+  try {
+    if (!firebaseInitialized) {
+      showNotification('Firebase not connected. Please set up Firebase configuration.', 'error');
+      return;
+    }
+
+    // Dynamic import for UserFavoritesService
+    const { UserFavoritesService } = await import('./firebase-service.js');
+
+    // For now, use a temporary user ID (will be replaced with actual auth)
+    const tempUserId = 'temp-user-' + Date.now();
+
+    await UserFavoritesService.addToFavorites(tempUserId, type, itemId);
+    console.log(`Added ${type} item ${itemId} to favorites`);
+
+    // Show success message
+    showNotification(`Added to favorites!`, 'success');
+
+  } catch (error) {
+    console.error('Error adding to favorites:', error);
+    showNotification('Failed to add to favorites', 'error');
+  }
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 10000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    ${type === 'success' ? 'background: #10b981;' : ''}
+    ${type === 'error' ? 'background: #ef4444;' : ''}
+    ${type === 'info' ? 'background: #3b82f6;' : ''}
+  `;
+  notification.textContent = message;
+
+  // Add to page
+  document.body.appendChild(notification);
+
+  // Animate in
+  setTimeout(() => {
+    notification.style.transform = 'translateX(0)';
+  }, 100);
+
+  // Remove after 3 seconds
+  setTimeout(() => {
+    notification.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 300);
+  }, 3000);
 }
 
 // Add zoom event listener to map
