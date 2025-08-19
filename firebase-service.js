@@ -15,10 +15,18 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase-config.js';
 
+// Check if Firebase is properly initialized
+function checkFirebaseConnection() {
+  if (!db) {
+    throw new Error('Firebase not initialized. Please check your configuration.');
+  }
+}
+
 // Food Stalls Service
 export class FoodStallsService {
   static async getAllFoodStalls() {
     try {
+      checkFirebaseConnection();
       const querySnapshot = await getDocs(collection(db, 'foodStalls'));
       return querySnapshot.docs.map(doc => ({
         id: doc.id,
