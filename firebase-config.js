@@ -1,8 +1,9 @@
 // Firebase Configuration
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import { getAnalytics } from 'firebase/analytics';
+// Using CDN imports for better compatibility with live server
+const { initializeApp } = firebase;
+const { getFirestore } = firebase;
+const { getAuth } = firebase;
+const { getAnalytics } = firebase;
 
 // Firebase Configuration
 let firebaseConfig = null;

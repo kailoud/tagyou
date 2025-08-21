@@ -1,5 +1,6 @@
 // Firebase Service - Data Operations
-import {
+// Using CDN imports for better compatibility with live server
+const {
   collection,
   getDocs,
   addDoc,
@@ -13,8 +14,16 @@ import {
   setDoc,
   getDoc,
   serverTimestamp
-} from 'firebase/firestore';
-import { db } from './firebase-config.js';
+} = firebase.firestore;
+
+// Import db from firebase-config
+let db = null;
+try {
+  const firebaseConfig = await import('./firebase-config.js');
+  db = firebaseConfig.db;
+} catch (error) {
+  console.error('Failed to import firebase-config:', error);
+}
 
 // Check if Firebase is properly initialized
 function checkFirebaseConnection() {

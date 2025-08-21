@@ -21,11 +21,24 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   // Then try to initialize Firebase (non-blocking)
   initializeFirebase();
+
+  // Add diagnostic test after a short delay
+  setTimeout(() => {
+    console.log('🔍 Running Firebase diagnostic test...');
+    import('./firebase-diagnostic.js').catch(error => {
+      console.error('❌ Failed to load diagnostic:', error);
+    });
+  }, 3000);
 });
 
 // Initialize Firebase (non-blocking)
 async function initializeFirebase() {
   try {
+    // Check if Firebase is available
+    if (typeof firebase === 'undefined') {
+      throw new Error('Firebase SDK not loaded');
+    }
+
     // Dynamic import to avoid blocking the main app
     const {
       FoodStallsService,
