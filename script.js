@@ -3,6 +3,7 @@ let map;
 let currentUser = null; // Will be set when user authentication is implemented
 let foodStallsData = [];
 let artistsData = [];
+let floatTrucksData = [];
 let firebaseInitialized = false;
 
 // Initialize the application
@@ -29,6 +30,7 @@ async function initializeFirebase() {
     const {
       FoodStallsService,
       ArtistsService,
+      FloatTrucksService,
       UserFavoritesService,
       RealtimeService,
       initializeDefaultData
@@ -41,7 +43,7 @@ async function initializeFirebase() {
     firebaseInitialized = true;
 
     // Load initial data
-    await loadInitialData(FoodStallsService, ArtistsService);
+    await loadInitialData(FoodStallsService, ArtistsService, FloatTrucksService);
 
     // Set up real-time listeners
     setupRealtimeListeners(RealtimeService);
@@ -55,11 +57,12 @@ async function initializeFirebase() {
     // Use hardcoded data as fallback
     foodStallsData = getHardcodedFoodStalls();
     artistsData = getHardcodedArtists();
+    floatTrucksData = getHardcodedFloatTrucks();
   }
 }
 
 // Load initial data from Firebase
-async function loadInitialData(FoodStallsService, ArtistsService) {
+async function loadInitialData(FoodStallsService, ArtistsService, FloatTrucksService) {
   try {
     console.log('🔥 Loading data from Firebase...');
 
@@ -75,12 +78,21 @@ async function loadInitialData(FoodStallsService, ArtistsService) {
     console.log('✅ Loaded artists from Firebase:', artistsData.length);
     console.log('📊 Artists data:', artistsData);
 
+    // Load float trucks with detailed logging
+    console.log('🚛 Fetching float trucks from Firebase...');
+    floatTrucksData = await FloatTrucksService.getAllFloatTrucks();
+    console.log('✅ Loaded float trucks from Firebase:', floatTrucksData.length);
+    console.log('📊 Float trucks data:', floatTrucksData);
+
     // Check if data is properly structured
     if (foodStallsData.length > 0) {
       console.log('🔍 Sample food stall structure:', foodStallsData[0]);
     }
     if (artistsData.length > 0) {
       console.log('🔍 Sample artist structure:', artistsData[0]);
+    }
+    if (floatTrucksData.length > 0) {
+      console.log('🔍 Sample float truck structure:', floatTrucksData[0]);
     }
 
   } catch (error) {
@@ -89,6 +101,7 @@ async function loadInitialData(FoodStallsService, ArtistsService) {
     // Fallback to hardcoded data
     foodStallsData = getHardcodedFoodStalls();
     artistsData = getHardcodedArtists();
+    floatTrucksData = getHardcodedFloatTrucks();
   }
 }
 
@@ -218,6 +231,38 @@ function getHardcodedArtists() {
       image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=300&fit=crop",
       phone: "+44 20 7123 4572",
       experience: "15+ years of carnival performances"
+    }
+  ];
+}
+
+function getHardcodedFloatTrucks() {
+  return [
+    {
+      id: 1,
+      name: "Circus Float",
+      type: "Circus",
+      route: "Parade Route",
+      time: "2:00 PM",
+      description: "Spectacular circus performers on wheels",
+      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop"
+    },
+    {
+      id: 2,
+      name: "Costume Float",
+      type: "Costume",
+      route: "Main Parade",
+      time: "3:30 PM",
+      description: "Vibrant costumes and cultural displays",
+      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop"
+    },
+    {
+      id: 3,
+      name: "Music Float",
+      type: "Music",
+      route: "Cultural Route",
+      time: "4:00 PM",
+      description: "Live music and entertainment on wheels",
+      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop"
     }
   ];
 }
