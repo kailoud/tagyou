@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Allow read access to all collections for the map application
+    match /foodStalls/{document} {
+      allow read: if true;  // Anyone can read food stalls
+      allow write: if false; // Only admin portal can write (via admin authentication)
+    }
+    
+    match /artists/{document} {
+      allow read: if true;  // Anyone can read artists
+      allow write: if false; // Only admin portal can write (via admin authentication)
+    }
+    
+    match /floatTrucks/{document} {
+      allow read: if true;  // Anyone can read float trucks
+      allow write: if false; // Only admin portal can write (via admin authentication)
+    }
+    
+    // User favorites - users can read/write their own favorites
+    match /userFavorites/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Artist locations - read only for map display
+    match /artistLocations/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    // Artist notifications - read only for map display
+    match /artistNotifications/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    // Users collection - read only for map display
+    match /users/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    // Clients collection - read only for map display
+    match /clients/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    // Default rule - deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
