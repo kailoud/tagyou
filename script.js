@@ -61,18 +61,31 @@ async function initializeFirebase() {
 // Load initial data from Firebase
 async function loadInitialData(FoodStallsService, ArtistsService) {
   try {
-    console.log('Loading data from Firebase...');
+    console.log('🔥 Loading data from Firebase...');
 
-    // Load food stalls
+    // Load food stalls with detailed logging
+    console.log('🍽️ Fetching food stalls from Firebase...');
     foodStallsData = await FoodStallsService.getAllFoodStalls();
-    console.log('Loaded food stalls:', foodStallsData.length);
+    console.log('✅ Loaded food stalls from Firebase:', foodStallsData.length);
+    console.log('📊 Food stalls data:', foodStallsData);
 
-    // Load artists
+    // Load artists with detailed logging
+    console.log('🎵 Fetching artists from Firebase...');
     artistsData = await ArtistsService.getAllArtists();
-    console.log('Loaded artists:', artistsData.length);
+    console.log('✅ Loaded artists from Firebase:', artistsData.length);
+    console.log('📊 Artists data:', artistsData);
+
+    // Check if data is properly structured
+    if (foodStallsData.length > 0) {
+      console.log('🔍 Sample food stall structure:', foodStallsData[0]);
+    }
+    if (artistsData.length > 0) {
+      console.log('🔍 Sample artist structure:', artistsData[0]);
+    }
 
   } catch (error) {
-    console.error('Error loading data from Firebase:', error);
+    console.error('❌ Error loading data from Firebase:', error);
+    console.log('🔄 Falling back to hardcoded data...');
     // Fallback to hardcoded data
     foodStallsData = getHardcodedFoodStalls();
     artistsData = getHardcodedArtists();
@@ -276,8 +289,14 @@ function showFoodStalls() {
   // Clear existing food stall markers
   hideFoodStalls();
 
+  console.log('🍽️ Showing food stalls...');
+  console.log('📊 Current foodStallsData:', foodStallsData);
+  console.log('📊 foodStallsData.length:', foodStallsData.length);
+
   // Use Firebase data or fallback to hardcoded data
   const stallsToShow = foodStallsData.length > 0 ? foodStallsData : getHardcodedFoodStalls();
+  console.log('🎯 Final stalls to show:', stallsToShow);
+  console.log('🎯 Number of stalls to display:', stallsToShow.length);
 
   // Custom food stall icon
   const foodStallIcon = L.divIcon({
@@ -345,8 +364,14 @@ function showArtists() {
   // Clear existing artist markers
   hideArtists();
 
+  console.log('🎵 Showing artists...');
+  console.log('📊 Current artistsData:', artistsData);
+  console.log('📊 artistsData.length:', artistsData.length);
+
   // Use Firebase data or fallback to hardcoded data
   const artistsToShow = artistsData.length > 0 ? artistsData : getHardcodedArtists();
+  console.log('🎯 Final artists to show:', artistsToShow);
+  console.log('🎯 Number of artists to display:', artistsToShow.length);
 
   // Custom artist icon
   const artistIcon = L.divIcon({
