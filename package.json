@@ -1,40 +1,36 @@
 {
-  "name": "festival-admin-portal",
+  "name": "tagyou2-london-map",
   "version": "1.0.0",
-  "description": "Comprehensive festival management admin portal with real-time tracking and pre-event setup",
-  "main": "admin/index.html",
+  "description": "Interactive London map focused on Notting Hill Carnival with festival features",
+  "main": "index.html",
   "scripts": {
-    "start": "live-server --port=5501 --open=/admin/login.html",
-    "dev": "live-server --port=5501 --open=/admin/login.html",
-    "build": "echo 'Build process for admin portal'",
+    "start": "live-server --port=5501 --open=/index.html",
+    "dev": "live-server --port=5501 --open=/index.html",
+    "build": "echo 'Build process for London map'",
     "test": "echo 'No tests specified'",
     "lint": "echo 'No linter configured'",
     "format": "echo 'No formatter configured'"
   },
   "keywords": [
+    "london",
+    "map",
+    "notting-hill-carnival",
     "festival",
-    "admin",
-    "management",
-    "real-time",
-    "tracking",
-    "firebase",
-    "carnival",
-    "events"
+    "leaflet",
+    "interactive"
   ],
-  "author": "Festival Admin Team",
+  "author": "TagYou2 Team",
   "license": "MIT",
-  "dependencies": {
-    "firebase": "^10.7.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "live-server": "^1.2.2"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/festival-admin.git"
+    "url": "https://github.com/yourusername/tagyou2-london-map.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/festival-admin/issues"
+    "url": "https://github.com/yourusername/tagyou2-london-map/issues"
   },
-  "homepage": "https://github.com/yourusername/festival-admin#readme"
+  "homepage": "https://github.com/yourusername/tagyou2-london-map#readme"
 }
