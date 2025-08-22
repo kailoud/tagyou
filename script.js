@@ -1139,18 +1139,18 @@ function detectSamsungDevice() {
       profileContainer.style.setProperty('align-items', 'center', 'important');
     }
 
-    // Adjust search and festival containers
+    // Adjust search and festival containers - follow 320-360px logic
     const searchContainer = document.querySelector('.search-container');
     const festivalsContainer = document.querySelector('.festivals-container');
 
     if (searchContainer) {
-      searchContainer.style.setProperty('width', '35%', 'important');
-      searchContainer.style.setProperty('max-width', '120px', 'important');
+      searchContainer.style.setProperty('width', '30%', 'important');
+      searchContainer.style.setProperty('max-width', '96px', 'important');
     }
 
     if (festivalsContainer) {
-      festivalsContainer.style.setProperty('width', '45%', 'important');
-      festivalsContainer.style.setProperty('max-width', '180px', 'important');
+      festivalsContainer.style.setProperty('width', '50%', 'important');
+      festivalsContainer.style.setProperty('max-width', '160px', 'important');
     }
   }
 }
