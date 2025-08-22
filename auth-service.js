@@ -485,15 +485,191 @@ class AuthService {
     });
   }
 
-  // Modal and UI methods (placeholder implementations)
+  // Modal and UI methods
   showSignInModal() {
-    console.log('🔐 Show sign in modal');
-    // Implement sign in modal
+    console.log('🔐 Showing sign in modal');
+    this.createAuthModal('signin');
   }
 
   showSignUpModal() {
-    console.log('🔐 Show sign up modal');
-    // Implement sign up modal
+    console.log('🔐 Showing sign up modal');
+    this.createAuthModal('signup');
+  }
+
+  createAuthModal(mode) {
+    // Remove existing modal if any
+    const existingModal = document.querySelector('.auth-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    const isSignUp = mode === 'signup';
+    const modalHTML = `
+      <div class="auth-modal">
+        <div class="auth-modal-overlay"></div>
+        <div class="auth-modal-content">
+          <button class="auth-modal-close" onclick="authService.closeAuthModal()">
+            <i class="fas fa-times"></i>
+          </button>
+          
+          <div class="auth-modal-header">
+            <h2>${isSignUp ? 'Create Account' : 'Welcome Back!'}</h2>
+            <p>${isSignUp ? 'Join TagYou to save favorites and get personalized recommendations' : 'Sign in to access your festival experience'}</p>
+          </div>
+          
+          <form class="auth-form" id="authForm">
+            ${isSignUp ? `
+              <div class="form-group">
+                <label for="displayName">Full Name</label>
+                <input type="text" id="displayName" name="displayName" required placeholder="Enter your full name">
+              </div>
+            ` : ''}
+            
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" name="email" required placeholder="Enter your email">
+            </div>
+            
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" id="password" name="password" required placeholder="Enter your password">
+              ${isSignUp ? '<small>Minimum 6 characters</small>' : ''}
+            </div>
+            
+            ${isSignUp ? `
+              <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirm your password">
+              </div>
+            ` : ''}
+            
+            <button type="submit" class="auth-submit-btn">
+              ${isSignUp ? 'Create Account' : 'Sign In'}
+            </button>
+          </form>
+          
+          <div class="auth-modal-footer">
+            ${isSignUp ? `
+              <p>Already have an account? <a href="#" onclick="authService.switchAuthMode('signin')" class="auth-link">Sign in</a></p>
+            ` : `
+              <p><a href="#" onclick="authService.showForgotPassword()" class="auth-link">Forgot your password?</a></p>
+              <p>Don't have an account? <a href="#" onclick="authService.switchAuthMode('signup')" class="auth-link">Sign up</a></p>
+            `}
+          </div>
+          
+          <div class="auth-error" id="authError" style="display: none;"></div>
+          <div class="auth-success" id="authSuccess" style="display: none;"></div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Add event listeners
+    this.setupAuthModalEvents(mode);
+
+    // Show modal with animation
+    setTimeout(() => {
+      const modal = document.querySelector('.auth-modal');
+      modal.classList.add('show');
+    }, 10);
+  }
+
+  setupAuthModalEvents(mode) {
+    const form = document.getElementById('authForm');
+    const modal = document.querySelector('.auth-modal');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const submitBtn = form.querySelector('.auth-submit-btn');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Processing...';
+      submitBtn.disabled = true;
+
+      const formData = new FormData(form);
+      const email = formData.get('email');
+      const password = formData.get('password');
+
+      let result;
+
+      if (mode === 'signin') {
+        result = await this.signIn(email, password);
+      } else {
+        const displayName = formData.get('displayName');
+        const confirmPassword = formData.get('confirmPassword');
+
+        if (password !== confirmPassword) {
+          this.showAuthError('Passwords do not match');
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+          return;
+        }
+
+        result = await this.signUp(email, password, displayName);
+      }
+
+      if (result.success) {
+        this.showAuthSuccess(mode === 'signin' ? 'Signed in successfully!' : 'Account created successfully!');
+        setTimeout(() => this.closeAuthModal(), 1500);
+      } else {
+        this.showAuthError(result.error);
+      }
+
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    });
+
+    // Close modal when clicking overlay
+    const overlay = modal.querySelector('.auth-modal-overlay');
+    overlay.addEventListener('click', () => this.closeAuthModal());
+  }
+
+  switchAuthMode(mode) {
+    this.closeAuthModal();
+    setTimeout(() => {
+      this.createAuthModal(mode);
+    }, 300);
+  }
+
+  showForgotPassword() {
+    const email = document.getElementById('email')?.value;
+    if (email) {
+      this.resetPassword(email).then(result => {
+        if (result.success) {
+          this.showAuthSuccess('Password reset email sent!');
+        } else {
+          this.showAuthError(result.error);
+        }
+      });
+    } else {
+      this.showAuthError('Please enter your email address first');
+    }
+  }
+
+  showAuthError(message) {
+    const errorDiv = document.getElementById('authError');
+    if (errorDiv) {
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      setTimeout(() => errorDiv.style.display = 'none', 5000);
+    }
+  }
+
+  showAuthSuccess(message) {
+    const successDiv = document.getElementById('authSuccess');
+    if (successDiv) {
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+    }
+  }
+
+  closeAuthModal() {
+    const modal = document.querySelector('.auth-modal');
+    if (modal) {
+      modal.classList.remove('show');
+      setTimeout(() => modal.remove(), 300);
+    }
   }
 
   showProfile() {
