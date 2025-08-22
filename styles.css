@@ -47,7 +47,7 @@ body {
   position: relative;
 }
 
-/* Profile Icon Styles */
+/* Profile Icon Styles - BASE DESKTOP */
 .profile-container {
   position: fixed;
   top: 20px;
@@ -61,6 +61,7 @@ body {
   display: flex;
   gap: 15px;
   align-items: center;
+  flex-direction: row;
 }
 
 /* Iconic Profile Button */
@@ -1729,6 +1730,8 @@ input:checked+.slider:before {
   .profile-container {
     padding: 8px;
     gap: 8px;
+    flex-direction: row;
+    /* Keep horizontal for larger screens */
   }
 
   .profile-button {
@@ -1872,7 +1875,8 @@ input:checked+.slider:before {
   .profile-container {
     padding: 8px;
     gap: 8px;
-    flex-direction: row;
+    flex-direction: column;
+    align-items: center;
   }
 
   .profile-button {
@@ -1999,7 +2003,7 @@ input:checked+.slider:before {
 
 
 
-@media (max-width: 479px) and (min-width: 320px) {
+@media (max-width: 360px) and (min-width: 320px) {
   .controls-container {
     top: 10px;
     gap: 8px;
@@ -2017,7 +2021,31 @@ input:checked+.slider:before {
     right: 10px;
     padding: 8px;
     gap: 8px;
-    flex-direction: row;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 479px) and (min-width: 361px) {
+  .controls-container {
+    top: 10px;
+    gap: 8px;
+    flex-direction: column;
+    width: 95%;
+    max-width: 360px;
+    padding: 0 8px;
+    left: 2.5%;
+    right: 2.5%;
+    align-items: flex-start;
+  }
+
+  .profile-container {
+    top: 10px;
+    right: 10px;
+    padding: 8px;
+    gap: 8px;
+    flex-direction: column;
+    align-items: center;
   }
 
   .profile-button {
@@ -2209,7 +2237,8 @@ input:checked+.slider:before {
     right: 6px;
     padding: 6px;
     gap: 6px;
-    flex-direction: row;
+    flex-direction: column;
+    align-items: center;
   }
 
   .profile-button {
@@ -2577,5 +2606,185 @@ input:checked+.slider:before {
 
   .mobile-auth-form button:active {
     transform: translateY(0);
+  }
+}
+
+/* ========================================= */
+/* CRITICAL OVERRIDE: Profile Container Layout Fix */
+/* ========================================= */
+
+/* Force vertical layout for mobile ranges - 320px to 480px */
+@media (max-width: 480px) and (min-width: 320px) {
+  .profile-container {
+    flex-direction: column !important;
+    align-items: center !important;
+    top: 10px !important;
+    right: 10px !important;
+    padding: 8px !important;
+    gap: 8px !important;
+  }
+}
+
+/* SPECIFIC RANGE: 321px to 330px - GUARANTEED VERTICAL */
+@media (max-width: 330px) and (min-width: 321px) {
+  .profile-container {
+    flex-direction: column !important;
+    align-items: center !important;
+    top: 10px !important;
+    right: 10px !important;
+    padding: 8px !important;
+    gap: 8px !important;
+  }
+
+  /* FORCE DESKTOP PROFILE VISIBLE AT 321px */
+  .profile-button {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .profile-dropdown {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* HIDE MOBILE PROFILE AT 321px */
+  .mobile-profile-button {
+    display: none !important;
+  }
+
+  .mobile-profile-dropdown {
+    display: none !important;
+  }
+}
+
+/* SEARCH BAR & UK FESTIVAL: Maintain 320px scale from 320px to 360px */
+@media (max-width: 360px) and (min-width: 320px) {
+  .search-container {
+    width: 30% !important;
+    max-width: 96px !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+  }
+
+  .search-bar {
+    padding: 6px !important;
+    min-height: 40px !important;
+  }
+
+  .search-input {
+    padding: 8px 6px !important;
+    font-size: 13px !important;
+    min-height: 28px !important;
+  }
+
+  .search-button {
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+    min-height: 28px !important;
+    min-width: 28px !important;
+  }
+
+  .clear-button {
+    padding: 4px !important;
+    font-size: 10px !important;
+    min-height: 20px !important;
+    min-width: 20px !important;
+  }
+
+  .festivals-container {
+    width: 50% !important;
+    max-width: 160px !important;
+  }
+
+  .festivals-button {
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+    min-height: 44px !important;
+    justify-content: center !important;
+    text-align: center !important;
+    border-radius: 25px !important;
+  }
+
+  .festivals-text {
+    font-size: 14px !important;
+  }
+
+  .dropdown-icon {
+    font-size: 12px !important;
+  }
+}
+
+/* Force horizontal layout for larger screens - 481px+ */
+@media (min-width: 481px) {
+  .profile-container {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+}
+
+/* ========================================= */
+/* SAMSUNG GALAXY S24 ULTRA & HIGH-DPI DEVICES */
+/* ========================================= */
+
+/* Samsung Galaxy S24 Ultra specific adjustments */
+@media screen and (max-width: 882px) and (min-width: 320px) and (-webkit-min-device-pixel-ratio: 3) {
+  .profile-container {
+    flex-direction: column !important;
+    align-items: center !important;
+    top: 15px !important;
+    right: 15px !important;
+    padding: 10px !important;
+    gap: 10px !important;
+  }
+
+  .search-container {
+    width: 35% !important;
+    max-width: 120px !important;
+  }
+
+  .festivals-container {
+    width: 45% !important;
+    max-width: 180px !important;
+  }
+
+  .search-bar {
+    padding: 8px !important;
+    min-height: 44px !important;
+  }
+
+  .search-input {
+    font-size: 14px !important;
+    min-height: 32px !important;
+  }
+
+  .festivals-button {
+    padding: 10px 18px !important;
+    font-size: 15px !important;
+    min-height: 48px !important;
+  }
+}
+
+/* High-DPI devices general fix */
+@media screen and (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 1000px) {
+  .profile-container {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .search-container,
+  .festivals-container {
+    transform: scale(0.95) !important;
+    transform-origin: left center !important;
+  }
+}
+
+/* Samsung device detection via user agent */
+@media screen and (max-width: 900px) {
+  .profile-container {
+    /* Force vertical layout for Samsung devices */
+    flex-direction: column !important;
+    align-items: center !important;
   }
 }

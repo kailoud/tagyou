@@ -1,0 +1,81 @@
+/* CLEAN PROFILE CONTAINER HIERARCHY - NO CONFLICTS */
+
+/* BASE DESKTOP RULE */
+.profile-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  width: auto;
+  padding: 20px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-direction: row;
+  /* DEFAULT: Horizontal for desktop */
+}
+
+/* TABLET AND ABOVE - 769px+ */
+@media (min-width: 769px) {
+  .profile-container {
+    flex-direction: row;
+    top: 20px;
+    right: 20px;
+    padding: 20px;
+    gap: 15px;
+  }
+}
+
+/* MOBILE LARGE - 481px to 768px */
+@media (max-width: 768px) and (min-width: 481px) {
+  .profile-container {
+    top: 15px;
+    right: 15px;
+    padding: 8px;
+    gap: 8px;
+    flex-direction: row;
+    /* Still horizontal for large mobile */
+  }
+}
+
+/* MOBILE MEDIUM - 361px to 480px */
+@media (max-width: 480px) and (min-width: 361px) {
+  .profile-container {
+    top: 10px;
+    right: 10px;
+    padding: 8px;
+    gap: 8px;
+    flex-direction: column;
+    /* VERTICAL: Switch top, Profile bottom */
+    align-items: center;
+  }
+}
+
+/* MOBILE SMALL - 320px to 360px */
+@media (max-width: 360px) and (min-width: 320px) {
+  .profile-container {
+    top: 10px;
+    right: 10px;
+    padding: 8px;
+    gap: 8px;
+    flex-direction: column;
+    /* VERTICAL: Switch top, Profile bottom */
+    align-items: center;
+  }
+}
+
+/* MOBILE EXTRA SMALL - Below 320px */
+@media (max-width: 319px) {
+  .profile-container {
+    top: 6px;
+    right: 6px;
+    padding: 6px;
+    gap: 6px;
+    flex-direction: column;
+    /* VERTICAL: Switch top, Profile bottom */
+    align-items: center;
+  }
+}

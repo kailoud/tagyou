@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', async function () {
   initProfileButton();
   initMobileProfile();
   initMapToolbar();
+
+  // Samsung Galaxy S24 Ultra detection and adjustments
+  detectSamsungDevice();
   initPullUpPanel();
   initResponsiveZoom();
 
@@ -1115,6 +1118,41 @@ function initProfileButton() {
   }
 
   console.log('✅ Profile button initialized with mobile support');
+}
+
+// Samsung Galaxy S24 Ultra detection and adjustments
+function detectSamsungDevice() {
+  const userAgent = navigator.userAgent;
+  const isSamsung = userAgent.includes('Samsung') || userAgent.includes('SM-');
+  const isS24Ultra = userAgent.includes('SM-S928') || userAgent.includes('S24 Ultra');
+
+  if (isSamsung || isS24Ultra) {
+    console.log('📱 Samsung device detected:', userAgent);
+
+    // Add Samsung-specific CSS class
+    document.body.classList.add('samsung-device');
+
+    // Force vertical layout for Samsung devices
+    const profileContainer = document.querySelector('.profile-container');
+    if (profileContainer) {
+      profileContainer.style.setProperty('flex-direction', 'column', 'important');
+      profileContainer.style.setProperty('align-items', 'center', 'important');
+    }
+
+    // Adjust search and festival containers
+    const searchContainer = document.querySelector('.search-container');
+    const festivalsContainer = document.querySelector('.festivals-container');
+
+    if (searchContainer) {
+      searchContainer.style.setProperty('width', '35%', 'important');
+      searchContainer.style.setProperty('max-width', '120px', 'important');
+    }
+
+    if (festivalsContainer) {
+      festivalsContainer.style.setProperty('width', '45%', 'important');
+      festivalsContainer.style.setProperty('max-width', '180px', 'important');
+    }
+  }
 }
 
 // Initialize mobile profile functionality
