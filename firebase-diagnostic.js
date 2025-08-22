@@ -4,14 +4,8 @@
 // Using CDN imports for better compatibility with live server
 const { collection, getDocs, doc, getDoc } = firebase.firestore;
 
-// Import db from firebase-config
-let db = null;
-try {
-  const firebaseConfig = await import('./firebase-config.js');
-  db = firebaseConfig.db;
-} catch (error) {
-  console.error('Failed to import firebase-config:', error);
-}
+// Use global Firebase Firestore instance
+const db = firebase.firestore();
 
 async function runFirebaseDiagnostic() {
   console.log('🔍 Starting Firebase Diagnostic...');

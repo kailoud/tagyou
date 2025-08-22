@@ -13,9 +13,9 @@ async function showFirebaseDataTable() {
       return;
     }
 
-    // Check if db is available
-    if (!db) {
-      console.error('❌ Firebase db not initialized');
+    // Check if Firebase Firestore is available
+    if (!firebase.firestore) {
+      console.error('❌ Firebase Firestore not loaded');
       return;
     }
 

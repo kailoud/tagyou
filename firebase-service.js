@@ -16,19 +16,13 @@ const {
   serverTimestamp
 } = firebase.firestore;
 
-// Import db from firebase-config
-let db = null;
-try {
-  const firebaseConfig = await import('./firebase-config.js');
-  db = firebaseConfig.db;
-} catch (error) {
-  console.error('Failed to import firebase-config:', error);
-}
+// Use global Firebase Firestore instance
+const db = firebase.firestore();
 
 // Check if Firebase is properly initialized
 function checkFirebaseConnection() {
-  if (!db) {
-    throw new Error('Firebase not initialized. Please check your configuration.');
+  if (!firebase.firestore) {
+    throw new Error('Firebase Firestore not loaded. Please check your configuration.');
   }
 }
 
