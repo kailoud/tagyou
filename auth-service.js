@@ -950,7 +950,7 @@ class AuthService {
       try {
         const result = await this.resetPassword(email);
         if (result.success) {
-          this.showForgotPasswordSuccess('Password reset email sent! Check your inbox (and spam folder) for the reset link.');
+          this.showForgotPasswordSuccess('Password reset email sent! Check your inbox. Check Your Spam if not found.');
           document.getElementById('resetEmail').value = '';
 
           // Show instructions for the user
@@ -959,7 +959,7 @@ class AuthService {
               📧 Password reset email sent!<br><br>
               <strong>Next steps:</strong><br>
               1. Check your email inbox<br>
-              2. <strong>⚠️ Don't see it? Check your SPAM/JUNK folder!</strong><br>
+              2. <strong>Check Your Spam</strong><br>
               3. Click the reset link in the email<br>
               4. Set your new password<br>
               5. You'll be automatically redirected back here and signed in!
