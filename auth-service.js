@@ -639,7 +639,12 @@ class AuthService {
 
   updateMenuItemsForAuthenticatedUser() {
     const profileMenu = document.getElementById('profileMenu');
-    if (!profileMenu) return;
+    if (!profileMenu) {
+      console.warn('⚠️ Profile menu not found for authenticated user');
+      return;
+    }
+
+    console.log('🔄 Updating menu items for authenticated user');
 
     // Clear existing menu items
     profileMenu.innerHTML = '';
@@ -659,14 +664,26 @@ class AuthService {
         <i class="${item.icon}"></i>
         <span>${item.text}</span>
       `;
-      button.addEventListener('click', item.action);
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log(`Menu item clicked: ${item.text}`);
+        item.action();
+      });
       profileMenu.appendChild(button);
     });
+
+    console.log(`✅ Added ${menuItems.length} menu items for authenticated user`);
   }
 
   updateMenuItemsForGuestUser() {
     const profileMenu = document.getElementById('profileMenu');
-    if (!profileMenu) return;
+    if (!profileMenu) {
+      console.warn('⚠️ Profile menu not found for guest user');
+      return;
+    }
+
+    console.log('🔄 Updating menu items for guest user');
 
     // Clear existing menu items
     profileMenu.innerHTML = '';

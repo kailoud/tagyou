@@ -345,7 +345,7 @@ function getHardcodedFoodStalls() {
       specialties: ["Jerk Chicken", "Roti", "Doubles", "Sorrel Drink"],
       rating: 4.7,
       priceRange: "£",
-      image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop",
+      image: "https://images.unsplash.com/photo-1544025162-d7669419868d?w=400&h=300&fit=crop",
       hours: "12:00 PM - 7:00 PM",
       phone: "+44 20 7123 4569"
     }
@@ -1015,25 +1015,39 @@ function initProfileButton() {
     return;
   }
 
-  // Profile button click handler
-  profileButton.addEventListener('click', function (e) {
+  // Profile button click handler with mobile support
+  const handleProfileClick = function (e) {
+    e.preventDefault();
     e.stopPropagation();
+
+    console.log('Profile button clicked - Mobile:', window.innerWidth <= 768);
+
     const isOpen = profileDropdown.classList.contains('show');
+    console.log('Dropdown currently open:', isOpen);
 
     if (isOpen) {
       profileDropdown.classList.remove('show');
+      console.log('Dropdown closed');
     } else {
       profileDropdown.classList.add('show');
+      console.log('Dropdown opened');
     }
-    console.log('Profile dropdown toggled');
-  });
+  };
 
-  // Close dropdown when clicking outside
-  document.addEventListener('click', function (e) {
+  // Add both click and touchstart events for mobile compatibility
+  profileButton.addEventListener('click', handleProfileClick);
+  profileButton.addEventListener('touchstart', handleProfileClick, { passive: false });
+
+  // Close dropdown when clicking outside with mobile support
+  const handleOutsideClick = function (e) {
     if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
       profileDropdown.classList.remove('show');
+      console.log('Dropdown closed by outside click');
     }
-  });
+  };
+
+  document.addEventListener('click', handleOutsideClick);
+  document.addEventListener('touchend', handleOutsideClick);
 
   // Toggle switch click handler
   if (toggleSwitch) {
@@ -1054,7 +1068,7 @@ function initProfileButton() {
     });
   }
 
-  console.log('✅ Profile button initialized');
+  console.log('✅ Profile button initialized with mobile support');
 }
 
 // Initialize map toolbar functionality

@@ -1907,6 +1907,12 @@ input:checked+.slider:before {
     max-width: 280px !important;
     right: 10px !important;
     margin-top: 8px !important;
+    z-index: 10000 !important;
+    display: none !important;
+  }
+
+  .profile-dropdown.show {
+    display: block !important;
   }
 
   .profile-menu-item {
@@ -1998,6 +2004,12 @@ input:checked+.slider:before {
     right: 15px !important;
     margin-top: 8px !important;
     border-radius: 15px !important;
+    z-index: 10000 !important;
+    display: none !important;
+  }
+
+  .profile-dropdown.show {
+    display: block !important;
   }
 
   .profile-header {
@@ -2328,6 +2340,12 @@ input:checked+.slider:before {
     margin-top: 5px !important;
     border-radius: 15px !important;
     box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3) !important;
+    z-index: 10000 !important;
+    display: none !important;
+  }
+
+  .profile-dropdown.show {
+    display: block !important;
   }
 
   .profile-header {
