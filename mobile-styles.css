@@ -2,6 +2,88 @@
    Dedicated mobile-specific styling */
 
 /* ========================================= */
+/* MOBILE HEADER - FULL BLEED */
+/* ========================================= */
+
+/* Mobile header container - full bleed */
+@media (max-width: 480px) {
+  .controls-container {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    padding: 10px 15px !important;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.95), rgba(118, 75, 162, 0.95)) !important;
+    backdrop-filter: blur(10px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1) !important;
+    z-index: 1000 !important;
+    display: flex !important;
+    gap: 10px !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+
+  /* Mobile search container - full width */
+  .search-container {
+    flex: 1 !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  /* Mobile search bar - full width */
+  .search-bar {
+    width: 100% !important;
+    max-width: none !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 25px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* Mobile festivals container - full width */
+  .festivals-container {
+    flex: 1 !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  /* Mobile festivals button - full width */
+  .festivals-button {
+    width: 100% !important;
+    max-width: none !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 25px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+    font-weight: 600 !important;
+  }
+
+  /* Mobile profile container - repositioned */
+  .profile-container {
+    position: fixed !important;
+    top: 10px !important;
+    right: 15px !important;
+    z-index: 1001 !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Mobile toggle switch - repositioned */
+  .toggle-switch {
+    position: fixed !important;
+    top: 10px !important;
+    right: 70px !important;
+    z-index: 1001 !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+/* ========================================= */
 /* MOBILE PROFILE BUTTON & DROPDOWN */
 /* ========================================= */
 
@@ -314,6 +396,22 @@
 
 /* Mobile devices - 320px to 480px */
 @media (max-width: 480px) and (min-width: 320px) {
+
+  /* Full bleed header adjustments */
+  .controls-container {
+    padding: 8px 10px !important;
+  }
+
+  .search-container {
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .festivals-container {
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
   .mobile-profile-dropdown {
     top: 70px !important;
     right: 10px !important;
@@ -329,6 +427,39 @@
 
 /* Extra small screens - 320px to 360px */
 @media (max-width: 360px) and (min-width: 320px) {
+
+  /* Ultra compact full bleed header */
+  .controls-container {
+    padding: 5px 8px !important;
+    gap: 8px !important;
+  }
+
+  .search-container {
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .festivals-container {
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .search-bar {
+    padding: 4px !important;
+    min-height: 36px !important;
+  }
+
+  .search-input {
+    font-size: 12px !important;
+    padding: 6px 8px !important;
+  }
+
+  .festivals-button {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+    min-height: 36px !important;
+  }
+
   .mobile-profile-dropdown {
     top: 65px !important;
     right: 8px !important;
@@ -383,6 +514,50 @@
 
   .profile-container {
     display: none !important;
+  }
+}
+
+/* ========================================= */
+/* MOBILE LAYOUT OVERRIDES */
+/* ========================================= */
+
+/* Ensure mobile header is full bleed and content is properly positioned */
+@media (max-width: 480px) {
+
+  /* Force full width header */
+  .controls-container {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Ensure search and festivals containers take equal space */
+  .search-container,
+  .festivals-container {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+
+  /* Ensure proper spacing between elements */
+  .controls-container>* {
+    margin: 0 !important;
+  }
+
+  /* Hide desktop profile on mobile */
+  .profile-container {
+    display: none !important;
+  }
+
+  /* Show mobile profile button */
+  .mobile-profile-button {
+    display: flex !important;
+    position: fixed !important;
+    top: 10px !important;
+    right: 15px !important;
+    z-index: 1001 !important;
   }
 }
 
