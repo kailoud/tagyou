@@ -19,70 +19,7 @@
   <!-- Authentication Service -->
   <script type="module" src="auth-service.js"></script>
 
-  <!-- Debug Button -->
-  <style>
-    .debug-button {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 10000;
-      background: #ff6b6b;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: bold;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
 
-    .debug-button:hover {
-      background: #ff5252;
-    }
-  </style>
-  <button class="debug-button" onclick="showFirebaseData()">📊 Show Firebase Data</button>
-  <button class="debug-button" onclick="testGuestUI()" style="top: 50px;">👤 Test Guest UI</button>
-  <script>
-    async function showFirebaseData() {
-      try {
-        // Wait for Firebase to be initialized
-        let attempts = 0;
-        const maxAttempts = 10;
-
-        while (attempts < maxAttempts) {
-          if (firebase.apps.length > 0) {
-            console.log('📊 Manual Firebase data check triggered...');
-            const showData = await import('./show-firebase-data.js');
-            showData.default();
-            break;
-          }
-          attempts++;
-          await new Promise(resolve => setTimeout(resolve, 500));
-        }
-
-        if (attempts >= maxAttempts) {
-          console.error('❌ Firebase not initialized. Please wait a moment and try again.');
-        }
-      } catch (error) {
-        console.error('❌ Failed to load data display:', error);
-      }
-    }
-
-    async function testGuestUI() {
-      try {
-        if (window.authService) {
-          console.log('🧪 Testing guest UI...');
-          window.authService.forceGuestUI();
-          console.log('✅ Guest UI test completed');
-        } else {
-          console.error('❌ Auth service not available');
-        }
-      } catch (error) {
-        console.error('❌ Guest UI test failed:', error);
-      }
-    }
-  </script>
 </head>
 
 <body>

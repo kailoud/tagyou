@@ -252,56 +252,8 @@
   white-space: nowrap;
 }
 
-/* Profile Menu Updates */
-.profile-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(15px);
-  border-radius: 15px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-  min-width: 200px;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-10px);
-  transition: all 0.3s ease;
-  z-index: 1000;
-  margin-top: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.profile-menu.show {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.profile-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 15px 20px;
-  color: #333;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.profile-menu-item:last-child {
-  border-bottom: none;
-}
-
-.profile-menu-item:hover {
-  background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
-}
-
-.profile-menu-item i {
-  width: 16px;
-  font-size: 16px;
-}
+/* Profile Menu Updates - Auth Service Styles */
+/* Note: These styles work with the existing dropdown system */
 
 .profile-menu-item.auth-action {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -313,6 +265,13 @@
   background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Auth-specific profile menu item styles */
+
+.profile-menu-item i {
+  width: 16px;
+  font-size: 16px;
 }
 
 .profile-menu-divider {
@@ -348,10 +307,7 @@
     display: none;
   }
 
-  .profile-menu {
-    right: -10px;
-    min-width: 180px;
-  }
+  /* Profile menu responsive styles handled by main styles.css */
 }
 
 @media (max-width: 320px) {
