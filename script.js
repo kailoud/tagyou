@@ -1,6 +1,7 @@
 // TagYou2 London Map - Firebase Integration
 let map;
 let currentUser = null; // Will be set when user authentication is implemented
+let authService = null; // Authentication service instance
 let foodStallsData = [];
 let artistsData = [];
 let floatTrucksData = [];
@@ -21,6 +22,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   // Then try to initialize Firebase (non-blocking)
   initializeFirebase();
+
+  // Initialize Authentication Service
+  initializeAuthService();
 
   // Wait for Firebase to be initialized before running diagnostics
   const waitForFirebase = async () => {
@@ -50,6 +54,13 @@ document.addEventListener('DOMContentLoaded', async function () {
           await import('./show-firebase-data.js');
         } catch (error) {
           console.error('❌ Failed to load data table:', error);
+        }
+
+        // Test authentication
+        try {
+          await import('./test-auth.js');
+        } catch (error) {
+          console.error('❌ Failed to load auth test:', error);
         }
 
         break;
@@ -109,6 +120,91 @@ async function initializeFirebase() {
     artistsData = getHardcodedArtists();
     floatTrucksData = getHardcodedFloatTrucks();
   }
+}
+
+// Authentication service initialization
+async function initializeAuthService() {
+  console.log('🔐 Initializing Authentication Service...');
+  try {
+    // Wait for Firebase to be available
+    let attempts = 0;
+    const maxAttempts = 30;
+
+    while (attempts < maxAttempts) {
+      if (firebase.apps.length > 0) {
+        console.log('✅ Firebase ready, loading auth service...');
+        break;
+      }
+      attempts++;
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    if (attempts >= maxAttempts) {
+      throw new Error('Firebase not available for auth service');
+    }
+
+    // Import and initialize auth service
+    const authModule = await import('./auth-service.js');
+    authService = authModule.default;
+
+    // Make auth service globally accessible
+    window.authService = authService;
+
+    // Set up auth state listener
+    authService.onAuthStateChanged((user) => {
+      currentUser = user;
+      console.log('Auth state changed:', user ? `User: ${user.email}` : 'No user');
+
+      // Update UI based on auth state
+      updateAuthenticatedUI(user);
+    });
+
+    console.log('✅ Authentication service initialized');
+
+  } catch (error) {
+    console.error('❌ Authentication service initialization failed:', error);
+  }
+}
+
+// Update UI based on authentication state
+function updateAuthenticatedUI(user) {
+  console.log('🎨 Updating UI for auth state:', user ? 'authenticated' : 'guest');
+
+  // Update profile button and menu (handled by auth service)
+  // Additional UI updates can be added here
+
+  if (user) {
+    // User is authenticated - enable protected features
+    console.log('✅ User authenticated, enabling protected features');
+
+    // Update favorites functionality
+    updateFavoritesUI(true);
+
+    // Update any other authenticated-only features
+    updateProtectedFeatures(true);
+
+  } else {
+    // User is not authenticated - disable protected features
+    console.log('👤 Guest user, disabling protected features');
+
+    // Update favorites functionality
+    updateFavoritesUI(false);
+
+    // Update any other authenticated-only features
+    updateProtectedFeatures(false);
+  }
+}
+
+// Update favorites UI based on auth state
+function updateFavoritesUI(isAuthenticated) {
+  // This will be implemented when we add favorites functionality
+  console.log('🖤 Favorites UI updated:', isAuthenticated ? 'enabled' : 'disabled');
+}
+
+// Update protected features based on auth state
+function updateProtectedFeatures(isAuthenticated) {
+  // This will be implemented for features that require authentication
+  console.log('🔒 Protected features updated:', isAuthenticated ? 'enabled' : 'disabled');
 }
 
 // Load initial data from Firebase
