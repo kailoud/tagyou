@@ -29,6 +29,14 @@ document.addEventListener('DOMContentLoaded', async function () {
       console.error('❌ Failed to load diagnostic:', error);
     });
   }, 3000);
+
+  // Add detailed Firebase check after a longer delay
+  setTimeout(() => {
+    console.log('🔍 Running detailed Firebase data check...');
+    import('./detailed-firebase-check.js').catch(error => {
+      console.error('❌ Failed to load detailed check:', error);
+    });
+  }, 5000);
 });
 
 // Initialize Firebase (non-blocking)
