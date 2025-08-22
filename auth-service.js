@@ -411,6 +411,8 @@ class AuthService {
   updateAuthUI(user) {
     const profileButton = document.getElementById('profileButton');
     const profileMenu = document.getElementById('profileMenu');
+    const profileName = document.getElementById('profileName');
+    const profileStatus = document.getElementById('profileStatus');
 
     if (!profileButton || !profileMenu) {
       console.warn('⚠️ Profile elements not found');
@@ -418,17 +420,53 @@ class AuthService {
     }
 
     if (user) {
-      // User is logged in
+      // User is logged in - show user initials
+      const displayName = user.displayName || user.email;
+      const initials = this.getUserInitials(displayName);
+
       profileButton.innerHTML = `
-        <i class="fas fa-user profile-icon"></i>
+        <div class="profile-initials">${initials}</div>
       `;
+
+      // Update profile header
+      if (profileName) {
+        profileName.textContent = user.displayName || 'Festival Goer';
+      }
+      if (profileStatus) {
+        profileStatus.textContent = `Signed in as ${user.email}`;
+      }
+
       this.updateMenuItemsForAuthenticatedUser();
     } else {
       // User is not logged in (guest)
       profileButton.innerHTML = `
         <i class="fas fa-user profile-icon"></i>
       `;
+
+      // Update profile header for guest
+      if (profileName) {
+        profileName.textContent = 'Festival Goer';
+      }
+      if (profileStatus) {
+        profileStatus.textContent = 'Welcome to TagYou2!';
+      }
+
       this.updateMenuItemsForGuestUser();
+    }
+  }
+
+  // Helper function to get user initials
+  getUserInitials(name) {
+    if (!name) return 'U';
+
+    // Split name by spaces and get first letter of each word
+    const words = name.trim().split(/\s+/);
+    if (words.length === 1) {
+      // Single word - take first 2 characters
+      return words[0].substring(0, 2).toUpperCase();
+    } else {
+      // Multiple words - take first letter of first two words
+      return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
     }
   }
 
