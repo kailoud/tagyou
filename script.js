@@ -32,16 +32,35 @@ document.addEventListener('DOMContentLoaded', async function () {
     const profileDropdown = document.getElementById('profileDropdown');
     const profileMenu = document.getElementById('profileMenu');
 
-    console.log('🔍 Profile Elements Debug:');
+    console.log('🔍 MOBILE/WEB VERSION DEBUG:');
+    console.log('Screen width:', window.innerWidth);
+    console.log('User agent:', navigator.userAgent);
+    console.log('Is mobile viewport:', window.innerWidth <= 768);
+    console.log('');
+    console.log('Profile Elements:');
     console.log('Profile Button:', profileButton);
     console.log('Profile Dropdown:', profileDropdown);
     console.log('Profile Menu:', profileMenu);
+    console.log('Profile Menu innerHTML:', profileMenu ? profileMenu.innerHTML : 'null');
     console.log('Auth Service:', authService);
+    console.log('');
 
     if (profileDropdown) {
-      console.log('Dropdown classes:', profileDropdown.className);
-      console.log('Dropdown display:', window.getComputedStyle(profileDropdown).display);
-      console.log('Dropdown z-index:', window.getComputedStyle(profileDropdown).zIndex);
+      console.log('Dropdown State:');
+      console.log('Classes:', profileDropdown.className);
+      console.log('Display:', window.getComputedStyle(profileDropdown).display);
+      console.log('Z-index:', window.getComputedStyle(profileDropdown).zIndex);
+      console.log('Position:', window.getComputedStyle(profileDropdown).position);
+      console.log('Width:', window.getComputedStyle(profileDropdown).width);
+    }
+
+    // Force populate menu if empty
+    if (profileMenu && profileMenu.innerHTML.trim() === '') {
+      console.log('⚠️ Profile menu is empty! Force populating...');
+      if (authService && authService.updateMenuItemsForGuestUser) {
+        authService.updateMenuItemsForGuestUser();
+        console.log('✅ Forced guest menu population');
+      }
     }
   }, 2000);
 
@@ -1114,6 +1133,45 @@ function testProfileDropdown() {
 
 // Make test function globally available
 window.testProfileDropdown = testProfileDropdown;
+
+// Force populate profile menu function
+function forcePopulateProfileMenu() {
+  console.log('🔧 Forcing profile menu population...');
+
+  const profileMenu = document.getElementById('profileMenu');
+  if (!profileMenu) {
+    console.error('❌ Profile menu not found');
+    return;
+  }
+
+  // Clear existing content
+  profileMenu.innerHTML = '';
+
+  // Add guest menu items manually
+  const menuItems = [
+    { icon: 'fas fa-sign-in-alt', text: 'Sign In' },
+    { icon: 'fas fa-user-plus', text: 'Create Account' },
+    { icon: 'fas fa-question-circle', text: 'Help' }
+  ];
+
+  menuItems.forEach(item => {
+    const button = document.createElement('button');
+    button.className = 'profile-menu-item';
+    button.innerHTML = `
+      <i class="${item.icon}"></i>
+      <span>${item.text}</span>
+    `;
+    button.addEventListener('click', () => {
+      console.log(`Menu item clicked: ${item.text}`);
+    });
+    profileMenu.appendChild(button);
+  });
+
+  console.log(`✅ Added ${menuItems.length} menu items manually`);
+}
+
+// Make function globally available
+window.forcePopulateProfileMenu = forcePopulateProfileMenu;
 
 // Initialize map toolbar functionality
 function initMapToolbar() {
