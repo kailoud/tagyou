@@ -671,17 +671,115 @@ class AuthService {
   }
 
   showForgotPassword() {
-    const email = document.getElementById('email')?.value;
-    if (email) {
-      this.resetPassword(email).then(result => {
+    // Create a dedicated forgot password modal
+    const modalHTML = `
+      <div class="auth-modal show" id="forgotPasswordModal">
+        <div class="auth-modal-overlay"></div>
+        <div class="auth-modal-content">
+          <button class="auth-modal-close" onclick="authService.closeForgotPasswordModal()">&times;</button>
+          <div class="auth-modal-header">
+            <h2>🔐 Reset Password</h2>
+            <p>Enter your email address and we'll send you a link to reset your password.</p>
+          </div>
+          
+          <form class="auth-form" id="forgotPasswordForm">
+            <div class="form-group">
+              <input type="email" id="resetEmail" placeholder="Enter your email address" required>
+            </div>
+            
+            <div class="auth-error" id="forgotPasswordError" style="display: none;"></div>
+            <div class="auth-success" id="forgotPasswordSuccess" style="display: none;"></div>
+            
+            <button type="submit" class="auth-submit-btn" id="resetPasswordBtn">
+              Send Reset Link
+            </button>
+          </form>
+          
+          <div class="auth-modal-footer">
+            <a href="#" onclick="authService.closeForgotPasswordModal(); authService.showSignInModal()" class="auth-link">
+              ← Back to Sign In
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Remove any existing modal
+    const existingModal = document.querySelector('.auth-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // Add the new modal
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Setup form submission
+    const form = document.getElementById('forgotPasswordForm');
+    const submitBtn = document.getElementById('resetPasswordBtn');
+    const originalText = submitBtn.textContent;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('resetEmail').value.trim();
+      if (!email) {
+        this.showForgotPasswordError('Please enter your email address');
+        return;
+      }
+
+      // Show loading state
+      submitBtn.textContent = 'Sending...';
+      submitBtn.disabled = true;
+
+      try {
+        const result = await this.resetPassword(email);
         if (result.success) {
-          this.showAuthSuccess('Password reset email sent!');
+          this.showForgotPasswordSuccess('Password reset email sent! Check your inbox.');
+          document.getElementById('resetEmail').value = '';
         } else {
-          this.showAuthError(result.error);
+          this.showForgotPasswordError(result.error);
         }
-      });
-    } else {
-      this.showAuthError('Please enter your email address first');
+      } catch (error) {
+        this.showForgotPasswordError('An unexpected error occurred. Please try again.');
+      }
+
+      // Reset button state
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    });
+
+    // Close modal when clicking overlay
+    const overlay = document.querySelector('#forgotPasswordModal .auth-modal-overlay');
+    overlay.addEventListener('click', () => this.closeForgotPasswordModal());
+
+    // Focus on email input
+    setTimeout(() => {
+      document.getElementById('resetEmail').focus();
+    }, 100);
+  }
+
+  closeForgotPasswordModal() {
+    const modal = document.getElementById('forgotPasswordModal');
+    if (modal) {
+      modal.classList.remove('show');
+      setTimeout(() => modal.remove(), 300);
+    }
+  }
+
+  showForgotPasswordError(message) {
+    const errorDiv = document.getElementById('forgotPasswordError');
+    if (errorDiv) {
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      setTimeout(() => errorDiv.style.display = 'none', 5000);
+    }
+  }
+
+  showForgotPasswordSuccess(message) {
+    const successDiv = document.getElementById('forgotPasswordSuccess');
+    if (successDiv) {
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
     }
   }
 
