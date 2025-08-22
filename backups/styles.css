@@ -2213,8 +2213,6 @@ input:checked+.slider:before {
     font-size: 12px;
   }
 
-  /* TOGGLE SWITCH COMMENTED OUT FOR MOBILE PROFILE TESTING */
-  /*
   .toggle-switch {
     height: 24px;
     width: 42px;
@@ -2232,7 +2230,6 @@ input:checked+.slider:before {
   .toggle-switch.enabled .toggle-thumb {
     transform: translateX(23px);
   }
-  */
 
   .search-container {
     width: 30%;
@@ -2298,12 +2295,6 @@ input:checked+.slider:before {
   }
 
   /* CLEAN MOBILE PROFILE DROPDOWN - NO CONFLICTS */
-
-  /* HIDE TOGGLE SWITCH ON MOBILE FOR TESTING */
-  .toggle-switch {
-    display: none !important;
-  }
-
   .profile-dropdown {
     width: 90vw;
     max-width: 280px;

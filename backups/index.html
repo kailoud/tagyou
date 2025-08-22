@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TagYou2 - London Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="auth-styles.css">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+
+  <!-- Authentication Service -->
+  <script type="module" src="auth-service.js"></script>
+
+
+</head>
+
+<body>
+  <!-- Centered Controls Container -->
+  <div class="controls-container">
+    <!-- Search Bar -->
+    <div class="search-container">
+      <div class="search-bar">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search London locations...">
+        <button type="button" id="clearButton" class="clear-button" style="display: none;">
+          <i class="fas fa-times"></i>
+        </button>
+        <button type="button" id="searchButton" class="search-button">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Festivals Dropdown -->
+    <div class="festivals-container">
+      <div class="festivals-bar">
+        <button type="button" id="festivalsButton" class="festivals-button">
+          <span class="festivals-text">UK Festivals</span>
+          <i class="fas fa-chevron-down dropdown-icon"></i>
+        </button>
+        <div class="festivals-dropdown" id="festivalsDropdown">
+          <div class="festivals-list">
+            <div class="festival-item available">🎭 Notting Hill Carnival</div>
+            <div class="festival-item coming-soon">🎪 Edinburgh Festival Fringe</div>
+            <div class="festival-item coming-soon">🎸 Glastonbury Festival</div>
+            <div class="festival-item coming-soon">🎵 Reading Festival</div>
+            <div class="festival-item coming-soon">🎤 Leeds Festival</div>
+            <div class="festival-item coming-soon">🤘 Download Festival</div>
+            <div class="festival-item coming-soon">🏝️ Isle of Wight Festival</div>
+            <div class="festival-item coming-soon">🌳 Latitude Festival</div>
+            <div class="festival-item coming-soon">🌈 Bestival</div>
+            <div class="festival-item coming-soon">🎪 Boomtown Fair</div>
+            <div class="festival-item coming-soon">🎧 Creamfields</div>
+            <div class="festival-item coming-soon">🎶 V Festival</div>
+            <div class="festival-item coming-soon">🎤 T in the Park</div>
+            <div class="festival-item coming-soon">🎵 Wireless Festival</div>
+            <div class="festival-item coming-soon">🎉 Parklife Festival</div>
+            <div class="festival-item coming-soon">💕 Lovebox Festival</div>
+            <div class="festival-item coming-soon">🌞 Field Day Festival</div>
+            <div class="festival-item coming-soon">🎨 All Points East</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Icon -->
+    <div class="profile-container">
+      <button class="toggle-switch disabled" id="toggleSwitch" role="switch" aria-checked="false">
+        <span class="toggle-thumb"></span>
+      </button>
+      <button type="button" id="profileButton" class="profile-button">
+        <i class="fas fa-user profile-icon"></i>
+      </button>
+
+      <!-- Profile Dropdown -->
+      <div class="profile-dropdown" id="profileDropdown">
+        <div class="profile-header">
+          <div class="profile-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="profile-info">
+            <h4 id="profileName">Festival Goer</h4>
+            <p id="profileStatus">Welcome to TagYou2!</p>
+          </div>
+        </div>
+
+        <div class="profile-menu" id="profileMenu">
+          <!-- Menu items will be dynamically populated by auth service -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Map Toolbar -->
+  <div class="map-toolbar">
+    <div class="toolbar-section">
+      <button class="toolbar-btn" id="groupsBtn" title="Groups">
+        <i class="fas fa-users"></i>
+      </button>
+      <button class="toolbar-btn" id="foodStallBtn" title="Food Stalls">
+        <i class="fas fa-utensils"></i>
+      </button>
+      <button class="toolbar-btn" id="floatTruckBtn" title="Float Trucks">
+        <i class="fas fa-truck"></i>
+      </button>
+      <button class="toolbar-btn" id="artistBandBtn" title="Artists & Bands">
+        <i class="fas fa-music"></i>
+      </button>
+      <button class="toolbar-btn" id="festivalBtn" title="Festivals">
+        <i class="fas fa-star"></i>
+      </button>
+    </div>
+
+    <div class="toolbar-section">
+      <button class="toolbar-btn location-btn" id="locationCenterBtn" title="Center on Location">
+        <i class="fas fa-crosshairs"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Pull Up Panel -->
+  <div class="pull-up-panel" id="pullUpPanel">
+    <div class="panel-handle">
+      <div class="handle-bar"></div>
+      <span class="handle-text">Pull up for more</span>
+    </div>
+    <div class="panel-content">
+      <div class="panel-header">
+        <h3>Festival Information</h3>
+        <button class="close-panel" id="closePanel">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tab-navigation">
+        <button class="tab-btn active" data-tab="foodstall">
+          <i class="fas fa-utensils"></i>
+          <span>Food Stalls</span>
+        </button>
+        <button class="tab-btn" data-tab="floattrucks">
+          <i class="fas fa-truck"></i>
+          <span>Float Trucks</span>
+        </button>
+        <button class="tab-btn" data-tab="artist">
+          <i class="fas fa-music"></i>
+          <span>Artists</span>
+        </button>
+        <button class="tab-btn" data-tab="groups">
+          <i class="fas fa-users"></i>
+          <span>Groups</span>
+        </button>
+        <button class="tab-btn" data-tab="settings">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Food Stalls Tab -->
+        <div class="tab-pane active" id="foodstall">
+          <div class="tab-header">
+            <h4>🍽️ Food Stalls</h4>
+            <p>Discover delicious festival food and refreshments</p>
+          </div>
+          <div class="content-list">
+            <div class="content-item">
+              <div class="item-image">
+                <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=150&h=100&fit=crop"
+                  alt="Caribbean Spice Kitchen">
+              </div>
+              <div class="item-content">
+                <div class="item-icon">🍗</div>
+                <div class="item-info">
+                  <h5>Caribbean Spice Kitchen</h5>
+                  <p>Authentic Jamaican jerk chicken and Caribbean cuisine</p>
+                  <span class="item-location">📍 Ladbroke Grove • ⭐ 4.8 • ££</span>
+                  <span class="item-specialties">🍽️ Jerk Chicken, Curry Goat, Rice & Peas, Plantain</span>
+                  <span class="item-hours">🕒 11:00 AM - 8:00 PM</span>
+                </div>
+              </div>
+            </div>
+            <div class="content-item">
+              <div class="item-image">
+                <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=150&h=100&fit=crop"
+                  alt="Notting Hill Jerk House">
+              </div>
+              <div class="item-content">
+                <div class="item-icon">🔥</div>
+                <div class="item-info">
+                  <h5>Notting Hill Jerk House</h5>
+                  <p>Traditional jerk chicken with secret family recipe</p>
+                  <span class="item-location">📍 Portobello Road • ⭐ 4.9 • ££</span>
+                  <span class="item-specialties">🍽️ Jerk Chicken, Jerk Pork, Ackee & Saltfish, Callaloo</span>
+                  <span class="item-hours">🕒 10:00 AM - 9:00 PM</span>
+                </div>
+              </div>
+            </div>
+            <div class="content-item">
+              <div class="item-image">
+                <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=150&h=100&fit=crop"
+                  alt="Island Flavours">
+              </div>
+              <div class="item-content">
+                <div class="item-icon">🌴</div>
+                <div class="item-info">
+                  <h5>Island Flavours</h5>
+                  <p>Fresh Caribbean street food and traditional dishes</p>
+                  <span class="item-location">📍 Westbourne Grove • ⭐ 4.7 • £</span>
+                  <span class="item-specialties">🍽️ Jerk Chicken, Roti, Doubles, Sorrel Drink</span>
+                  <span class="item-hours">🕒 12:00 PM - 7:00 PM</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Float Trucks Tab -->
+        <div class="tab-pane" id="floattrucks">
+          <div class="tab-header">
+            <h4>🚛 Float Trucks</h4>
+            <p>Amazing parade floats and mobile attractions</p>
+          </div>
+          <div class="content-list">
+            <div class="content-item">
+              <div class="item-image">
+                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=150&h=100&fit=crop"
+                  alt="Circus Float">
+              </div>
+              <div class="item-content">
+                <div class="item-icon">🎪</div>
+                <div class="item-info">
+                  <h5>Circus Float</h5>
+                  <p>Spectacular circus performers on wheels</p>
+                  <span class="item-location">📍 Parade Route, 2:00 PM</span>
+                </div>
+              </div>
+            </div>
+            <div class="content-item">
+              <div class="item-image">
+                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=150&h=100&fit=crop"
+                  alt="Costume Float">
+              </div>
+              <div class="item-content">
+                <div class="item-icon">🎭</div>
+                <div class="item-info">
+                  <h5>Costume Float</h5>
+                  <p>Vibrant costumes and cultural displays</p>
+                  <span class="item-location">📍 Main Parade, 3:30 PM</span>
+                </div>
+              </div>
+            </div>
+            <div class="content-item">
+              <div class="item-image">
+                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=150&h=100&fit=crop"
+                  alt="Music Float">
+              </div>
+              <div class="item-content">
+                <div class="item-icon">🎵</div>
+                <div class="item-info">
+                  <h5>Music Float</h5>
+                  <p>Live music and DJ performances</p>
+                  <span class="item-location">📍 Sound Stage, 4:15 PM</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Artists Tab -->
+        <div class="tab-pane" id="artist">
+          <div class="tab-header">
+            <h4>🎵 Artists & Bands</h4>
+            <p>Live performances and musical entertainment</p>
+          </div>
+          <div class="content-list">
+            <div class="content-item">
+              <div class="item-image">
+                <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=100&fit=crop"
+                  alt="DJ Shy FX">
+              </div>
+              <div class="item-content">
+                <div class="item-icon">🎧</div>
+                <div class="item-info">
+                  <h5>DJ Shy FX</h5>
+                  <p>Legendary drum & bass and jungle pioneer</p>
+                  <span class="item-location">📍 Ladbroke Grove • ⭐ 4.9 • 3:00 PM</span>
+                  <span class="item-specialties">🎵 Drum & Bass, Jungle, UK Garage, Reggae</span>
+                  <span class="item-hours">🕒 3:00 PM - 4:30 PM • Main Float Route</span>
+                </div>
+              </div>
+            </div>
+            <div class="content-item">
+              <div class="item-image">
+                <img src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=150&h=100&fit=crop"
+                  alt="Steel Pulse">
+              </div>
+              <div class="item-content">
+                <div class="item-icon">🎸</div>
+                <div class="item-info">
+                  <h5>Steel Pulse</h5>
+                  <p>Grammy-winning reggae legends from Birmingham</p>
+                  <span class="item-location">📍 Portobello Road • ⭐ 4.8 • 5:00 PM</span>
+                  <span class="item-specialties">🎵 Reggae, Roots, Conscious Music, Political Lyrics</span>
+                  <span class="item-hours">🕒 5:00 PM - 6:30 PM • Cultural Stage</span>
+                </div>
+              </div>
+            </div>
+            <div class="content-item">
+              <div class="item-image">
+                <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=150&h=100&fit=crop"
+                  alt="London Samba Collective">
+              </div>
+              <div class="item-content">
+                <div class="item-icon">🥁</div>
+                <div class="item-info">
+                  <h5>London Samba Collective</h5>
+                  <p>Energetic Brazilian samba rhythms and percussion</p>
+                  <span class="item-location">📍 Westbourne Grove • ⭐ 4.7 • 2:00 PM</span>
+                  <span class="item-specialties">🎵 Samba, Batucada, Brazilian Rhythms, Carnival Music</span>
+                  <span class="item-hours">🕒 2:00 PM - 3:30 PM • Parade Route</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Groups Tab -->
+        <div class="tab-pane" id="groups">
+          <div class="tab-header">
+            <h4>👥 Groups & Communities</h4>
+            <p>Connect with festival communities and groups</p>
+          </div>
+          <div class="content-list">
+            <div class="content-item">
+              <div class="item-image">
+                <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=150&h=100&fit=crop"
+                  alt="LGBTQ+ Community">
+              </div>
+              <div class="item-content">
+                <div class="item-icon">🏳️‍🌈</div>
+                <div class="item-info">
+                  <h5>LGBTQ+ Community</h5>
+                  <p>Inclusive space for LGBTQ+ festival-goers</p>
+                  <span class="item-location">📍 Community Hub, All Day</span>
+                </div>
+              </div>
+            </div>
+            <div class="content-item">
+              <div class="item-image">
+                <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=150&h=100&fit=crop"
+                  alt="International Visitors">
+              </div>
+              <div class="item-content">
+                <div class="item-icon">🌍</div>
+                <div class="item-info">
+                  <h5>International Visitors</h5>
+                  <p>Group for international festival attendees</p>
+                  <span class="item-location">📍 Welcome Center, 10:00 AM</span>
+                </div>
+              </div>
+            </div>
+            <div class="content-item">
+              <div class="item-image">
+                <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=150&h=100&fit=crop"
+                  alt="Art & Culture Group">
+              </div>
+              <div class="item-content">
+                <div class="item-icon">🎨</div>
+                <div class="item-info">
+                  <h5>Art & Culture Group</h5>
+                  <p>Creative community for art enthusiasts</p>
+                  <span class="item-location">📍 Art Gallery, 2:00 PM</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-pane" id="settings">
+          <div class="tab-header">
+            <h4>⚙️ Settings</h4>
+            <p>Customize your festival experience</p>
+          </div>
+          <div class="settings-list">
+            <div class="setting-item">
+              <div class="setting-info">
+                <h5>Push Notifications</h5>
+                <p>Get alerts about events and updates</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <h5>Location Services</h5>
+                <p>Share your location for better recommendations</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <h5>Dark Mode</h5>
+                <p>Switch to dark theme for better visibility</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <h5>Auto-Save Favorites</h5>
+                <p>Automatically save your favorite items</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full Scale Map Container -->
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
