@@ -37,6 +37,14 @@ document.addEventListener('DOMContentLoaded', async function () {
       console.error('❌ Failed to load detailed check:', error);
     });
   }, 5000);
+
+  // Show Firebase data table after a longer delay
+  setTimeout(() => {
+    console.log('📊 Showing Firebase data table...');
+    import('./show-firebase-data.js').catch(error => {
+      console.error('❌ Failed to load data table:', error);
+    });
+  }, 7000);
 });
 
 // Initialize Firebase (non-blocking)
