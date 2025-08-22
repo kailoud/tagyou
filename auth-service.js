@@ -1100,23 +1100,382 @@ class AuthService {
   }
 
   showProfile() {
-    console.log('👤 Show profile');
-    // Implement profile view
+    if (!this.currentUser) {
+      this.showSignInModal();
+      return;
+    }
+
+    const modalHTML = `
+      <div class="auth-modal show" id="profileModal">
+        <div class="auth-modal-overlay"></div>
+        <div class="auth-modal-content">
+          <button class="auth-modal-close" onclick="authService.closeProfileModal()">&times;</button>
+          <div class="auth-modal-header">
+            <h2>👤 My Profile</h2>
+            <p>Manage your account information and preferences</p>
+          </div>
+          
+          <div class="profile-content">
+            <div class="profile-section">
+              <h3>Account Information</h3>
+              <div class="profile-info-item">
+                <label>Email:</label>
+                <span>${this.currentUser.email}</span>
+              </div>
+              <div class="profile-info-item">
+                <label>Display Name:</label>
+                <input type="text" id="profileDisplayName" value="${this.currentUser.displayName || ''}" placeholder="Enter your name">
+              </div>
+            </div>
+            
+            <div class="profile-section">
+              <h3>Site Activity</h3>
+              <div class="profile-info-item">
+                <label>First Login:</label>
+                <span>${new Date().toLocaleDateString()}</span>
+              </div>
+              <div class="profile-info-item">
+                <label>Login Count:</label>
+                <span>Active user</span>
+              </div>
+            </div>
+            
+            <div class="profile-actions">
+              <button class="auth-submit-btn" onclick="authService.updateProfileInfo()">
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Remove any existing modal
+    const existingModal = document.querySelector('.auth-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // Add the new modal
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Close modal when clicking overlay
+    const overlay = document.querySelector('#profileModal .auth-modal-overlay');
+    overlay.addEventListener('click', () => this.closeProfileModal());
+  }
+
+  closeProfileModal() {
+    const modal = document.getElementById('profileModal');
+    if (modal) {
+      modal.classList.remove('show');
+      setTimeout(() => modal.remove(), 300);
+    }
+  }
+
+  async updateProfileInfo() {
+    const displayName = document.getElementById('profileDisplayName').value.trim();
+
+    if (!displayName) {
+      this.showProfileError('Display name cannot be empty');
+      return;
+    }
+
+    try {
+      const result = await this.updateProfile({ displayName });
+      if (result.success) {
+        this.showProfileSuccess('Profile updated successfully!');
+        setTimeout(() => this.closeProfileModal(), 1500);
+      } else {
+        this.showProfileError(result.error);
+      }
+    } catch (error) {
+      this.showProfileError('Failed to update profile');
+    }
   }
 
   showFavorites() {
-    console.log('❤️ Show favorites');
-    // Implement favorites view
+    if (!this.currentUser) {
+      this.showSignInModal();
+      return;
+    }
+
+    const modalHTML = `
+      <div class="auth-modal show" id="favoritesModal">
+        <div class="auth-modal-overlay"></div>
+        <div class="auth-modal-content">
+          <button class="auth-modal-close" onclick="authService.closeFavoritesModal()">&times;</button>
+          <div class="auth-modal-header">
+            <h2>❤️ My Favorites</h2>
+            <p>Your saved food stalls, artists, and float trucks</p>
+          </div>
+          
+          <div class="favorites-content">
+            <div class="favorites-section">
+              <h3>🍕 Food Stalls</h3>
+              <div class="favorites-list" id="foodStallsList">
+                <div class="empty-state">No food stalls saved yet</div>
+              </div>
+            </div>
+            
+            <div class="favorites-section">
+              <h3>🎵 Artists</h3>
+              <div class="favorites-list" id="artistsList">
+                <div class="empty-state">No artists saved yet</div>
+              </div>
+            </div>
+            
+            <div class="favorites-section">
+              <h3>🚛 Float Trucks</h3>
+              <div class="favorites-list" id="floatTrucksList">
+                <div class="empty-state">No float trucks saved yet</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Remove any existing modal
+    const existingModal = document.querySelector('.auth-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // Add the new modal
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Close modal when clicking overlay
+    const overlay = document.querySelector('#favoritesModal .auth-modal-overlay');
+    overlay.addEventListener('click', () => this.closeFavoritesModal());
+
+    // Load user favorites
+    this.loadUserFavorites();
+  }
+
+  closeFavoritesModal() {
+    const modal = document.getElementById('favoritesModal');
+    if (modal) {
+      modal.classList.remove('show');
+      setTimeout(() => modal.remove(), 300);
+    }
+  }
+
+  async loadUserFavorites() {
+    try {
+      const userData = await this.getUserDocument(this.currentUser.uid);
+      const siteData = userData?.sites?.[this.siteId];
+      const favorites = siteData?.favorites || { foodStalls: [], artists: [], floatTrucks: [] };
+
+      this.displayFavorites('foodStallsList', favorites.foodStalls, 'food stall');
+      this.displayFavorites('artistsList', favorites.artists, 'artist');
+      this.displayFavorites('floatTrucksList', favorites.floatTrucks, 'float truck');
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+    }
+  }
+
+  displayFavorites(containerId, items, itemType) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (items.length === 0) {
+      container.innerHTML = `<div class="empty-state">No ${itemType}s saved yet</div>`;
+    } else {
+      container.innerHTML = items.map(item => `
+        <div class="favorite-item">
+          <span class="favorite-name">${item}</span>
+          <button class="remove-favorite" onclick="authService.removeFavorite('${itemType}', '${item}')">
+            ❌
+          </button>
+        </div>
+      `).join('');
+    }
   }
 
   showSettings() {
-    console.log('⚙️ Show settings');
-    // Implement settings view
+    if (!this.currentUser) {
+      this.showSignInModal();
+      return;
+    }
+
+    const modalHTML = `
+      <div class="auth-modal show" id="settingsModal">
+        <div class="auth-modal-overlay"></div>
+        <div class="auth-modal-content">
+          <button class="auth-modal-close" onclick="authService.closeSettingsModal()">&times;</button>
+          <div class="auth-modal-header">
+            <h2>⚙️ Settings</h2>
+            <p>Customize your experience and preferences</p>
+          </div>
+          
+          <div class="settings-content">
+            <div class="settings-section">
+              <h3>Notifications</h3>
+              <div class="setting-item">
+                <label class="toggle-label">
+                  <input type="checkbox" id="notificationsToggle" checked>
+                  <span class="toggle-slider"></span>
+                  Email Notifications
+                </label>
+              </div>
+            </div>
+            
+            <div class="settings-section">
+              <h3>Theme</h3>
+              <div class="setting-item">
+                <label class="radio-label">
+                  <input type="radio" name="theme" value="light" checked>
+                  <span class="radio-custom"></span>
+                  Light Theme
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="theme" value="dark">
+                  <span class="radio-custom"></span>
+                  Dark Theme
+                </label>
+              </div>
+            </div>
+            
+            <div class="settings-section">
+              <h3>Account</h3>
+              <div class="setting-item">
+                <button class="auth-submit-btn" onclick="authService.changePassword()">
+                  Change Password
+                </button>
+              </div>
+              <div class="setting-item">
+                <button class="danger-btn" onclick="authService.deleteAccount()">
+                  Delete Account
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Remove any existing modal
+    const existingModal = document.querySelector('.auth-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // Add the new modal
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Close modal when clicking overlay
+    const overlay = document.querySelector('#settingsModal .auth-modal-overlay');
+    overlay.addEventListener('click', () => this.closeSettingsModal());
+
+    // Load current settings
+    this.loadUserSettings();
+  }
+
+  closeSettingsModal() {
+    const modal = document.getElementById('settingsModal');
+    if (modal) {
+      modal.classList.remove('show');
+      setTimeout(() => modal.remove(), 300);
+    }
+  }
+
+  async loadUserSettings() {
+    try {
+      const userData = await this.getUserDocument(this.currentUser.uid);
+      const siteData = userData?.sites?.[this.siteId];
+      const preferences = siteData?.preferences || { notifications: true, theme: 'light' };
+
+      // Set notification toggle
+      const notificationsToggle = document.getElementById('notificationsToggle');
+      if (notificationsToggle) {
+        notificationsToggle.checked = preferences.notifications;
+      }
+
+      // Set theme radio buttons
+      const themeRadios = document.querySelectorAll('input[name="theme"]');
+      themeRadios.forEach(radio => {
+        radio.checked = radio.value === preferences.theme;
+      });
+    } catch (error) {
+      console.error('Error loading settings:', error);
+    }
   }
 
   showHelp() {
-    console.log('❓ Show help');
-    // Implement help view
+    const modalHTML = `
+      <div class="auth-modal show" id="helpModal">
+        <div class="auth-modal-overlay"></div>
+        <div class="auth-modal-content">
+          <button class="auth-modal-close" onclick="authService.closeHelpModal()">&times;</button>
+          <div class="auth-modal-header">
+            <h2>❓ Help & Support</h2>
+            <p>Get help with using the app</p>
+          </div>
+          
+          <div class="help-content">
+            <div class="help-section">
+              <h3>How to use the app</h3>
+              <ul>
+                <li>Use the search bar to find food stalls and attractions</li>
+                <li>Click on the UK Festivals dropdown to explore events</li>
+                <li>Use the toolbar icons to access different features</li>
+                <li>Save your favorites by clicking the heart icon</li>
+              </ul>
+            </div>
+            
+            <div class="help-section">
+              <h3>Need more help?</h3>
+              <p>Contact us at: <a href="mailto:support@tagyou.app">support@tagyou.app</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Remove any existing modal
+    const existingModal = document.querySelector('.auth-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // Add the new modal
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Close modal when clicking overlay
+    const overlay = document.querySelector('#helpModal .auth-modal-overlay');
+    overlay.addEventListener('click', () => this.closeHelpModal());
+  }
+
+  closeHelpModal() {
+    const modal = document.getElementById('helpModal');
+    if (modal) {
+      modal.classList.remove('show');
+      setTimeout(() => modal.remove(), 300);
+    }
+  }
+
+  showProfileError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'auth-error';
+    errorDiv.textContent = message;
+
+    const profileContent = document.querySelector('.profile-content');
+    if (profileContent) {
+      profileContent.insertBefore(errorDiv, profileContent.firstChild);
+      setTimeout(() => errorDiv.remove(), 5000);
+    }
+  }
+
+  showProfileSuccess(message) {
+    const successDiv = document.createElement('div');
+    successDiv.className = 'auth-success';
+    successDiv.textContent = message;
+
+    const profileContent = document.querySelector('.profile-content');
+    if (profileContent) {
+      profileContent.insertBefore(successDiv, profileContent.firstChild);
+      setTimeout(() => successDiv.remove(), 3000);
+    }
   }
 }
 
