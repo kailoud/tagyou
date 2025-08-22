@@ -2383,17 +2383,23 @@ input:checked+.slider:before {
     top: 80px;
     right: 15px;
     width: 200px;
+    max-height: calc(100vh - 100px);
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     z-index: 1001;
     display: none;
     border: 1px solid rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .mobile-profile-dropdown.show {
     display: block;
     animation: mobileDropdownSlide 0.3s ease;
+    /* Ensure dropdown is fully visible on mobile */
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
   }
 
   @keyframes mobileDropdownSlide {
@@ -2623,6 +2629,14 @@ input:checked+.slider:before {
     padding: 8px !important;
     gap: 8px !important;
   }
+
+  /* Mobile dropdown positioning fixes */
+  .mobile-profile-dropdown {
+    top: 70px !important;
+    right: 10px !important;
+    width: 180px !important;
+    max-height: calc(100vh - 90px) !important;
+  }
 }
 
 /* SPECIFIC RANGE: 321px to 330px - GUARANTEED VERTICAL */
@@ -2666,6 +2680,14 @@ input:checked+.slider:before {
     max-width: 96px !important;
     margin-left: 0 !important;
     margin-right: auto !important;
+  }
+
+  /* Extra small screen dropdown fixes */
+  .mobile-profile-dropdown {
+    top: 65px !important;
+    right: 8px !important;
+    width: 160px !important;
+    max-height: calc(100vh - 80px) !important;
   }
 
   .search-bar {
