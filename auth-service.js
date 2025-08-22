@@ -23,6 +23,7 @@ class AuthService {
         // Trigger initial UI update
         setTimeout(() => {
           this.updateAuthUI(this.currentUser);
+          console.log('🎨 Initial auth UI update triggered for:', this.currentUser ? 'authenticated user' : 'guest user');
         }, 500);
 
         break;
@@ -98,6 +99,13 @@ class AuthService {
   async signOut() {
     try {
       console.log('🔐 Signing out user...');
+
+      // Close the profile dropdown
+      const profileDropdown = document.getElementById('profileDropdown');
+      if (profileDropdown) {
+        profileDropdown.classList.remove('show');
+      }
+
       await this.auth.signOut();
       console.log('✅ User signed out successfully');
       return { success: true };
@@ -225,30 +233,9 @@ class AuthService {
         `;
       }
 
-      if (profileMenu) {
-        profileMenu.innerHTML = `
-          <button class="profile-menu-item" onclick="authService.showProfile()">
-            <i class="fas fa-user-circle"></i>
-            <span>My Profile</span>
-          </button>
-          <button class="profile-menu-item" onclick="authService.showFavorites()">
-            <i class="fas fa-heart"></i>
-            <span>My Favorites</span>
-            <span class="badge">0</span>
-          </button>
-          <button class="profile-menu-item" onclick="authService.showSettings()">
-            <i class="fas fa-cog"></i>
-            <span>Settings</span>
-          </button>
-          
-          <div class="profile-divider"></div>
-          
-          <button class="profile-menu-item logout" onclick="authService.signOut()">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Sign Out</span>
-          </button>
-        `;
-      }
+      // Update menu items without breaking existing event listeners
+      this.updateMenuItemsForAuthenticatedUser();
+
     } else {
       // User is not logged in
       if (profileButton) {
@@ -265,26 +252,99 @@ class AuthService {
         `;
       }
 
-      if (profileMenu) {
-        profileMenu.innerHTML = `
-          <button class="profile-menu-item" onclick="authService.showLogin()">
-            <i class="fas fa-sign-in-alt"></i>
-            <span>Sign In</span>
-          </button>
-          <button class="profile-menu-item" onclick="authService.showRegister()">
-            <i class="fas fa-user-plus"></i>
-            <span>Register</span>
-          </button>
-          
-          <div class="profile-divider"></div>
-          
-          <button class="profile-menu-item" onclick="authService.showHelp()">
-            <i class="fas fa-question-circle"></i>
-            <span>Help & Support</span>
-          </button>
-        `;
-      }
+      // Update menu items without breaking existing event listeners
+      this.updateMenuItemsForGuestUser();
     }
+  }
+
+  updateMenuItemsForAuthenticatedUser() {
+    const profileMenu = document.querySelector('.profile-menu');
+    if (!profileMenu) return;
+
+    // Clear existing content
+    profileMenu.innerHTML = '';
+
+    // Add authenticated user menu items
+    const menuItems = [
+      { id: 'profileMenuItem', icon: 'fas fa-user-circle', text: 'My Profile', action: () => this.showProfile() },
+      { id: 'favoritesMenuItem', icon: 'fas fa-heart', text: 'My Favorites', badge: '0', action: () => this.showFavorites() },
+      { id: 'settingsMenuItem', icon: 'fas fa-cog', text: 'Settings', action: () => this.showSettings() },
+      { id: 'logoutMenuItem', icon: 'fas fa-sign-out-alt', text: 'Sign Out', action: () => this.signOut(), className: 'logout' }
+    ];
+
+    // Create menu items
+    menuItems.forEach((item, index) => {
+      if (index === 3) { // Add divider before logout
+        const divider = document.createElement('div');
+        divider.className = 'profile-divider';
+        profileMenu.appendChild(divider);
+      }
+
+      const button = document.createElement('button');
+      button.className = `profile-menu-item ${item.className || ''}`;
+      button.id = item.id;
+      button.innerHTML = `
+        <i class="${item.icon}"></i>
+        <span>${item.text}</span>
+        ${item.badge ? `<span class="badge">${item.badge}</span>` : ''}
+      `;
+
+      // Add click event listener
+      button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        item.action();
+      });
+
+      profileMenu.appendChild(button);
+    });
+  }
+
+  updateMenuItemsForGuestUser() {
+    const profileMenu = document.querySelector('.profile-menu');
+    if (!profileMenu) {
+      console.warn('⚠️ Profile menu not found - cannot update guest menu');
+      return;
+    }
+
+    console.log('👤 Updating menu for guest user...');
+
+    // Clear existing content
+    profileMenu.innerHTML = '';
+
+    // Add guest user menu items
+    const menuItems = [
+      { id: 'loginMenuItem', icon: 'fas fa-sign-in-alt', text: 'Sign In', action: () => this.showLogin(), highlight: true },
+      { id: 'registerMenuItem', icon: 'fas fa-user-plus', text: 'Create Account', action: () => this.showRegister(), highlight: true },
+      { id: 'helpMenuItem', icon: 'fas fa-question-circle', text: 'Help & Support', action: () => this.showHelp() }
+    ];
+
+    // Create menu items
+    menuItems.forEach((item, index) => {
+      if (index === 2) { // Add divider before help
+        const divider = document.createElement('div');
+        divider.className = 'profile-divider';
+        profileMenu.appendChild(divider);
+      }
+
+      const button = document.createElement('button');
+      button.className = `profile-menu-item ${item.highlight ? 'auth-action' : ''}`;
+      button.id = item.id;
+      button.innerHTML = `
+        <i class="${item.icon}"></i>
+        <span>${item.text}</span>
+      `;
+
+      // Add click event listener
+      button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log(`🔘 Guest menu item clicked: ${item.text}`);
+        item.action();
+      });
+
+      profileMenu.appendChild(button);
+    });
+
+    console.log('✅ Guest menu updated with', menuItems.length, 'items');
   }
 
   showLogin() {
@@ -313,6 +373,12 @@ class AuthService {
   showHelp() {
     console.log('Show help');
     // Implementation will be added
+  }
+
+  // Force update to guest UI (useful for debugging)
+  forceGuestUI() {
+    console.log('🔄 Forcing guest UI update...');
+    this.updateAuthUI(null);
   }
 
   showAuthModal(mode = 'login') {
