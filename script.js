@@ -26,6 +26,25 @@ document.addEventListener('DOMContentLoaded', async function () {
   // Initialize Authentication Service
   initializeAuthService();
 
+  // Debug profile dropdown elements
+  setTimeout(() => {
+    const profileButton = document.getElementById('profileButton');
+    const profileDropdown = document.getElementById('profileDropdown');
+    const profileMenu = document.getElementById('profileMenu');
+
+    console.log('🔍 Profile Elements Debug:');
+    console.log('Profile Button:', profileButton);
+    console.log('Profile Dropdown:', profileDropdown);
+    console.log('Profile Menu:', profileMenu);
+    console.log('Auth Service:', authService);
+
+    if (profileDropdown) {
+      console.log('Dropdown classes:', profileDropdown.className);
+      console.log('Dropdown display:', window.getComputedStyle(profileDropdown).display);
+      console.log('Dropdown z-index:', window.getComputedStyle(profileDropdown).zIndex);
+    }
+  }, 2000);
+
   // Wait for Firebase to be initialized before running diagnostics
   const waitForFirebase = async () => {
     let attempts = 0;
@@ -1070,6 +1089,31 @@ function initProfileButton() {
 
   console.log('✅ Profile button initialized with mobile support');
 }
+
+// Test function to manually trigger dropdown
+function testProfileDropdown() {
+  const profileDropdown = document.getElementById('profileDropdown');
+  if (profileDropdown) {
+    console.log('🧪 Testing profile dropdown...');
+    console.log('Before toggle - classes:', profileDropdown.className);
+    console.log('Before toggle - display:', window.getComputedStyle(profileDropdown).display);
+
+    profileDropdown.classList.add('show');
+
+    console.log('After adding show - classes:', profileDropdown.className);
+    console.log('After adding show - display:', window.getComputedStyle(profileDropdown).display);
+
+    setTimeout(() => {
+      profileDropdown.classList.remove('show');
+      console.log('After removing show - classes:', profileDropdown.className);
+    }, 3000);
+  } else {
+    console.error('❌ Profile dropdown not found for testing');
+  }
+}
+
+// Make test function globally available
+window.testProfileDropdown = testProfileDropdown;
 
 // Initialize map toolbar functionality
 function initMapToolbar() {

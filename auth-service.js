@@ -581,6 +581,9 @@ class AuthService {
     const profileName = document.getElementById('profileName');
     const profileStatus = document.getElementById('profileStatus');
 
+    console.log('🔄 updateAuthUI called with user:', user ? 'logged in' : 'guest');
+    console.log('Profile elements found:', { profileButton: !!profileButton, profileMenu: !!profileMenu });
+
     if (!profileButton || !profileMenu) {
       console.warn('⚠️ Profile elements not found');
       return;
