@@ -956,13 +956,8 @@ class AuthService {
           // Show instructions for the user
           setTimeout(() => {
             this.showForgotPasswordSuccess(`
-              📧 Password reset email sent!<br><br>
-              <strong>Next steps:</strong><br>
-              1. Check your email inbox<br>
-              2. <strong>Check Your Spam</strong><br>
-              3. Click the reset link in the email<br>
-              4. Set your new password<br>
-              5. You'll be automatically redirected back here and signed in!
+              📧 Email sent! Check your inbox.<br>
+              <strong>Check Your Spam</strong> if not found.
             `);
           }, 1000);
         } else {
@@ -1007,7 +1002,7 @@ class AuthService {
   showForgotPasswordSuccess(message) {
     const successDiv = document.getElementById('forgotPasswordSuccess');
     if (successDiv) {
-      successDiv.textContent = message;
+      successDiv.innerHTML = message;
       successDiv.style.display = 'block';
     }
   }
