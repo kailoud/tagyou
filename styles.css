@@ -2304,6 +2304,17 @@ input:checked+.slider:before {
     display: none !important;
   }
 
+  /* HIDE PROFILE ON MOBILE FOR TESTING */
+  .profile-button {
+    display: none !important;
+  }
+
+  .profile-dropdown {
+    display: none !important;
+  }
+
+  /* COMMENTED OUT PROFILE DROPDOWN STYLES FOR MOBILE TESTING */
+  /*
   .profile-dropdown {
     width: 90vw;
     max-width: 280px;
@@ -2366,4 +2377,5 @@ input:checked+.slider:before {
     padding: 1px 4px;
     min-width: 14px;
   }
+  */
 }
