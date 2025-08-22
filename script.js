@@ -1010,6 +1010,11 @@ function initProfileButton() {
   const profileDropdown = document.getElementById('profileDropdown');
   const toggleSwitch = document.getElementById('toggleSwitch');
 
+  if (!profileButton || !profileDropdown) {
+    console.error('❌ Profile elements not found');
+    return;
+  }
+
   // Profile button click handler
   profileButton.addEventListener('click', function (e) {
     e.stopPropagation();
@@ -1030,73 +1035,26 @@ function initProfileButton() {
     }
   });
 
-  // Profile menu item click handlers
-  const profileMenuItems = document.querySelectorAll('.profile-menu-item');
-  profileMenuItems.forEach(item => {
-    item.addEventListener('click', function (e) {
-      e.stopPropagation();
-      const itemId = this.id;
-      const itemText = this.querySelector('span').textContent;
+  // Toggle switch click handler
+  if (toggleSwitch) {
+    toggleSwitch.addEventListener('click', function () {
+      const isEnabled = this.classList.contains('enabled');
 
-      console.log('Profile menu item clicked:', itemText);
-
-      // Handle different menu items
-      switch (itemId) {
-        case 'profileMenuItem':
-          console.log('Opening profile page...');
-          // Add functionality to open profile page
-          break;
-        case 'favoritesMenuItem':
-          console.log('Opening favorites...');
-          // Add functionality to show favorites
-          break;
-        case 'historyMenuItem':
-          console.log('Opening recent activity...');
-          // Add functionality to show activity history
-          break;
-        case 'notificationsMenuItem':
-          console.log('Opening notifications...');
-          // Add functionality to show notifications
-          break;
-        case 'settingsMenuItem':
-          console.log('Opening settings...');
-          // Add functionality to open settings
-          break;
-        case 'helpMenuItem':
-          console.log('Opening help & support...');
-          // Add functionality to show help
-          break;
-        case 'logoutMenuItem':
-          console.log('Signing out...');
-          // Add logout functionality
-          if (confirm('Are you sure you want to sign out?')) {
-            console.log('User confirmed logout');
-            profileDropdown.classList.remove('show');
-            // Add actual logout logic here
-          }
-          break;
-        default:
-          console.log('Unknown menu item clicked');
+      if (isEnabled) {
+        this.classList.remove('enabled');
+        this.classList.add('disabled');
+        this.setAttribute('aria-checked', 'false');
+        console.log('Toggle switched OFF');
+      } else {
+        this.classList.remove('disabled');
+        this.classList.add('enabled');
+        this.setAttribute('aria-checked', 'true');
+        console.log('Toggle switched ON');
       }
     });
-  });
+  }
 
-  // Toggle switch click handler
-  toggleSwitch.addEventListener('click', function () {
-    const isEnabled = this.classList.contains('enabled');
-
-    if (isEnabled) {
-      this.classList.remove('enabled');
-      this.classList.add('disabled');
-      this.setAttribute('aria-checked', 'false');
-      console.log('Toggle switched OFF');
-    } else {
-      this.classList.remove('disabled');
-      this.classList.add('enabled');
-      this.setAttribute('aria-checked', 'true');
-      console.log('Toggle switched ON');
-    }
-  });
+  console.log('✅ Profile button initialized');
 }
 
 // Initialize map toolbar functionality

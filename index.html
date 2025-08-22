@@ -87,48 +87,13 @@
             <i class="fas fa-user"></i>
           </div>
           <div class="profile-info">
-            <h4>Festival Goer</h4>
-            <p>Welcome to TagYou2!</p>
+            <h4 id="profileName">Festival Goer</h4>
+            <p id="profileStatus">Welcome to TagYou2!</p>
           </div>
         </div>
 
-        <div class="profile-menu">
-          <button class="profile-menu-item" id="profileMenuItem">
-            <i class="fas fa-user-circle"></i>
-            <span>My Profile</span>
-          </button>
-          <button class="profile-menu-item" id="favoritesMenuItem">
-            <i class="fas fa-heart"></i>
-            <span>My Favorites</span>
-            <span class="badge">3</span>
-          </button>
-          <button class="profile-menu-item" id="historyMenuItem">
-            <i class="fas fa-history"></i>
-            <span>Recent Activity</span>
-          </button>
-          <button class="profile-menu-item" id="notificationsMenuItem">
-            <i class="fas fa-bell"></i>
-            <span>Notifications</span>
-            <span class="badge">2</span>
-          </button>
-
-          <div class="profile-divider"></div>
-
-          <button class="profile-menu-item" id="settingsMenuItem">
-            <i class="fas fa-cog"></i>
-            <span>Settings</span>
-          </button>
-          <button class="profile-menu-item" id="helpMenuItem">
-            <i class="fas fa-question-circle"></i>
-            <span>Help & Support</span>
-          </button>
-
-          <div class="profile-divider"></div>
-
-          <button class="profile-menu-item logout" id="logoutMenuItem">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Sign Out</span>
-          </button>
+        <div class="profile-menu" id="profileMenu">
+          <!-- Menu items will be dynamically populated by auth service -->
         </div>
       </div>
     </div>
