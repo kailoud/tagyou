@@ -5,7 +5,7 @@
 /* MOBILE PROFILE BUTTON & DROPDOWN */
 /* ========================================= */
 
-/* Mobile Profile Button */
+/* Mobile Profile Button - Hidden by default, shown on mobile */
 .mobile-profile-button {
   position: fixed;
   top: 15px;
@@ -16,7 +16,8 @@
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
   cursor: pointer;
-  display: flex;
+  display: none;
+  /* Hidden by default */
   align-items: center;
   justify-content: center;
   z-index: 1000;
@@ -34,7 +35,7 @@
   color: #fff;
 }
 
-/* Mobile Profile Dropdown */
+/* Mobile Profile Dropdown - Hidden by default, shown on mobile */
 .mobile-profile-dropdown {
   position: fixed;
   top: 80px;
@@ -46,6 +47,7 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   z-index: 1001;
   display: none;
+  /* Hidden by default */
   border: 1px solid rgba(0, 0, 0, 0.1);
   overflow-y: auto;
   overflow-x: hidden;
@@ -355,8 +357,19 @@
 }
 
 /* ========================================= */
-/* HIDE DESKTOP ELEMENTS ON MOBILE */
+/* MOBILE VISIBILITY RULES */
 /* ========================================= */
+
+/* Show mobile profile elements on mobile devices */
+@media (max-width: 480px) {
+  .mobile-profile-button {
+    display: flex !important;
+  }
+
+  .mobile-profile-dropdown {
+    display: block !important;
+  }
+}
 
 /* Hide desktop profile on mobile */
 @media (max-width: 480px) {
@@ -382,6 +395,15 @@
 }
 
 .mobile-visible {
+  display: block !important;
+}
+
+/* Desktop testing - show mobile elements when needed */
+.mobile-test-mode .mobile-profile-button {
+  display: flex !important;
+}
+
+.mobile-test-mode .mobile-profile-dropdown {
   display: block !important;
 }
 

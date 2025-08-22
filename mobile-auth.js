@@ -14,6 +14,17 @@ class MobileAuth {
     this.setupMobileProfileDropdown();
     this.isInitialized = true;
     console.log('✅ Mobile Auth Module initialized');
+
+    // Debug: Check if elements were created
+    setTimeout(() => {
+      const mobileButton = document.getElementById('mobileProfileButton');
+      const mobileDropdown = document.getElementById('mobileProfileDropdown');
+      console.log('🔍 Debug - Mobile button exists:', !!mobileButton);
+      console.log('🔍 Debug - Mobile dropdown exists:', !!mobileDropdown);
+      if (mobileButton) {
+        console.log('🔍 Debug - Mobile button display:', window.getComputedStyle(mobileButton).display);
+      }
+    }, 1000);
   }
 
   // Setup mobile profile button
@@ -368,6 +379,30 @@ class MobileAuth {
   testMobileSignUp() {
     console.log('🧪 Testing mobile sign up...');
     this.showSignUpModal();
+  }
+
+  // Public method to show mobile elements for testing
+  showMobileElements() {
+    console.log('🧪 Showing mobile elements for testing...');
+    const mobileButton = document.getElementById('mobileProfileButton');
+    const mobileDropdown = document.getElementById('mobileProfileDropdown');
+
+    if (mobileButton) {
+      mobileButton.style.display = 'flex';
+      mobileButton.style.position = 'fixed';
+      mobileButton.style.top = '15px';
+      mobileButton.style.right = '15px';
+      mobileButton.style.zIndex = '1000';
+    }
+
+    if (mobileDropdown) {
+      mobileDropdown.style.display = 'block';
+    }
+
+    // Add test mode class to body
+    document.body.classList.add('mobile-test-mode');
+
+    console.log('✅ Mobile elements should now be visible');
   }
 }
 

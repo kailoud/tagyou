@@ -23,6 +23,39 @@
   <!-- Mobile Authentication Module -->
   <script src="mobile-auth.js"></script>
 
+  <!-- Test script for mobile functionality -->
+  <script>
+    // Add test button for mobile functionality
+    document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(() => {
+        const testButton = document.createElement('button');
+        testButton.textContent = '🧪 Test Mobile';
+        testButton.style.cssText = `
+          position: fixed;
+          top: 80px;
+          right: 15px;
+          z-index: 9999;
+          background: #ff6b6b;
+          color: white;
+          border: none;
+          padding: 10px 15px;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 12px;
+        `;
+        testButton.onclick = function () {
+          if (window.mobileAuth) {
+            window.mobileAuth.showMobileElements();
+            alert('Mobile elements should now be visible! Check the top-right corner.');
+          } else {
+            alert('Mobile auth module not loaded!');
+          }
+        };
+        document.body.appendChild(testButton);
+      }, 2000);
+    });
+  </script>
+
 
 </head>
 
