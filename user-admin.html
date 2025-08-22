@@ -172,6 +172,7 @@
       <button class="btn" onclick="loadAllUsers()">👥 Load All Users</button>
       <button class="btn" onclick="showCurrentUser()">👤 Show Current User</button>
       <button class="btn" onclick="testSignIn()">🔐 Test Sign In</button>
+      <button class="btn" onclick="testMobileSignUp()">📱 Test Mobile Sign Up</button>
       <button class="btn" onclick="clearData()">🗑️ Clear Data</button>
     </div>
 
@@ -319,6 +320,15 @@
       if (confirm('Are you sure you want to clear all user data? This cannot be undone.')) {
         const userList = document.getElementById('userList');
         userList.innerHTML = '<div class="loading">Click "Load All Users" to see user data across sites</div>';
+      }
+    }
+
+    function testMobileSignUp() {
+      console.log('🧪 Testing mobile sign up...');
+      if (typeof showMobileAuthModal === 'function') {
+        showMobileAuthModal('signup');
+      } else {
+        alert('Mobile sign up function not available. Please check the console for errors.');
       }
     }
 

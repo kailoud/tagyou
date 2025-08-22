@@ -1318,12 +1318,12 @@ function showMobileHelp() {
   }
 }
 
-// Fallback mobile auth modal (if auth service not available)
+// Enhanced mobile auth modal with full functionality
 function showMobileAuthModal(mode) {
   const title = mode === 'signin' ? 'Sign In' : 'Create Account';
   const submitText = mode === 'signin' ? 'Sign In' : 'Create Account';
 
-  // Simple mobile-optimized modal
+  // Enhanced mobile-optimized modal with proper form fields
   const modalHTML = `
     <div class="mobile-auth-modal" id="mobileAuthModal">
       <div class="mobile-auth-overlay"></div>
@@ -1333,10 +1333,45 @@ function showMobileAuthModal(mode) {
           <button class="mobile-auth-close" onclick="closeMobileAuthModal()">&times;</button>
         </div>
         <form class="mobile-auth-form" id="mobileAuthForm">
-          <input type="email" placeholder="Email" required style="width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
-          <input type="password" placeholder="Password" required style="width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
-          <button type="submit" style="width: 100%; padding: 15px; margin: 10px 0; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600;">${submitText}</button>
+          ${mode === 'signup' ? `
+            <div class="mobile-form-group">
+              <label for="mobileDisplayName">Full Name</label>
+              <input type="text" id="mobileDisplayName" name="displayName" required placeholder="Enter your full name" style="width: 100%; padding: 15px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+            </div>
+          ` : ''}
+          
+          <div class="mobile-form-group">
+            <label for="mobileEmail">Email Address</label>
+            <input type="email" id="mobileEmail" name="email" required placeholder="Enter your email" style="width: 100%; padding: 15px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+          </div>
+          
+          <div class="mobile-form-group">
+            <label for="mobilePassword">Password</label>
+            <input type="password" id="mobilePassword" name="password" required placeholder="Enter your password" style="width: 100%; padding: 15px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+            ${mode === 'signup' ? '<small style="color: #666; font-size: 12px;">Minimum 6 characters</small>' : ''}
+          </div>
+          
+          ${mode === 'signup' ? `
+            <div class="mobile-form-group">
+              <label for="mobileConfirmPassword">Confirm Password</label>
+              <input type="password" id="mobileConfirmPassword" name="confirmPassword" required placeholder="Confirm your password" style="width: 100%; padding: 15px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+            </div>
+          ` : ''}
+          
+          <button type="submit" style="width: 100%; padding: 15px; margin: 15px 0; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">${submitText}</button>
         </form>
+        
+        <div class="mobile-auth-footer" style="text-align: center; margin-top: 15px;">
+          ${mode === 'signup' ? `
+            <p style="font-size: 14px; color: #666;">Already have an account? <a href="#" onclick="switchMobileAuthMode('signin')" style="color: #667eea; text-decoration: none;">Sign in</a></p>
+          ` : `
+            <p style="font-size: 14px; color: #666;"><a href="#" onclick="showMobileForgotPassword()" style="color: #667eea; text-decoration: none;">Forgot your password?</a></p>
+            <p style="font-size: 14px; color: #666;">Don't have an account? <a href="#" onclick="switchMobileAuthMode('signup')" style="color: #667eea; text-decoration: none;">Sign up</a></p>
+          `}
+        </div>
+        
+        <div id="mobileAuthError" style="display: none; background: #ffebee; color: #c62828; padding: 10px; border-radius: 5px; margin: 10px 0; font-size: 14px;"></div>
+        <div id="mobileAuthSuccess" style="display: none; background: #e8f5e8; color: #2e7d32; padding: 10px; border-radius: 5px; margin: 10px 0; font-size: 14px;"></div>
       </div>
     </div>
   `;
@@ -1347,11 +1382,65 @@ function showMobileAuthModal(mode) {
   // Prevent body scroll
   document.body.style.overflow = 'hidden';
 
-  // Handle form submission
-  document.getElementById('mobileAuthForm').addEventListener('submit', (e) => {
+  // Handle form submission with actual auth functionality
+  document.getElementById('mobileAuthForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    alert(`📱 ${title} functionality would be implemented here!`);
-    closeMobileAuthModal();
+
+    const formData = new FormData(e.target);
+    const email = formData.get('email');
+    const password = formData.get('password');
+    const displayName = formData.get('displayName');
+    const confirmPassword = formData.get('confirmPassword');
+
+    // Validation
+    if (mode === 'signup') {
+      if (!displayName || displayName.trim().length < 2) {
+        showMobileAuthError('Please enter your full name (minimum 2 characters)');
+        return;
+      }
+
+      if (password.length < 6) {
+        showMobileAuthError('Password must be at least 6 characters long');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showMobileAuthError('Passwords do not match');
+        return;
+      }
+    }
+
+    try {
+      showMobileAuthLoading(true);
+
+      if (window.authService) {
+        // Use the auth service if available
+        let result;
+        if (mode === 'signup') {
+          result = await window.authService.signUp(email, password, displayName);
+        } else {
+          result = await window.authService.signIn(email, password);
+        }
+
+        if (result.success) {
+          showMobileAuthSuccess(mode === 'signup' ? 'Account created successfully!' : 'Signed in successfully!');
+          setTimeout(() => {
+            closeMobileAuthModal();
+            // Refresh the page to update UI
+            window.location.reload();
+          }, 1500);
+        } else {
+          showMobileAuthError(result.error || 'Authentication failed');
+        }
+      } else {
+        // Fallback if auth service is not available
+        showMobileAuthError('Authentication service not available. Please try again later.');
+      }
+    } catch (error) {
+      showMobileAuthError(error.message || 'An error occurred. Please try again.');
+    } finally {
+      showMobileAuthLoading(false);
+    }
   });
 }
 
@@ -1364,11 +1453,72 @@ function closeMobileAuthModal() {
   }
 }
 
+// Mobile auth helper functions
+function showMobileAuthError(message) {
+  const errorDiv = document.getElementById('mobileAuthError');
+  if (errorDiv) {
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+    setTimeout(() => {
+      errorDiv.style.display = 'none';
+    }, 5000);
+  }
+}
+
+function showMobileAuthSuccess(message) {
+  const successDiv = document.getElementById('mobileAuthSuccess');
+  if (successDiv) {
+    successDiv.textContent = message;
+    successDiv.style.display = 'block';
+  }
+}
+
+function showMobileAuthLoading(show) {
+  const submitBtn = document.querySelector('#mobileAuthForm button[type="submit"]');
+  if (submitBtn) {
+    if (show) {
+      submitBtn.textContent = 'Loading...';
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = '0.7';
+    } else {
+      submitBtn.textContent = submitBtn.getAttribute('data-original-text') || 'Submit';
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
+    }
+  }
+}
+
+function switchMobileAuthMode(mode) {
+  closeMobileAuthModal();
+  setTimeout(() => {
+    showMobileAuthModal(mode);
+  }, 300);
+}
+
+function showMobileForgotPassword() {
+  // Simple forgot password implementation
+  const email = prompt('Enter your email address to reset your password:');
+  if (email && window.authService) {
+    window.authService.resetPassword(email).then(result => {
+      if (result.success) {
+        alert('Password reset email sent! Check your inbox.');
+      } else {
+        alert('Error: ' + result.error);
+      }
+    });
+  }
+}
+
 // Make functions globally available
 window.showMobileSignIn = showMobileSignIn;
 window.showMobileCreateAccount = showMobileCreateAccount;
 window.showMobileHelp = showMobileHelp;
 window.closeMobileAuthModal = closeMobileAuthModal;
+window.switchMobileAuthMode = switchMobileAuthMode;
+window.showMobileForgotPassword = showMobileForgotPassword;
+window.showMobileAuthError = showMobileAuthError;
+window.showMobileAuthSuccess = showMobileAuthSuccess;
+window.showMobileAuthLoading = showMobileAuthLoading;
 
 // Test function to manually trigger dropdown
 function testProfileDropdown() {
