@@ -22,29 +22,50 @@ document.addEventListener('DOMContentLoaded', async function () {
   // Then try to initialize Firebase (non-blocking)
   initializeFirebase();
 
-  // Add diagnostic test after a short delay
-  setTimeout(() => {
-    console.log('🔍 Running Firebase diagnostic test...');
-    import('./firebase-diagnostic.js').catch(error => {
-      console.error('❌ Failed to load diagnostic:', error);
-    });
-  }, 3000);
+  // Wait for Firebase to be initialized before running diagnostics
+  const waitForFirebase = async () => {
+    let attempts = 0;
+    const maxAttempts = 30; // Wait up to 30 seconds
 
-  // Add detailed Firebase check after a longer delay
-  setTimeout(() => {
-    console.log('🔍 Running detailed Firebase data check...');
-    import('./detailed-firebase-check.js').catch(error => {
-      console.error('❌ Failed to load detailed check:', error);
-    });
-  }, 5000);
+    while (attempts < maxAttempts) {
+      if (firebase.apps.length > 0) {
+        console.log('✅ Firebase initialized, running diagnostics...');
 
-  // Show Firebase data table after a longer delay
-  setTimeout(() => {
-    console.log('📊 Showing Firebase data table...');
-    import('./show-firebase-data.js').catch(error => {
-      console.error('❌ Failed to load data table:', error);
-    });
-  }, 7000);
+        // Run diagnostic test
+        try {
+          await import('./firebase-diagnostic.js');
+        } catch (error) {
+          console.error('❌ Failed to load diagnostic:', error);
+        }
+
+        // Run detailed check
+        try {
+          await import('./detailed-firebase-check.js');
+        } catch (error) {
+          console.error('❌ Failed to load detailed check:', error);
+        }
+
+        // Show data table
+        try {
+          await import('./show-firebase-data.js');
+        } catch (error) {
+          console.error('❌ Failed to load data table:', error);
+        }
+
+        break;
+      }
+
+      attempts++;
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+    }
+
+    if (attempts >= maxAttempts) {
+      console.error('❌ Firebase failed to initialize within 30 seconds');
+    }
+  };
+
+  // Start waiting for Firebase
+  waitForFirebase();
 });
 
 // Initialize Firebase (non-blocking)

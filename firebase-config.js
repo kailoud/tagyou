@@ -53,7 +53,11 @@ async function initializeFirebase() {
 }
 
 // Initialize Firebase immediately
-initializeFirebase();
+initializeFirebase().then(() => {
+  console.log('Firebase initialization completed');
+}).catch(error => {
+  console.error('Firebase initialization failed:', error);
+});
 
 // Export Firebase services (will be null if not initialized)
 export { db, auth, analytics, app as default };
