@@ -149,6 +149,9 @@ class AuthService {
 
       // Update UI
       this.updateAuthUI(user);
+
+      // Check if this is a password reset completion
+      this.handlePasswordResetCompletion(user);
     });
   }
 
@@ -158,6 +161,56 @@ class AuthService {
     if (this.currentUser !== null) {
       callback(this.currentUser);
     }
+  }
+
+  handlePasswordResetCompletion(user) {
+    if (!user) return;
+
+    // Check if user just completed password reset by looking at URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    const oobCode = urlParams.get('oobCode');
+
+    if (mode === 'resetPassword' && oobCode) {
+      console.log('🔄 Password reset completed, user automatically signed in');
+
+      // Show success message
+      this.showPasswordResetSuccess();
+
+      // Clean up URL parameters
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+
+      // Close any open modals
+      this.closeAuthModal();
+      this.closeForgotPasswordModal();
+    }
+  }
+
+  showPasswordResetSuccess() {
+    // Create a temporary success notification
+    const notification = document.createElement('div');
+    notification.className = 'password-reset-success';
+    notification.innerHTML = `
+      <div class="notification-content">
+        <div class="notification-icon">✅</div>
+        <div class="notification-text">
+          <h3>Password Reset Successful!</h3>
+          <p>Welcome back! You've been automatically signed in.</p>
+        </div>
+        <button class="notification-close" onclick="this.parentElement.parentElement.remove()">&times;</button>
+      </div>
+    `;
+
+    // Add to page
+    document.body.appendChild(notification);
+
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      if (notification.parentElement) {
+        notification.remove();
+      }
+    }, 5000);
   }
 
   async signUp(email, password, displayName) {
@@ -252,13 +305,42 @@ class AuthService {
 
   async resetPassword(email) {
     try {
-      console.log('🔐 Sending password reset email...');
+      console.log('🔐 Sending password reset email to:', email);
+
+      // Check if Firebase Auth is properly initialized
+      if (!this.auth) {
+        throw new Error('Firebase Auth not initialized');
+      }
+
+      // Check if email is valid
+      if (!email || !this.isValidEmail(email)) {
+        throw new Error('Please enter a valid email address');
+      }
+
+      // Send password reset email
       await this.auth.sendPasswordResetEmail(email);
-      console.log('✅ Password reset email sent');
+      console.log('✅ Password reset email sent successfully');
+
       return { success: true };
     } catch (error) {
       console.error('❌ Password reset error:', error);
-      return { success: false, error: error.message };
+
+      // Provide more specific error messages
+      let errorMessage = 'Failed to send password reset email';
+
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No account found with this email address. Please check the email or create a new account.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Please enter a valid email address.';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Too many password reset attempts. Please try again later.';
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMessage = 'Network error. Please check your internet connection and try again.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      return { success: false, error: errorMessage };
     }
   }
 
@@ -606,6 +688,9 @@ class AuthService {
     // Add event listeners
     this.setupAuthModalEvents(mode);
 
+    // Add real-time email validation
+    this.setupEmailValidation();
+
     // Show modal with animation
     setTimeout(() => {
       const modal = document.querySelector('.auth-modal');
@@ -628,6 +713,14 @@ class AuthService {
       const formData = new FormData(form);
       const email = formData.get('email');
       const password = formData.get('password');
+
+      // Validate email format
+      if (!this.isValidEmail(email)) {
+        this.showAuthError('Please enter a valid email address');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        return;
+      }
 
       let result;
 
@@ -670,6 +763,44 @@ class AuthService {
     }, 300);
   }
 
+  setupEmailValidation() {
+    const emailInput = document.getElementById('email');
+    if (emailInput) {
+      emailInput.addEventListener('input', (e) => {
+        const email = e.target.value.trim();
+        const isValid = this.isValidEmail(email);
+
+        // Remove existing validation classes
+        emailInput.classList.remove('valid-email', 'invalid-email');
+
+        // Add appropriate class based on validation
+        if (email.length > 0) {
+          emailInput.classList.add(isValid ? 'valid-email' : 'invalid-email');
+        }
+      });
+
+      emailInput.addEventListener('blur', (e) => {
+        const email = e.target.value.trim();
+        if (email.length > 0 && !this.isValidEmail(email)) {
+          // Show validation message
+          const validationMessage = document.getElementById('emailValidationMessage');
+          if (validationMessage) {
+            validationMessage.textContent = 'Please enter a valid email address';
+            validationMessage.style.display = 'block';
+          }
+        }
+      });
+
+      emailInput.addEventListener('focus', () => {
+        // Hide validation message when user starts typing
+        const validationMessage = document.getElementById('emailValidationMessage');
+        if (validationMessage) {
+          validationMessage.style.display = 'none';
+        }
+      });
+    }
+  }
+
   showForgotPassword() {
     // Create a dedicated forgot password modal
     const modalHTML = `
@@ -679,7 +810,7 @@ class AuthService {
           <button class="auth-modal-close" onclick="authService.closeForgotPasswordModal()">&times;</button>
           <div class="auth-modal-header">
             <h2>🔐 Reset Password</h2>
-            <p>Enter your email address and we'll send you a link to reset your password.</p>
+            <p>Enter your email address and we'll send you a link to reset your password. After resetting, you'll be automatically signed in!</p>
           </div>
           
           <form class="auth-form" id="forgotPasswordForm">
@@ -734,8 +865,21 @@ class AuthService {
       try {
         const result = await this.resetPassword(email);
         if (result.success) {
-          this.showForgotPasswordSuccess('Password reset email sent! Check your inbox.');
+          this.showForgotPasswordSuccess('Password reset email sent! Check your inbox (and spam folder) for the reset link.');
           document.getElementById('resetEmail').value = '';
+
+          // Show instructions for the user
+          setTimeout(() => {
+            this.showForgotPasswordSuccess(`
+              📧 Password reset email sent!<br><br>
+              <strong>Next steps:</strong><br>
+              1. Check your email inbox<br>
+              2. <strong>⚠️ Don't see it? Check your SPAM/JUNK folder!</strong><br>
+              3. Click the reset link in the email<br>
+              4. Set your new password<br>
+              5. You'll be automatically signed in!
+            `);
+          }, 1000);
         } else {
           this.showForgotPasswordError(result.error);
         }
@@ -781,6 +925,73 @@ class AuthService {
       successDiv.textContent = message;
       successDiv.style.display = 'block';
     }
+  }
+
+  // Email validation function
+  isValidEmail(email) {
+    if (!email || typeof email !== 'string') {
+      return false;
+    }
+
+    // Trim whitespace
+    email = email.trim();
+
+    // Basic email format validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    // Check if email matches the pattern
+    if (!emailRegex.test(email)) {
+      return false;
+    }
+
+    // Additional checks
+    const parts = email.split('@');
+    if (parts.length !== 2) {
+      return false;
+    }
+
+    const [localPart, domain] = parts;
+
+    // Check local part (before @)
+    if (localPart.length === 0 || localPart.length > 64) {
+      return false;
+    }
+
+    // Check domain (after @)
+    if (domain.length === 0 || domain.length > 253) {
+      return false;
+    }
+
+    // Check for valid domain format
+    const domainParts = domain.split('.');
+    if (domainParts.length < 2) {
+      return false;
+    }
+
+    // Check each domain part
+    for (const part of domainParts) {
+      if (part.length === 0 || part.length > 63) {
+        return false;
+      }
+
+      // Domain parts should only contain letters, numbers, and hyphens
+      if (!/^[a-zA-Z0-9-]+$/.test(part)) {
+        return false;
+      }
+
+      // Domain parts shouldn't start or end with hyphens
+      if (part.startsWith('-') || part.endsWith('-')) {
+        return false;
+      }
+    }
+
+    // Top-level domain should be at least 2 characters
+    const topLevelDomain = domainParts[domainParts.length - 1];
+    if (topLevelDomain.length < 2) {
+      return false;
+    }
+
+    return true;
   }
 
   showAuthError(message) {
