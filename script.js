@@ -1121,13 +1121,17 @@ function initProfileButton() {
 function initMobileProfile() {
   const mobileProfileButton = document.getElementById('mobileProfileButton');
   const mobileProfileDropdown = document.getElementById('mobileProfileDropdown');
+  const mobileProfileMenu = document.getElementById('mobileProfileMenu');
 
-  if (!mobileProfileButton || !mobileProfileDropdown) {
+  if (!mobileProfileButton || !mobileProfileDropdown || !mobileProfileMenu) {
     console.log('Mobile profile elements not found (desktop mode)');
     return;
   }
 
   console.log('📱 Initializing mobile profile...');
+
+  // Populate mobile profile menu
+  populateMobileProfileMenu();
 
   // Mobile profile button click handler
   const handleMobileProfileClick = function (e) {
@@ -1165,6 +1169,168 @@ function initMobileProfile() {
 
   console.log('✅ Mobile profile initialized');
 }
+
+// Populate mobile profile menu with authentication options
+function populateMobileProfileMenu() {
+  const mobileProfileMenu = document.getElementById('mobileProfileMenu');
+  if (!mobileProfileMenu) return;
+
+  console.log('📱 Populating mobile profile menu...');
+
+  // Clear existing menu items
+  mobileProfileMenu.innerHTML = '';
+
+  // Guest user menu items for mobile
+  const menuItems = [
+    {
+      icon: 'fas fa-sign-in-alt',
+      text: 'Sign In',
+      action: () => showMobileSignIn(),
+      className: 'mobile-auth-action'
+    },
+    {
+      icon: 'fas fa-user-plus',
+      text: 'Create Account',
+      action: () => showMobileCreateAccount(),
+      className: 'mobile-auth-action'
+    },
+    {
+      icon: 'fas fa-question-circle',
+      text: 'Help',
+      action: () => showMobileHelp(),
+      className: ''
+    }
+  ];
+
+  menuItems.forEach(item => {
+    const button = document.createElement('button');
+    button.className = `mobile-profile-menu-item ${item.className}`;
+    button.innerHTML = `
+      <i class="${item.icon}"></i>
+      <span>${item.text}</span>
+    `;
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log(`📱 Mobile menu item clicked: ${item.text}`);
+
+      // Close dropdown first
+      const dropdown = document.getElementById('mobileProfileDropdown');
+      if (dropdown) dropdown.classList.remove('show');
+
+      // Then execute action
+      item.action();
+    });
+
+    // Add touch event for better mobile response
+    button.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      button.style.backgroundColor = '#e0e0e0';
+    }, { passive: false });
+
+    button.addEventListener('touchend', (e) => {
+      button.style.backgroundColor = '';
+    });
+
+    mobileProfileMenu.appendChild(button);
+  });
+
+  console.log(`✅ Added ${menuItems.length} mobile menu items`);
+}
+
+// Mobile Sign In functionality
+function showMobileSignIn() {
+  console.log('📱 Mobile Sign In clicked');
+
+  // Use the existing auth service if available
+  if (window.authService && typeof window.authService.showSignInModal === 'function') {
+    console.log('📱 Using auth service for sign in');
+    window.authService.showSignInModal();
+  } else {
+    console.log('📱 Auth service not available, showing mobile sign in');
+    showMobileAuthModal('signin');
+  }
+}
+
+// Mobile Create Account functionality
+function showMobileCreateAccount() {
+  console.log('📱 Mobile Create Account clicked');
+
+  // Use the existing auth service if available
+  if (window.authService && typeof window.authService.showSignUpModal === 'function') {
+    console.log('📱 Using auth service for create account');
+    window.authService.showSignUpModal();
+  } else {
+    console.log('📱 Auth service not available, showing mobile create account');
+    showMobileAuthModal('signup');
+  }
+}
+
+// Mobile Help functionality
+function showMobileHelp() {
+  console.log('📱 Mobile Help clicked');
+
+  // Use the existing auth service if available
+  if (window.authService && typeof window.authService.showHelp === 'function') {
+    console.log('📱 Using auth service for help');
+    window.authService.showHelp();
+  } else {
+    console.log('📱 Auth service not available, showing mobile help');
+    alert('📱 Help: Welcome to TagYou2! This is a festival map application. Use the search bar to find locations and explore festival information.');
+  }
+}
+
+// Fallback mobile auth modal (if auth service not available)
+function showMobileAuthModal(mode) {
+  const title = mode === 'signin' ? 'Sign In' : 'Create Account';
+  const submitText = mode === 'signin' ? 'Sign In' : 'Create Account';
+
+  // Simple mobile-optimized modal
+  const modalHTML = `
+    <div class="mobile-auth-modal" id="mobileAuthModal">
+      <div class="mobile-auth-overlay"></div>
+      <div class="mobile-auth-content">
+        <div class="mobile-auth-header">
+          <h2>📱 ${title}</h2>
+          <button class="mobile-auth-close" onclick="closeMobileAuthModal()">&times;</button>
+        </div>
+        <form class="mobile-auth-form" id="mobileAuthForm">
+          <input type="email" placeholder="Email" required style="width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+          <input type="password" placeholder="Password" required style="width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+          <button type="submit" style="width: 100%; padding: 15px; margin: 10px 0; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600;">${submitText}</button>
+        </form>
+      </div>
+    </div>
+  `;
+
+  // Add modal to page
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
+
+  // Handle form submission
+  document.getElementById('mobileAuthForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    alert(`📱 ${title} functionality would be implemented here!`);
+    closeMobileAuthModal();
+  });
+}
+
+// Close mobile auth modal
+function closeMobileAuthModal() {
+  const modal = document.getElementById('mobileAuthModal');
+  if (modal) {
+    modal.remove();
+    document.body.style.overflow = '';
+  }
+}
+
+// Make functions globally available
+window.showMobileSignIn = showMobileSignIn;
+window.showMobileCreateAccount = showMobileCreateAccount;
+window.showMobileHelp = showMobileHelp;
+window.closeMobileAuthModal = closeMobileAuthModal;
 
 // Test function to manually trigger dropdown
 function testProfileDropdown() {

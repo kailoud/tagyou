@@ -2439,4 +2439,119 @@ input:checked+.slider:before {
   .mobile-profile-menu-item span {
     flex: 1;
   }
+
+  /* Mobile Auth Modal Styles */
+  .mobile-auth-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .mobile-auth-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+  }
+
+  .mobile-auth-content {
+    background: white;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+  }
+
+  .mobile-auth-header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    padding: 20px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mobile-auth-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .mobile-auth-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+  }
+
+  .mobile-auth-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .mobile-auth-form {
+    padding: 20px;
+  }
+
+  .mobile-auth-form input {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+
+  .mobile-auth-form input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .mobile-auth-form button {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+  }
+
+  .mobile-auth-form button:hover {
+    background: linear-gradient(135deg, #7c8ff0, #8a5bb8);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+  }
+
+  .mobile-auth-form button:active {
+    transform: translateY(0);
+  }
 }
