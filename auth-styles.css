@@ -465,7 +465,10 @@
 
 /* Responsive notification */
 @media (max-width: 480px) {
-  .password-reset-success {
+
+  .password-reset-success,
+  .password-reset-loading,
+  .password-reset-error {
     top: 10px;
     right: 10px;
     left: 10px;
@@ -475,4 +478,48 @@
     min-width: auto;
     max-width: none;
   }
+}
+
+/* Password Reset Loading Notification */
+.password-reset-loading {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10001;
+  animation: slideInRight 0.5s ease-out;
+}
+
+.password-reset-loading .notification-content {
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 350px;
+  max-width: 450px;
+}
+
+/* Password Reset Error Notification */
+.password-reset-error {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10001;
+  animation: slideInRight 0.5s ease-out;
+}
+
+.password-reset-error .notification-content {
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 350px;
+  max-width: 450px;
 }

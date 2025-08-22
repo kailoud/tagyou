@@ -93,6 +93,9 @@ class AuthService {
           console.log('🎨 Initial auth UI update triggered for:', this.currentUser ? 'authenticated user' : 'guest user');
         }, 500);
 
+        // Check for password reset confirmation on page load
+        this.handlePasswordResetConfirmation();
+
         break;
       }
       attempts++;
@@ -185,6 +188,83 @@ class AuthService {
       this.closeAuthModal();
       this.closeForgotPasswordModal();
     }
+  }
+
+  // Handle password reset confirmation when user returns from reset link
+  async handlePasswordResetConfirmation() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    const oobCode = urlParams.get('oobCode');
+
+    if (mode === 'resetPassword' && oobCode) {
+      console.log('🔄 Processing password reset confirmation...');
+
+      try {
+        // Show loading state
+        this.showPasswordResetLoading();
+
+        // Confirm the password reset
+        await this.auth.confirmPasswordReset(oobCode, '');
+
+        // The user should now be signed in automatically
+        console.log('✅ Password reset confirmed successfully');
+
+        // Clean up URL parameters
+        const cleanUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+
+        // Show success message
+        this.showPasswordResetSuccess();
+
+      } catch (error) {
+        console.error('❌ Password reset confirmation error:', error);
+        this.showPasswordResetError('Failed to complete password reset. Please try again.');
+      }
+    }
+  }
+
+  showPasswordResetLoading() {
+    // Create a loading notification
+    const notification = document.createElement('div');
+    notification.className = 'password-reset-loading';
+    notification.innerHTML = `
+      <div class="notification-content">
+        <div class="notification-icon">⏳</div>
+        <div class="notification-text">
+          <h3>Completing Password Reset...</h3>
+          <p>Please wait while we process your request.</p>
+        </div>
+      </div>
+    `;
+
+    // Add to page
+    document.body.appendChild(notification);
+  }
+
+  showPasswordResetError(message) {
+    // Create an error notification
+    const notification = document.createElement('div');
+    notification.className = 'password-reset-error';
+    notification.innerHTML = `
+      <div class="notification-content">
+        <div class="notification-icon">❌</div>
+        <div class="notification-text">
+          <h3>Password Reset Failed</h3>
+          <p>${message}</p>
+        </div>
+        <button class="notification-close" onclick="this.parentElement.parentElement.remove()">&times;</button>
+      </div>
+    `;
+
+    // Add to page
+    document.body.appendChild(notification);
+
+    // Auto-remove after 8 seconds
+    setTimeout(() => {
+      if (notification.parentElement) {
+        notification.remove();
+      }
+    }, 8000);
   }
 
   showPasswordResetSuccess() {
@@ -317,9 +397,14 @@ class AuthService {
         throw new Error('Please enter a valid email address');
       }
 
-      // Send password reset email
-      await this.auth.sendPasswordResetEmail(email);
-      console.log('✅ Password reset email sent successfully');
+      // Send password reset email with custom redirect URL
+      const actionCodeSettings = {
+        url: window.location.origin + window.location.pathname,
+        handleCodeInApp: true
+      };
+
+      await this.auth.sendPasswordResetEmail(email, actionCodeSettings);
+      console.log('✅ Password reset email sent successfully with custom redirect');
 
       return { success: true };
     } catch (error) {
@@ -810,7 +895,7 @@ class AuthService {
           <button class="auth-modal-close" onclick="authService.closeForgotPasswordModal()">&times;</button>
           <div class="auth-modal-header">
             <h2>🔐 Reset Password</h2>
-            <p>Enter your email address and we'll send you a link to reset your password. After resetting, you'll be automatically signed in!</p>
+            <p>Enter your email address and we'll send you a link to reset your password. After resetting, you'll be automatically redirected back to this app and signed in!</p>
           </div>
           
           <form class="auth-form" id="forgotPasswordForm">
@@ -877,7 +962,7 @@ class AuthService {
               2. <strong>⚠️ Don't see it? Check your SPAM/JUNK folder!</strong><br>
               3. Click the reset link in the email<br>
               4. Set your new password<br>
-              5. You'll be automatically signed in!
+              5. You'll be automatically redirected back here and signed in!
             `);
           }, 1000);
         } else {
