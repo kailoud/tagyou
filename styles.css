@@ -231,6 +231,15 @@ body {
   overflow: hidden;
 }
 
+/* HIDE MOBILE PROFILE ON DESKTOP */
+.mobile-profile-button {
+  display: none !important;
+}
+
+.mobile-profile-dropdown {
+  display: none !important;
+}
+
 @keyframes profileGradientShift {
   0% {
     background-position: 0% 50%;
