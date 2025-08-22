@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   initSearch();
   initFestivalsDropdown();
   initProfileButton();
+  initMobileProfile();
   initMapToolbar();
   initPullUpPanel();
   initResponsiveZoom();
@@ -1114,6 +1115,55 @@ function initProfileButton() {
   }
 
   console.log('✅ Profile button initialized with mobile support');
+}
+
+// Initialize mobile profile functionality
+function initMobileProfile() {
+  const mobileProfileButton = document.getElementById('mobileProfileButton');
+  const mobileProfileDropdown = document.getElementById('mobileProfileDropdown');
+
+  if (!mobileProfileButton || !mobileProfileDropdown) {
+    console.log('Mobile profile elements not found (desktop mode)');
+    return;
+  }
+
+  console.log('📱 Initializing mobile profile...');
+
+  // Mobile profile button click handler
+  const handleMobileProfileClick = function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    console.log('📱 Mobile profile button clicked');
+
+    const isOpen = mobileProfileDropdown.classList.contains('show');
+    console.log('📱 Mobile dropdown currently open:', isOpen);
+
+    if (isOpen) {
+      mobileProfileDropdown.classList.remove('show');
+      console.log('📱 Mobile dropdown closed');
+    } else {
+      mobileProfileDropdown.classList.add('show');
+      console.log('📱 Mobile dropdown opened');
+    }
+  };
+
+  // Add both click and touchstart events for mobile compatibility
+  mobileProfileButton.addEventListener('click', handleMobileProfileClick);
+  mobileProfileButton.addEventListener('touchstart', handleMobileProfileClick, { passive: false });
+
+  // Close dropdown when clicking outside
+  const handleMobileOutsideClick = function (e) {
+    if (!mobileProfileButton.contains(e.target) && !mobileProfileDropdown.contains(e.target)) {
+      mobileProfileDropdown.classList.remove('show');
+      console.log('📱 Mobile dropdown closed by outside click');
+    }
+  };
+
+  document.addEventListener('click', handleMobileOutsideClick);
+  document.addEventListener('touchend', handleMobileOutsideClick);
+
+  console.log('✅ Mobile profile initialized');
 }
 
 // Test function to manually trigger dropdown

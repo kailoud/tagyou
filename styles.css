@@ -2299,12 +2299,9 @@ input:checked+.slider:before {
 
   /* CLEAN MOBILE PROFILE DROPDOWN - NO CONFLICTS */
 
-  /* HIDE TOGGLE SWITCH ON MOBILE FOR TESTING */
-  .toggle-switch {
-    display: none !important;
-  }
+  /* MOBILE-SPECIFIC PROFILE DROPDOWN - SEPARATE FROM DESKTOP */
 
-  /* HIDE PROFILE ON MOBILE FOR TESTING */
+  /* Hide desktop profile on mobile */
   .profile-button {
     display: none !important;
   }
@@ -2313,69 +2310,124 @@ input:checked+.slider:before {
     display: none !important;
   }
 
-  /* COMMENTED OUT PROFILE DROPDOWN STYLES FOR MOBILE TESTING */
-  /*
-  .profile-dropdown {
-    width: 90vw;
-    max-width: 280px;
-    right: 10px;
-    margin-top: 8px;
-    border-radius: 15px;
-    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
-    z-index: 10000;
+  /* Mobile Profile Button */
+  .mobile-profile-button {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
   }
 
-  .profile-dropdown.show {
+  .mobile-profile-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  }
+
+  .mobile-profile-button i {
+    font-size: 20px;
+    color: #fff;
+  }
+
+  /* Mobile Profile Dropdown */
+  .mobile-profile-dropdown {
+    position: fixed;
+    top: 80px;
+    right: 15px;
+    width: 200px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 1001;
+    display: none;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .mobile-profile-dropdown.show {
     display: block;
+    animation: mobileDropdownSlide 0.3s ease;
   }
 
-  .profile-header {
-    padding: 12px;
-    gap: 10px;
+  @keyframes mobileDropdownSlide {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
-  .profile-avatar {
-    width: 35px;
-    height: 35px;
+  /* Mobile Profile Header */
+  .mobile-profile-header {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 12px 12px 0 0;
   }
 
-  .profile-avatar i {
+  .mobile-profile-header h4 {
+    color: #fff;
     font-size: 16px;
+    margin: 0 0 5px 0;
+    font-weight: 600;
   }
 
-  .profile-info h4 {
-    font-size: 13px;
-    margin: 0 0 2px 0;
-  }
-
-  .profile-info p {
-    font-size: 10px;
-  }
-
-  .profile-menu {
-    padding: 6px 0;
-  }
-
-  .profile-menu-item {
-    padding: 10px 12px;
+  .mobile-profile-header p {
+    color: rgba(255, 255, 255, 0.9);
     font-size: 12px;
-    min-height: 40px;
-    gap: 8px;
+    margin: 0;
   }
 
-  .profile-menu-item i {
-    font-size: 13px;
-    width: 16px;
+  /* Mobile Profile Menu */
+  .mobile-profile-menu {
+    padding: 8px 0;
   }
 
-  .profile-menu-item span {
-    font-size: 12px;
+  .mobile-profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 15px;
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    text-align: left;
+    min-height: 50px;
   }
 
-  .badge {
-    font-size: 9px;
-    padding: 1px 4px;
-    min-width: 14px;
+  .mobile-profile-menu-item:hover {
+    background: #f5f5f5;
   }
-  */
+
+  .mobile-profile-menu-item:active {
+    background: #e0e0e0;
+  }
+
+  .mobile-profile-menu-item i {
+    font-size: 16px;
+    width: 20px;
+    color: #667eea;
+  }
+
+  .mobile-profile-menu-item span {
+    flex: 1;
+  }
 }
