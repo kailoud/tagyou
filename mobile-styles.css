@@ -1,0 +1,473 @@
+/* Mobile Styles for TagYou2
+   Dedicated mobile-specific styling */
+
+/* ========================================= */
+/* MOBILE PROFILE BUTTON & DROPDOWN */
+/* ========================================= */
+
+/* Mobile Profile Button */
+.mobile-profile-button {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.mobile-profile-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.mobile-profile-button i {
+  font-size: 20px;
+  color: #fff;
+}
+
+/* Mobile Profile Dropdown */
+.mobile-profile-dropdown {
+  position: fixed;
+  top: 80px;
+  right: 15px;
+  width: 200px;
+  max-height: calc(100vh - 100px);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  display: none;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.mobile-profile-dropdown.show {
+  display: block;
+  animation: mobileDropdownSlide 0.3s ease;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+@keyframes mobileDropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile Profile Header */
+.mobile-profile-header {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobile-profile-avatar {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.mobile-profile-avatar i {
+  font-size: 18px;
+  color: #fff;
+}
+
+.mobile-profile-info {
+  flex: 1;
+}
+
+.mobile-profile-info h4 {
+  color: #fff;
+  font-size: 16px;
+  margin: 0 0 5px 0;
+  font-weight: 600;
+}
+
+.mobile-profile-info p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  margin: 0;
+}
+
+/* Mobile Profile Menu */
+.mobile-profile-menu {
+  padding: 8px 0;
+}
+
+.mobile-profile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 15px;
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  text-align: left;
+  min-height: 50px;
+}
+
+.mobile-profile-menu-item:hover {
+  background: #f5f5f5;
+}
+
+.mobile-profile-menu-item:active {
+  background: #e0e0e0;
+}
+
+.mobile-profile-menu-item i {
+  font-size: 16px;
+  width: 20px;
+  color: #667eea;
+}
+
+.mobile-profile-menu-item span {
+  flex: 1;
+}
+
+/* ========================================= */
+/* MOBILE AUTH MODAL */
+/* ========================================= */
+
+/* Mobile Auth Modal */
+.mobile-auth-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.mobile-auth-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+}
+
+.mobile-auth-content {
+  background: white;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.mobile-auth-header {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  padding: 20px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mobile-auth-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.mobile-auth-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.mobile-auth-close:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Mobile Form Styles */
+.mobile-form-group {
+  margin-bottom: 15px;
+}
+
+.mobile-form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.mobile-auth-form {
+  padding: 20px;
+}
+
+.mobile-auth-form input {
+  width: 100%;
+  padding: 15px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.mobile-auth-form input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.mobile-auth-form button {
+  width: 100%;
+  padding: 15px;
+  margin: 10px 0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.mobile-auth-form button:hover {
+  background: linear-gradient(135deg, #7c8ff0, #8a5bb8);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.mobile-auth-form button:active {
+  transform: translateY(0);
+}
+
+/* ========================================= */
+/* MOBILE RESPONSIVE BREAKPOINTS */
+/* ========================================= */
+
+/* Mobile devices - 320px to 480px */
+@media (max-width: 480px) and (min-width: 320px) {
+  .mobile-profile-dropdown {
+    top: 70px !important;
+    right: 10px !important;
+    width: 180px !important;
+    max-height: calc(100vh - 90px) !important;
+  }
+
+  .mobile-auth-content {
+    max-width: 350px;
+    margin: 10px;
+  }
+}
+
+/* Extra small screens - 320px to 360px */
+@media (max-width: 360px) and (min-width: 320px) {
+  .mobile-profile-dropdown {
+    top: 65px !important;
+    right: 8px !important;
+    width: 160px !important;
+    max-height: calc(100vh - 80px) !important;
+  }
+
+  .mobile-auth-content {
+    max-width: 300px;
+    margin: 5px;
+  }
+
+  .mobile-auth-form {
+    padding: 15px;
+  }
+
+  .mobile-auth-form input {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .mobile-auth-form button {
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+
+/* ========================================= */
+/* HIDE DESKTOP ELEMENTS ON MOBILE */
+/* ========================================= */
+
+/* Hide desktop profile on mobile */
+@media (max-width: 480px) {
+  .profile-button {
+    display: none !important;
+  }
+
+  .profile-dropdown {
+    display: none !important;
+  }
+
+  .profile-container {
+    display: none !important;
+  }
+}
+
+/* ========================================= */
+/* MOBILE UTILITY CLASSES */
+/* ========================================= */
+
+.mobile-hidden {
+  display: none !important;
+}
+
+.mobile-visible {
+  display: block !important;
+}
+
+.mobile-text-center {
+  text-align: center !important;
+}
+
+.mobile-full-width {
+  width: 100% !important;
+}
+
+.mobile-no-margin {
+  margin: 0 !important;
+}
+
+.mobile-no-padding {
+  padding: 0 !important;
+}
+
+/* ========================================= */
+/* MOBILE TOUCH OPTIMIZATIONS */
+/* ========================================= */
+
+/* Ensure touch targets are at least 44px */
+.mobile-profile-menu-item,
+.mobile-auth-form button,
+.mobile-profile-button {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Prevent text selection on buttons */
+.mobile-profile-menu-item,
+.mobile-auth-form button,
+.mobile-profile-button {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth scrolling for dropdown */
+.mobile-profile-dropdown {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* ========================================= */
+/* MOBILE ANIMATIONS */
+/* ========================================= */
+
+/* Mobile button press animation */
+.mobile-profile-button:active,
+.mobile-profile-menu-item:active {
+  transform: scale(0.95);
+}
+
+/* Mobile modal entrance animation */
+.mobile-auth-modal {
+  animation: mobileModalFadeIn 0.3s ease;
+}
+
+@keyframes mobileModalFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Mobile content slide animation */
+.mobile-auth-content {
+  animation: mobileContentSlideUp 0.3s ease;
+}
+
+@keyframes mobileContentSlideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

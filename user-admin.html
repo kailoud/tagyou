@@ -325,10 +325,10 @@
 
     function testMobileSignUp() {
       console.log('🧪 Testing mobile sign up...');
-      if (typeof showMobileAuthModal === 'function') {
-        showMobileAuthModal('signup');
+      if (window.mobileAuth && typeof window.mobileAuth.testMobileSignUp === 'function') {
+        window.mobileAuth.testMobileSignUp();
       } else {
-        alert('Mobile sign up function not available. Please check the console for errors.');
+        alert('Mobile auth module not available. Please check the console for errors.');
       }
     }
 
