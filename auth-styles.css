@@ -324,29 +324,193 @@
   .auth-modal-content {
     margin: 10px;
     border-radius: 15px;
+    max-height: 90vh;
+    overflow-y: auto;
   }
 
   .auth-modal-header {
-    padding: 30px 20px 15px;
+    padding: 20px 15px 10px;
   }
 
   .auth-modal-header h2 {
-    font-size: 24px;
+    font-size: 20px;
+  }
+
+  .auth-modal-header p {
+    font-size: 14px;
   }
 
   .auth-form {
-    padding: 0 20px 15px;
+    padding: 0 15px 10px;
   }
 
   .auth-modal-footer {
-    padding: 0 20px 25px;
+    padding: 0 15px 20px;
   }
 
   .profile-name {
     display: none;
   }
 
-  /* Profile menu responsive styles handled by main styles.css */
+  /* Profile Modal Mobile Optimization */
+  .profile-content,
+  .favorites-content,
+  .settings-content,
+  .help-content {
+    padding: 0 15px 20px;
+    max-height: 70vh;
+  }
+
+  .profile-section,
+  .favorites-section,
+  .settings-section,
+  .help-section {
+    margin-bottom: 20px;
+  }
+
+  .profile-section h3,
+  .favorites-section h3,
+  .settings-section h3,
+  .help-section h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .profile-info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .profile-info-item label {
+    min-width: auto;
+    font-size: 14px;
+  }
+
+  .profile-info-item input {
+    width: 100%;
+    margin-left: 0;
+    font-size: 16px;
+    /* Prevents zoom on iOS */
+    padding: 10px;
+  }
+
+  .profile-info-item span {
+    font-size: 14px;
+    word-break: break-all;
+  }
+
+  /* Favorites Mobile Optimization */
+  .favorites-list {
+    max-height: 150px;
+  }
+
+  .favorite-item {
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .favorite-name {
+    font-size: 14px;
+    flex: 1;
+    margin-right: 10px;
+  }
+
+  .remove-favorite {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+
+  /* Settings Mobile Optimization */
+  .toggle-label,
+  .radio-label {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .toggle-slider {
+    width: 45px;
+    height: 22px;
+    margin-right: 10px;
+  }
+
+  .toggle-slider:before {
+    width: 18px;
+    height: 18px;
+  }
+
+  .toggle-label input:checked+.toggle-slider:before {
+    transform: translateX(23px);
+  }
+
+  .radio-custom {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+  }
+
+  .radio-custom:after {
+    width: 6px;
+    height: 6px;
+  }
+
+  .danger-btn {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+
+  /* Help Mobile Optimization */
+  .help-content li {
+    padding: 10px 0;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .help-content a {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 320px) {
+  .auth-modal-content {
+    margin: 5px;
+    border-radius: 10px;
+  }
+
+  .auth-modal-header {
+    padding: 15px 10px 8px;
+  }
+
+  .auth-modal-header h2 {
+    font-size: 18px;
+  }
+
+  .profile-content,
+  .favorites-content,
+  .settings-content,
+  .help-content {
+    padding: 0 10px 15px;
+  }
+
+  .profile-info-item {
+    padding: 10px;
+  }
+
+  .profile-info-item input {
+    font-size: 16px;
+    padding: 8px;
+  }
+
+  .favorite-item {
+    padding: 10px;
+  }
+
+  .toggle-label,
+  .radio-label {
+    padding: 10px;
+    font-size: 13px;
+  }
 }
 
 @media (max-width: 320px) {
@@ -358,6 +522,67 @@
   .auth-submit-btn {
     padding: 12px;
     font-size: 14px;
+  }
+}
+
+/* Mobile Touch Improvements */
+@media (max-width: 768px) {
+
+  /* Larger touch targets for mobile */
+  .auth-modal-close {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+
+  .toggle-label,
+  .radio-label {
+    min-height: 44px;
+    /* Minimum touch target size */
+  }
+
+  .remove-favorite {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .favorite-item {
+    min-height: 44px;
+  }
+
+  /* Better scrolling for mobile */
+  .auth-modal-content {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .favorites-list {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevent text selection on interactive elements */
+  .toggle-label,
+  .radio-label,
+  .remove-favorite,
+  .auth-modal-close {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Improve button feedback on mobile */
+  .auth-submit-btn,
+  .danger-btn {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .auth-submit-btn:active,
+  .danger-btn:active {
+    transform: scale(0.98);
   }
 }
 

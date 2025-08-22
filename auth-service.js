@@ -1105,6 +1105,9 @@ class AuthService {
       return;
     }
 
+    // Prevent body scroll on mobile when modal is open
+    document.body.style.overflow = 'hidden';
+
     const modalHTML = `
       <div class="auth-modal show" id="profileModal">
         <div class="auth-modal-overlay"></div>
@@ -1168,7 +1171,11 @@ class AuthService {
     const modal = document.getElementById('profileModal');
     if (modal) {
       modal.classList.remove('show');
-      setTimeout(() => modal.remove(), 300);
+      setTimeout(() => {
+        modal.remove();
+        // Restore body scroll
+        document.body.style.overflow = '';
+      }, 300);
     }
   }
 
@@ -1198,6 +1205,9 @@ class AuthService {
       this.showSignInModal();
       return;
     }
+
+    // Prevent body scroll on mobile when modal is open
+    document.body.style.overflow = 'hidden';
 
     const modalHTML = `
       <div class="auth-modal show" id="favoritesModal">
@@ -1256,7 +1266,11 @@ class AuthService {
     const modal = document.getElementById('favoritesModal');
     if (modal) {
       modal.classList.remove('show');
-      setTimeout(() => modal.remove(), 300);
+      setTimeout(() => {
+        modal.remove();
+        // Restore body scroll
+        document.body.style.overflow = '';
+      }, 300);
     }
   }
 
@@ -1297,6 +1311,9 @@ class AuthService {
       this.showSignInModal();
       return;
     }
+
+    // Prevent body scroll on mobile when modal is open
+    document.body.style.overflow = 'hidden';
 
     const modalHTML = `
       <div class="auth-modal show" id="settingsModal">
@@ -1375,7 +1392,11 @@ class AuthService {
     const modal = document.getElementById('settingsModal');
     if (modal) {
       modal.classList.remove('show');
-      setTimeout(() => modal.remove(), 300);
+      setTimeout(() => {
+        modal.remove();
+        // Restore body scroll
+        document.body.style.overflow = '';
+      }, 300);
     }
   }
 
@@ -1402,6 +1423,9 @@ class AuthService {
   }
 
   showHelp() {
+    // Prevent body scroll on mobile when modal is open
+    document.body.style.overflow = 'hidden';
+
     const modalHTML = `
       <div class="auth-modal show" id="helpModal">
         <div class="auth-modal-overlay"></div>
@@ -1450,7 +1474,11 @@ class AuthService {
     const modal = document.getElementById('helpModal');
     if (modal) {
       modal.classList.remove('show');
-      setTimeout(() => modal.remove(), 300);
+      setTimeout(() => {
+        modal.remove();
+        // Restore body scroll
+        document.body.style.overflow = '';
+      }, 300);
     }
   }
 
