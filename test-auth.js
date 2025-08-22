@@ -33,11 +33,26 @@ async function testAuthentication() {
   console.log('\n📋 Test 2: Auth UI Elements');
   const profileButton = document.querySelector('.profile-button');
   const profileMenu = document.querySelector('.profile-menu');
+  const profileHeader = document.querySelector('.profile-header .profile-info');
+
   console.log('Profile button exists:', !!profileButton);
   console.log('Profile menu exists:', !!profileMenu);
+  console.log('Profile header exists:', !!profileHeader);
 
   if (profileButton) {
     console.log('Profile button HTML:', profileButton.innerHTML);
+  }
+
+  if (profileMenu) {
+    console.log('Profile menu HTML:', profileMenu.innerHTML);
+
+    // Check for sign out button
+    const signOutButton = profileMenu.querySelector('.logout');
+    console.log('Sign out button exists:', !!signOutButton);
+
+    if (signOutButton) {
+      console.log('Sign out button text:', signOutButton.textContent);
+    }
   }
 
   // Test 3: Test modal functionality

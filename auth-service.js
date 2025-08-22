@@ -19,6 +19,12 @@ class AuthService {
         this.auth = firebase.auth();
         this.setupAuthStateListener();
         console.log('✅ AuthService initialized');
+
+        // Trigger initial UI update
+        setTimeout(() => {
+          this.updateAuthUI(this.currentUser);
+        }, 500);
+
         break;
       }
       attempts++;
@@ -201,50 +207,81 @@ class AuthService {
     // Update profile button and menu
     const profileButton = document.querySelector('.profile-button');
     const profileMenu = document.querySelector('.profile-menu');
+    const profileHeader = document.querySelector('.profile-header .profile-info');
 
     if (user) {
       // User is logged in
       if (profileButton) {
         profileButton.innerHTML = `
-          <i class="fas fa-user-circle"></i>
-          <span class="profile-name">${user.displayName || user.email}</span>
+          <i class="fas fa-user-circle profile-icon"></i>
+        `;
+      }
+
+      // Update profile header
+      if (profileHeader) {
+        profileHeader.innerHTML = `
+          <h4>${user.displayName || user.email}</h4>
+          <p>Signed in to TagYou2</p>
         `;
       }
 
       if (profileMenu) {
         profileMenu.innerHTML = `
-          <div class="profile-menu-item" onclick="authService.showProfile()">
-            <i class="fas fa-user"></i> Profile
-          </div>
-          <div class="profile-menu-item" onclick="authService.showFavorites()">
-            <i class="fas fa-heart"></i> My Favorites
-          </div>
-          <div class="profile-menu-item" onclick="authService.showSettings()">
-            <i class="fas fa-cog"></i> Settings
-          </div>
-          <div class="profile-menu-divider"></div>
-          <div class="profile-menu-item" onclick="authService.signOut()">
-            <i class="fas fa-sign-out-alt"></i> Sign Out
-          </div>
+          <button class="profile-menu-item" onclick="authService.showProfile()">
+            <i class="fas fa-user-circle"></i>
+            <span>My Profile</span>
+          </button>
+          <button class="profile-menu-item" onclick="authService.showFavorites()">
+            <i class="fas fa-heart"></i>
+            <span>My Favorites</span>
+            <span class="badge">0</span>
+          </button>
+          <button class="profile-menu-item" onclick="authService.showSettings()">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </button>
+          
+          <div class="profile-divider"></div>
+          
+          <button class="profile-menu-item logout" onclick="authService.signOut()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Sign Out</span>
+          </button>
         `;
       }
     } else {
       // User is not logged in
       if (profileButton) {
         profileButton.innerHTML = `
-          <i class="fas fa-user-circle"></i>
-          <span class="profile-name">Guest</span>
+          <i class="fas fa-user profile-icon"></i>
+        `;
+      }
+
+      // Update profile header
+      if (profileHeader) {
+        profileHeader.innerHTML = `
+          <h4>Festival Goer</h4>
+          <p>Welcome to TagYou2!</p>
         `;
       }
 
       if (profileMenu) {
         profileMenu.innerHTML = `
-          <div class="profile-menu-item" onclick="authService.showLogin()">
-            <i class="fas fa-sign-in-alt"></i> Sign In
-          </div>
-          <div class="profile-menu-item" onclick="authService.showRegister()">
-            <i class="fas fa-user-plus"></i> Register
-          </div>
+          <button class="profile-menu-item" onclick="authService.showLogin()">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Sign In</span>
+          </button>
+          <button class="profile-menu-item" onclick="authService.showRegister()">
+            <i class="fas fa-user-plus"></i>
+            <span>Register</span>
+          </button>
+          
+          <div class="profile-divider"></div>
+          
+          <button class="profile-menu-item" onclick="authService.showHelp()">
+            <i class="fas fa-question-circle"></i>
+            <span>Help & Support</span>
+          </button>
         `;
       }
     }
@@ -270,6 +307,11 @@ class AuthService {
 
   showSettings() {
     console.log('Show settings');
+    // Implementation will be added
+  }
+
+  showHelp() {
+    console.log('Show help');
     // Implementation will be added
   }
 

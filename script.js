@@ -63,6 +63,13 @@ document.addEventListener('DOMContentLoaded', async function () {
           console.error('❌ Failed to load auth test:', error);
         }
 
+        // Test Firebase connection
+        try {
+          await import('./firebase-connection-test.js');
+        } catch (error) {
+          console.error('❌ Failed to load connection test:', error);
+        }
+
         break;
       }
 
@@ -81,39 +88,53 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 // Initialize Firebase (non-blocking)
 async function initializeFirebase() {
+  console.log('🔥 Starting Firebase initialization...');
   try {
     // Check if Firebase is available
     if (typeof firebase === 'undefined') {
       throw new Error('Firebase SDK not loaded');
     }
 
-    // Dynamic import to avoid blocking the main app
-    const {
-      FoodStallsService,
-      ArtistsService,
-      FloatTrucksService,
-      UserFavoritesService,
-      RealtimeService,
-      initializeDefaultData
-    } = await import('./firebase-service.js');
+    // Import and initialize Firebase config first
+    const firebaseModule = await import('./firebase-config.js');
+    const { initializeFirebase: initFirebase } = firebaseModule;
 
-    console.log('Firebase modules loaded successfully');
+    // Initialize Firebase using the exported function
+    const success = await initFirebase();
 
-    // Initialize Firebase data
-    await initializeDefaultData();
-    firebaseInitialized = true;
+    if (success) {
+      console.log('✅ Firebase core initialized successfully');
 
-    // Load initial data
-    await loadInitialData(FoodStallsService, ArtistsService, FloatTrucksService);
+      // Now import and initialize Firebase services
+      const {
+        FoodStallsService,
+        ArtistsService,
+        FloatTrucksService,
+        UserFavoritesService,
+        RealtimeService,
+        initializeDefaultData
+      } = await import('./firebase-service.js');
 
-    // Set up real-time listeners
-    setupRealtimeListeners(RealtimeService);
+      console.log('✅ Firebase modules loaded successfully');
 
-    console.log('Firebase initialization complete!');
+      // Initialize Firebase data
+      await initializeDefaultData();
+      firebaseInitialized = true;
+
+      // Load initial data
+      await loadInitialData(FoodStallsService, ArtistsService, FloatTrucksService);
+
+      // Set up real-time listeners
+      setupRealtimeListeners(RealtimeService);
+
+      console.log('✅ Firebase initialization complete!');
+    } else {
+      throw new Error('Firebase core initialization failed');
+    }
 
   } catch (error) {
-    console.error('Firebase initialization failed:', error);
-    console.log('Continuing with hardcoded data...');
+    console.error('❌ Firebase initialization failed:', error);
+    console.log('📁 Using hardcoded data instead...');
 
     // Use hardcoded data as fallback
     foodStallsData = getHardcodedFoodStalls();
