@@ -2385,16 +2385,40 @@ input:checked+.slider:before {
     border-bottom: 1px solid #eee;
     background: linear-gradient(135deg, #667eea, #764ba2);
     border-radius: 12px 12px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
 
-  .mobile-profile-header h4 {
+  .mobile-profile-avatar {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+  }
+
+  .mobile-profile-avatar i {
+    font-size: 18px;
+    color: #fff;
+  }
+
+  .mobile-profile-info {
+    flex: 1;
+  }
+
+  .mobile-profile-info h4 {
     color: #fff;
     font-size: 16px;
     margin: 0 0 5px 0;
     font-weight: 600;
   }
 
-  .mobile-profile-header p {
+  .mobile-profile-info p {
     color: rgba(255, 255, 255, 0.9);
     font-size: 12px;
     margin: 0;
