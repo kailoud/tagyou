@@ -59,7 +59,10 @@ document.addEventListener('DOMContentLoaded', async function () {
       console.log('⚠️ Profile menu is empty! Force populating...');
       if (authService && authService.updateMenuItemsForGuestUser) {
         authService.updateMenuItemsForGuestUser();
-        console.log('✅ Forced guest menu population');
+        console.log('✅ Forced guest menu population via auth service');
+      } else {
+        console.log('⚠️ Auth service not available, using manual population');
+        forcePopulateProfileMenu();
       }
     }
   }, 2000);
@@ -217,6 +220,10 @@ async function initializeAuthService() {
       // Update UI based on auth state
       updateAuthenticatedUI(user);
     });
+
+    // Force initial UI update for guest user
+    console.log('🔄 Forcing initial UI update for guest user...');
+    authService.updateAuthUI(null);
 
     console.log('✅ Authentication service initialized');
 
