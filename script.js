@@ -1,11 +1,11 @@
-// TagYou2 London Map - Firebase Integration
+// TagYou2 London Map - Supabase Integration
 let map;
 let currentUser = null; // Will be set when user authentication is implemented
 let authService = null; // Authentication service instance
 let foodStallsData = [];
 let artistsData = [];
 let floatTrucksData = [];
-let firebaseInitialized = false;
+let supabaseInitialized = false;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function () {
@@ -24,8 +24,8 @@ document.addEventListener('DOMContentLoaded', async function () {
   initPullUpPanel();
   initResponsiveZoom();
 
-  // Then try to initialize Firebase (non-blocking)
-  initializeFirebase();
+  // Then try to initialize Supabase (non-blocking)
+  initializeSupabase();
 
   // Initialize Authentication Service
   initializeAuthService();
@@ -71,46 +71,39 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   }, 2000);
 
-  // Wait for Firebase to be initialized before running diagnostics
-  const waitForFirebase = async () => {
+  // Wait for Supabase to be initialized before running diagnostics
+  const waitForSupabase = async () => {
     let attempts = 0;
     const maxAttempts = 30; // Wait up to 30 seconds
 
     while (attempts < maxAttempts) {
-      if (firebase.apps.length > 0) {
-        console.log('✅ Firebase initialized, running diagnostics...');
+      if (supabaseInitialized) {
+        console.log('✅ Supabase initialized, running diagnostics...');
 
         // Run diagnostic test
         try {
-          await import('./firebase-diagnostic.js');
+          await import('./supabase-diagnostic.js');
         } catch (error) {
           console.error('❌ Failed to load diagnostic:', error);
         }
 
-        // Run detailed check
-        try {
-          await import('./detailed-firebase-check.js');
-        } catch (error) {
-          console.error('❌ Failed to load detailed check:', error);
-        }
-
         // Show data table
         try {
-          await import('./show-firebase-data.js');
+          await import('./show-supabase-data.js');
         } catch (error) {
           console.error('❌ Failed to load data table:', error);
         }
 
         // Test authentication
         try {
-          await import('./test-auth.js');
+          await import('./test-supabase-auth.js');
         } catch (error) {
           console.error('❌ Failed to load auth test:', error);
         }
 
-        // Test Firebase connection
+        // Test Supabase connection
         try {
-          await import('./firebase-connection-test.js');
+          await import('./supabase-connection-test.js');
         } catch (error) {
           console.error('❌ Failed to load connection test:', error);
         }
@@ -123,48 +116,52 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     if (attempts >= maxAttempts) {
-      console.error('❌ Firebase failed to initialize within 30 seconds');
+      console.error('❌ Supabase failed to initialize within 30 seconds');
     }
   };
 
-  // Start waiting for Firebase
-  waitForFirebase();
+  // Start waiting for Supabase
+  waitForSupabase();
 });
 
-// Initialize Firebase (non-blocking)
-async function initializeFirebase() {
-  console.log('🔥 Starting Firebase initialization...');
+// Initialize Supabase (non-blocking)
+async function initializeSupabase() {
+  console.log('🚀 Starting Supabase initialization...');
   try {
-    // Check if Firebase is available
-    if (typeof firebase === 'undefined') {
-      throw new Error('Firebase SDK not loaded');
+    // Check if Supabase is available
+    if (typeof window.supabase === 'undefined') {
+      throw new Error('Supabase SDK not loaded');
     }
 
-    // Import and initialize Firebase config first
-    const firebaseModule = await import('./firebase-config.js');
-    const { initializeFirebase: initFirebase } = firebaseModule;
+    // Import and initialize Supabase config first
+    const supabaseModule = await import('./supabase-config.js');
+    const { initializeSupabase: initSupabase, supabase: supabaseClient } = supabaseModule;
 
-    // Initialize Firebase using the exported function
-    const success = await initFirebase();
+    // Initialize Supabase using the exported function
+    const success = await initSupabase();
 
     if (success) {
-      console.log('✅ Firebase core initialized successfully');
+      console.log('✅ Supabase core initialized successfully');
 
-      // Now import and initialize Firebase services
+      // Now import and initialize Supabase services
       const {
         FoodStallsService,
         ArtistsService,
         FloatTrucksService,
         UserFavoritesService,
         RealtimeService,
-        initializeDefaultData
-      } = await import('./firebase-service.js');
+        initializeDefaultData,
+        setSupabaseInstance
+      } = await import('./supabase-service.js');
 
-      console.log('✅ Firebase modules loaded successfully');
+      console.log('✅ Supabase modules loaded successfully');
 
-      // Initialize Firebase data
+      // Set the global Supabase instance
+      setSupabaseInstance(supabaseClient);
+
+      // Initialize Supabase data
       await initializeDefaultData();
-      firebaseInitialized = true;
+      supabaseInitialized = true;
 
       // Load initial data
       await loadInitialData(FoodStallsService, ArtistsService, FloatTrucksService);
@@ -172,13 +169,13 @@ async function initializeFirebase() {
       // Set up real-time listeners
       setupRealtimeListeners(RealtimeService);
 
-      console.log('✅ Firebase initialization complete!');
+      console.log('✅ Supabase initialization complete!');
     } else {
-      throw new Error('Firebase core initialization failed');
+      throw new Error('Supabase core initialization failed');
     }
 
   } catch (error) {
-    console.error('❌ Firebase initialization failed:', error);
+    console.error('❌ Supabase initialization failed:', error);
     console.log('📁 Using hardcoded data instead...');
 
     // Use hardcoded data as fallback
@@ -192,13 +189,13 @@ async function initializeFirebase() {
 async function initializeAuthService() {
   console.log('🔐 Initializing Authentication Service...');
   try {
-    // Wait for Firebase to be available
+    // Wait for Supabase to be available
     let attempts = 0;
     const maxAttempts = 30;
 
     while (attempts < maxAttempts) {
-      if (firebase.apps.length > 0) {
-        console.log('✅ Firebase ready, loading auth service...');
+      if (supabaseInitialized) {
+        console.log('✅ Supabase ready, loading auth service...');
         break;
       }
       attempts++;
@@ -206,15 +203,18 @@ async function initializeAuthService() {
     }
 
     if (attempts >= maxAttempts) {
-      throw new Error('Firebase not available for auth service');
+      throw new Error('Supabase not available for auth service');
     }
 
     // Import and initialize auth service
-    const authModule = await import('./auth-service.js');
-    authService = authModule.default;
+    const authModule = await import('./supabase-auth-service.js');
+    authService = authModule.supabaseAuthService;
 
     // Make auth service globally accessible
     window.authService = authService;
+
+    // Initialize the auth service
+    await authService.initialize();
 
     // Set up auth state listener
     authService.onAuthStateChanged((user) => {

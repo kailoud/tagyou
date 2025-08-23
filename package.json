@@ -22,7 +22,7 @@
   "author": "TagYou2 Team",
   "license": "MIT",
   "dependencies": {
-    "firebase": "^12.1.0"
+    "@supabase/supabase-js": "^2.39.0"
   },
   "devDependencies": {
     "live-server": "^1.2.2"

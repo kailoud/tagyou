@@ -1,6 +1,6 @@
 # TagYou2 - London Festival Map
 
-A modern, interactive London map application for festival-goers, featuring real-time data from Firebase.
+A modern, interactive London map application for festival-goers, featuring real-time data from Supabase.
 
 ## Features
 
@@ -18,7 +18,7 @@ A modern, interactive London map application for festival-goers, featuring real-
 ### Prerequisites
 
 - Node.js installed
-- A Firebase project (see [Firebase Setup Guide](FIREBASE_SETUP.md))
+- A Supabase project (see [Supabase Setup Guide](SUPABASE_SETUP.md))
 
 ### Installation
 
@@ -28,9 +28,9 @@ A modern, interactive London map application for festival-goers, featuring real-
    npm install
    ```
 
-3. Set up Firebase:
-   - Follow the [Firebase Setup Guide](FIREBASE_SETUP.md)
-   - Update `firebase-config.js` with your Firebase credentials
+3. Set up Supabase:
+   - Follow the [Supabase Setup Guide](SUPABASE_SETUP.md)
+   - Update `supabase-config-secret.js` with your Supabase credentials
 
 4. Start the development server:
    ```bash
@@ -46,26 +46,29 @@ tagyou2/
 ├── index.html              # Main HTML file
 ├── styles.css              # CSS styling
 ├── script.js               # Main JavaScript functionality
-├── firebase-config.js      # Firebase configuration
-├── firebase-service.js     # Firebase data services
+├── supabase-config.js      # Supabase configuration
+├── supabase-service.js     # Supabase data services
+├── supabase-auth-service.js # Supabase authentication
 ├── package.json            # Node.js dependencies
-├── FIREBASE_SETUP.md       # Firebase setup guide
+├── SUPABASE_SETUP.md       # Supabase setup guide
 └── README.md               # This documentation file
 ```
 
-## Firebase Integration
+## Supabase Integration
 
-This project uses Firebase for:
-- **Firestore Database**: Store food stalls, artists, and user data
-- **Real-time Updates**: Live data synchronization
+This project uses Supabase for:
+- **PostgreSQL Database**: Store food stalls, artists, and user data
+- **Real-time Updates**: Live data synchronization via PostgreSQL subscriptions
 - **User Favorites**: Save user preferences
+- **Authentication**: Built-in auth with multiple providers
 - **Scalability**: Handle growing user base
 
-### Collections
+### Tables
 
-- `foodStalls`: Food stall information and locations
+- `food_stalls`: Food stall information and locations
 - `artists`: Artist and band details
-- `userFavorites`: User favorite items
+- `float_trucks`: Float truck information and routes
+- `user_favorites`: User favorite items
 
 ## Development
 
