@@ -469,117 +469,14 @@ export class RealtimeService {
   }
 }
 
-// Initialize default data
+// Initialize default data - now empty for custom schema
 export async function initializeDefaultData() {
   try {
     checkSupabaseConnection();
 
-    console.log('🚀 Initializing default data...');
+    console.log('🚀 Data initialization ready for custom schema...');
+    console.log('ℹ️ No demo data will be inserted - implement your own schema');
 
-    // Check if data already exists
-    const { data: existingFoodStalls } = await supabase
-      .from('food_stalls')
-      .select('count')
-      .limit(1);
-
-    if (existingFoodStalls && existingFoodStalls.length > 0) {
-      console.log('✅ Default data already exists, skipping initialization');
-      return;
-    }
-
-    // Insert default food stalls
-    const defaultFoodStalls = [
-      {
-        name: "Jerk Chicken Paradise",
-        description: "Authentic Jamaican jerk chicken with rice and peas",
-        location: { lat: 51.5194, lng: -0.1270 },
-        cuisine: "Jamaican",
-        price_range: "£8-12",
-        rating: 4.5,
-        hours: "10:00-22:00"
-      },
-      {
-        name: "Caribbean Curry Corner",
-        description: "Spicy curry goat and roti",
-        location: { lat: 51.5200, lng: -0.1280 },
-        cuisine: "Caribbean",
-        price_range: "£6-10",
-        rating: 4.3,
-        hours: "11:00-21:00"
-      }
-    ];
-
-    const { error: foodStallsError } = await supabase
-      .from('food_stalls')
-      .insert(defaultFoodStalls);
-
-    if (foodStallsError) {
-      console.error('❌ Error inserting default food stalls:', foodStallsError);
-    } else {
-      console.log('✅ Default food stalls inserted');
-    }
-
-    // Insert default artists
-    const defaultArtists = [
-      {
-        name: "Steel Pulse",
-        description: "Legendary reggae band",
-        genre: "Reggae",
-        performance_time: "15:00",
-        stage: "Main Stage",
-        rating: 4.8
-      },
-      {
-        name: "Soca Warriors",
-        description: "High-energy soca music",
-        genre: "Soca",
-        performance_time: "16:30",
-        stage: "Dance Stage",
-        rating: 4.6
-      }
-    ];
-
-    const { error: artistsError } = await supabase
-      .from('artists')
-      .insert(defaultArtists);
-
-    if (artistsError) {
-      console.error('❌ Error inserting default artists:', artistsError);
-    } else {
-      console.log('✅ Default artists inserted');
-    }
-
-    // Insert default float trucks
-    const defaultFloatTrucks = [
-      {
-        name: "Mas Band Float 1",
-        description: "Traditional masquerade float",
-        route: "Notting Hill Gate to Ladbroke Grove",
-        start_time: "14:00",
-        end_time: "18:00",
-        capacity: 50
-      },
-      {
-        name: "Steel Band Float",
-        description: "Steel pan music float",
-        route: "Portobello Road to Westbourne Grove",
-        start_time: "15:30",
-        end_time: "19:30",
-        capacity: 30
-      }
-    ];
-
-    const { error: floatTrucksError } = await supabase
-      .from('float_trucks')
-      .insert(defaultFloatTrucks);
-
-    if (floatTrucksError) {
-      console.error('❌ Error inserting default float trucks:', floatTrucksError);
-    } else {
-      console.log('✅ Default float trucks inserted');
-    }
-
-    console.log('✅ Default data initialization complete!');
   } catch (error) {
     console.error('❌ initializeDefaultData error:', error);
   }

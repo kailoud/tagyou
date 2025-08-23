@@ -176,12 +176,12 @@ async function initializeSupabase() {
 
   } catch (error) {
     console.error('❌ Supabase initialization failed:', error);
-    console.log('📁 Using hardcoded data instead...');
+    console.log('📁 No data available - please set up your database tables');
 
-    // Use hardcoded data as fallback
-    foodStallsData = getHardcodedFoodStalls();
-    artistsData = getHardcodedArtists();
-    floatTrucksData = getHardcodedFloatTrucks();
+    // Initialize empty arrays
+    foodStallsData = [];
+    artistsData = [];
+    floatTrucksData = [];
   }
 }
 
@@ -313,11 +313,11 @@ async function loadInitialData(FoodStallsService, ArtistsService, FloatTrucksSer
 
   } catch (error) {
     console.error('❌ Error loading data from Supabase:', error);
-    console.log('🔄 Falling back to hardcoded data...');
-    // Fallback to hardcoded data
-    foodStallsData = getHardcodedFoodStalls();
-    artistsData = getHardcodedArtists();
-    floatTrucksData = getHardcodedFloatTrucks();
+    console.log('🔄 No data available - please set up your database tables');
+    // Initialize empty arrays
+    foodStallsData = [];
+    artistsData = [];
+    floatTrucksData = [];
   }
 }
 
@@ -353,134 +353,17 @@ function setupRealtimeListeners(RealtimeService) {
   }
 }
 
-// Fallback hardcoded data functions
+// Data loading functions - now empty for custom schema implementation
 function getHardcodedFoodStalls() {
-  return [
-    {
-      id: 1,
-      name: "Caribbean Spice Kitchen",
-      lat: 51.517871,
-      lng: -0.205163,
-      location: "Ladbroke Grove",
-      description: "Authentic Jamaican jerk chicken and Caribbean cuisine",
-      specialties: ["Jerk Chicken", "Curry Goat", "Rice & Peas", "Plantain"],
-      rating: 4.8,
-      priceRange: "££",
-      image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop",
-      hours: "11:00 AM - 8:00 PM",
-      phone: "+44 20 7123 4567"
-    },
-    {
-      id: 2,
-      name: "Notting Hill Jerk House",
-      lat: 51.515638,
-      lng: -0.201236,
-      location: "Portobello Road",
-      description: "Traditional jerk chicken with secret family recipe",
-      specialties: ["Jerk Chicken", "Jerk Pork", "Ackee & Saltfish", "Callaloo"],
-      rating: 4.9,
-      priceRange: "££",
-      image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop",
-      hours: "10:00 AM - 9:00 PM",
-      phone: "+44 20 7123 4568"
-    },
-    {
-      id: 3,
-      name: "Island Flavours",
-      lat: 51.516875,
-      lng: -0.200021,
-      location: "Westbourne Grove",
-      description: "Fresh Caribbean street food and traditional dishes",
-      specialties: ["Jerk Chicken", "Roti", "Doubles", "Sorrel Drink"],
-      rating: 4.7,
-      priceRange: "£",
-      image: "https://images.unsplash.com/photo-1544025162-d7669419868d?w=400&h=300&fit=crop",
-      hours: "12:00 PM - 7:00 PM",
-      phone: "+44 20 7123 4569"
-    }
-  ];
+  return [];
 }
 
 function getHardcodedArtists() {
-  return [
-    {
-      id: 1,
-      name: "DJ Shy FX",
-      lat: 51.517674,
-      lng: -0.200438,
-      location: "Ladbroke Grove",
-      description: "Legendary drum & bass and jungle pioneer",
-      genres: ["Drum & Bass", "Jungle", "UK Garage", "Reggae"],
-      rating: 4.9,
-      performanceTime: "3:00 PM - 4:30 PM",
-      stage: "Main Float Route",
-      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
-      phone: "+44 20 7123 4570",
-      experience: "25+ years in UK dance music scene"
-    },
-    {
-      id: 2,
-      name: "Steel Pulse",
-      lat: 51.522428,
-      lng: -0.203347,
-      location: "Portobello Road",
-      description: "Grammy-winning reggae legends from Birmingham",
-      genres: ["Reggae", "Roots", "Conscious Music", "Political Lyrics"],
-      rating: 4.8,
-      performanceTime: "5:00 PM - 6:30 PM",
-      stage: "Cultural Stage",
-      image: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=400&h=300&fit=crop",
-      phone: "+44 20 7123 4571",
-      experience: "40+ years of reggae excellence"
-    },
-    {
-      id: 3,
-      name: "London Samba Collective",
-      lat: 51.518363,
-      lng: -0.210441,
-      location: "Westbourne Grove",
-      description: "Energetic Brazilian samba rhythms and percussion",
-      genres: ["Samba", "Batucada", "Brazilian Rhythms", "Carnival Music"],
-      rating: 4.7,
-      performanceTime: "2:00 PM - 3:30 PM",
-      stage: "Parade Route",
-      image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=300&fit=crop",
-      phone: "+44 20 7123 4572",
-      experience: "15+ years of carnival performances"
-    }
-  ];
+  return [];
 }
 
 function getHardcodedFloatTrucks() {
-  return [
-    {
-      id: 1,
-      name: "Circus Float",
-      type: "Circus",
-      route: "Parade Route",
-      time: "2:00 PM",
-      description: "Spectacular circus performers on wheels",
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop"
-    },
-    {
-      id: 2,
-      name: "Costume Float",
-      type: "Costume",
-      route: "Main Parade",
-      time: "3:30 PM",
-      description: "Vibrant costumes and cultural displays",
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop"
-    },
-    {
-      id: 3,
-      name: "Music Float",
-      type: "Music",
-      route: "Cultural Route",
-      time: "4:00 PM",
-      description: "Live music and entertainment on wheels",
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop"
-    }
-  ];
+  return [];
 }
 
 // Initialize the map
@@ -554,8 +437,8 @@ function showFoodStalls() {
   console.log('📊 Current foodStallsData:', foodStallsData);
   console.log('📊 foodStallsData.length:', foodStallsData.length);
 
-  // Use Firebase data or fallback to hardcoded data
-  const stallsToShow = foodStallsData.length > 0 ? foodStallsData : getHardcodedFoodStalls();
+  // Use Supabase data
+  const stallsToShow = foodStallsData;
   console.log('🎯 Final stalls to show:', stallsToShow);
   console.log('🎯 Number of stalls to display:', stallsToShow.length);
 
@@ -629,8 +512,8 @@ function showArtists() {
   console.log('📊 Current artistsData:', artistsData);
   console.log('📊 artistsData.length:', artistsData.length);
 
-  // Use Firebase data or fallback to hardcoded data
-  const artistsToShow = artistsData.length > 0 ? artistsData : getHardcodedArtists();
+  // Use Supabase data
+  const artistsToShow = artistsData;
   console.log('🎯 Final artists to show:', artistsToShow);
   console.log('🎯 Number of artists to display:', artistsToShow.length);
 

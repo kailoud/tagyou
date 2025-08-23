@@ -3010,3 +3010,24 @@ input:checked+.slider:before {
     align-items: center !important;
   }
 }
+
+/* ========================================= */
+/* EMPTY STATE STYLING */
+/* ========================================= */
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b7280;
+  background: #f9fafb;
+  border-radius: 8px;
+  margin: 20px;
+  border: 2px dashed #d1d5db;
+}
+
+.empty-state p {
+  font-size: 16px;
+  margin: 0;
+  font-style: italic;
+  color: #9ca3af;
+}
