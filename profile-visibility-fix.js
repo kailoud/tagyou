@@ -443,7 +443,7 @@ window.showAuthModalDirect = function () {
             </form>
 
             <div class="auth-modal-footer">
-              <p id="authToggleText">Don't have an account? <a href="#" id="authToggleBtn" onclick="toggleAuthModeDirect()">Sign Up</a></p>
+              <p id="authToggleText">Don't have an account? <a href="#" onclick="toggleAuthModeDirect()" class="auth-link">Sign Up</a></p>
               <p><a href="#" id="forgotPasswordBtn" onclick="handleForgotPasswordDirect()">Forgot Password?</a></p>
             </div>
 
@@ -493,16 +493,14 @@ window.toggleAuthModeDirect = function () {
     title.textContent = 'Sign In';
     subtitle.textContent = 'Welcome to TagYou!';
     submitText.textContent = 'Sign In';
-    toggleText.textContent = "Don't have an account? ";
-    toggleBtn.textContent = 'Sign Up';
+    toggleText.innerHTML = "Don't have an account? <a href='#' onclick='toggleAuthModeDirect()' class='auth-link'>Sign Up</a>";
     form.dataset.mode = 'signin';
   } else {
     // Switch to sign up
     title.textContent = 'Sign Up';
     subtitle.textContent = 'Create your TagYou account';
     submitText.textContent = 'Sign Up';
-    toggleText.textContent = 'Already have an account? ';
-    toggleBtn.textContent = 'Sign In';
+    toggleText.innerHTML = "Already have an account? <a href='#' onclick='toggleAuthModeDirect()' class='auth-link'>Sign In</a>";
     form.dataset.mode = 'signup';
   }
 };
@@ -519,33 +517,206 @@ window.handleAuthSubmitDirect = function (event) {
 
   console.log('🔐 Auth attempt:', { mode, email });
 
-  // For now, just show a message
+  // Show loading state
+  const submitBtn = form.querySelector('#authSubmitBtn');
+  const submitText = submitBtn.querySelector('#authSubmitText');
+  const originalText = submitText.textContent;
+
+  submitBtn.disabled = true;
+  submitText.textContent = mode === 'signin' ? 'Signing In...' : 'Signing Up...';
+
+  // Clear any existing messages
   const messageDiv = document.getElementById('authMessage');
   if (messageDiv) {
-    messageDiv.textContent = `${mode === 'signin' ? 'Sign In' : 'Sign Up'} functionality will be implemented with Supabase`;
-    messageDiv.className = 'auth-message auth-info';
+    messageDiv.textContent = '';
+    messageDiv.className = '';
   }
+
+  // Simulate auth process (replace with actual Supabase auth later)
+  setTimeout(() => {
+    submitBtn.disabled = false;
+    submitText.textContent = originalText;
+
+    // For now, just close the modal
+    hideAuthModalDirect();
+  }, 1500);
 };
 
 // Handle forgot password function
 window.handleForgotPasswordDirect = function () {
   console.log('🔑 Forgot password clicked');
-  const email = document.getElementById('authEmail').value;
+
+  // Hide the auth modal
+  hideAuthModalDirect();
+
+  // Show forgot password modal
+  showForgotPasswordModal();
+};
+
+// Show forgot password modal
+window.showForgotPasswordModal = function () {
+  console.log('🔑 Showing forgot password modal...');
+
+  // Create or find forgot password modal
+  let forgotModal = document.getElementById('forgotPasswordModal');
+  if (!forgotModal) {
+    console.log('🔄 Creating forgot password modal...');
+    const modalHTML = `
+      <div id="forgotPasswordModal" class="auth-modal">
+        <div class="auth-modal-overlay">
+          <div class="auth-modal-content forgot-password-content">
+            <button class="auth-modal-close" id="forgotPasswordModalClose" onclick="hideForgotPasswordModal()">
+              <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="forgot-password-header">
+              <div class="forgot-password-icon">
+                <i class="fas fa-lock"></i>
+              </div>
+              <h2>Forgot Password?</h2>
+              <p>No worries! Enter your email and we'll send you reset instructions.</p>
+            </div>
+
+            <form id="forgotPasswordForm" class="forgot-password-form" onsubmit="handleForgotPasswordSubmit(event)">
+              <div class="form-group">
+                <label for="forgotPasswordEmail">Email Address</label>
+                <div class="input-wrapper">
+                  <i class="fas fa-envelope input-icon"></i>
+                  <input type="email" id="forgotPasswordEmail" placeholder="Enter your email address" required>
+                </div>
+              </div>
+
+              <button type="submit" class="forgot-password-submit-btn" id="forgotPasswordSubmitBtn">
+                <span id="forgotPasswordSubmitText">Send Reset Link</span>
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </form>
+
+            <div class="forgot-password-footer">
+              <p>Remember your password? <a href="#" onclick="backToSignIn()">Back to Sign In</a></p>
+            </div>
+
+            <div id="forgotPasswordMessage"></div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    forgotModal = document.getElementById('forgotPasswordModal');
+    console.log('✅ Forgot password modal created');
+  }
+
+  // Show the modal
+  if (forgotModal) {
+    forgotModal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    console.log('✅ Forgot password modal shown successfully');
+
+    // Focus on email input
+    setTimeout(() => {
+      const emailInput = document.getElementById('forgotPasswordEmail');
+      if (emailInput) {
+        emailInput.focus();
+      }
+    }, 100);
+  } else {
+    console.error('❌ Failed to create or find forgot password modal');
+  }
+};
+
+// Hide forgot password modal
+window.hideForgotPasswordModal = function () {
+  console.log('❌ Hiding forgot password modal...');
+  const forgotModal = document.getElementById('forgotPasswordModal');
+  if (forgotModal) {
+    forgotModal.classList.remove('show');
+    document.body.style.overflow = '';
+    console.log('✅ Forgot password modal hidden');
+  }
+};
+
+// Handle forgot password form submit
+window.handleForgotPasswordSubmit = async function (event) {
+  event.preventDefault();
+  console.log('📝 Forgot password form submitted');
+
+  const email = document.getElementById('forgotPasswordEmail').value;
+  const messageDiv = document.getElementById('forgotPasswordMessage');
+  const submitBtn = document.getElementById('forgotPasswordSubmitBtn');
+  const submitText = document.getElementById('forgotPasswordSubmitText');
 
   if (!email) {
-    const messageDiv = document.getElementById('authMessage');
     if (messageDiv) {
-      messageDiv.textContent = 'Please enter your email address first.';
+      messageDiv.textContent = 'Please enter your email address.';
       messageDiv.className = 'auth-message auth-error';
     }
     return;
   }
 
-  const messageDiv = document.getElementById('authMessage');
+  // Show loading state
+  submitBtn.disabled = true;
+  submitText.textContent = 'Sending...';
+
   if (messageDiv) {
-    messageDiv.textContent = `Password reset email will be sent to ${email}`;
+    messageDiv.textContent = 'Sending password reset email...';
     messageDiv.className = 'auth-message auth-info';
   }
+
+  try {
+    console.log('🔑 Sending password reset email to:', email);
+
+    // Check if Supabase is available
+    if (typeof window.supabase === 'undefined') {
+      throw new Error('Supabase not available. Please refresh the page and try again.');
+    }
+
+    // Send password reset email using Supabase
+    const { error } = await window.supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/reset-password.html'
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    // Success - show success state
+    if (messageDiv) {
+      messageDiv.textContent = '✅ Reset link sent! Check your email for instructions.';
+      messageDiv.className = 'auth-message auth-success';
+    }
+
+    // Update button to show success
+    submitText.textContent = 'Email Sent!';
+    submitBtn.classList.add('success');
+
+    console.log('✅ Password reset email sent successfully');
+
+  } catch (error) {
+    console.error('❌ Password reset error:', error);
+
+    if (messageDiv) {
+      messageDiv.textContent = 'Failed to send reset email: ' + error.message;
+      messageDiv.className = 'auth-message auth-error';
+    }
+
+    // Reset button state
+    submitText.textContent = 'Send Reset Link';
+    submitBtn.classList.remove('success');
+  } finally {
+    // Re-enable button after a delay
+    setTimeout(() => {
+      submitBtn.disabled = false;
+      submitText.textContent = 'Send Reset Link';
+      submitBtn.classList.remove('success');
+    }, 3000);
+  }
+};
+
+// Back to sign in function
+window.backToSignIn = function () {
+  console.log('🔄 Going back to sign in...');
+  hideForgotPasswordModal();
+  showAuthModalDirect();
 };
 
 // Debug function to test Sign In button
