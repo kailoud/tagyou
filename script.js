@@ -277,27 +277,27 @@ function updateProtectedFeatures(isAuthenticated) {
   console.log('🔒 Protected features updated:', isAuthenticated ? 'enabled' : 'disabled');
 }
 
-// Load initial data from Firebase
+// Load initial data from Supabase
 async function loadInitialData(FoodStallsService, ArtistsService, FloatTrucksService) {
   try {
-    console.log('🔥 Loading data from Firebase...');
+    console.log('🚀 Loading data from Supabase...');
 
     // Load food stalls with detailed logging
-    console.log('🍽️ Fetching food stalls from Firebase...');
+    console.log('🍽️ Fetching food stalls from Supabase...');
     foodStallsData = await FoodStallsService.getAllFoodStalls();
-    console.log('✅ Loaded food stalls from Firebase:', foodStallsData.length);
+    console.log('✅ Loaded food stalls from Supabase:', foodStallsData.length);
     console.log('📊 Food stalls data:', foodStallsData);
 
     // Load artists with detailed logging
-    console.log('🎵 Fetching artists from Firebase...');
+    console.log('🎵 Fetching artists from Supabase...');
     artistsData = await ArtistsService.getAllArtists();
-    console.log('✅ Loaded artists from Firebase:', artistsData.length);
+    console.log('✅ Loaded artists from Supabase:', artistsData.length);
     console.log('📊 Artists data:', artistsData);
 
     // Load float trucks with detailed logging
-    console.log('🚛 Fetching float trucks from Firebase...');
+    console.log('🚛 Fetching float trucks from Supabase...');
     floatTrucksData = await FloatTrucksService.getAllFloatTrucks();
-    console.log('✅ Loaded float trucks from Firebase:', floatTrucksData.length);
+    console.log('✅ Loaded float trucks from Supabase:', floatTrucksData.length);
     console.log('📊 Float trucks data:', floatTrucksData);
 
     // Check if data is properly structured
@@ -312,7 +312,7 @@ async function loadInitialData(FoodStallsService, ArtistsService, FloatTrucksSer
     }
 
   } catch (error) {
-    console.error('❌ Error loading data from Firebase:', error);
+    console.error('❌ Error loading data from Supabase:', error);
     console.log('🔄 Falling back to hardcoded data...');
     // Fallback to hardcoded data
     foodStallsData = getHardcodedFoodStalls();
@@ -1946,13 +1946,13 @@ function handleStartFlagScaling(zoomLevel, screenWidth) {
 // Favorites functionality
 async function addToFavorites(type, itemId) {
   try {
-    if (!firebaseInitialized) {
-      showNotification('Firebase not connected. Please set up Firebase configuration.', 'error');
+    if (!supabaseInitialized) {
+      showNotification('Supabase not connected. Please set up Supabase configuration.', 'error');
       return;
     }
 
     // Dynamic import for UserFavoritesService
-    const { UserFavoritesService } = await import('./firebase-service.js');
+    const { UserFavoritesService } = await import('./supabase-service.js');
 
     // For now, use a temporary user ID (will be replaced with actual auth)
     const tempUserId = 'temp-user-' + Date.now();

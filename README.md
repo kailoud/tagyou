@@ -10,7 +10,7 @@ A modern, interactive London map application for festival-goers, featuring real-
 - 🎵 Artists and bands information
 - ❤️ User favorites system
 - 📱 Responsive design for all devices
-- 🔄 Real-time updates via Firebase
+- 🔄 Real-time updates via Supabase
 - 🎨 Modern, clean UI
 
 ## Getting Started
@@ -82,23 +82,24 @@ This project uses Supabase for:
 
 ### Adding New Features
 
-1. **Add new data types**: Update `firebase-service.js`
+1. **Add new data types**: Update `supabase-service.js`
 2. **Add new UI components**: Modify `script.js` and `styles.css`
-3. **Add authentication**: Extend Firebase Auth integration
+3. **Add authentication**: Extend Supabase Auth integration
 4. **Add offline support**: Implement service workers
 
 ## Deployment
 
-1. Set up Firebase Hosting:
+1. Set up Vercel or Netlify:
    ```bash
-   npm install -g firebase-tools
-   firebase login
-   firebase init hosting
+   npm install -g vercel
+   vercel login
+   vercel
    ```
 
 2. Build and deploy:
    ```bash
-   firebase deploy
+   npm run build
+   # Upload dist/ folder to your hosting provider
    ```
 
 ## Contributing

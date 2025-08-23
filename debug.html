@@ -38,61 +38,50 @@
     function test1() {
       log('=== Test 1: Loading Scripts ===');
 
-      // Load Firebase
-      const firebaseScript = document.createElement('script');
-      firebaseScript.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js';
-      firebaseScript.onload = () => {
-        log('✅ Firebase loaded');
+      // Load Supabase
+      const supabaseScript = document.createElement('script');
+      supabaseScript.src = 'https://unpkg.com/@supabase/supabase-js@2';
+      supabaseScript.onload = () => {
+        log('✅ Supabase loaded');
 
-        // Load Firebase Auth
-        const authScript = document.createElement('script');
-        authScript.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js';
-        authScript.onload = () => {
-          log('✅ Firebase Auth loaded');
+        // Load Supabase Config
+        const configScript = document.createElement('script');
+        configScript.src = 'supabase-config.js';
+        configScript.onload = () => {
+          log('✅ Supabase Config loaded');
 
-          // Load Firebase Config
-          const configScript = document.createElement('script');
-          configScript.src = 'firebase-config.js';
-          configScript.onload = () => {
-            log('✅ Firebase Config loaded');
+          // Load Auth Service
+          const authServiceScript = document.createElement('script');
+          authServiceScript.src = 'supabase-auth-service.js';
+          authServiceScript.onload = () => {
+            log('✅ Auth Service loaded');
 
-            // Load Auth Service
-            const authServiceScript = document.createElement('script');
-            authServiceScript.src = 'auth-service.js';
-            authServiceScript.onload = () => {
-              log('✅ Auth Service loaded');
-
-              // Load Mobile Auth
-              const mobileAuthScript = document.createElement('script');
-              mobileAuthScript.src = 'mobile-auth.js';
-              mobileAuthScript.onload = () => {
-                log('✅ Mobile Auth loaded');
-                log('✅ All scripts loaded successfully!');
-              };
-              mobileAuthScript.onerror = () => {
-                log('❌ Mobile Auth failed to load');
-              };
-              document.head.appendChild(mobileAuthScript);
+            // Load Mobile Auth
+            const mobileAuthScript = document.createElement('script');
+            mobileAuthScript.src = 'mobile-auth.js';
+            mobileAuthScript.onload = () => {
+              log('✅ Mobile Auth loaded');
+              log('✅ All scripts loaded successfully!');
             };
-            authServiceScript.onerror = () => {
-              log('❌ Auth Service failed to load');
+            mobileAuthScript.onerror = () => {
+              log('❌ Mobile Auth failed to load');
             };
-            document.head.appendChild(authServiceScript);
+            document.head.appendChild(mobileAuthScript);
           };
-          configScript.onerror = () => {
-            log('❌ Firebase Config failed to load');
+          authServiceScript.onerror = () => {
+            log('❌ Auth Service failed to load');
           };
-          document.head.appendChild(configScript);
+          document.head.appendChild(authServiceScript);
         };
-        authScript.onerror = () => {
-          log('❌ Firebase Auth failed to load');
+        configScript.onerror = () => {
+          log('❌ Supabase Config failed to load');
         };
-        document.head.appendChild(authScript);
+        document.head.appendChild(configScript);
       };
-      firebaseScript.onerror = () => {
-        log('❌ Firebase failed to load');
+      supabaseScript.onerror = () => {
+        log('❌ Supabase failed to load');
       };
-      document.head.appendChild(firebaseScript);
+      document.head.appendChild(supabaseScript);
     }
 
     function test2() {

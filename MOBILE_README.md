@@ -26,7 +26,7 @@ A dedicated mobile authentication system for TagYou2 that provides a complete mo
 - **Auto-Close** - Closes on outside tap
 
 ### 🔧 Technical Features
-- **Firebase Integration** - Uses existing Firebase Auth service
+- **Supabase Integration** - Uses existing Supabase Auth service
 - **Error Handling** - Comprehensive error management
 - **Session Management** - Integrates with existing auth system
 - **Modular Design** - Completely separate from main application code
@@ -52,7 +52,7 @@ let mobileAuth = new MobileAuth();
 ### 4. Authentication Modal
 - Full-screen modal for sign in/sign up
 - Form validation with real-time feedback
-- Integrates with Firebase Auth service
+- Integrates with Supabase Auth service
 - Success/error messaging
 
 ## 📱 Mobile Breakpoints
@@ -116,7 +116,7 @@ window.mobileAuth.testMobileSignUp();
 ## 🔒 Security
 
 - **Client-Side Validation** - Prevents invalid submissions
-- **Firebase Auth** - Secure authentication via Firebase
+- **Supabase Auth** - Secure authentication via Supabase
 - **Error Handling** - Safe error messages without exposing sensitive data
 - **Session Management** - Integrates with existing auth system
 
@@ -180,7 +180,7 @@ Edit `mobile-auth.js` to customize:
    - Verify mobile breakpoints
 
 3. **Authentication fails**
-   - Check Firebase configuration
+   - Check Supabase configuration
    - Verify `window.authService` exists
    - Check network connectivity
 
