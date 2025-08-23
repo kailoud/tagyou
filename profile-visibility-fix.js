@@ -452,6 +452,18 @@ window.ensureModernProfileUI = ensureModernProfileUI;
 window.ensureAuthModalEventListeners = ensureAuthModalEventListeners;
 window.removeOldAuthConflicts = removeOldAuthConflicts;
 window.initializeProfileFix = initializeProfileFix;
+window.updateProfilePositioning = updateProfilePositioning;
+
+// Test function to manually switch states
+window.testAuthenticatedState = function () {
+  console.log('🧪 Testing authenticated state...');
+  showAuthenticatedState('test@example.com');
+};
+
+window.testGuestState = function () {
+  console.log('🧪 Testing guest state...');
+  handleSignOut();
+};
 
 // Direct auth modal function
 window.showAuthModalDirect = function () {
@@ -597,16 +609,26 @@ window.handleAuthSubmitDirect = function (event) {
 window.showAuthenticatedState = function (email) {
   console.log('👤 Showing authenticated state for:', email);
 
-  // Hide guest state
+  // Force hide guest state with multiple approaches
   const profileGuest = document.getElementById('profileGuest');
   if (profileGuest) {
-    profileGuest.style.display = 'none';
+    profileGuest.style.display = 'none !important';
+    profileGuest.style.visibility = 'hidden !important';
+    profileGuest.style.opacity = '0 !important';
+    profileGuest.style.position = 'absolute !important';
+    profileGuest.style.left = '-9999px !important';
+    console.log('✅ Guest state forcefully hidden');
   }
 
-  // Show authenticated state
+  // Force show authenticated state
   const profileAuthenticated = document.getElementById('profileAuthenticated');
   if (profileAuthenticated) {
-    profileAuthenticated.style.display = 'flex';
+    profileAuthenticated.style.display = 'flex !important';
+    profileAuthenticated.style.visibility = 'visible !important';
+    profileAuthenticated.style.opacity = '1 !important';
+    profileAuthenticated.style.position = 'relative !important';
+    profileAuthenticated.style.left = 'auto !important';
+    console.log('✅ Authenticated state forcefully shown');
   }
 
   // Update user info
@@ -623,6 +645,14 @@ window.showAuthenticatedState = function (email) {
   }
   if (profileUserEmail) {
     profileUserEmail.textContent = email;
+  }
+
+  // Force update the profile container to show authenticated state
+  const profileContainer = document.querySelector('.profile-container');
+  if (profileContainer) {
+    profileContainer.style.display = 'flex !important';
+    profileContainer.style.visibility = 'visible !important';
+    profileContainer.style.opacity = '1 !important';
   }
 
   console.log('✅ Authenticated state shown successfully');
@@ -644,16 +674,26 @@ window.showUserMenu = function () {
 window.handleSignOut = function () {
   console.log('👋 Signing out...');
 
-  // Hide authenticated state
+  // Force hide authenticated state
   const profileAuthenticated = document.getElementById('profileAuthenticated');
   if (profileAuthenticated) {
-    profileAuthenticated.style.display = 'none';
+    profileAuthenticated.style.display = 'none !important';
+    profileAuthenticated.style.visibility = 'hidden !important';
+    profileAuthenticated.style.opacity = '0 !important';
+    profileAuthenticated.style.position = 'absolute !important';
+    profileAuthenticated.style.left = '-9999px !important';
+    console.log('✅ Authenticated state forcefully hidden');
   }
 
-  // Show guest state
+  // Force show guest state
   const profileGuest = document.getElementById('profileGuest');
   if (profileGuest) {
-    profileGuest.style.display = 'flex';
+    profileGuest.style.display = 'flex !important';
+    profileGuest.style.visibility = 'visible !important';
+    profileGuest.style.opacity = '1 !important';
+    profileGuest.style.position = 'relative !important';
+    profileGuest.style.left = 'auto !important';
+    console.log('✅ Guest state forcefully shown');
   }
 
   // Hide user menu
@@ -662,6 +702,14 @@ window.handleSignOut = function () {
   if (userMenu && userBtn) {
     userMenu.classList.remove('show');
     userBtn.classList.remove('active');
+  }
+
+  // Force update the profile container to show guest state
+  const profileContainer = document.querySelector('.profile-container');
+  if (profileContainer) {
+    profileContainer.style.display = 'flex !important';
+    profileContainer.style.visibility = 'visible !important';
+    profileContainer.style.opacity = '1 !important';
   }
 
   console.log('✅ Signed out successfully');
