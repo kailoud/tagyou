@@ -718,11 +718,18 @@ window.handleSignOut = function () {
     console.log('✅ Large avatar reset to default and hidden');
   }
 
-  // Hide user menu first
+  // Hide user menu first - ensure it's completely hidden
   const userMenu = document.getElementById('profileUserMenu');
   const userBtn = document.getElementById('profileUserBtn');
-  if (userMenu && userBtn) {
+  if (userMenu) {
     userMenu.classList.remove('show');
+    userMenu.style.display = 'none';
+    userMenu.style.visibility = 'hidden';
+    userMenu.style.opacity = '0';
+    userMenu.style.transform = 'translateY(-10px)';
+    console.log('✅ User menu completely hidden');
+  }
+  if (userBtn) {
     userBtn.classList.remove('active');
   }
 
@@ -800,6 +807,28 @@ window.handleSignOut = function () {
       console.log('✅ New Sign In button styled and positioned');
     }
   }, 400);
+
+  // Final cleanup - ensure no remnants are visible
+  setTimeout(() => {
+    // Hide any remaining user menu elements
+    const allUserMenuElements = document.querySelectorAll('.profile-user-menu, .profile-user-header, .profile-user-info, .profile-user-actions');
+    allUserMenuElements.forEach(element => {
+      element.style.display = 'none';
+      element.style.visibility = 'hidden';
+      element.style.opacity = '0';
+    });
+
+    // Clear any user info text
+    const userInfoElements = document.querySelectorAll('#profileUserName, #profileUserDisplayName, #profileUserEmail');
+    userInfoElements.forEach(element => {
+      if (element) {
+        element.textContent = '';
+        element.style.display = 'none';
+      }
+    });
+
+    console.log('✅ Final cleanup completed - all user elements hidden');
+  }, 500);
 
   console.log('✅ Signed out successfully with avatar reset and smooth transition');
 };
