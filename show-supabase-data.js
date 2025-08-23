@@ -212,10 +212,10 @@ function createDataSection(title, data) {
 // Export for manual use
 export default showSupabaseData;
 
-// Auto-run if this script is loaded directly
-if (typeof window !== 'undefined') {
-  // Wait a bit for everything to load
-  setTimeout(() => {
-    showSupabaseData();
-  }, 2000);
-}
+// Auto-run disabled - only run when explicitly called
+// if (typeof window !== 'undefined') {
+//   // Wait a bit for everything to load
+//   setTimeout(() => {
+//     showSupabaseData();
+//   }, 2000);
+// }

@@ -110,10 +110,10 @@ async function runSupabaseDiagnostic() {
 // Export for manual use
 export default runSupabaseDiagnostic;
 
-// Auto-run if this script is loaded directly
-if (typeof window !== 'undefined') {
-  // Wait a bit for everything to load
-  setTimeout(() => {
-    runSupabaseDiagnostic();
-  }, 1000);
-}
+// Auto-run disabled - only run when explicitly called
+// if (typeof window !== 'undefined') {
+//   // Wait a bit for everything to load
+//   setTimeout(() => {
+//     runSupabaseDiagnostic();
+//   }, 1000);
+// }
