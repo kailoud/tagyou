@@ -2284,10 +2284,14 @@ input:checked+.slider:before {
   */
 
   .search-container {
-    width: 30%;
-    max-width: 90px;
-    margin-left: 0;
-    margin-right: auto;
+    width: 24% !important;
+    /* 30% * 0.8 = 24% (20% reduction) */
+    max-width: 72px !important;
+    /* 90px * 0.8 = 72px (20% reduction) */
+    margin-left: auto !important;
+    /* Center the search bar */
+    margin-right: auto !important;
+    /* Center the search bar */
   }
 
   .search-bar {
