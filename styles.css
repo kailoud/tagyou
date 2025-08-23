@@ -2395,7 +2395,9 @@ input:checked+.slider:before {
   }
 
   .mobile-profile-dropdown.show {
-    display: block;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
     animation: mobileDropdownSlide 0.3s ease;
     /* Ensure dropdown is fully visible on mobile */
     max-height: calc(100vh - 100px);

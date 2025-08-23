@@ -174,6 +174,8 @@
       <button class="btn" onclick="testSignIn()">🔐 Test Sign In</button>
       <button class="btn" onclick="testMobileSignUp()">📱 Test Mobile Sign Up</button>
       <button class="btn" onclick="testMobileElements()">📱 Show Mobile Elements</button>
+      <button class="btn" onclick="testDropdownClose()">📱 Test Dropdown Close</button>
+      <button class="btn" onclick="testAuthServiceConnection()">🔗 Test Auth Service</button>
       <button class="btn" onclick="clearData()">🗑️ Clear Data</button>
     </div>
 
@@ -337,6 +339,24 @@
       console.log('🧪 Testing mobile elements visibility...');
       if (window.mobileAuth && typeof window.mobileAuth.showMobileElements === 'function') {
         window.mobileAuth.showMobileElements();
+      } else {
+        alert('Mobile auth module not available. Please check the console for errors.');
+      }
+    }
+
+    function testDropdownClose() {
+      console.log('🧪 Testing dropdown close functionality...');
+      if (window.mobileAuth && typeof window.mobileAuth.testDropdownClose === 'function') {
+        window.mobileAuth.testDropdownClose();
+      } else {
+        alert('Mobile auth module not available. Please check the console for errors.');
+      }
+    }
+
+    function testAuthServiceConnection() {
+      console.log('🧪 Testing auth service connection...');
+      if (window.mobileAuth && typeof window.mobileAuth.testAuthServiceConnection === 'function') {
+        window.mobileAuth.testAuthServiceConnection();
       } else {
         alert('Mobile auth module not available. Please check the console for errors.');
       }

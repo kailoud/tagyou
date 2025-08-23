@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Debug Mobile Auth</title>
+</head>
+
+<body>
+  <h1>Debug Mobile Auth</h1>
+  <button onclick="test1()">Test 1: Load Scripts</button>
+  <button onclick="test2()">Test 2: Create Mobile Auth</button>
+  <button onclick="test3()">Test 3: Show Modal</button>
+  <div id="output"></div>
+
+  <script>
+    function log(msg) {
+      console.log(msg);
+      document.getElementById('output').innerHTML += msg + '<br>';
+    }
+
+    function test1() {
+      log('=== Test 1: Loading Scripts ===');
+
+      // Load Firebase
+      const firebaseScript = document.createElement('script');
+      firebaseScript.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js';
+      firebaseScript.onload = () => {
+        log('✅ Firebase loaded');
+
+        // Load Firebase Auth
+        const authScript = document.createElement('script');
+        authScript.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js';
+        authScript.onload = () => {
+          log('✅ Firebase Auth loaded');
+
+          // Load Firebase Config
+          const configScript = document.createElement('script');
+          configScript.src = 'firebase-config.js';
+          configScript.onload = () => {
+            log('✅ Firebase Config loaded');
+
+            // Load Auth Service
+            const authServiceScript = document.createElement('script');
+            authServiceScript.src = 'auth-service.js';
+            authServiceScript.onload = () => {
+              log('✅ Auth Service loaded');
+
+              // Load Mobile Auth
+              const mobileAuthScript = document.createElement('script');
+              mobileAuthScript.src = 'mobile-auth.js';
+              mobileAuthScript.onload = () => {
+                log('✅ Mobile Auth loaded');
+                log('✅ All scripts loaded successfully!');
+              };
+              mobileAuthScript.onerror = () => {
+                log('❌ Mobile Auth failed to load');
+              };
+              document.head.appendChild(mobileAuthScript);
+            };
+            authServiceScript.onerror = () => {
+              log('❌ Auth Service failed to load');
+            };
+            document.head.appendChild(authServiceScript);
+          };
+          configScript.onerror = () => {
+            log('❌ Firebase Config failed to load');
+          };
+          document.head.appendChild(configScript);
+        };
+        authScript.onerror = () => {
+          log('❌ Firebase Auth failed to load');
+        };
+        document.head.appendChild(authScript);
+      };
+      firebaseScript.onerror = () => {
+        log('❌ Firebase failed to load');
+      };
+      document.head.appendChild(firebaseScript);
+    }
+
+    function test2() {
+      log('=== Test 2: Creating Mobile Auth ===');
+
+      if (typeof MobileAuth === 'undefined') {
+        log('❌ MobileAuth class not found');
+        return;
+      }
+
+      try {
+        log('📱 Creating MobileAuth instance...');
+        const mobileAuth = new MobileAuth();
+        log('✅ MobileAuth instance created');
+
+        window.mobileAuth = mobileAuth;
+        log('✅ Assigned to window.mobileAuth');
+
+        log('📱 Testing methods:');
+        log('- showSignUpModal: ' + (typeof mobileAuth.showSignUpModal));
+        log('- showSignInModal: ' + (typeof mobileAuth.showSignInModal));
+
+      } catch (error) {
+        log('❌ Error creating MobileAuth: ' + error.message);
+      }
+    }
+
+    function test3() {
+      log('=== Test 3: Showing Modal ===');
+
+      if (!window.mobileAuth) {
+        log('❌ Mobile auth not available');
+        return;
+      }
+
+      try {
+        log('📱 Calling showSignUpModal...');
+        window.mobileAuth.showSignUpModal();
+        log('✅ Modal should be visible now');
+      } catch (error) {
+        log('❌ Error showing modal: ' + error.message);
+      }
+    }
+  </script>
+</body>
+
+</html>

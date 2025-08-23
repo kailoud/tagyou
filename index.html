@@ -23,38 +23,9 @@
   <!-- Mobile Authentication Module -->
   <script src="mobile-auth.js"></script>
 
-  <!-- Test script for mobile functionality -->
-  <script>
-    // Add test button for mobile functionality
-    document.addEventListener('DOMContentLoaded', function () {
-      setTimeout(() => {
-        const testButton = document.createElement('button');
-        testButton.textContent = '🧪 Test Mobile';
-        testButton.style.cssText = `
-          position: fixed;
-          top: 80px;
-          right: 15px;
-          z-index: 9999;
-          background: #ff6b6b;
-          color: white;
-          border: none;
-          padding: 10px 15px;
-          border-radius: 5px;
-          cursor: pointer;
-          font-size: 12px;
-        `;
-        testButton.onclick = function () {
-          if (window.mobileAuth) {
-            window.mobileAuth.showMobileElements();
-            alert('Mobile elements should now be visible! Check the top-right corner.');
-          } else {
-            alert('Mobile auth module not loaded!');
-          }
-        };
-        document.body.appendChild(testButton);
-      }, 2000);
-    });
-  </script>
+
+
+
 
 
 </head>
@@ -501,6 +472,78 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="script.js"></script>
+
+
+
+  <script>
+
+
+    // Force show mobile elements (only for testing)
+    function forceShowMobileElements() {
+      console.log('🔧 Force showing mobile elements for testing...');
+
+      // Only show mobile elements if we're in test mode or on mobile
+      const isMobile = window.innerWidth <= 480;
+      const isTestMode = document.body.classList.contains('mobile-test-mode');
+
+      if (!isMobile && !isTestMode) {
+        console.log('📱 Not mobile and not in test mode, skipping force show');
+        return;
+      }
+
+      // Force show mobile profile button
+      const mobileButton = document.getElementById('mobileProfileButton');
+      if (mobileButton) {
+        mobileButton.style.display = 'flex';
+        mobileButton.style.visibility = 'visible';
+        mobileButton.style.opacity = '1';
+        mobileButton.style.position = 'fixed';
+        mobileButton.style.top = '15px';
+        mobileButton.style.right = '15px';
+        mobileButton.style.zIndex = '1001';
+        console.log('✅ Mobile profile button forced visible');
+      } else {
+        console.log('❌ Mobile profile button not found');
+      }
+
+      // Force show mobile profile dropdown (but don't open it)
+      const mobileDropdown = document.getElementById('mobileProfileDropdown');
+      if (mobileDropdown) {
+        mobileDropdown.style.display = 'block';
+        mobileDropdown.style.visibility = 'visible';
+        mobileDropdown.style.opacity = '1';
+        // Ensure dropdown is closed by default
+        mobileDropdown.classList.remove('show');
+        console.log('✅ Mobile profile dropdown forced visible (closed)');
+      } else {
+        console.log('❌ Mobile profile dropdown not found');
+      }
+    }
+
+
+
+    // Auto-test mobile auth on page load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        console.log('🚀 Page loaded, checking mobile auth...');
+
+        // Force show mobile elements only on mobile
+        if (window.innerWidth <= 480) {
+          forceShowMobileElements();
+        }
+
+        if (window.mobileAuth) {
+          console.log('✅ Mobile auth is available on page load');
+          if (typeof window.mobileAuth.quickTest === 'function') {
+            console.log('✅ Running quick test...');
+            window.mobileAuth.quickTest();
+          }
+        } else {
+          console.warn('⚠️ Mobile auth not available on page load');
+        }
+      }, 3000);
+    });
+  </script>
 </body>
 
 </html>

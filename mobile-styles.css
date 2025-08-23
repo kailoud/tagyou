@@ -14,10 +14,10 @@
     right: 0 !important;
     width: 100vw !important;
     padding: 10px 15px !important;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.95), rgba(118, 75, 162, 0.95)) !important;
-    backdrop-filter: blur(10px) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1) !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
     z-index: 1000 !important;
     display: flex !important;
     gap: 10px !important;
@@ -37,9 +37,19 @@
   .search-bar {
     width: 100% !important;
     max-width: none !important;
-    background: rgba(255, 255, 255, 0.9) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
     border-radius: 25px !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    height: 50px !important;
+    min-height: 50px !important;
+  }
+
+  /* Mobile search input - match festivals button styling */
+  .search-input {
+    color: #666 !important;
+    font-size: 14px !important;
+    padding: 8px 16px !important;
   }
 
   /* Mobile festivals container - full width */
@@ -54,10 +64,19 @@
   .festivals-button {
     width: 100% !important;
     max-width: none !important;
-    background: rgba(255, 255, 255, 0.9) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
     border-radius: 25px !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
     font-weight: 600 !important;
+    height: 50px !important;
+    min-height: 50px !important;
+    font-size: 14px !important;
+    color: #666 !important;
+    padding: 8px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   /* Mobile profile container - repositioned */
@@ -77,9 +96,10 @@
     top: 10px !important;
     right: 70px !important;
     z-index: 1001 !important;
-    background: rgba(255, 255, 255, 0.9) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
     border-radius: 20px !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
   }
 }
 
@@ -95,7 +115,7 @@
   width: 50px;
   height: 50px;
   background: linear-gradient(135deg, #667eea, #764ba2);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 50%;
   cursor: pointer;
   display: none;
@@ -103,7 +123,7 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
 }
 
@@ -128,15 +148,19 @@
   border-radius: 12px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   z-index: 1001;
-  display: none;
+  display: none !important;
   /* Hidden by default */
   border: 1px solid rgba(0, 0, 0, 0.1);
   overflow-y: auto;
   overflow-x: hidden;
+  visibility: hidden;
+  opacity: 0;
 }
 
 .mobile-profile-dropdown.show {
-  display: block;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
   animation: mobileDropdownSlide 0.3s ease;
   max-height: calc(100vh - 100px);
   overflow-y: auto;
@@ -163,6 +187,27 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  position: relative;
+}
+
+/* Mobile dropdown close button */
+.mobile-dropdown-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  z-index: 10;
+}
+
+.mobile-dropdown-close:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .mobile-profile-avatar {
@@ -447,17 +492,24 @@
   .search-bar {
     padding: 4px !important;
     min-height: 36px !important;
+    height: 36px !important;
   }
 
   .search-input {
     font-size: 12px !important;
     padding: 6px 8px !important;
+    color: #666 !important;
   }
 
   .festivals-button {
     padding: 6px 12px !important;
     font-size: 12px !important;
     min-height: 36px !important;
+    height: 36px !important;
+    color: #666 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   .mobile-profile-dropdown {
@@ -495,11 +547,34 @@
 @media (max-width: 480px) {
   .mobile-profile-button {
     display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
+  /* Mobile dropdown should remain hidden by default, only show when .show class is added */
   .mobile-profile-dropdown {
-    display: block !important;
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
   }
+
+  /* Only show dropdown when explicitly opened */
+  .mobile-profile-dropdown.show {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+/* FORCE SHOW MOBILE ELEMENTS FOR TESTING - ONLY WHEN TESTING */
+.mobile-test-mode .mobile-profile-button {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: fixed !important;
+  top: 15px !important;
+  right: 15px !important;
+  z-index: 1001 !important;
 }
 
 /* Hide desktop profile on mobile */

@@ -1069,17 +1069,17 @@ function initProfileButton() {
     e.preventDefault();
     e.stopPropagation();
 
-    console.log('Profile button clicked - Mobile:', window.innerWidth <= 768);
+    console.log('Desktop Profile button clicked - Mobile:', false);
 
     const isOpen = profileDropdown.classList.contains('show');
-    console.log('Dropdown currently open:', isOpen);
+    console.log('Desktop dropdown currently open:', isOpen);
 
     if (isOpen) {
       profileDropdown.classList.remove('show');
-      console.log('Dropdown closed');
+      console.log('Desktop dropdown closed');
     } else {
       profileDropdown.classList.add('show');
-      console.log('Dropdown opened');
+      console.log('Desktop dropdown opened');
     }
   };
 

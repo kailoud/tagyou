@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Mobile Auth Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    .test-btn {
+      background: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .log {
+      background: #f8f9fa;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🧪 Simple Mobile Auth Test</h1>
+
+  <button class="test-btn" onclick="test1()">Test 1: Check Scripts Loaded</button>
+  <button class="test-btn" onclick="test2()">Test 2: Check Firebase</button>
+  <button class="test-btn" onclick="test3()">Test 3: Check Auth Service</button>
+  <button class="test-btn" onclick="test4()">Test 4: Check Mobile Auth</button>
+  <button class="test-btn" onclick="test5()">Test 5: Show Mobile Sign Up</button>
+
+  <div id="log" class="log">Click a test button to see results...</div>
+
+  <!-- Load scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script type="module" src="auth-service.js"></script>
+  <script src="mobile-auth.js"></script>
+
+  <script>
+    function log(message) {
+      const logDiv = document.getElementById('log');
+      logDiv.textContent += message + '\n';
+      console.log(message);
+    }
+
+    function test1() {
+      log('=== Test 1: Check Scripts Loaded ===');
+      log('Firebase loaded: ' + (typeof firebase !== 'undefined'));
+      log('Auth service loaded: ' + (typeof AuthService !== 'undefined'));
+      log('Mobile auth loaded: ' + (typeof MobileAuth !== 'undefined'));
+      log('Window authService: ' + (!!window.authService));
+      log('Window mobileAuth: ' + (!!window.mobileAuth));
+    }
+
+    function test2() {
+      log('=== Test 2: Check Firebase ===');
+      if (typeof firebase !== 'undefined') {
+        log('✅ Firebase is loaded');
+        log('Firebase apps: ' + firebase.apps.length);
+        if (firebase.apps.length > 0) {
+          log('✅ Firebase is initialized');
+        } else {
+          log('❌ Firebase not initialized');
+        }
+      } else {
+        log('❌ Firebase not loaded');
+      }
+    }
+
+    function test3() {
+      log('=== Test 3: Check Auth Service ===');
+      if (window.authService) {
+        log('✅ Auth service exists');
+        log('Auth service methods: ' + Object.keys(window.authService).length);
+        log('Current user: ' + (window.authService.currentUser ? 'Yes' : 'No'));
+      } else {
+        log('❌ Auth service not found');
+      }
+    }
+
+    function test4() {
+      log('=== Test 4: Check Mobile Auth ===');
+      if (window.mobileAuth) {
+        log('✅ Mobile auth exists');
+        log('Mobile auth methods: ' + Object.keys(window.mobileAuth).length);
+        log('Mobile button exists: ' + (!!document.getElementById('mobileProfileButton')));
+        log('Mobile dropdown exists: ' + (!!document.getElementById('mobileProfileDropdown')));
+      } else {
+        log('❌ Mobile auth not found');
+      }
+    }
+
+    function test5() {
+      log('=== Test 5: Show Mobile Sign Up ===');
+      if (window.mobileAuth && window.mobileAuth.showSignUpModal) {
+        log('✅ Calling showSignUpModal...');
+        window.mobileAuth.showSignUpModal();
+        log('✅ Modal should be visible now');
+      } else {
+        log('❌ Mobile auth or showSignUpModal not available');
+      }
+    }
+
+    // Auto-test on load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        log('🚀 Page loaded, running auto-test...');
+        test1();
+        test2();
+        test3();
+        test4();
+      }, 2000);
+    });
+  </script>
+</body>
+
+</html>
