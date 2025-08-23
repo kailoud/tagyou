@@ -465,6 +465,31 @@ window.testGuestState = function () {
   handleSignOut();
 };
 
+// Test complete sign out flow
+window.testCompleteSignOut = function () {
+  console.log('🧪 Testing complete sign out flow...');
+
+  // First ensure we're in authenticated state
+  if (!document.getElementById('profileGuest')) {
+    console.log('🔄 Setting up authenticated state first...');
+    showAuthenticatedState('test@example.com');
+
+    // Wait a moment, then sign out
+    setTimeout(() => {
+      console.log('🔄 Now testing sign out...');
+      handleSignOut();
+    }, 1000);
+  } else {
+    console.log('🔄 Already in guest state, testing sign in then sign out...');
+    showAuthenticatedState('test@example.com');
+
+    setTimeout(() => {
+      console.log('🔄 Now testing sign out...');
+      handleSignOut();
+    }, 1000);
+  }
+};
+
 // Direct auth modal function
 window.showAuthModalDirect = function () {
   console.log('🔐 showAuthModalDirect called!');
@@ -609,26 +634,21 @@ window.handleAuthSubmitDirect = function (event) {
 window.showAuthenticatedState = function (email) {
   console.log('👤 Showing authenticated state for:', email);
 
-  // Force hide guest state with multiple approaches
+  // AGGRESSIVE: Remove guest state from DOM completely
   const profileGuest = document.getElementById('profileGuest');
   if (profileGuest) {
-    profileGuest.style.display = 'none !important';
-    profileGuest.style.visibility = 'hidden !important';
-    profileGuest.style.opacity = '0 !important';
-    profileGuest.style.position = 'absolute !important';
-    profileGuest.style.left = '-9999px !important';
-    console.log('✅ Guest state forcefully hidden');
+    profileGuest.remove();
+    console.log('✅ Guest state completely removed from DOM');
   }
 
   // Force show authenticated state
   const profileAuthenticated = document.getElementById('profileAuthenticated');
   if (profileAuthenticated) {
-    profileAuthenticated.style.display = 'flex !important';
-    profileAuthenticated.style.visibility = 'visible !important';
-    profileAuthenticated.style.opacity = '1 !important';
-    profileAuthenticated.style.position = 'relative !important';
-    profileAuthenticated.style.left = 'auto !important';
-    console.log('✅ Authenticated state forcefully shown');
+    profileAuthenticated.style.display = 'flex';
+    profileAuthenticated.style.visibility = 'visible';
+    profileAuthenticated.style.opacity = '1';
+    profileAuthenticated.style.position = 'relative';
+    console.log('✅ Authenticated state shown');
   }
 
   // Update user info
@@ -647,12 +667,12 @@ window.showAuthenticatedState = function (email) {
     profileUserEmail.textContent = email;
   }
 
-  // Force update the profile container to show authenticated state
+  // Force update the profile container
   const profileContainer = document.querySelector('.profile-container');
   if (profileContainer) {
-    profileContainer.style.display = 'flex !important';
-    profileContainer.style.visibility = 'visible !important';
-    profileContainer.style.opacity = '1 !important';
+    profileContainer.style.display = 'flex';
+    profileContainer.style.visibility = 'visible';
+    profileContainer.style.opacity = '1';
   }
 
   console.log('✅ Authenticated state shown successfully');
@@ -674,29 +694,31 @@ window.showUserMenu = function () {
 window.handleSignOut = function () {
   console.log('👋 Signing out...');
 
-  // Force hide authenticated state
-  const profileAuthenticated = document.getElementById('profileAuthenticated');
-  if (profileAuthenticated) {
-    profileAuthenticated.style.display = 'none !important';
-    profileAuthenticated.style.visibility = 'hidden !important';
-    profileAuthenticated.style.opacity = '0 !important';
-    profileAuthenticated.style.position = 'absolute !important';
-    profileAuthenticated.style.left = '-9999px !important';
-    console.log('✅ Authenticated state forcefully hidden');
+  // First, reset avatar to default state (user icon) and then hide it
+  const profileUserAvatar = document.getElementById('profileUserAvatar');
+  const profileUserAvatarLarge = document.getElementById('profileUserAvatarLarge');
+
+  if (profileUserAvatar) {
+    // Clear any custom avatar and show default user icon
+    profileUserAvatar.innerHTML = '<i class="fas fa-user"></i>';
+    // Hide the avatar
+    profileUserAvatar.style.display = 'none';
+    profileUserAvatar.style.visibility = 'hidden';
+    profileUserAvatar.style.opacity = '0';
+    console.log('✅ Avatar reset to default and hidden');
   }
 
-  // Force show guest state
-  const profileGuest = document.getElementById('profileGuest');
-  if (profileGuest) {
-    profileGuest.style.display = 'flex !important';
-    profileGuest.style.visibility = 'visible !important';
-    profileGuest.style.opacity = '1 !important';
-    profileGuest.style.position = 'relative !important';
-    profileGuest.style.left = 'auto !important';
-    console.log('✅ Guest state forcefully shown');
+  if (profileUserAvatarLarge) {
+    // Clear any custom avatar and show default user icon
+    profileUserAvatarLarge.innerHTML = '<i class="fas fa-user"></i>';
+    // Hide the large avatar
+    profileUserAvatarLarge.style.display = 'none';
+    profileUserAvatarLarge.style.visibility = 'hidden';
+    profileUserAvatarLarge.style.opacity = '0';
+    console.log('✅ Large avatar reset to default and hidden');
   }
 
-  // Hide user menu
+  // Hide user menu first
   const userMenu = document.getElementById('profileUserMenu');
   const userBtn = document.getElementById('profileUserBtn');
   if (userMenu && userBtn) {
@@ -704,15 +726,82 @@ window.handleSignOut = function () {
     userBtn.classList.remove('active');
   }
 
-  // Force update the profile container to show guest state
-  const profileContainer = document.querySelector('.profile-container');
-  if (profileContainer) {
-    profileContainer.style.display = 'flex !important';
-    profileContainer.style.visibility = 'visible !important';
-    profileContainer.style.opacity = '1 !important';
+  // Hide authenticated state with fade out effect
+  const profileAuthenticated = document.getElementById('profileAuthenticated');
+  if (profileAuthenticated) {
+    profileAuthenticated.style.opacity = '0';
+    profileAuthenticated.style.transform = 'scale(0.95)';
+    profileAuthenticated.style.transition = 'all 0.3s ease';
+
+    setTimeout(() => {
+      profileAuthenticated.style.display = 'none';
+      profileAuthenticated.style.visibility = 'hidden';
+      console.log('✅ Authenticated state hidden with fade effect');
+    }, 300);
   }
 
-  console.log('✅ Signed out successfully');
+  // RECREATE guest state since we removed it
+  const profileSystem = document.querySelector('.profile-system');
+  if (profileSystem && !document.getElementById('profileGuest')) {
+    const guestHTML = `
+      <div class="profile-guest" id="profileGuest" style="opacity: 0; transform: scale(0.95);">
+        <button class="profile-signin-btn" id="profileSignInBtn" onclick="showAuthModalDirect()">
+          <i class="fas fa-sign-in-alt"></i>
+          <span>Sign In</span>
+        </button>
+      </div>
+    `;
+    profileSystem.insertAdjacentHTML('afterbegin', guestHTML);
+    console.log('✅ Guest state recreated');
+  }
+
+  // Force show the profile container and ensure guest state is visible
+  const profileContainer = document.querySelector('.profile-container');
+  if (profileContainer) {
+    profileContainer.style.display = 'flex';
+    profileContainer.style.visibility = 'visible';
+    profileContainer.style.opacity = '1';
+
+    // Force show the newly created guest state with fade in effect
+    const newProfileGuest = document.getElementById('profileGuest');
+    if (newProfileGuest) {
+      newProfileGuest.style.display = 'flex';
+      newProfileGuest.style.visibility = 'visible';
+      newProfileGuest.style.position = 'relative';
+
+      // Fade in effect
+      setTimeout(() => {
+        newProfileGuest.style.opacity = '1';
+        newProfileGuest.style.transform = 'scale(1)';
+        newProfileGuest.style.transition = 'all 0.3s ease';
+        console.log('✅ New guest state shown with fade in effect');
+      }, 350);
+    }
+  }
+
+  // Apply positioning to the new Sign In button
+  setTimeout(() => {
+    const newSignInBtn = document.getElementById('profileSignInBtn');
+    if (newSignInBtn) {
+      newSignInBtn.style.display = 'flex';
+      newSignInBtn.style.visibility = 'visible';
+      newSignInBtn.style.opacity = '1';
+      newSignInBtn.style.position = 'relative';
+      newSignInBtn.style.margin = '0 auto';
+      newSignInBtn.style.justifyContent = 'center';
+      newSignInBtn.style.alignItems = 'center';
+      newSignInBtn.style.minWidth = '120px';
+      newSignInBtn.style.padding = '12px 20px';
+      newSignInBtn.style.fontSize = '14px';
+      newSignInBtn.style.whiteSpace = 'nowrap';
+      newSignInBtn.style.overflow = 'visible';
+      newSignInBtn.style.pointerEvents = 'auto';
+      newSignInBtn.style.cursor = 'pointer';
+      console.log('✅ New Sign In button styled and positioned');
+    }
+  }, 400);
+
+  console.log('✅ Signed out successfully with avatar reset and smooth transition');
 };
 
 // Close user menu when clicking outside
