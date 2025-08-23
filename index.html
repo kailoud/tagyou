@@ -91,9 +91,52 @@
           </button>
         </div>
 
-        <!-- Authenticated State - Simplified -->
+        <!-- Authenticated State -->
         <div class="profile-authenticated" id="profileAuthenticated" style="display: none;">
-          <!-- Profile functionality handled by modern profile system -->
+          <button class="profile-user-btn" id="profileUserBtn" onclick="showUserMenu()">
+            <div class="profile-user-avatar" id="profileUserAvatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <span class="profile-user-name" id="profileUserName">User</span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+
+          <!-- User Menu Dropdown -->
+          <div class="profile-user-menu" id="profileUserMenu">
+            <div class="profile-user-header">
+              <div class="profile-user-avatar-large" id="profileUserAvatarLarge">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="profile-user-info">
+                <h4 id="profileUserDisplayName">User Name</h4>
+                <p id="profileUserEmail">user@example.com</p>
+              </div>
+            </div>
+
+            <div class="profile-user-actions">
+              <button class="profile-menu-item" onclick="showProfileModal()">
+                <i class="fas fa-user-circle"></i>
+                <span>Profile</span>
+              </button>
+              <button class="profile-menu-item" onclick="showFavoritesModal()">
+                <i class="fas fa-heart"></i>
+                <span>Favorites</span>
+              </button>
+              <button class="profile-menu-item" onclick="showSettingsModal()">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+              </button>
+              <button class="profile-menu-item" onclick="showHelpModal()">
+                <i class="fas fa-question-circle"></i>
+                <span>Help</span>
+              </button>
+              <div class="profile-menu-divider"></div>
+              <button class="profile-menu-item profile-signout" onclick="handleSignOut()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

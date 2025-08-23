@@ -47,11 +47,9 @@ function forceProfileVisibility() {
   if (screenWidth >= 361 && screenWidth <= 479) {
     console.log('🎯 In target range (361px-479px) - applying special fixes');
 
-    // Additional fixes for the problematic range
+    // Universal positioning for all screen sizes
     if (profileContainer) {
       profileContainer.style.position = 'fixed';
-      profileContainer.style.top = '20px';
-      profileContainer.style.right = '20px';
       profileContainer.style.display = 'flex';
       profileContainer.style.visibility = 'visible';
       profileContainer.style.opacity = '1';
@@ -60,6 +58,26 @@ function forceProfileVisibility() {
       profileContainer.style.flexDirection = 'row';
       profileContainer.style.alignItems = 'center';
       profileContainer.style.justifyContent = 'center';
+
+      // Responsive positioning based on screen size
+      const screenWidth = window.innerWidth;
+      if (screenWidth <= 480) {
+        // Mobile
+        profileContainer.style.top = '15px';
+        profileContainer.style.right = '15px';
+      } else if (screenWidth <= 768) {
+        // Tablet
+        profileContainer.style.top = '18px';
+        profileContainer.style.right = '18px';
+      } else if (screenWidth <= 1024) {
+        // Desktop
+        profileContainer.style.top = '20px';
+        profileContainer.style.right = '20px';
+      } else {
+        // Large Desktop & Web
+        profileContainer.style.top = '25px';
+        profileContainer.style.right = '25px';
+      }
     }
 
     if (profileSignInBtn) {
@@ -386,9 +404,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Run on window resize
 window.addEventListener('resize', () => {
-  console.log('📱 Window resized, checking profile visibility...');
-  setTimeout(forceProfileVisibility, 100);
+  console.log('📱 Window resized, updating profile positioning...');
+  setTimeout(() => {
+    forceProfileVisibility();
+    updateProfilePositioning();
+  }, 100);
 });
+
+// Function to update profile positioning based on screen size
+function updateProfilePositioning() {
+  const profileContainer = document.querySelector('.profile-container');
+  if (!profileContainer) return;
+
+  const screenWidth = window.innerWidth;
+  console.log('📱 Updating profile position for screen width:', screenWidth);
+
+  if (screenWidth <= 480) {
+    // Mobile
+    profileContainer.style.top = '15px';
+    profileContainer.style.right = '15px';
+  } else if (screenWidth <= 768) {
+    // Tablet
+    profileContainer.style.top = '18px';
+    profileContainer.style.right = '18px';
+  } else if (screenWidth <= 1024) {
+    // Desktop
+    profileContainer.style.top = '20px';
+    profileContainer.style.right = '20px';
+  } else {
+    // Large Desktop & Web
+    profileContainer.style.top = '25px';
+    profileContainer.style.right = '25px';
+  }
+}
 
 // Run immediately if DOM is already loaded
 if (document.readyState === 'loading') {
@@ -537,10 +585,100 @@ window.handleAuthSubmitDirect = function (event) {
     submitBtn.disabled = false;
     submitText.textContent = originalText;
 
-    // For now, just close the modal
+    // Close the modal
     hideAuthModalDirect();
+
+    // Show authenticated state
+    showAuthenticatedState(email);
   }, 1500);
 };
+
+// Show authenticated state
+window.showAuthenticatedState = function (email) {
+  console.log('👤 Showing authenticated state for:', email);
+
+  // Hide guest state
+  const profileGuest = document.getElementById('profileGuest');
+  if (profileGuest) {
+    profileGuest.style.display = 'none';
+  }
+
+  // Show authenticated state
+  const profileAuthenticated = document.getElementById('profileAuthenticated');
+  if (profileAuthenticated) {
+    profileAuthenticated.style.display = 'flex';
+  }
+
+  // Update user info
+  const userName = email.split('@')[0];
+  const profileUserName = document.getElementById('profileUserName');
+  const profileUserDisplayName = document.getElementById('profileUserDisplayName');
+  const profileUserEmail = document.getElementById('profileUserEmail');
+
+  if (profileUserName) {
+    profileUserName.textContent = userName;
+  }
+  if (profileUserDisplayName) {
+    profileUserDisplayName.textContent = userName;
+  }
+  if (profileUserEmail) {
+    profileUserEmail.textContent = email;
+  }
+
+  console.log('✅ Authenticated state shown successfully');
+};
+
+// Show user menu
+window.showUserMenu = function () {
+  console.log('📋 Showing user menu...');
+  const userMenu = document.getElementById('profileUserMenu');
+  const userBtn = document.getElementById('profileUserBtn');
+
+  if (userMenu && userBtn) {
+    userMenu.classList.toggle('show');
+    userBtn.classList.toggle('active');
+  }
+};
+
+// Handle sign out
+window.handleSignOut = function () {
+  console.log('👋 Signing out...');
+
+  // Hide authenticated state
+  const profileAuthenticated = document.getElementById('profileAuthenticated');
+  if (profileAuthenticated) {
+    profileAuthenticated.style.display = 'none';
+  }
+
+  // Show guest state
+  const profileGuest = document.getElementById('profileGuest');
+  if (profileGuest) {
+    profileGuest.style.display = 'flex';
+  }
+
+  // Hide user menu
+  const userMenu = document.getElementById('profileUserMenu');
+  const userBtn = document.getElementById('profileUserBtn');
+  if (userMenu && userBtn) {
+    userMenu.classList.remove('show');
+    userBtn.classList.remove('active');
+  }
+
+  console.log('✅ Signed out successfully');
+};
+
+// Close user menu when clicking outside
+document.addEventListener('click', function (e) {
+  const userBtn = document.getElementById('profileUserBtn');
+  const userMenu = document.getElementById('profileUserMenu');
+
+  if (userMenu && userBtn) {
+    if (!userBtn.contains(e.target) && !userMenu.contains(e.target)) {
+      userMenu.classList.remove('show');
+      userBtn.classList.remove('active');
+    }
+  }
+});
 
 // Handle forgot password function
 window.handleForgotPasswordDirect = function () {
