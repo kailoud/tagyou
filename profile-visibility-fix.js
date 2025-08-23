@@ -117,6 +117,10 @@ function forceProfileVisibility() {
 function ensureModernProfileUI() {
   console.log('🎨 Ensuring modern profile UI is working...');
 
+  // Check if we're on mobile
+  const isMobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  console.log('📱 Mobile device detected:', isMobile);
+
   // Check if modern profile UI is available
   if (window.modernProfileUI) {
     console.log('✅ Modern Profile UI is available');
@@ -132,16 +136,18 @@ function ensureModernProfileUI() {
         opacity: signInBtn.style.opacity,
         pointerEvents: signInBtn.style.pointerEvents,
         cursor: signInBtn.style.cursor,
-        zIndex: signInBtn.style.zIndex
+        zIndex: signInBtn.style.zIndex,
+        touchAction: signInBtn.style.touchAction,
+        userSelect: signInBtn.style.userSelect
       });
 
       // Check if the button already has a click event listener
       const hasClickListener = signInBtn.onclick || signInBtn._hasClickListener;
 
       if (!hasClickListener) {
-        // Add event listener for modern profile UI
-        signInBtn.addEventListener('click', (e) => {
-          console.log('🔐 Sign In button clicked!', e);
+        // Function to handle button interaction
+        const handleButtonInteraction = (e) => {
+          console.log('🔐 Sign In button interacted!', e.type, e);
           e.preventDefault();
           e.stopPropagation();
 
@@ -152,11 +158,16 @@ function ensureModernProfileUI() {
             console.error('❌ Modern Profile UI showAuthModal not available');
             console.log('🔍 Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.modernProfileUI)));
           }
-        });
+        };
 
-        // Mark that we've added a listener
+        // Add multiple event listeners for mobile compatibility
+        signInBtn.addEventListener('click', handleButtonInteraction);
+        signInBtn.addEventListener('touchstart', handleButtonInteraction);
+        signInBtn.addEventListener('touchend', handleButtonInteraction);
+
+        // Mark that we've added listeners
         signInBtn._hasClickListener = true;
-        console.log('✅ Sign In button event listener added');
+        console.log('✅ Sign In button event listeners added (click, touchstart, touchend)');
       } else {
         console.log('✅ Sign In button already has event listener');
       }
