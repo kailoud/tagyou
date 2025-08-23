@@ -2088,10 +2088,10 @@ input:checked+.slider:before {
   }
 
   .search-container {
-    width: 42% !important;
-    /* 70% * 0.6 = 42% (40% reduction) */
-    max-width: 134px !important;
-    /* 224px * 0.6 = 134px (40% reduction) */
+    width: 35% !important;
+    /* 70% * 0.5 = 35% (50% reduction) */
+    max-width: 112px !important;
+    /* 224px * 0.5 = 112px (50% reduction) */
     margin-left: auto !important;
     /* Center the search bar */
     margin-right: auto !important;
@@ -2288,10 +2288,10 @@ input:checked+.slider:before {
   */
 
   .search-container {
-    width: 18% !important;
-    /* 30% * 0.6 = 18% (40% reduction) */
-    max-width: 54px !important;
-    /* 90px * 0.6 = 54px (40% reduction) */
+    width: 15% !important;
+    /* 30% * 0.5 = 15% (50% reduction) */
+    max-width: 45px !important;
+    /* 90px * 0.5 = 45px (50% reduction) */
     margin-left: auto !important;
     /* Center the search bar */
     margin-right: auto !important;
@@ -2380,8 +2380,10 @@ input:checked+.slider:before {
     position: fixed;
     top: 15px;
     right: 15px;
-    width: 50px;
-    height: 50px;
+    width: 30px !important;
+    /* 50px * 0.6 = 30px (40% reduction) */
+    height: 30px !important;
+    /* 50px * 0.6 = 30px (40% reduction) */
     background: linear-gradient(135deg, #667eea, #764ba2);
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
@@ -2400,7 +2402,8 @@ input:checked+.slider:before {
   }
 
   .mobile-profile-button i {
-    font-size: 20px;
+    font-size: 12px !important;
+    /* 20px * 0.6 = 12px (40% reduction) */
     color: #fff;
   }
 
@@ -2854,6 +2857,46 @@ input:checked+.slider:before {
     /* 14px 20px * 0.8 = 11px 16px */
     font-size: 14px !important;
     /* 17px * 0.8 = 14px */
+  }
+}
+
+/* Maintain consistent spacing between search bar and profile from 320px to 400px */
+@media (max-width: 400px) and (min-width: 320px) {
+  .controls-container {
+    gap: 20px !important;
+    /* Increased gap to prevent overlap */
+    justify-content: space-between !important;
+    /* Ensure proper distribution */
+    align-items: center !important;
+    /* Center align items */
+  }
+
+  .search-container {
+    margin-right: 0 !important;
+    /* Remove right margin to prevent overlap */
+    flex-shrink: 0 !important;
+    /* Prevent search from shrinking */
+  }
+
+  .profile-container {
+    margin-left: 0 !important;
+    /* Remove left margin to prevent overlap */
+    flex-shrink: 0 !important;
+    /* Prevent profile from shrinking */
+    position: relative !important;
+    /* Use relative positioning instead of fixed */
+    right: auto !important;
+    /* Remove fixed right positioning */
+  }
+
+  /* Ensure mobile profile button doesn't overlap */
+  .mobile-profile-button {
+    position: relative !important;
+    /* Use relative positioning */
+    right: auto !important;
+    /* Remove fixed right positioning */
+    top: auto !important;
+    /* Remove fixed top positioning */
   }
 }
 
