@@ -34,6 +34,7 @@ function forceProfileVisibility() {
       element.style.opacity = '1';
       element.style.position = 'relative';
       element.style.zIndex = '1000';
+      element.style.pointerEvents = 'auto';
       console.log('✅ Forced visibility for:', element.className || element.id);
     }
   });
@@ -55,6 +56,7 @@ function forceProfileVisibility() {
       profileContainer.style.visibility = 'visible';
       profileContainer.style.opacity = '1';
       profileContainer.style.zIndex = '1000';
+      profileContainer.style.pointerEvents = 'auto';
       profileContainer.style.flexDirection = 'row';
       profileContainer.style.alignItems = 'center';
       profileContainer.style.justifyContent = 'center';
@@ -73,6 +75,9 @@ function forceProfileVisibility() {
       profileSignInBtn.style.fontSize = '14px';
       profileSignInBtn.style.whiteSpace = 'nowrap';
       profileSignInBtn.style.overflow = 'visible';
+      profileSignInBtn.style.pointerEvents = 'auto';
+      profileSignInBtn.style.cursor = 'pointer';
+      console.log('✅ Sign In button styles applied');
     }
 
     if (profileSystem) {
@@ -82,6 +87,7 @@ function forceProfileVisibility() {
       profileSystem.style.flexDirection = 'row';
       profileSystem.style.alignItems = 'center';
       profileSystem.style.justifyContent = 'center';
+      profileSystem.style.pointerEvents = 'auto';
     }
 
     if (profileGuest) {
@@ -90,6 +96,7 @@ function forceProfileVisibility() {
       profileGuest.style.opacity = '1';
       profileGuest.style.justifyContent = 'center';
       profileGuest.style.alignItems = 'center';
+      profileGuest.style.pointerEvents = 'auto';
     }
   }
 
@@ -100,6 +107,7 @@ function forceProfileVisibility() {
       profileGuest.style.display = 'flex';
       profileGuest.style.visibility = 'visible';
       profileGuest.style.opacity = '1';
+      profileGuest.style.pointerEvents = 'auto';
       console.log('✅ Guest state forced visible');
     }
   }
@@ -112,25 +120,48 @@ function ensureModernProfileUI() {
   // Check if modern profile UI is available
   if (window.modernProfileUI) {
     console.log('✅ Modern Profile UI is available');
+    console.log('🔍 Modern Profile UI methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.modernProfileUI)));
 
     // Ensure event listeners are set up
     const signInBtn = document.getElementById('profileSignInBtn');
     if (signInBtn) {
-      // Remove any existing event listeners
-      const newSignInBtn = signInBtn.cloneNode(true);
-      signInBtn.parentNode.replaceChild(newSignInBtn, signInBtn);
-
-      // Add event listener for modern profile UI
-      newSignInBtn.addEventListener('click', () => {
-        console.log('🔐 Sign In button clicked - showing auth modal');
-        if (window.modernProfileUI && window.modernProfileUI.showModal) {
-          window.modernProfileUI.showModal('auth', 'signin');
-        } else {
-          console.error('❌ Modern Profile UI showModal not available');
-        }
+      console.log('✅ Sign In button found:', signInBtn);
+      console.log('🔍 Sign In button properties:', {
+        display: signInBtn.style.display,
+        visibility: signInBtn.style.visibility,
+        opacity: signInBtn.style.opacity,
+        pointerEvents: signInBtn.style.pointerEvents,
+        cursor: signInBtn.style.cursor,
+        zIndex: signInBtn.style.zIndex
       });
 
-      console.log('✅ Sign In button event listener re-established');
+      // Check if the button already has a click event listener
+      const hasClickListener = signInBtn.onclick || signInBtn._hasClickListener;
+
+      if (!hasClickListener) {
+        // Add event listener for modern profile UI
+        signInBtn.addEventListener('click', (e) => {
+          console.log('🔐 Sign In button clicked!', e);
+          e.preventDefault();
+          e.stopPropagation();
+
+          if (window.modernProfileUI && window.modernProfileUI.showAuthModal) {
+            console.log('✅ Calling showAuthModal...');
+            window.modernProfileUI.showAuthModal();
+          } else {
+            console.error('❌ Modern Profile UI showAuthModal not available');
+            console.log('🔍 Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.modernProfileUI)));
+          }
+        });
+
+        // Mark that we've added a listener
+        signInBtn._hasClickListener = true;
+        console.log('✅ Sign In button event listener added');
+      } else {
+        console.log('✅ Sign In button already has event listener');
+      }
+    } else {
+      console.error('❌ Sign In button not found');
     }
   } else {
     console.error('❌ Modern Profile UI not available');
