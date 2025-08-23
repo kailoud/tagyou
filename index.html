@@ -79,9 +79,7 @@
 
     <!-- Profile Icon -->
     <div class="profile-container">
-      <button class="toggle-switch disabled" id="toggleSwitch" role="switch" aria-checked="false">
-        <span class="toggle-thumb"></span>
-      </button>
+      <!-- Old toggle switch removed - using modern profile system -->
 
       <!-- Modern Profile System -->
       <div class="profile-system">
@@ -93,48 +91,9 @@
           </button>
         </div>
 
-        <!-- Authenticated State -->
+        <!-- Authenticated State - Simplified -->
         <div class="profile-authenticated" id="profileAuthenticated" style="display: none;">
-          <button class="profile-avatar-btn" id="profileAvatarBtn">
-            <div class="profile-avatar">
-              <i class="fas fa-user"></i>
-            </div>
-            <span class="profile-name" id="profileName">User</span>
-            <i class="fas fa-chevron-down"></i>
-          </button>
-
-          <!-- Profile Dropdown -->
-          <div class="profile-dropdown" id="profileDropdown">
-            <div class="profile-header">
-              <div class="profile-avatar-large">
-                <i class="fas fa-user"></i>
-              </div>
-              <div class="profile-info">
-                <h4 id="profileDisplayName">User Name</h4>
-                <p id="profileEmail">user@example.com</p>
-              </div>
-            </div>
-
-            <div class="profile-menu">
-              <button class="profile-menu-item" id="profileSettingsBtn">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-              </button>
-              <button class="profile-menu-item" id="profileFavoritesBtn">
-                <i class="fas fa-heart"></i>
-                <span>Favorites</span>
-              </button>
-              <button class="profile-menu-item" id="profileHelpBtn">
-                <i class="fas fa-question-circle"></i>
-                <span>Help</span>
-              </button>
-              <div class="profile-divider"></div>
-              <button class="profile-menu-item profile-signout" id="profileSignOutBtn">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Sign Out</span>
-              </button>
-            </div>
-          </div>
+          <!-- Profile functionality handled by modern profile system -->
         </div>
       </div>
     </div>
@@ -358,6 +317,7 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script>
+    <script src="profile-visibility-fix.js"></script>
 
 
 
@@ -377,33 +337,7 @@
           return;
         }
 
-        // Force show mobile profile button
-        const mobileButton = document.getElementById('mobileProfileButton');
-        if (mobileButton) {
-          mobileButton.style.display = 'flex';
-          mobileButton.style.visibility = 'visible';
-          mobileButton.style.opacity = '1';
-          mobileButton.style.position = 'fixed';
-          mobileButton.style.top = '15px';
-          mobileButton.style.right = '15px';
-          mobileButton.style.zIndex = '1001';
-          console.log('✅ Mobile profile button forced visible');
-        } else {
-          console.log('❌ Mobile profile button not found');
-        }
-
-        // Force show mobile profile dropdown (but don't open it)
-        const mobileDropdown = document.getElementById('mobileProfileDropdown');
-        if (mobileDropdown) {
-          mobileDropdown.style.display = 'block';
-          mobileDropdown.style.visibility = 'visible';
-          mobileDropdown.style.opacity = '1';
-          // Ensure dropdown is closed by default
-          mobileDropdown.classList.remove('show');
-          console.log('✅ Mobile profile dropdown forced visible (closed)');
-        } else {
-          console.log('❌ Mobile profile dropdown not found');
-        }
+        // Old mobile profile elements removed - using modern profile system
       }
 
 
@@ -418,15 +352,7 @@
             forceShowMobileElements();
           }
 
-          if (window.mobileAuth) {
-            console.log('✅ Mobile auth is available on page load');
-            if (typeof window.mobileAuth.quickTest === 'function') {
-              console.log('✅ Running quick test...');
-              window.mobileAuth.quickTest();
-            }
-          } else {
-            console.warn('⚠️ Mobile auth not available on page load');
-          }
+          // Old mobileAuth references removed - using modern profile system
         }, 3000);
       });
 
@@ -504,99 +430,9 @@
           }, 1000);
         }
 
-        // Monitor Mobile Flow
-        const mobileButton = document.getElementById('mobileProfileButton');
-        if (mobileButton) {
-          addToMobileFlow('Button Found', 'Mobile profile button exists');
+        // Old mobile profile monitoring removed - using modern profile system
 
-          // Force show mobile button
-          mobileButton.style.display = 'flex';
-          mobileButton.style.visibility = 'visible';
-          mobileButton.style.opacity = '1';
-
-          // Monitor mobile button click
-          mobileButton.addEventListener('click', (e) => {
-            addToMobileFlow('Button Clicked', 'Mobile profile button clicked');
-          });
-
-          // Monitor mobile dropdown
-          const mobileDropdown = document.getElementById('mobileProfileDropdown');
-          if (mobileDropdown) {
-            addToMobileFlow('Dropdown Found', 'Mobile dropdown exists');
-
-            // Force show mobile dropdown
-            mobileDropdown.style.display = 'block';
-            mobileDropdown.style.visibility = 'visible';
-            mobileDropdown.style.opacity = '1';
-
-            // Monitor dropdown visibility
-            const mobileObserver = new MutationObserver((mutations) => {
-              mutations.forEach((mutation) => {
-                if (mutation.type === 'attributes') {
-                  if (mutation.attributeName === 'style') {
-                    addToMobileFlow('Dropdown Style Changed', `Display: ${mobileDropdown.style.display}`);
-                  } else if (mutation.attributeName === 'class') {
-                    if (mobileDropdown.classList.contains('show')) {
-                      addToMobileFlow('Dropdown Show Class Added', 'Mobile dropdown SHOW class added');
-                    }
-                  }
-                }
-              });
-            });
-            mobileObserver.observe(mobileDropdown, { attributes: true, attributeFilter: ['style', 'class'] });
-          }
-
-          // Monitor mobile sign in button
-          setTimeout(() => {
-            const mobileMenu = document.getElementById('mobileProfileMenu');
-            if (mobileMenu) {
-              const mobileSignInButtons = mobileMenu.querySelectorAll('.profile-menu-item');
-              mobileSignInButtons.forEach((button) => {
-                if (button.textContent.includes('Sign In')) {
-                  addToMobileFlow('Sign In Button Found', 'Mobile Sign In button exists');
-
-                  button.addEventListener('click', (e) => {
-                    addToMobileFlow('Sign In Button Clicked', 'Mobile Sign In button clicked');
-                  });
-                }
-              });
-            } else {
-              addToMobileFlow('Menu Not Found', 'Mobile menu does not exist - trying to populate');
-              if (window.mobileAuth && typeof window.mobileAuth.populateMobileProfileMenu === 'function') {
-                window.mobileAuth.populateMobileProfileMenu();
-                addToMobileFlow('Menu Population Called', 'populateMobileProfileMenu() called');
-              }
-            }
-          }, 1000);
-        }
-
-        // Override auth service showSignInModal for desktop
-        if (window.authService) {
-          const originalDesktopShowSignInModal = window.authService.showSignInModal;
-          window.authService.showSignInModal = function () {
-            addToDesktopFlow('showSignInModal Called', 'Auth service showSignInModal called');
-            addToDesktopFlow('Stack Trace', new Error().stack.split('\n').slice(1, 4).join('\n'));
-
-            if (typeof originalDesktopShowSignInModal === 'function') {
-              addToDesktopFlow('Original Method Called', 'Calling original auth service showSignInModal');
-              return originalDesktopShowSignInModal.call(this);
-            }
-          };
-        }
-
-        // Override mobile auth showSignInModal for mobile
-        if (window.mobileAuth) {
-          const originalMobileShowSignInModal = window.mobileAuth.showSignInModal;
-          window.mobileAuth.showSignInModal = function () {
-            addToMobileFlow('showSignInModal Called', 'Mobile auth showSignInModal called');
-            addToMobileFlow('Stack Trace', new Error().stack.split('\n').slice(1, 4).join('\n'));
-
-            if (typeof originalMobileShowSignInModal === 'function') {
-              addToMobileFlow('Original Method Called', 'Calling original mobile auth showSignInModal');
-              return originalMobileShowSignInModal.call(this);
-            }
-          };
-        }
+        // Old authentication function overrides removed - using modern profile system
 
         console.log('✅ Sign in comparison monitoring enabled!');
         console.log('🖥️ Click the desktop profile button to see desktop flow');

@@ -1,7 +1,7 @@
 // TagYou2 London Map - Supabase Integration
 let map;
 let currentUser = null; // Will be set when user authentication is implemented
-let authService = null; // Authentication service instance
+// Old authService variable removed - using modern profile system
 let foodStallsData = [];
 let artistsData = [];
 let floatTrucksData = [];
@@ -26,8 +26,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   // Then try to initialize Supabase (non-blocking)
   initializeSupabase();
 
-  // Initialize Authentication Service
-  initializeAuthService();
+  // Old authentication service removed - using modern profile system
 
   // Initialize Modern Profile Service
   initializeModernProfileService();
@@ -151,58 +150,7 @@ async function initializeSupabase() {
   }
 }
 
-// Authentication service initialization
-async function initializeAuthService() {
-  console.log('🔐 Initializing Authentication Service...');
-  try {
-    // Wait for Supabase to be available
-    let attempts = 0;
-    const maxAttempts = 30;
-
-    while (attempts < maxAttempts) {
-      if (supabaseInitialized) {
-        console.log('✅ Supabase ready, loading auth service...');
-        break;
-      }
-      attempts++;
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-
-    if (attempts >= maxAttempts) {
-      throw new Error('Supabase not available for auth service');
-    }
-
-    // Import and initialize auth service
-    const authModule = await import('./supabase-auth-service.js');
-    authService = authModule.supabaseAuthService;
-
-    // Make auth service globally accessible
-    window.authService = authService;
-
-    // Initialize the auth service
-    await authService.initialize();
-
-    // Set up auth state listener
-    authService.onAuthStateChanged((user) => {
-      currentUser = user;
-      console.log('Auth state changed:', user ? `User: ${user.email}` : 'No user');
-
-      // Update UI based on auth state
-      updateAuthenticatedUI(user);
-
-
-    });
-
-    // Force initial UI update for guest user
-    console.log('🔄 Forcing initial UI update for guest user...');
-    authService.updateAuthUI(null);
-
-    console.log('✅ Authentication service initialized');
-
-  } catch (error) {
-    console.error('❌ Authentication service initialization failed:', error);
-  }
-}
+// Old authentication service removed - using modern profile system instead
 
 // Initialize Modern Profile Service
 async function initializeModernProfileService() {
@@ -1650,11 +1598,11 @@ function testUniversalDropdown() {
   // Step 1: Force populate menu items
   console.log('Step 1: Populating menu items...');
   profileMenu.innerHTML = `
-    <button class="profile-menu-item" onclick="showSignInModal()">
+    <button class="profile-menu-item" onclick="window.modernProfileUI?.showModal('auth', 'signin')">
       <i class="fas fa-sign-in-alt"></i>
       <span>Sign In</span>
     </button>
-    <button class="profile-menu-item" onclick="showSignUpModal()">
+    <button class="profile-menu-item" onclick="window.modernProfileUI?.showModal('auth', 'signup')">
       <i class="fas fa-user-plus"></i>
       <span>Create Account</span>
     </button>
@@ -1689,196 +1637,4 @@ function testUniversalDropdown() {
 // Make function globally available
 window.testUniversalDropdown = testUniversalDropdown;
 
-// Authentication Modal Functions
-function showSignUpModal() {
-  console.log('🔐 Showing sign up modal');
-
-  // Create modal HTML
-  const modalHTML = `
-    <div id="authModal" class="auth-modal">
-      <div class="auth-modal-content">
-        <div class="auth-modal-header">
-          <h2>Create Account</h2>
-          <button class="auth-modal-close" onclick="closeAuthModal()">&times;</button>
-        </div>
-        <div class="auth-modal-body">
-          <form id="signUpForm" onsubmit="handleSignUp(event)">
-            <div class="auth-form-group">
-              <label for="signupEmail">Email</label>
-              <input type="email" id="signupEmail" required placeholder="Enter your email">
-            </div>
-            <div class="auth-form-group">
-              <label for="signupPassword">Password</label>
-              <input type="password" id="signupPassword" required placeholder="Enter password (min 6 characters)" minlength="6">
-            </div>
-            <button type="submit" class="auth-submit-btn">Create Account</button>
-          </form>
-          <div class="auth-modal-footer">
-            <p>Already have an account? <a href="#" onclick="switchToSignIn()">Sign In</a></p>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Add modal to page
-  document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-  // Show modal
-  setTimeout(() => {
-    document.getElementById('authModal').classList.add('show');
-  }, 10);
-}
-
-function showSignInModal() {
-  console.log('🔐 Showing sign in modal');
-
-  // Create modal HTML
-  const modalHTML = `
-    <div id="authModal" class="auth-modal">
-      <div class="auth-modal-content">
-        <div class="auth-modal-header">
-          <h2>Sign In</h2>
-          <button class="auth-modal-close" onclick="closeAuthModal()">&times;</button>
-        </div>
-        <div class="auth-modal-body">
-          <form id="signInForm" onsubmit="handleSignIn(event)">
-            <div class="auth-form-group">
-              <label for="signinEmail">Email</label>
-              <input type="email" id="signinEmail" required placeholder="Enter your email">
-            </div>
-            <div class="auth-form-group">
-              <label for="signinPassword">Password</label>
-              <input type="password" id="signinPassword" required placeholder="Enter your password">
-            </div>
-            <button type="submit" class="auth-submit-btn">Sign In</button>
-          </form>
-          <div class="auth-modal-footer">
-            <p>Don't have an account? <a href="#" onclick="switchToSignUp()">Create Account</a></p>
-            <p><a href="#" onclick="showPasswordReset()">Forgot Password?</a></p>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Add modal to page
-  document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-  // Show modal
-  setTimeout(() => {
-    document.getElementById('authModal').classList.add('show');
-  }, 10);
-}
-
-function closeAuthModal() {
-  const modal = document.getElementById('authModal');
-  if (modal) {
-    modal.classList.remove('show');
-    setTimeout(() => {
-      modal.remove();
-    }, 300);
-  }
-}
-
-function switchToSignIn() {
-  closeAuthModal();
-  setTimeout(() => {
-    showSignInModal();
-  }, 300);
-}
-
-function switchToSignUp() {
-  closeAuthModal();
-  setTimeout(() => {
-    showSignUpModal();
-  }, 300);
-}
-
-async function handleSignUp(event) {
-  event.preventDefault();
-
-  const email = document.getElementById('signupEmail').value;
-  const password = document.getElementById('signupPassword').value;
-
-  try {
-    console.log('🔐 Attempting sign up for:', email);
-
-    if (window.authService) {
-      const result = await window.authService.signUp(email, password);
-      console.log('✅ Sign up successful:', result);
-      closeAuthModal();
-      alert('Account created successfully! Please check your email for verification.');
-    } else {
-      throw new Error('Authentication service not available');
-    }
-  } catch (error) {
-    console.error('❌ Sign up failed:', error);
-    alert('Sign up failed: ' + error.message);
-  }
-}
-
-async function handleSignIn(event) {
-  event.preventDefault();
-
-  const email = document.getElementById('signinEmail').value;
-  const password = document.getElementById('signinPassword').value;
-
-  try {
-    console.log('🔐 Attempting sign in for:', email);
-
-    if (window.authService) {
-      const result = await window.authService.signIn(email, password);
-      console.log('✅ Sign in successful:', result);
-      closeAuthModal();
-    } else {
-      throw new Error('Authentication service not available');
-    }
-  } catch (error) {
-    console.error('❌ Sign in failed:', error);
-    alert('Sign in failed: ' + error.message);
-  }
-}
-
-function showPasswordReset() {
-  const email = document.getElementById('signinEmail')?.value || '';
-
-  const resetHTML = `
-    <div class="auth-form-group">
-      <label for="resetEmail">Email</label>
-      <input type="email" id="resetEmail" value="${email}" required placeholder="Enter your email">
-    </div>
-    <button type="button" onclick="handlePasswordReset()" class="auth-submit-btn">Send Reset Link</button>
-    <button type="button" onclick="switchToSignIn()" class="auth-secondary-btn">Back to Sign In</button>
-  `;
-
-  document.querySelector('.auth-modal-body').innerHTML = resetHTML;
-}
-
-async function handlePasswordReset() {
-  const email = document.getElementById('resetEmail').value;
-
-  try {
-    if (window.authService) {
-      await window.authService.resetPassword(email);
-      alert('Password reset email sent! Please check your inbox.');
-      closeAuthModal();
-    } else {
-      throw new Error('Authentication service not available');
-    }
-  } catch (error) {
-    console.error('❌ Password reset failed:', error);
-    alert('Password reset failed: ' + error.message);
-  }
-}
-
-// Make functions globally available
-window.showSignUpModal = showSignUpModal;
-window.showSignInModal = showSignInModal;
-window.closeAuthModal = closeAuthModal;
-window.switchToSignIn = switchToSignIn;
-window.switchToSignUp = switchToSignUp;
-window.handleSignUp = handleSignUp;
-window.handleSignIn = handleSignIn;
-window.showPasswordReset = showPasswordReset;
-window.handlePasswordReset = handlePasswordReset;
+// Old authentication functions removed - using modern profile system instead

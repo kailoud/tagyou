@@ -9,7 +9,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   line-height: 1.6;
   color: #333;
-  background-color: #f5f5f5;
+  background-color: transparent;
   overflow: hidden;
 }
 
@@ -93,120 +93,9 @@ body {
   font-size: 16px;
 }
 
-/* Authenticated State */
+/* Authenticated State - Simplified */
 .profile-authenticated {
   position: relative;
-}
-
-.profile-avatar-btn {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 25px;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.profile-avatar-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
-  transform: translateY(-1px);
-}
-
-.profile-avatar {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-}
-
-.profile-avatar i {
-  font-size: 14px;
-  color: white;
-}
-
-.profile-name {
-  font-size: 14px;
-  font-weight: 600;
-  max-width: 100px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.profile-avatar-btn i.fa-chevron-down {
-  font-size: 12px;
-  transition: transform 0.3s ease;
-}
-
-.profile-avatar-btn.active i.fa-chevron-down {
-  transform: rotate(180deg);
-}
-
-/* Profile Dropdown */
-.profile-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  width: 280px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  margin-top: 8px;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-10px);
-  transition: all 0.3s ease;
-  z-index: 1000;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.profile-dropdown.show {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.profile-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 20px;
-  border-bottom: 1px solid #f0f0f0;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border-radius: 12px 12px 0 0;
-}
-
-.profile-avatar-large {
-  width: 48px;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-}
-
-.profile-avatar-large i {
-  font-size: 20px;
-  color: white;
-}
-
-.profile-info h4 {
-  color: white;
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0 0 4px 0;
 }
 
 .profile-info p {
@@ -263,125 +152,7 @@ body {
   margin: 8px 0;
 }
 
-/* Toggle Switch CSS */
-.toggle-switch {
-  position: relative;
-  display: inline-flex;
-  height: 32px;
-  width: 56px;
-  align-items: center;
-  border-radius: 9999px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  outline: none;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  overflow: hidden;
-}
-
-.toggle-switch::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.4s ease;
-}
-
-.toggle-switch:hover::before {
-  left: 100%;
-}
-
-/* Focus styles */
-.toggle-switch:focus {
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 1),
-    0 0 0 4px rgba(59, 130, 246, 0.5);
-  /* focus:ring-2 focus:ring-offset-2 */
-}
-
-/* Disabled state (gray) */
-.toggle-switch.disabled {
-  background: linear-gradient(135deg, #d1d5db, #9ca3af, #6b7280);
-  background-size: 200% 200%;
-}
-
-.toggle-switch.disabled:focus {
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 1),
-    0 0 0 4px rgba(156, 163, 175, 0.5);
-  /* focus:ring-gray-400 */
-}
-
-/* Enabled state (green) */
-.toggle-switch.enabled {
-  background: linear-gradient(135deg, #10b981, #059669, #047857);
-  background-size: 200% 200%;
-  animation: toggleGradientShift 2s ease infinite;
-}
-
-@keyframes toggleGradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.toggle-switch.enabled:focus {
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 1),
-    0 0 0 4px rgba(16, 185, 129, 0.5);
-  /* focus:ring-green-500 */
-}
-
-/* Toggle circle/thumb */
-.toggle-thumb {
-  display: inline-block;
-  height: 24px;
-  width: 24px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #ffffff, #f3f4f6);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2),
-    0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  position: relative;
-  z-index: 1;
-}
-
-.toggle-thumb::before {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  right: 2px;
-  bottom: 2px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4));
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.toggle-switch:hover .toggle-thumb::before {
-  opacity: 1;
-}
-
-/* Thumb position when disabled */
-.toggle-switch.disabled .toggle-thumb {
-  transform: translateX(4px);
-  /* translate-x-1 */
-}
-
-/* Thumb position when enabled */
-.toggle-switch.enabled .toggle-thumb {
-  transform: translateX(28px);
-  /* translate-x-7 */
-}
+/* Old toggle switch removed - using modern profile system */
 
 .search-bar {
   display: flex;
@@ -1617,23 +1388,9 @@ input:checked+.slider:before {
 
 
 
-  .toggle-switch {
-    height: 26px;
-    width: 46px;
-  }
 
-  .toggle-thumb {
-    height: 18px;
-    width: 18px;
-  }
 
-  .toggle-switch.disabled .toggle-thumb {
-    transform: translateX(4px);
-  }
 
-  .toggle-switch.enabled .toggle-thumb {
-    transform: translateX(24px);
-  }
 }
 
 @media (max-width: 640px) and (min-width: 541px) {
@@ -1665,23 +1422,9 @@ input:checked+.slider:before {
     font-size: 14px;
   }
 
-  .toggle-switch {
-    height: 26px;
-    width: 46px;
-  }
 
-  .toggle-thumb {
-    height: 18px;
-    width: 18px;
-  }
 
-  .toggle-switch.disabled .toggle-thumb {
-    transform: translateX(4px);
-  }
 
-  .toggle-switch.enabled .toggle-thumb {
-    transform: translateX(24px);
-  }
 }
 
 @media (max-width: 540px) and (min-width: 481px) {
@@ -1713,23 +1456,9 @@ input:checked+.slider:before {
     font-size: 14px;
   }
 
-  .toggle-switch {
-    height: 26px;
-    width: 46px;
-  }
 
-  .toggle-thumb {
-    height: 18px;
-    width: 18px;
-  }
 
-  .toggle-switch.disabled .toggle-thumb {
-    transform: translateX(4px);
-  }
 
-  .toggle-switch.enabled .toggle-thumb {
-    transform: translateX(24px);
-  }
 }
 
 @media (max-width: 480px) and (min-width: 431px) {
@@ -1762,23 +1491,9 @@ input:checked+.slider:before {
     font-size: 14px;
   }
 
-  .toggle-switch {
-    height: 26px;
-    width: 46px;
-  }
 
-  .toggle-thumb {
-    height: 18px;
-    width: 18px;
-  }
 
-  .toggle-switch.disabled .toggle-thumb {
-    transform: translateX(4px);
-  }
 
-  .toggle-switch.enabled .toggle-thumb {
-    transform: translateX(24px);
-  }
 
   .festivals-dropdown {
     left: 70px !important;
@@ -1820,23 +1535,9 @@ input:checked+.slider:before {
     font-size: 14px;
   }
 
-  .toggle-switch {
-    height: 26px;
-    width: 46px;
-  }
 
-  .toggle-thumb {
-    height: 18px;
-    width: 18px;
-  }
 
-  .toggle-switch.disabled .toggle-thumb {
-    transform: translateX(4px);
-  }
 
-  .toggle-switch.enabled .toggle-thumb {
-    transform: translateX(24px);
-  }
 
   .search-container {
     width: 70%;
@@ -1931,23 +1632,7 @@ input:checked+.slider:before {
     font-size: 14px;
   }
 
-  .toggle-switch {
-    height: 26px;
-    width: 46px;
-  }
-
-  .toggle-thumb {
-    height: 18px;
-    width: 18px;
-  }
-
-  .toggle-switch.disabled .toggle-thumb {
-    transform: translateX(4px);
-  }
-
-  .toggle-switch.enabled .toggle-thumb {
-    transform: translateX(24px);
-  }
+  /* Old toggle switch removed - using modern profile system */
 
   .search-container {
     width: 17.5% !important;
@@ -2130,23 +1815,9 @@ input:checked+.slider:before {
 
   /* TOGGLE SWITCH COMMENTED OUT FOR MOBILE PROFILE TESTING */
   /*
-  .toggle-switch {
-    height: 24px;
-    width: 42px;
-  }
 
-  .toggle-thumb {
-    height: 16px;
-    width: 16px;
-  }
 
-  .toggle-switch.disabled .toggle-thumb {
-    transform: translateX(3px);
-  }
 
-  .toggle-switch.enabled .toggle-thumb {
-    transform: translateX(23px);
-  }
   */
 
   .search-container {
@@ -2262,7 +1933,7 @@ input:checked+.slider:before {
   }
 
   .mobile-auth-content {
-    background: white;
+    background: transparent;
     border-radius: 15px;
     width: 100%;
     max-width: 400px;
@@ -2392,13 +2063,7 @@ input:checked+.slider:before {
     gap: 8px !important;
   }
 
-  /* Mobile dropdown positioning fixes */
-  .mobile-profile-dropdown {
-    top: 70px !important;
-    right: 10px !important;
-    width: 180px !important;
-    max-height: calc(100vh - 90px) !important;
-  }
+  /* Old mobile profile elements removed - using modern profile system */
 }
 
 /* SPECIFIC RANGE: 321px to 330px - GUARANTEED VERTICAL */
@@ -2425,14 +2090,7 @@ input:checked+.slider:before {
     opacity: 1 !important;
   }
 
-  /* HIDE MOBILE PROFILE AT 321px */
-  .mobile-profile-button {
-    display: none !important;
-  }
-
-  .mobile-profile-dropdown {
-    display: none !important;
-  }
+  /* Old mobile profile elements removed - using modern profile system */
 }
 
 /* SEARCH BAR & UK FESTIVAL: Maintain 320px scale from 320px to 360px */
@@ -2444,13 +2102,7 @@ input:checked+.slider:before {
     margin-right: auto !important;
   }
 
-  /* Extra small screen dropdown fixes */
-  .mobile-profile-dropdown {
-    top: 65px !important;
-    right: 8px !important;
-    width: 160px !important;
-    max-height: calc(100vh - 80px) !important;
-  }
+  /* Old mobile profile elements removed - using modern profile system */
 
   .search-bar {
     padding: 6px !important;
@@ -2525,14 +2177,7 @@ input:checked+.slider:before {
     opacity: 1 !important;
   }
 
-  /* HIDE MOBILE PROFILE */
-  .mobile-profile-button {
-    display: none !important;
-  }
-
-  .mobile-profile-dropdown {
-    display: none !important;
-  }
+  /* Old mobile profile elements removed - using modern profile system */
 }
 
 /* Scale down festivals dropdown by 20% for 360px to 481px */
@@ -2584,15 +2229,86 @@ input:checked+.slider:before {
     /* Remove fixed right positioning */
   }
 
-  /* Ensure mobile profile button doesn't overlap */
-  .mobile-profile-button {
+  /* Old mobile profile elements removed - using modern profile system */
+}
+
+/* Ensure profile is visible from 401px to 480px */
+@media (max-width: 480px) and (min-width: 401px) {
+  .profile-container {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    flex-direction: row !important;
+    align-items: center !important;
     position: relative !important;
-    /* Use relative positioning */
     right: auto !important;
-    /* Remove fixed right positioning */
     top: auto !important;
-    /* Remove fixed top positioning */
   }
+
+  .profile-system {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .profile-guest {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+  }
+
+  .profile-authenticated {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .profile-signin-btn {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 1000 !important;
+  }
+
+  /* Override any inline styles */
+  #profileGuest {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  #profileSignInBtn {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Global profile visibility - ensure profile is always visible */
+.profile-container {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.profile-system {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.profile-guest {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.profile-signin-btn {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* Force horizontal layout for larger screens - 481px+ */
@@ -2753,7 +2469,7 @@ input:checked+.slider:before {
 }
 
 .auth-modal-content {
-  background: white;
+  background: transparent;
   border-radius: 12px;
   padding: 0;
   width: 90%;
@@ -2912,5 +2628,67 @@ input:checked+.slider:before {
 
   .auth-modal-header h2 {
     font-size: 20px;
+  }
+}
+
+/* Specific positioning for 401px to 479px range */
+@media (min-width: 401px) and (max-width: 479px) {
+  .profile-container {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 1000 !important;
+  }
+
+  .profile-system {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .profile-guest {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .profile-signin-btn {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    margin: 0 auto !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-width: 120px !important;
+    padding: 12px 20px !important;
+    font-size: 14px !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+  }
+
+  /* Ensure controls container doesn't interfere */
+  .controls-container {
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 15px !important;
+  }
+
+  /* Ensure search and festivals don't overlap */
+  .search-container {
+    flex-shrink: 0 !important;
+    margin-right: 10px !important;
+  }
+
+  .festivals-container {
+    flex-shrink: 0 !important;
+    margin-left: 10px !important;
   }
 }

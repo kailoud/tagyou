@@ -181,10 +181,11 @@
   margin: 10px 0;
   font-size: 14px;
   opacity: 0.8;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .auth-link {
-  color: #fff;
+  color: #4ecdc4;
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
@@ -192,8 +193,9 @@
 }
 
 .auth-link:hover {
-  border-bottom-color: #fff;
+  border-bottom-color: #4ecdc4;
   opacity: 1;
+  color: #6ee7df;
 }
 
 /* Auth Messages */
@@ -331,7 +333,10 @@
   }
 
   .auth-modal-header {
-    padding: 20px 15px 10px;
+    padding: 60px 15px 10px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
   }
 
   .auth-modal-header h2 {
@@ -340,6 +345,22 @@
 
   .auth-modal-header p {
     font-size: 14px;
+  }
+
+  .auth-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
   }
 
   .auth-form {
@@ -481,11 +502,24 @@
   }
 
   .auth-modal-header {
-    padding: 15px 10px 8px;
+    padding: 50px 10px 8px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
   }
 
   .auth-modal-header h2 {
     font-size: 18px;
+  }
+
+  .auth-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 35px;
+    height: 35px;
+    z-index: 10;
+    font-size: 14px;
   }
 
   .profile-content,

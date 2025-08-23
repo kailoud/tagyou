@@ -16,7 +16,7 @@ class ModernProfileUI {
       guest: null,
       authenticated: null,
       signInBtn: null,
-      avatarBtn: null,
+      // avatarBtn removed - using modern profile system
       dropdown: null,
       profileName: null,
       displayName: null,
@@ -56,15 +56,7 @@ class ModernProfileUI {
     this.elements.guest = document.getElementById('profileGuest');
     this.elements.authenticated = document.getElementById('profileAuthenticated');
     this.elements.signInBtn = document.getElementById('profileSignInBtn');
-    this.elements.avatarBtn = document.getElementById('profileAvatarBtn');
-    this.elements.dropdown = document.getElementById('profileDropdown');
-    this.elements.profileName = document.getElementById('profileName');
-    this.elements.displayName = document.getElementById('profileDisplayName');
-    this.elements.email = document.getElementById('profileEmail');
-    this.elements.settingsBtn = document.getElementById('profileSettingsBtn');
-    this.elements.favoritesBtn = document.getElementById('profileFavoritesBtn');
-    this.elements.helpBtn = document.getElementById('profileHelpBtn');
-    this.elements.signOutBtn = document.getElementById('profileSignOutBtn');
+    // Profile elements removed - using modern profile system
 
     // Create modals if they don't exist
     this.createModals();
@@ -380,12 +372,7 @@ class ModernProfileUI {
       });
     }
 
-    if (this.elements.avatarBtn) {
-      this.elements.avatarBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.toggleDropdown();
-      });
-    }
+    // Avatar button event listener removed - using modern profile system
 
     if (this.elements.settingsBtn) {
       this.elements.settingsBtn.addEventListener('click', () => {
@@ -411,10 +398,9 @@ class ModernProfileUI {
       });
     }
 
-    // Close dropdown when clicking outside
+    // Close dropdown when clicking outside - simplified
     document.addEventListener('click', (e) => {
-      if (!this.elements.avatarBtn?.contains(e.target) &&
-        !this.elements.dropdown?.contains(e.target)) {
+      if (!this.elements.dropdown?.contains(e.target)) {
         this.closeDropdown();
       }
     });
@@ -438,18 +424,26 @@ class ModernProfileUI {
 
       const toggleBtn = this.elements.authModal.querySelector('#authToggleBtn');
       if (toggleBtn) {
+        console.log('✅ Toggle button found and event listener added');
         toggleBtn.addEventListener('click', (e) => {
           e.preventDefault();
+          console.log('🔄 Toggle button clicked');
           this.toggleAuthMode();
         });
+      } else {
+        console.error('❌ Toggle button not found');
       }
 
       const forgotBtn = this.elements.authModal.querySelector('#forgotPasswordBtn');
       if (forgotBtn) {
+        console.log('✅ Forgot password button found and event listener added');
         forgotBtn.addEventListener('click', (e) => {
           e.preventDefault();
+          console.log('🔑 Forgot password button clicked');
           this.handleForgotPassword();
         });
+      } else {
+        console.error('❌ Forgot password button not found');
       }
     }
 
@@ -584,20 +578,7 @@ class ModernProfileUI {
   }
 
   updateAvatar(profile) {
-    const avatar = modernProfileService.getUserAvatar(profile);
-    const initials = modernProfileService.getUserInitials(profile);
-
-    // Update avatar in profile button
-    const avatarElements = document.querySelectorAll('.profile-avatar');
-    avatarElements.forEach(element => {
-      if (avatar && avatar.startsWith('http')) {
-        // Use image
-        element.innerHTML = `<img src="${avatar}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-      } else {
-        // Use initials
-        element.innerHTML = `<span>${initials}</span>`;
-      }
-    });
+    // Avatar update removed - using modern profile system
   }
 
   toggleDropdown() {
@@ -609,21 +590,11 @@ class ModernProfileUI {
   }
 
   openDropdown() {
-    if (this.elements.dropdown && this.elements.avatarBtn) {
-      this.elements.dropdown.classList.add('show');
-      this.elements.avatarBtn.classList.add('active');
-      this.dropdownOpen = true;
-      console.log('📋 Profile dropdown opened');
-    }
+    // Dropdown functionality removed - using modern profile system
   }
 
   closeDropdown() {
-    if (this.elements.dropdown && this.elements.avatarBtn) {
-      this.elements.dropdown.classList.remove('show');
-      this.elements.avatarBtn.classList.remove('active');
-      this.dropdownOpen = false;
-      console.log('📋 Profile dropdown closed');
-    }
+    // Dropdown functionality removed - using modern profile system
   }
 
   // Modal management
@@ -701,11 +672,16 @@ class ModernProfileUI {
   }
 
   toggleAuthMode() {
+    console.log('🔄 Toggling auth mode...');
     const form = this.elements.authModal?.querySelector('#authForm');
-    if (!form) return;
+    if (!form) {
+      console.error('❌ Auth form not found');
+      return;
+    }
 
     const currentMode = form.dataset.mode;
     const newMode = currentMode === 'signin' ? 'signup' : 'signin';
+    console.log(`🔄 Switching from ${currentMode} to ${newMode}`);
     this.setAuthMode(newMode);
   }
 
@@ -741,6 +717,7 @@ class ModernProfileUI {
   }
 
   async handleForgotPassword() {
+    console.log('🔑 Handling forgot password...');
     const email = this.elements.authModal?.querySelector('#authEmail').value;
     if (!email) {
       this.showErrorMessage('Please enter your email address first.');
@@ -748,9 +725,11 @@ class ModernProfileUI {
     }
 
     try {
+      console.log('🔑 Sending password reset email to:', email);
       await supabaseAuthService.resetPassword(email);
       this.showSuccessMessage('Password reset email sent! Please check your inbox.');
     } catch (error) {
+      console.error('❌ Password reset error:', error);
       this.showErrorMessage(error.message);
     }
   }
