@@ -2088,10 +2088,10 @@ input:checked+.slider:before {
   }
 
   .search-container {
-    width: 35% !important;
-    /* 70% * 0.5 = 35% (50% reduction) */
-    max-width: 112px !important;
-    /* 224px * 0.5 = 112px (50% reduction) */
+    width: 17.5% !important;
+    /* 35% * 0.5 = 17.5% (50% reduction) */
+    max-width: 56px !important;
+    /* 112px * 0.5 = 56px (50% reduction) */
     margin-left: auto !important;
     /* Center the search bar */
     margin-right: auto !important;
@@ -2288,10 +2288,10 @@ input:checked+.slider:before {
   */
 
   .search-container {
-    width: 15% !important;
-    /* 30% * 0.5 = 15% (50% reduction) */
-    max-width: 45px !important;
-    /* 90px * 0.5 = 45px (50% reduction) */
+    width: 7.5% !important;
+    /* 15% * 0.5 = 7.5% (50% reduction) */
+    max-width: 22.5px !important;
+    /* 45px * 0.5 = 22.5px (50% reduction) */
     margin-left: auto !important;
     /* Center the search bar */
     margin-right: auto !important;
