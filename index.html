@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="auth-styles.css">
+  <link rel="stylesheet" href="modern-profile-styles.css">
   <link rel="stylesheet" href="mobile-styles.css">
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -82,6 +83,60 @@
         <span class="toggle-thumb"></span>
       </button>
 
+      <!-- Modern Profile System -->
+      <div class="profile-system">
+        <!-- Guest State -->
+        <div class="profile-guest" id="profileGuest">
+          <button class="profile-signin-btn" id="profileSignInBtn">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Sign In</span>
+          </button>
+        </div>
+
+        <!-- Authenticated State -->
+        <div class="profile-authenticated" id="profileAuthenticated" style="display: none;">
+          <button class="profile-avatar-btn" id="profileAvatarBtn">
+            <div class="profile-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <span class="profile-name" id="profileName">User</span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+
+          <!-- Profile Dropdown -->
+          <div class="profile-dropdown" id="profileDropdown">
+            <div class="profile-header">
+              <div class="profile-avatar-large">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="profile-info">
+                <h4 id="profileDisplayName">User Name</h4>
+                <p id="profileEmail">user@example.com</p>
+              </div>
+            </div>
+
+            <div class="profile-menu">
+              <button class="profile-menu-item" id="profileSettingsBtn">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+              </button>
+              <button class="profile-menu-item" id="profileFavoritesBtn">
+                <i class="fas fa-heart"></i>
+                <span>Favorites</span>
+              </button>
+              <button class="profile-menu-item" id="profileHelpBtn">
+                <i class="fas fa-question-circle"></i>
+                <span>Help</span>
+              </button>
+              <div class="profile-divider"></div>
+              <button class="profile-menu-item profile-signout" id="profileSignOutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Interactive Map Toolbar -->

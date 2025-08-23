@@ -51,6 +51,218 @@ body {
 
 
 
+/* ========================================= */
+/* MODERN PROFILE SYSTEM */
+/* ========================================= */
+
+.profile-system {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Guest State */
+.profile-guest {
+  display: flex;
+  align-items: center;
+}
+
+.profile-signin-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 25px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.profile-signin-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+.profile-signin-btn i {
+  font-size: 16px;
+}
+
+/* Authenticated State */
+.profile-authenticated {
+  position: relative;
+}
+
+.profile-avatar-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 25px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.profile-avatar-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.profile-avatar {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.profile-avatar i {
+  font-size: 14px;
+  color: white;
+}
+
+.profile-name {
+  font-size: 14px;
+  font-weight: 600;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-avatar-btn i.fa-chevron-down {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.profile-avatar-btn.active i.fa-chevron-down {
+  transform: rotate(180deg);
+}
+
+/* Profile Dropdown */
+.profile-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 280px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  margin-top: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.profile-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  border-bottom: 1px solid #f0f0f0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 12px 12px 0 0;
+}
+
+.profile-avatar-large {
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.profile-avatar-large i {
+  font-size: 20px;
+  color: white;
+}
+
+.profile-info h4 {
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.profile-info p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  margin: 0;
+}
+
+.profile-menu {
+  padding: 8px 0;
+}
+
+.profile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  text-align: left;
+}
+
+.profile-menu-item:hover {
+  background: #f8f9fa;
+}
+
+.profile-menu-item i {
+  font-size: 16px;
+  width: 20px;
+  color: #667eea;
+}
+
+.profile-menu-item.profile-signout {
+  color: #dc3545;
+}
+
+.profile-menu-item.profile-signout i {
+  color: #dc3545;
+}
+
+.profile-menu-item.profile-signout:hover {
+  background: #fff5f5;
+}
+
+.profile-divider {
+  height: 1px;
+  background: #f0f0f0;
+  margin: 8px 0;
+}
+
 /* Toggle Switch CSS */
 .toggle-switch {
   position: relative;

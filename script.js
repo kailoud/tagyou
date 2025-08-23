@@ -29,6 +29,12 @@ document.addEventListener('DOMContentLoaded', async function () {
   // Initialize Authentication Service
   initializeAuthService();
 
+  // Initialize Modern Profile Service
+  initializeModernProfileService();
+
+  // Initialize Modern Profile UI
+  initializeModernProfileUI();
+
 
 
   // Wait for Supabase to be initialized before running diagnostics
@@ -195,6 +201,43 @@ async function initializeAuthService() {
 
   } catch (error) {
     console.error('❌ Authentication service initialization failed:', error);
+  }
+}
+
+// Initialize Modern Profile Service
+async function initializeModernProfileService() {
+  try {
+    console.log('👤 Initializing Modern Profile Service...');
+
+    // Import and initialize modern profile service
+    const { modernProfileService } = await import('./modern-profile-service.js');
+
+    // Initialize the service
+    const success = await modernProfileService.initialize();
+    if (success) {
+      console.log('✅ Modern Profile Service initialized successfully');
+      window.modernProfileService = modernProfileService;
+    } else {
+      console.error('❌ Modern Profile Service initialization failed');
+    }
+  } catch (error) {
+    console.error('❌ Error initializing Modern Profile Service:', error);
+  }
+}
+
+// Initialize Modern Profile UI
+async function initializeModernProfileUI() {
+  try {
+    console.log('🎨 Initializing Modern Profile UI...');
+
+    // Import and initialize modern profile UI
+    const { modernProfileUI } = await import('./modern-profile-ui.js');
+
+    // The UI is auto-initialized in the constructor
+    console.log('✅ Modern Profile UI initialized successfully');
+    window.modernProfileUI = modernProfileUI;
+  } catch (error) {
+    console.error('❌ Error initializing Modern Profile UI:', error);
   }
 }
 
