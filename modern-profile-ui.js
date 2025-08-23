@@ -685,14 +685,14 @@ class ModernProfileUI {
 
     if (mode === 'signin') {
       title.textContent = 'Sign In';
-      subtitle.textContent = 'Welcome back to TagYou2';
+      subtitle.textContent = 'Welcome to TagYou!';
       submitText.textContent = 'Sign In';
       toggleText.textContent = "Don't have an account? ";
       toggleBtn.textContent = 'Sign Up';
       form.dataset.mode = 'signin';
     } else {
       title.textContent = 'Sign Up';
-      subtitle.textContent = 'Create your TagYou2 account';
+      subtitle.textContent = 'Create your TagYou account';
       submitText.textContent = 'Sign Up';
       toggleText.textContent = 'Already have an account? ';
       toggleBtn.textContent = 'Sign In';
