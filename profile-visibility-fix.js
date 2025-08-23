@@ -151,17 +151,70 @@ function ensureModernProfileUI() {
           e.preventDefault();
           e.stopPropagation();
 
-          if (window.modernProfileUI && window.modernProfileUI.showAuthModal) {
-            console.log('✅ Calling showAuthModal...');
-            window.modernProfileUI.showAuthModal();
+          // Simple approach: Try to show the auth modal directly
+          console.log('🔄 Attempting to show auth modal...');
 
-            // Ensure auth modal event listeners are set up after modal is shown
+          // First, try to create the modal if it doesn't exist
+          let authModal = document.getElementById('authModal');
+          if (!authModal) {
+            console.log('🔄 Auth modal not found, creating it...');
+            // Create a simple auth modal
+            const modalHTML = `
+              <div id="authModal" class="auth-modal">
+                <div class="auth-modal-overlay">
+                  <div class="auth-modal-content">
+                    <button class="auth-modal-close" id="authModalClose">
+                      <i class="fas fa-times"></i>
+                    </button>
+                    
+                    <div class="auth-modal-header">
+                      <h2 id="authModalTitle">Sign In</h2>
+                      <p id="authModalSubtitle">Welcome to TagYou!</p>
+                    </div>
+
+                    <form id="authForm" class="auth-form">
+                      <div class="form-group">
+                        <label for="authEmail">Email</label>
+                        <input type="email" id="authEmail" required>
+                      </div>
+                      
+                      <div class="form-group">
+                        <label for="authPassword">Password</label>
+                        <input type="password" id="authPassword" required>
+                      </div>
+
+                      <button type="submit" class="auth-submit-btn" id="authSubmitBtn">
+                        <span id="authSubmitText">Sign In</span>
+                      </button>
+                    </form>
+
+                    <div class="auth-modal-footer">
+                      <p id="authToggleText">Don't have an account? <a href="#" id="authToggleBtn">Sign Up</a></p>
+                      <p><a href="#" id="forgotPasswordBtn">Forgot Password?</a></p>
+                    </div>
+
+                    <div id="authMessage"></div>
+                  </div>
+                </div>
+              </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            authModal = document.getElementById('authModal');
+            console.log('✅ Auth modal created');
+          }
+
+          // Show the modal
+          if (authModal) {
+            authModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            console.log('✅ Auth modal shown successfully');
+
+            // Set up event listeners for the modal
             setTimeout(() => {
               ensureAuthModalEventListeners();
             }, 100);
           } else {
-            console.error('❌ Modern Profile UI showAuthModal not available');
-            console.log('🔍 Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.modernProfileUI)));
+            console.error('❌ Failed to create or find auth modal');
           }
         };
 
@@ -181,6 +234,8 @@ function ensureModernProfileUI() {
     }
   } else {
     console.error('❌ Modern Profile UI not available');
+    console.log('🔄 Will retry in 1 second...');
+    setTimeout(ensureModernProfileUI, 1000);
   }
 }
 
@@ -301,8 +356,18 @@ function initializeProfileFix() {
   // Force visibility
   forceProfileVisibility();
 
-  // Ensure modern profile UI is working
-  ensureModernProfileUI();
+  // Wait for modern profile UI to be available
+  const waitForModernProfileUI = () => {
+    if (window.modernProfileUI) {
+      console.log('✅ Modern Profile UI found, setting up event listeners...');
+      ensureModernProfileUI();
+    } else {
+      console.log('⏳ Waiting for Modern Profile UI to be available...');
+      setTimeout(waitForModernProfileUI, 500);
+    }
+  };
+
+  waitForModernProfileUI();
 
   console.log('✅ Comprehensive profile fix initialized');
 }
@@ -339,5 +404,177 @@ window.ensureModernProfileUI = ensureModernProfileUI;
 window.ensureAuthModalEventListeners = ensureAuthModalEventListeners;
 window.removeOldAuthConflicts = removeOldAuthConflicts;
 window.initializeProfileFix = initializeProfileFix;
+
+// Direct auth modal function
+window.showAuthModalDirect = function () {
+  console.log('🔐 showAuthModalDirect called!');
+
+  // Create or find auth modal
+  let authModal = document.getElementById('authModal');
+  if (!authModal) {
+    console.log('🔄 Creating auth modal...');
+    const modalHTML = `
+      <div id="authModal" class="auth-modal">
+        <div class="auth-modal-overlay">
+          <div class="auth-modal-content">
+            <button class="auth-modal-close" id="authModalClose" onclick="hideAuthModalDirect()">
+              <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="auth-modal-header">
+              <h2 id="authModalTitle">Sign In</h2>
+              <p id="authModalSubtitle">Welcome to TagYou!</p>
+            </div>
+
+            <form id="authForm" class="auth-form" onsubmit="handleAuthSubmitDirect(event)">
+              <div class="form-group">
+                <label for="authEmail">Email</label>
+                <input type="email" id="authEmail" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="authPassword">Password</label>
+                <input type="password" id="authPassword" required>
+              </div>
+
+              <button type="submit" class="auth-submit-btn" id="authSubmitBtn">
+                <span id="authSubmitText">Sign In</span>
+              </button>
+            </form>
+
+            <div class="auth-modal-footer">
+              <p id="authToggleText">Don't have an account? <a href="#" id="authToggleBtn" onclick="toggleAuthModeDirect()">Sign Up</a></p>
+              <p><a href="#" id="forgotPasswordBtn" onclick="handleForgotPasswordDirect()">Forgot Password?</a></p>
+            </div>
+
+            <div id="authMessage"></div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    authModal = document.getElementById('authModal');
+    console.log('✅ Auth modal created');
+  }
+
+  // Show the modal
+  if (authModal) {
+    authModal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    console.log('✅ Auth modal shown successfully');
+  } else {
+    console.error('❌ Failed to create or find auth modal');
+  }
+};
+
+// Hide auth modal function
+window.hideAuthModalDirect = function () {
+  console.log('❌ Hiding auth modal...');
+  const authModal = document.getElementById('authModal');
+  if (authModal) {
+    authModal.classList.remove('show');
+    document.body.style.overflow = '';
+    console.log('✅ Auth modal hidden');
+  }
+};
+
+// Toggle auth mode function
+window.toggleAuthModeDirect = function () {
+  console.log('🔄 Toggling auth mode...');
+  const title = document.getElementById('authModalTitle');
+  const subtitle = document.getElementById('authModalSubtitle');
+  const submitText = document.getElementById('authSubmitText');
+  const toggleText = document.getElementById('authToggleText');
+  const toggleBtn = document.getElementById('authToggleBtn');
+  const form = document.getElementById('authForm');
+
+  if (form.dataset.mode === 'signup') {
+    // Switch to sign in
+    title.textContent = 'Sign In';
+    subtitle.textContent = 'Welcome to TagYou!';
+    submitText.textContent = 'Sign In';
+    toggleText.textContent = "Don't have an account? ";
+    toggleBtn.textContent = 'Sign Up';
+    form.dataset.mode = 'signin';
+  } else {
+    // Switch to sign up
+    title.textContent = 'Sign Up';
+    subtitle.textContent = 'Create your TagYou account';
+    submitText.textContent = 'Sign Up';
+    toggleText.textContent = 'Already have an account? ';
+    toggleBtn.textContent = 'Sign In';
+    form.dataset.mode = 'signup';
+  }
+};
+
+// Handle auth submit function
+window.handleAuthSubmitDirect = function (event) {
+  event.preventDefault();
+  console.log('📝 Auth form submitted');
+
+  const form = event.target;
+  const mode = form.dataset.mode || 'signin';
+  const email = form.querySelector('#authEmail').value;
+  const password = form.querySelector('#authPassword').value;
+
+  console.log('🔐 Auth attempt:', { mode, email });
+
+  // For now, just show a message
+  const messageDiv = document.getElementById('authMessage');
+  if (messageDiv) {
+    messageDiv.textContent = `${mode === 'signin' ? 'Sign In' : 'Sign Up'} functionality will be implemented with Supabase`;
+    messageDiv.className = 'auth-message auth-info';
+  }
+};
+
+// Handle forgot password function
+window.handleForgotPasswordDirect = function () {
+  console.log('🔑 Forgot password clicked');
+  const email = document.getElementById('authEmail').value;
+
+  if (!email) {
+    const messageDiv = document.getElementById('authMessage');
+    if (messageDiv) {
+      messageDiv.textContent = 'Please enter your email address first.';
+      messageDiv.className = 'auth-message auth-error';
+    }
+    return;
+  }
+
+  const messageDiv = document.getElementById('authMessage');
+  if (messageDiv) {
+    messageDiv.textContent = `Password reset email will be sent to ${email}`;
+    messageDiv.className = 'auth-message auth-info';
+  }
+};
+
+// Debug function to test Sign In button
+window.testSignInButton = function () {
+  console.log('🧪 Testing Sign In button...');
+
+  const signInBtn = document.getElementById('profileSignInBtn');
+  if (signInBtn) {
+    console.log('✅ Sign In button found');
+    console.log('🔍 Button properties:', {
+      display: signInBtn.style.display,
+      visibility: signInBtn.style.visibility,
+      opacity: signInBtn.style.opacity,
+      pointerEvents: signInBtn.style.pointerEvents,
+      cursor: signInBtn.style.cursor
+    });
+
+    // Test click
+    console.log('🖱️ Simulating click...');
+    signInBtn.click();
+  } else {
+    console.error('❌ Sign In button not found');
+  }
+
+  // Test modern profile UI
+  console.log('🔍 Modern Profile UI:', window.modernProfileUI);
+  if (window.modernProfileUI) {
+    console.log('🔍 Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.modernProfileUI)));
+  }
+};
 
 console.log('✅ Comprehensive profile visibility fix loaded');
