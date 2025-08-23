@@ -187,6 +187,8 @@
   visibility: hidden;
   opacity: 0;
   transition: all 0.3s ease;
+  /* Ensure no invisible overlay - only actual content is clickable */
+  pointer-events: none;
 }
 
 .mobile-profile-dropdown.show {
@@ -196,6 +198,8 @@
   animation: mobileDropdownSlide 0.3s ease;
   max-height: calc(100vh - 100px);
   overflow-y: auto;
+  /* Re-enable pointer events when shown */
+  pointer-events: auto;
 }
 
 @keyframes mobileDropdownSlide {
@@ -220,6 +224,8 @@
   align-items: center;
   gap: 12px;
   position: relative;
+  /* Ensure header is clickable for close button */
+  pointer-events: auto;
 }
 
 /* Mobile dropdown close button */
@@ -322,17 +328,85 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.3s ease;
   text-align: left;
   min-height: 50px;
+  /* Ensure menu items are clickable */
+  pointer-events: auto;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  margin: 2px 8px;
+}
+
+.mobile-profile-menu-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+  transition: left 0.5s ease;
 }
 
 .mobile-profile-menu-item:hover {
-  background: #f5f5f5;
+  background: linear-gradient(135deg, #f8f9ff, #e8f0ff);
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.mobile-profile-menu-item:hover::before {
+  left: 100%;
 }
 
 .mobile-profile-menu-item:active {
-  background: #e0e0e0;
+  background: linear-gradient(135deg, #e8f0ff, #d0e0ff);
+  transform: translateX(3px) scale(0.98);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  transition: all 0.1s ease;
+}
+
+/* Special styling for Sign In button */
+.mobile-profile-menu-item.mobile-auth-action {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  animation: mobileAuthButtonGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes mobileAuthButtonGlow {
+  0% {
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+
+  100% {
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5), 0 0 30px rgba(102, 126, 234, 0.2);
+  }
+}
+
+.mobile-profile-menu-item.mobile-auth-action:hover {
+  background: linear-gradient(135deg, #5a6fd8, #6a4190);
+  transform: translateX(5px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.mobile-profile-menu-item.mobile-auth-action:active {
+  background: linear-gradient(135deg, #4f64c6, #5f3780);
+  transform: translateX(3px) scale(0.98);
+  box-shadow: 0 3px 12px rgba(102, 126, 234, 0.5);
+}
+
+.mobile-profile-menu-item.mobile-auth-action i {
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-profile-menu-item.mobile-auth-action span {
+  color: white;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .mobile-profile-menu-item i {
@@ -690,6 +764,36 @@
   top: 15px !important;
   right: 15px !important;
   z-index: 1001 !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%) !important;
+  background-size: 400% 400% !important;
+  border-radius: 50% !important;
+  width: 55px !important;
+  height: 55px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow:
+    0 8px 25px rgba(102, 126, 234, 0.4),
+    0 4px 15px rgba(245, 87, 108, 0.3),
+    inset 0 2px 8px rgba(255, 255, 255, 0.2) !important;
+  border: 3px solid rgba(255, 255, 255, 0.4) !important;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  animation: mobileButtonGlow 6s ease-in-out infinite !important;
+}
+
+.mobile-test-mode .mobile-profile-dropdown {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: fixed !important;
+  top: 80px !important;
+  right: 15px !important;
+  z-index: 1001 !important;
+  background: white !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  width: 200px !important;
+  max-height: calc(100vh - 100px) !important;
 }
 
 /* Hide desktop profile on mobile */

@@ -10,6 +10,23 @@
   <button onclick="test1()">Test 1: Load Scripts</button>
   <button onclick="test2()">Test 2: Create Mobile Auth</button>
   <button onclick="test3()">Test 3: Show Modal</button>
+  <button onclick="test4()">Test 4: Test Sign In Popup</button>
+  <button onclick="test5()">Test 5: Test Sign Up Popup</button>
+  <button onclick="test6()">Test 6: Quick Modal Test</button>
+  <button onclick="test7()">Test 7: Mobile Profile Button Test</button>
+  <button onclick="test8()">Test 8: Direct Sign In Popup</button>
+  <button onclick="test9()">Test 9: Enable Mobile Test Mode</button>
+  <button onclick="test10()">Test 10: Monitor Desktop Sign In</button>
+  <button onclick="test11()">Test 11: Monitor Mobile Sign In</button>
+  <button onclick="test12()">Test 12: Side-by-Side Desktop vs Mobile Sign In Comparison</button>
+  <button onclick="compareFlows()">🔍 Compare Flows</button>
+  <button onclick="test13()">Test 13: Debug Dropdown Clicks</button>
+  <button onclick="test14()">Test 14: Monitor All Click Events</button>
+  <button onclick="test15()">Test 15: Test Mobile Auth Directly</button>
+  <button onclick="test16()">Test 16: Check Mobile Button Functionality</button>
+  <button onclick="test17()">Test 17: Force Mobile Auth Initialization</button>
+  <button onclick="test18()">Test 18: Check Script Loading Order</button>
+  <button onclick="test19()">Test 19: Direct Mobile Button Test</button>
   <div id="output"></div>
 
   <script>
@@ -118,6 +135,935 @@
       } catch (error) {
         log('❌ Error showing modal: ' + error.message);
       }
+    }
+
+    function test4() {
+      log('=== Test 4: Test Sign In Popup ===');
+
+      if (!window.mobileAuth) {
+        log('❌ Mobile auth not available');
+        return;
+      }
+
+      try {
+        log('📱 Testing Sign In popup...');
+        window.mobileAuth.showSignInModal();
+        log('✅ Sign In popup should be visible now');
+      } catch (error) {
+        log('❌ Error showing Sign In popup: ' + error.message);
+      }
+    }
+
+    function test5() {
+      log('=== Test 5: Test Sign Up Popup ===');
+
+      if (!window.mobileAuth) {
+        log('❌ Mobile auth not available');
+        return;
+      }
+
+      try {
+        log('📱 Testing Sign Up popup...');
+        window.mobileAuth.showSignUpModal();
+        log('✅ Sign Up popup should be visible now');
+      } catch (error) {
+        log('❌ Error showing Sign Up popup: ' + error.message);
+      }
+    }
+
+    function test6() {
+      log('=== Test 6: Quick Test ===');
+
+      // Test if we can create a simple modal
+      const modalHTML = `
+        <div id="quickTestModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+          <div style="background: white; padding: 30px; border-radius: 15px; max-width: 400px; width: 90%;">
+            <h2>🧪 Quick Test</h2>
+            <p>This is a quick test to verify modals work!</p>
+            <button onclick="document.getElementById('quickTestModal').remove()" style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Close</button>
+          </div>
+        </div>
+      `;
+
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
+      log('✅ Quick test modal created - modals are working!');
+    }
+
+    function test7() {
+      log('=== Test 7: Mobile Profile Button Test ===');
+
+      // Check if mobile profile button exists
+      const mobileButton = document.getElementById('mobileProfileButton');
+      log(`Mobile profile button exists: ${!!mobileButton}`);
+
+      if (mobileButton) {
+        log(`Mobile button display: ${window.getComputedStyle(mobileButton).display}`);
+        log(`Mobile button position: ${window.getComputedStyle(mobileButton).position}`);
+        log(`Mobile button z-index: ${window.getComputedStyle(mobileButton).zIndex}`);
+
+        // Try to click the button
+        log('📱 Attempting to click mobile profile button...');
+        mobileButton.click();
+
+        // Check if dropdown opened
+        setTimeout(() => {
+          const dropdown = document.getElementById('mobileProfileDropdown');
+          if (dropdown) {
+            log(`Dropdown exists: ${!!dropdown}`);
+            log(`Dropdown has show class: ${dropdown.classList.contains('show')}`);
+            log(`Dropdown display: ${window.getComputedStyle(dropdown).display}`);
+
+            // Check if menu items exist
+            const menu = document.getElementById('mobileProfileMenu');
+            if (menu) {
+              log(`Menu exists: ${!!menu}`);
+              log(`Menu children count: ${menu.children.length}`);
+              log(`Menu innerHTML: ${menu.innerHTML.substring(0, 200)}...`);
+            }
+          }
+        }, 500);
+      } else {
+        log('❌ Mobile profile button not found - creating one...');
+
+        // Create mobile profile button manually
+        const button = document.createElement('button');
+        button.id = 'mobileProfileButton';
+        button.className = 'mobile-profile-button';
+        button.innerHTML = '<i class="fas fa-user"></i>';
+        button.style.cssText = 'position: fixed; top: 15px; right: 15px; z-index: 1000; display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; background: linear-gradient(135deg, #667eea, #764ba2); border: none; border-radius: 50%; color: white; cursor: pointer;';
+
+        button.addEventListener('click', () => {
+          log('📱 Manual mobile button clicked!');
+          if (window.mobileAuth) {
+            window.mobileAuth.toggleMobileProfileDropdown();
+          }
+        });
+
+        document.body.appendChild(button);
+        log('✅ Manual mobile profile button created');
+      }
+    }
+
+    function test8() {
+      log('=== Test 8: Direct Sign In Popup Test ===');
+
+      // Test direct sign in popup
+      if (window.mobileAuth && typeof window.mobileAuth.showSignInModal === 'function') {
+        log('✅ Mobile auth showSignInModal method exists');
+        try {
+          log('📱 Calling showSignInModal directly...');
+          window.mobileAuth.showSignInModal();
+          log('✅ showSignInModal called successfully - popup should be visible!');
+        } catch (error) {
+          log(`❌ Error calling showSignInModal: ${error.message}`);
+        }
+      } else if (window.authService && typeof window.authService.showSignInModal === 'function') {
+        log('✅ Auth service showSignInModal method exists');
+        try {
+          log('📱 Calling auth service showSignInModal...');
+          window.authService.showSignInModal();
+          log('✅ auth service showSignInModal called successfully - popup should be visible!');
+        } catch (error) {
+          log(`❌ Error calling auth service showSignInModal: ${error.message}`);
+        }
+      } else {
+        log('❌ Neither mobile auth nor auth service showSignInModal available');
+        log(`Mobile auth: ${!!window.mobileAuth}`);
+        log(`Auth service: ${!!window.authService}`);
+        if (window.mobileAuth) {
+          log(`Mobile auth methods: ${Object.keys(window.mobileAuth).join(', ')}`);
+        }
+        if (window.authService) {
+          log(`Auth service methods: ${Object.keys(window.authService).join(', ')}`);
+        }
+      }
+    }
+
+    function test9() {
+      log('=== Test 9: Enable Mobile Test Mode ===');
+
+      // Add mobile test mode class to body
+      document.body.classList.add('mobile-test-mode');
+      log('✅ Mobile test mode enabled - mobile elements should now be visible on desktop');
+
+      // Force show mobile profile button
+      const mobileButton = document.getElementById('mobileProfileButton');
+      if (mobileButton) {
+        mobileButton.style.display = 'flex';
+        mobileButton.style.visibility = 'visible';
+        mobileButton.style.opacity = '1';
+        mobileButton.style.position = 'fixed';
+        mobileButton.style.top = '15px';
+        mobileButton.style.right = '15px';
+        mobileButton.style.zIndex = '1001';
+        log('✅ Mobile profile button forced visible');
+      } else {
+        log('❌ Mobile profile button not found');
+      }
+
+      // Force show mobile dropdown
+      const mobileDropdown = document.getElementById('mobileProfileDropdown');
+      if (mobileDropdown) {
+        mobileDropdown.style.display = 'block';
+        mobileDropdown.style.visibility = 'visible';
+        mobileDropdown.style.opacity = '1';
+        mobileDropdown.style.position = 'fixed';
+        mobileDropdown.style.top = '80px';
+        mobileDropdown.style.right = '15px';
+        mobileDropdown.style.zIndex = '1001';
+        mobileDropdown.style.background = 'white';
+        mobileDropdown.style.borderRadius = '12px';
+        mobileDropdown.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+        mobileDropdown.style.border = '1px solid rgba(0, 0, 0, 0.1)';
+        mobileDropdown.style.width = '200px';
+        mobileDropdown.style.maxHeight = 'calc(100vh - 100px)';
+        log('✅ Mobile dropdown forced visible');
+      } else {
+        log('❌ Mobile dropdown not found');
+      }
+
+      log('📱 Now you should see the mobile profile button in the top right corner!');
+      log('📱 Click it to open the dropdown with Sign In and Create Account options');
+    }
+
+    function test10() {
+      log('=== Test 10: Monitor Desktop Sign In Flow ===');
+
+      // Check if desktop profile button exists
+      const desktopButton = document.querySelector('.profile-button');
+      log(`Desktop profile button exists: ${!!desktopButton}`);
+
+      if (desktopButton) {
+        log(`Desktop button display: ${window.getComputedStyle(desktopButton).display}`);
+        log(`Desktop button position: ${window.getComputedStyle(desktopButton).position}`);
+
+        // Add click listener to monitor desktop button clicks
+        desktopButton.addEventListener('click', (e) => {
+          log('🖥️ Desktop profile button clicked!');
+          log(`Event target: ${e.target}`);
+          log(`Event type: ${e.type}`);
+          log(`Timestamp: ${new Date().toISOString()}`);
+        });
+
+        // Check if dropdown exists
+        const desktopDropdown = document.querySelector('.profile-dropdown');
+        log(`Desktop dropdown exists: ${!!desktopDropdown}`);
+
+        if (desktopDropdown) {
+          // Monitor dropdown visibility changes
+          const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                log(`🖥️ Desktop dropdown style changed: ${desktopDropdown.style.display}`);
+              }
+            });
+          });
+
+          observer.observe(desktopDropdown, {
+            attributes: true,
+            attributeFilter: ['style']
+          });
+
+          log('✅ Desktop dropdown observer added');
+        }
+
+        // Monitor for sign in buttons in the dropdown
+        setTimeout(() => {
+          const signInButtons = document.querySelectorAll('.profile-menu-item');
+          log(`Found ${signInButtons.length} profile menu items`);
+
+          signInButtons.forEach((button, index) => {
+            const text = button.textContent.trim();
+            log(`Menu item ${index + 1}: "${text}"`);
+
+            if (text.includes('Sign In')) {
+              log(`✅ Found Sign In button: ${button.outerHTML.substring(0, 100)}...`);
+
+              // Add click listener to monitor sign in button clicks
+              button.addEventListener('click', (e) => {
+                log('🖥️ Desktop Sign In button clicked!');
+                log(`Event target: ${e.target}`);
+                log(`Event type: ${e.type}`);
+                log(`Timestamp: ${new Date().toISOString()}`);
+                log(`Button text: ${button.textContent.trim()}`);
+
+                // Check if auth service is available
+                log(`Auth service available: ${!!window.authService}`);
+                if (window.authService) {
+                  log(`showSignInModal method: ${typeof window.authService.showSignInModal}`);
+                }
+              });
+
+              log('✅ Desktop Sign In button click listener added');
+            }
+          });
+        }, 1000);
+
+        log('🖥️ Desktop profile button monitoring enabled');
+        log('🖥️ Click the desktop profile button to see what happens');
+      } else {
+        log('❌ Desktop profile button not found');
+      }
+
+      // Also monitor auth service methods
+      if (window.authService) {
+        log('🔐 Auth service found - monitoring methods');
+
+        // Override showSignInModal to add logging
+        const originalShowSignInModal = window.authService.showSignInModal;
+        window.authService.showSignInModal = function () {
+          log('🔐 Auth service showSignInModal called!');
+          log(`Original method: ${typeof originalShowSignInModal}`);
+          log(`Timestamp: ${new Date().toISOString()}`);
+          log(`Stack trace: ${new Error().stack}`);
+
+          if (typeof originalShowSignInModal === 'function') {
+            log('🔐 Calling original showSignInModal...');
+            return originalShowSignInModal.call(this);
+          } else {
+            log('❌ Original showSignInModal is not a function');
+          }
+        };
+
+        log('✅ Auth service showSignInModal method overridden with logging');
+      } else {
+        log('❌ Auth service not found');
+      }
+    }
+
+    function test11() {
+      log('=== Test 11: Monitor Mobile Sign In Flow ===');
+
+      // First enable mobile test mode to make elements visible
+      document.body.classList.add('mobile-test-mode');
+      log('✅ Mobile test mode enabled');
+
+      // Check if mobile profile button exists
+      const mobileButton = document.getElementById('mobileProfileButton');
+      log(`Mobile profile button exists: ${!!mobileButton}`);
+
+      if (mobileButton) {
+        log(`Mobile button display: ${window.getComputedStyle(mobileButton).display}`);
+        log(`Mobile button position: ${window.getComputedStyle(mobileButton).position}`);
+        log(`Mobile button z-index: ${window.getComputedStyle(mobileButton).zIndex}`);
+
+        // Force show mobile button if hidden
+        if (window.getComputedStyle(mobileButton).display === 'none') {
+          mobileButton.style.display = 'flex';
+          mobileButton.style.visibility = 'visible';
+          mobileButton.style.opacity = '1';
+          log('✅ Mobile button forced visible');
+        }
+
+        // Add click listener to monitor mobile button clicks
+        mobileButton.addEventListener('click', (e) => {
+          log('📱 Mobile profile button clicked!');
+          log(`Event target: ${e.target}`);
+          log(`Event type: ${e.type}`);
+          log(`Timestamp: ${new Date().toISOString()}`);
+        });
+
+        // Check if mobile dropdown exists
+        const mobileDropdown = document.getElementById('mobileProfileDropdown');
+        log(`Mobile dropdown exists: ${!!mobileDropdown}`);
+
+        if (mobileDropdown) {
+          // Force show mobile dropdown if hidden
+          if (window.getComputedStyle(mobileDropdown).display === 'none') {
+            mobileDropdown.style.display = 'block';
+            mobileDropdown.style.visibility = 'visible';
+            mobileDropdown.style.opacity = '1';
+            log('✅ Mobile dropdown forced visible');
+          }
+
+          // Monitor dropdown visibility changes
+          const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              if (mutation.type === 'attributes') {
+                if (mutation.attributeName === 'style') {
+                  log(`📱 Mobile dropdown style changed: ${mobileDropdown.style.display}`);
+                } else if (mutation.attributeName === 'class') {
+                  log(`📱 Mobile dropdown class changed: ${mobileDropdown.className}`);
+                  if (mobileDropdown.classList.contains('show')) {
+                    log('📱 Mobile dropdown SHOW class added!');
+                  }
+                }
+              }
+            });
+          });
+
+          observer.observe(mobileDropdown, {
+            attributes: true,
+            attributeFilter: ['style', 'class']
+          });
+
+          log('✅ Mobile dropdown observer added');
+        }
+
+        // Monitor for sign in buttons in the mobile dropdown
+        setTimeout(() => {
+          const mobileMenu = document.getElementById('mobileProfileMenu');
+          log(`Mobile menu exists: ${!!mobileMenu}`);
+
+          if (mobileMenu) {
+            const mobileMenuItems = mobileMenu.querySelectorAll('.profile-menu-item');
+            log(`Found ${mobileMenuItems.length} mobile profile menu items`);
+
+            mobileMenuItems.forEach((button, index) => {
+              const text = button.textContent.trim();
+              log(`Mobile menu item ${index + 1}: "${text}"`);
+
+              if (text.includes('Sign In')) {
+                log(`✅ Found Mobile Sign In button: ${button.outerHTML.substring(0, 100)}...`);
+
+                // Add click listener to monitor mobile sign in button clicks
+                button.addEventListener('click', (e) => {
+                  log('📱 Mobile Sign In button clicked!');
+                  log(`Event target: ${e.target}`);
+                  log(`Event type: ${e.type}`);
+                  log(`Timestamp: ${new Date().toISOString()}`);
+                  log(`Button text: ${button.textContent.trim()}`);
+
+                  // Check if auth service is available
+                  log(`Auth service available: ${!!window.authService}`);
+                  if (window.authService) {
+                    log(`showSignInModal method: ${typeof window.authService.showSignInModal}`);
+                  }
+
+                  // Check if mobile auth is available
+                  log(`Mobile auth available: ${!!window.mobileAuth}`);
+                  if (window.mobileAuth) {
+                    log(`showSignInModal method: ${typeof window.mobileAuth.showSignInModal}`);
+                  }
+                });
+
+                log('✅ Mobile Sign In button click listener added');
+              }
+            });
+          } else {
+            log('❌ Mobile menu not found - trying to populate it');
+            if (window.mobileAuth && typeof window.mobileAuth.populateMobileProfileMenu === 'function') {
+              log('📱 Calling populateMobileProfileMenu...');
+              window.mobileAuth.populateMobileProfileMenu();
+
+              // Check again after population
+              setTimeout(() => {
+                const newMenu = document.getElementById('mobileProfileMenu');
+                if (newMenu) {
+                  const newItems = newMenu.querySelectorAll('.profile-menu-item');
+                  log(`After population: Found ${newItems.length} mobile menu items`);
+
+                  newItems.forEach((button, index) => {
+                    const text = button.textContent.trim();
+                    log(`New mobile menu item ${index + 1}: "${text}"`);
+
+                    if (text.includes('Sign In')) {
+                      log(`✅ Found new Mobile Sign In button`);
+
+                      button.addEventListener('click', (e) => {
+                        log('📱 NEW Mobile Sign In button clicked!');
+                        log(`Event target: ${e.target}`);
+                        log(`Event type: ${e.type}`);
+                        log(`Timestamp: ${new Date().toISOString()}`);
+                      });
+                    }
+                  });
+                }
+              }, 500);
+            }
+          }
+        }, 1000);
+
+        log('📱 Mobile profile button monitoring enabled');
+        log('📱 Click the mobile profile button to see what happens');
+      } else {
+        log('❌ Mobile profile button not found');
+      }
+
+      // Also monitor mobile auth methods
+      if (window.mobileAuth) {
+        log('📱 Mobile auth found - monitoring methods');
+
+        // Override mobile auth showSignInModal to add logging
+        const originalMobileShowSignInModal = window.mobileAuth.showSignInModal;
+        window.mobileAuth.showSignInModal = function () {
+          log('📱 Mobile auth showSignInModal called!');
+          log(`Original method: ${typeof originalMobileShowSignInModal}`);
+          log(`Timestamp: ${new Date().toISOString()}`);
+          log(`Stack trace: ${new Error().stack}`);
+
+          if (typeof originalMobileShowSignInModal === 'function') {
+            log('📱 Calling original mobile showSignInModal...');
+            return originalMobileShowSignInModal.call(this);
+          } else {
+            log('❌ Original mobile showSignInModal is not a function');
+          }
+        };
+
+        log('✅ Mobile auth showSignInModal method overridden with logging');
+      } else {
+        log('❌ Mobile auth not found');
+      }
+
+      // Also monitor the toggle method
+      if (window.mobileAuth && typeof window.mobileAuth.toggleMobileProfileDropdown === 'function') {
+        const originalToggle = window.mobileAuth.toggleMobileProfileDropdown;
+        window.mobileAuth.toggleMobileProfileDropdown = function () {
+          log('📱 Mobile toggleMobileProfileDropdown called!');
+          log(`Timestamp: ${new Date().toISOString()}`);
+          log(`Stack trace: ${new Error().stack}`);
+
+          if (typeof originalToggle === 'function') {
+            log('📱 Calling original toggle method...');
+            return originalToggle.call(this);
+          }
+        };
+
+        log('✅ Mobile toggleMobileProfileDropdown method overridden with logging');
+      }
+    }
+
+    function test12() {
+      log('=== Test 12: Side-by-Side Desktop vs Mobile Sign In Comparison ===');
+
+      // Enable mobile test mode
+      document.body.classList.add('mobile-test-mode');
+      log('✅ Mobile test mode enabled for comparison');
+
+      // Store the flows for comparison
+      window.desktopFlow = [];
+      window.mobileFlow = [];
+
+      // Function to add to desktop flow
+      function addToDesktopFlow(event, details) {
+        const entry = {
+          timestamp: new Date().toISOString(),
+          event: event,
+          details: details
+        };
+        window.desktopFlow.push(entry);
+        log(`🖥️ DESKTOP: ${event} - ${details}`);
+      }
+
+      // Function to add to mobile flow
+      function addToMobileFlow(event, details) {
+        const entry = {
+          timestamp: new Date().toISOString(),
+          event: event,
+          details: details
+        };
+        window.mobileFlow.push(entry);
+        log(`📱 MOBILE: ${event} - ${details}`);
+      }
+
+      // Monitor Desktop Flow
+      const desktopButton = document.querySelector('.profile-button');
+      if (desktopButton) {
+        addToDesktopFlow('Button Found', 'Desktop profile button exists');
+
+        // Monitor desktop button click
+        desktopButton.addEventListener('click', (e) => {
+          addToDesktopFlow('Button Clicked', 'Desktop profile button clicked');
+        });
+
+        // Monitor desktop dropdown
+        const desktopDropdown = document.querySelector('.profile-dropdown');
+        if (desktopDropdown) {
+          addToDesktopFlow('Dropdown Found', 'Desktop dropdown exists');
+
+          // Monitor dropdown visibility
+          const desktopObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                addToDesktopFlow('Dropdown Style Changed', `Display: ${desktopDropdown.style.display}`);
+              }
+            });
+          });
+          desktopObserver.observe(desktopDropdown, { attributes: true, attributeFilter: ['style'] });
+        }
+
+        // Monitor desktop sign in button
+        setTimeout(() => {
+          const desktopSignInButtons = document.querySelectorAll('.profile-menu-item');
+          desktopSignInButtons.forEach((button) => {
+            if (button.textContent.includes('Sign In')) {
+              addToDesktopFlow('Sign In Button Found', 'Desktop Sign In button exists');
+
+              button.addEventListener('click', (e) => {
+                addToDesktopFlow('Sign In Button Clicked', 'Desktop Sign In button clicked');
+              });
+            }
+          });
+        }, 1000);
+      }
+
+      // Monitor Mobile Flow
+      const mobileButton = document.getElementById('mobileProfileButton');
+      if (mobileButton) {
+        addToMobileFlow('Button Found', 'Mobile profile button exists');
+
+        // Force show mobile button
+        mobileButton.style.display = 'flex';
+        mobileButton.style.visibility = 'visible';
+        mobileButton.style.opacity = '1';
+
+        // Monitor mobile button click
+        mobileButton.addEventListener('click', (e) => {
+          addToMobileFlow('Button Clicked', 'Mobile profile button clicked');
+        });
+
+        // Monitor mobile dropdown
+        const mobileDropdown = document.getElementById('mobileProfileDropdown');
+        if (mobileDropdown) {
+          addToMobileFlow('Dropdown Found', 'Mobile dropdown exists');
+
+          // Force show mobile dropdown
+          mobileDropdown.style.display = 'block';
+          mobileDropdown.style.visibility = 'visible';
+          mobileDropdown.style.opacity = '1';
+
+          // Monitor dropdown visibility
+          const mobileObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              if (mutation.type === 'attributes') {
+                if (mutation.attributeName === 'style') {
+                  addToMobileFlow('Dropdown Style Changed', `Display: ${mobileDropdown.style.display}`);
+                } else if (mutation.attributeName === 'class') {
+                  if (mobileDropdown.classList.contains('show')) {
+                    addToMobileFlow('Dropdown Show Class Added', 'Mobile dropdown SHOW class added');
+                  }
+                }
+              }
+            });
+          });
+          mobileObserver.observe(mobileDropdown, { attributes: true, attributeFilter: ['style', 'class'] });
+        }
+
+        // Monitor mobile sign in button
+        setTimeout(() => {
+          const mobileMenu = document.getElementById('mobileProfileMenu');
+          if (mobileMenu) {
+            const mobileSignInButtons = mobileMenu.querySelectorAll('.profile-menu-item');
+            mobileSignInButtons.forEach((button) => {
+              if (button.textContent.includes('Sign In')) {
+                addToMobileFlow('Sign In Button Found', 'Mobile Sign In button exists');
+
+                button.addEventListener('click', (e) => {
+                  addToMobileFlow('Sign In Button Clicked', 'Mobile Sign In button clicked');
+                });
+              }
+            });
+          } else {
+            addToMobileFlow('Menu Not Found', 'Mobile menu does not exist - trying to populate');
+            if (window.mobileAuth && typeof window.mobileAuth.populateMobileProfileMenu === 'function') {
+              window.mobileAuth.populateMobileProfileMenu();
+              addToMobileFlow('Menu Population Called', 'populateMobileProfileMenu() called');
+            }
+          }
+        }, 1000);
+      }
+
+      // Override auth service showSignInModal for desktop
+      if (window.authService) {
+        const originalDesktopShowSignInModal = window.authService.showSignInModal;
+        window.authService.showSignInModal = function () {
+          addToDesktopFlow('showSignInModal Called', 'Auth service showSignInModal called');
+          addToDesktopFlow('Stack Trace', new Error().stack.split('\n').slice(1, 4).join('\n'));
+
+          if (typeof originalDesktopShowSignInModal === 'function') {
+            addToDesktopFlow('Original Method Called', 'Calling original auth service showSignInModal');
+            return originalDesktopShowSignInModal.call(this);
+          }
+        };
+      }
+
+      // Override mobile auth showSignInModal for mobile
+      if (window.mobileAuth) {
+        const originalMobileShowSignInModal = window.mobileAuth.showSignInModal;
+        window.mobileAuth.showSignInModal = function () {
+          addToMobileFlow('showSignInModal Called', 'Mobile auth showSignInModal called');
+          addToMobileFlow('Stack Trace', new Error().stack.split('\n').slice(1, 4).join('\n'));
+
+          if (typeof originalMobileShowSignInModal === 'function') {
+            addToMobileFlow('Original Method Called', 'Calling original mobile auth showSignInModal');
+            return originalMobileShowSignInModal.call(this);
+          }
+        };
+      }
+
+      // Function to compare flows
+      window.compareFlows = function () {
+        log('=== FLOW COMPARISON ===');
+        log(`Desktop Flow Steps: ${window.desktopFlow.length}`);
+        log(`Mobile Flow Steps: ${window.mobileFlow.length}`);
+
+        log('\n🖥️ DESKTOP FLOW:');
+        window.desktopFlow.forEach((entry, index) => {
+          log(`${index + 1}. ${entry.event}: ${entry.details}`);
+        });
+
+        log('\n📱 MOBILE FLOW:');
+        window.mobileFlow.forEach((entry, index) => {
+          log(`${index + 1}. ${entry.event}: ${entry.details}`);
+        });
+
+        // Find differences
+        log('\n🔍 DIFFERENCES:');
+        const desktopEvents = window.desktopFlow.map(e => e.event);
+        const mobileEvents = window.mobileFlow.map(e => e.event);
+
+        const desktopOnly = desktopEvents.filter(e => !mobileEvents.includes(e));
+        const mobileOnly = mobileEvents.filter(e => !desktopEvents.includes(e));
+
+        if (desktopOnly.length > 0) {
+          log(`Desktop only: ${desktopOnly.join(', ')}`);
+        }
+        if (mobileOnly.length > 0) {
+          log(`Mobile only: ${mobileOnly.join(', ')}`);
+        }
+
+        if (desktopOnly.length === 0 && mobileOnly.length === 0) {
+          log('✅ Both flows have the same events');
+        }
+      };
+
+      log('✅ Side-by-side monitoring enabled');
+      log('🖥️ Click the desktop profile button to see desktop flow');
+      log('📱 Click the mobile profile button to see mobile flow');
+      log('🔍 Run compareFlows() in console to compare the flows');
+    }
+
+    function test13() {
+      console.log('🔍 TEST 13: Debug Dropdown Clicks');
+
+      // Monitor all click events on the page
+      const originalAddEventListener = EventTarget.prototype.addEventListener;
+      EventTarget.prototype.addEventListener = function (type, listener, options) {
+        if (type === 'click' || type === 'touchend') {
+          console.log(`🔍 Adding ${type} listener to:`, this);
+        }
+        return originalAddEventListener.call(this, type, listener, options);
+      };
+
+      // Monitor all click events
+      document.addEventListener('click', (e) => {
+        console.log(`🔍 Click detected on:`, e.target);
+        console.log(`🔍 Click target classes:`, e.target.className);
+        console.log(`🔍 Click target id:`, e.target.id);
+
+        // Check if it's on mobile dropdown
+        const mobileDropdown = document.getElementById('mobileProfileDropdown');
+        if (mobileDropdown && mobileDropdown.contains(e.target)) {
+          console.log('🔍 Click is INSIDE mobile dropdown');
+        } else {
+          console.log('🔍 Click is OUTSIDE mobile dropdown');
+        }
+      }, true);
+
+      console.log('✅ Click monitoring enabled');
+    }
+
+    function test14() {
+      console.log('🔍 TEST 14: Monitor All Click Events');
+
+      // Remove all existing click handlers temporarily
+      const mobileDropdown = document.getElementById('mobileProfileDropdown');
+      const mobileButton = document.getElementById('mobileProfileButton');
+
+      if (mobileDropdown) {
+        console.log('🔍 Mobile dropdown found:', mobileDropdown);
+        console.log('🔍 Mobile dropdown classes:', mobileDropdown.className);
+        console.log('🔍 Mobile dropdown has show class:', mobileDropdown.classList.contains('show'));
+      }
+
+      if (mobileButton) {
+        console.log('🔍 Mobile button found:', mobileButton);
+        console.log('🔍 Mobile button classes:', mobileButton.className);
+      }
+
+      // Add a simple click handler to see what happens
+      document.addEventListener('click', (e) => {
+        console.log(`🔍 CLICK EVENT:`, {
+          target: e.target,
+          targetId: e.target.id,
+          targetClass: e.target.className,
+          targetTag: e.target.tagName,
+          isMobileDropdown: mobileDropdown && mobileDropdown.contains(e.target),
+          isMobileButton: mobileButton && mobileButton.contains(e.target)
+        });
+      }, true);
+
+      console.log('✅ All click events being monitored');
+    }
+
+    function test15() {
+      console.log('🔍 TEST 15: Test Mobile Auth Directly');
+
+      // Test if mobile auth is available
+      console.log('📱 Mobile auth available:', !!window.mobileAuth);
+      console.log('📱 Auth service available:', !!window.authService);
+
+      if (window.mobileAuth) {
+        console.log('📱 Mobile auth methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.mobileAuth)));
+        console.log('📱 showSignInModal method:', typeof window.mobileAuth.showSignInModal);
+        console.log('📱 showSignUpModal method:', typeof window.mobileAuth.showSignUpModal);
+
+        // Test calling showSignInModal directly
+        try {
+          console.log('📱 Calling showSignInModal directly...');
+          window.mobileAuth.showSignInModal();
+          console.log('✅ showSignInModal called successfully');
+        } catch (error) {
+          console.error('❌ Error calling showSignInModal:', error);
+        }
+      } else {
+        console.error('❌ Mobile auth not available');
+      }
+    }
+
+    function test16() {
+      console.log('🔍 TEST 16: Check Mobile Button Functionality');
+
+      // Check if mobile elements exist
+      const mobileButton = document.getElementById('mobileProfileButton');
+      const mobileDropdown = document.getElementById('mobileProfileDropdown');
+      const mobileMenu = document.getElementById('mobileProfileMenu');
+
+      console.log('📱 Mobile button exists:', !!mobileButton);
+      console.log('📱 Mobile dropdown exists:', !!mobileDropdown);
+      console.log('📱 Mobile menu exists:', !!mobileMenu);
+
+      if (mobileMenu) {
+        const menuItems = mobileMenu.querySelectorAll('button');
+        console.log('📱 Menu items found:', menuItems.length);
+
+        menuItems.forEach((item, index) => {
+          console.log(`📱 Menu item ${index}:`, {
+            text: item.textContent,
+            className: item.className,
+            hasClickListeners: item.onclick !== null || item._clickListeners
+          });
+
+          // Add a test click listener to see if clicks are working
+          item.addEventListener('click', (e) => {
+            console.log(`🔍 Menu item ${index} clicked!`, e.target);
+          });
+        });
+      }
+
+      // Force open the dropdown for testing
+      if (mobileDropdown) {
+        mobileDropdown.classList.add('show');
+        console.log('📱 Forced dropdown open for testing');
+      }
+    }
+
+    function test17() {
+      console.log('🔍 TEST 17: Force Mobile Auth Initialization');
+
+      // Check if mobile auth exists
+      console.log('📱 Mobile auth exists:', !!window.mobileAuth);
+      console.log('📱 Mobile auth constructor:', typeof MobileAuth);
+
+      // Try to create mobile auth if it doesn't exist
+      if (!window.mobileAuth && typeof MobileAuth === 'function') {
+        console.log('📱 Creating new MobileAuth instance...');
+        try {
+          window.mobileAuth = new MobileAuth();
+          console.log('✅ MobileAuth created successfully');
+        } catch (error) {
+          console.error('❌ Error creating MobileAuth:', error);
+        }
+      }
+
+      // Check if mobile elements exist after initialization
+      setTimeout(() => {
+        const mobileButton = document.getElementById('mobileProfileButton');
+        const mobileDropdown = document.getElementById('mobileProfileDropdown');
+        const mobileMenu = document.getElementById('mobileProfileMenu');
+
+        console.log('📱 After initialization:');
+        console.log('📱 Mobile button exists:', !!mobileButton);
+        console.log('📱 Mobile dropdown exists:', !!mobileDropdown);
+        console.log('📱 Mobile menu exists:', !!mobileMenu);
+
+        if (mobileMenu) {
+          const menuItems = mobileMenu.querySelectorAll('button');
+          console.log('📱 Menu items found:', menuItems.length);
+          menuItems.forEach((item, index) => {
+            console.log(`📱 Menu item ${index}:`, item.textContent.trim());
+          });
+        }
+      }, 1000);
+    }
+
+    function test18() {
+      console.log('🔍 TEST 18: Check Script Loading Order');
+
+      // Check all loaded scripts
+      const scripts = document.querySelectorAll('script');
+      console.log('📱 Total scripts loaded:', scripts.length);
+
+      scripts.forEach((script, index) => {
+        console.log(`📱 Script ${index}:`, {
+          src: script.src,
+          type: script.type,
+          id: script.id
+        });
+      });
+
+      // Check if mobile auth script is loaded
+      const mobileAuthScript = Array.from(scripts).find(script =>
+        script.src && script.src.includes('mobile-auth.js')
+      );
+
+      console.log('📱 Mobile auth script found:', !!mobileAuthScript);
+
+      // Check global objects
+      console.log('📱 Global objects:');
+      console.log('📱 window.mobileAuth:', !!window.mobileAuth);
+      console.log('📱 window.authService:', !!window.authService);
+      console.log('📱 MobileAuth constructor:', typeof MobileAuth);
+    }
+
+    function test19() {
+      console.log('🔍 TEST 19: Direct Mobile Button Test');
+
+      // Force initialize mobile auth if needed
+      if (!window.mobileAuth) {
+        console.log('📱 Mobile auth not found, forcing initialization...');
+        window.forceInitMobileAuth();
+      }
+
+      // Wait a moment for initialization
+      setTimeout(() => {
+        // Force open the dropdown
+        const mobileDropdown = document.getElementById('mobileProfileDropdown');
+        if (mobileDropdown) {
+          mobileDropdown.classList.add('show');
+          console.log('📱 Forced dropdown open');
+
+          // Find and click the Sign In button
+          const mobileMenu = document.getElementById('mobileProfileMenu');
+          if (mobileMenu) {
+            const signInButton = Array.from(mobileMenu.querySelectorAll('button')).find(btn =>
+              btn.textContent.includes('Sign In')
+            );
+
+            if (signInButton) {
+              console.log('📱 Found Sign In button, clicking it...');
+              signInButton.click();
+              console.log('✅ Sign In button clicked!');
+            } else {
+              console.log('❌ Sign In button not found');
+            }
+          } else {
+            console.log('❌ Mobile menu not found');
+          }
+        } else {
+          console.log('❌ Mobile dropdown not found');
+        }
+      }, 500);
     }
   </script>
 </body>

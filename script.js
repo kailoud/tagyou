@@ -1089,14 +1089,49 @@ function initProfileButton() {
 
   // Close dropdown when clicking outside with mobile support
   const handleOutsideClick = function (e) {
+    // Don't close desktop dropdown if clicking on mobile dropdown elements
+    const mobileProfileButton = document.getElementById('mobileProfileButton');
+    const mobileProfileDropdown = document.getElementById('mobileProfileDropdown');
+
+    // If mobile test mode is enabled, don't interfere with mobile dropdown
+    if (document.body.classList.contains('mobile-test-mode')) {
+      return;
+    }
+
+    // If we're on mobile (screen width <= 480px), don't run desktop dropdown logic
+    if (window.innerWidth <= 480) {
+      return;
+    }
+
+    // If mobile dropdown exists and is visible, don't interfere
+    if (mobileProfileDropdown && mobileProfileDropdown.classList.contains('show')) {
+      return;
+    }
+
     if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+      // Check if click is on mobile dropdown elements - if so, don't close desktop dropdown
+      if (mobileProfileButton && mobileProfileButton.contains(e.target)) {
+        return; // Don't close desktop dropdown when clicking mobile button
+      }
+      if (mobileProfileDropdown && mobileProfileDropdown.contains(e.target)) {
+        return; // Don't close desktop dropdown when clicking mobile dropdown
+      }
+
       profileDropdown.classList.remove('show');
-      console.log('Dropdown closed by outside click');
+      console.log('Desktop dropdown closed by outside click');
     }
   };
 
-  document.addEventListener('click', handleOutsideClick);
-  document.addEventListener('touchend', handleOutsideClick);
+  // Only add desktop dropdown handlers if we're not in mobile mode
+  const isMobileMode = window.innerWidth <= 480 || document.body.classList.contains('mobile-test-mode');
+
+  if (!isMobileMode) {
+    document.addEventListener('click', handleOutsideClick);
+    document.addEventListener('touchend', handleOutsideClick);
+    console.log('✅ Desktop dropdown handlers added (desktop mode)');
+  } else {
+    console.log('📱 Desktop dropdown handlers disabled (mobile mode)');
+  }
 
   // Toggle switch click handler
   if (toggleSwitch) {
@@ -1194,16 +1229,9 @@ function initMobileProfile() {
   mobileProfileButton.addEventListener('click', handleMobileProfileClick);
   mobileProfileButton.addEventListener('touchstart', handleMobileProfileClick, { passive: false });
 
-  // Close dropdown when clicking outside
-  const handleMobileOutsideClick = function (e) {
-    if (!mobileProfileButton.contains(e.target) && !mobileProfileDropdown.contains(e.target)) {
-      mobileProfileDropdown.classList.remove('show');
-      console.log('📱 Mobile dropdown closed by outside click');
-    }
-  };
-
-  document.addEventListener('click', handleMobileOutsideClick);
-  document.addEventListener('touchend', handleMobileOutsideClick);
+  // Close dropdown when clicking outside - REMOVED: This is now handled by mobile-auth.js
+  // The mobile-auth.js module has its own outside click handler that's more robust
+  // and prevents conflicts between multiple handlers
 
   console.log('✅ Mobile profile initialized');
 }

@@ -247,18 +247,128 @@ class MobileAuth {
       {
         icon: 'fas fa-sign-in-alt',
         text: 'Sign In',
-        action: () => {
-          console.log('📱 Mobile Sign In clicked - calling auth service');
-          console.log('📱 Auth service:', window.authService);
-          console.log('📱 showSignInModal method:', typeof window.authService?.showSignInModal);
+        action: (event) => {
+          console.log('📱 Mobile Sign In clicked - SIMPLE DIRECT APPROACH');
 
+          // Add click animation to the button
+          const signInButton = event.target.closest('.mobile-profile-menu-item');
+          if (signInButton) {
+            signInButton.style.transform = 'translateX(3px) scale(0.95)';
+            signInButton.style.transition = 'all 0.1s ease';
+            setTimeout(() => {
+              signInButton.style.transform = '';
+              signInButton.style.transition = '';
+            }, 150);
+          }
+
+          // Try multiple approaches to show sign in modal
+          let modalShown = false;
+
+          // Approach 1: Try auth service first
           if (window.authService && typeof window.authService.showSignInModal === 'function') {
-            console.log('📱 Calling showSignInModal...');
-            window.authService.showSignInModal();
-            console.log('✅ showSignInModal called successfully');
+            console.log('📱 Trying auth service showSignInModal...');
+            try {
+              window.authService.showSignInModal();
+              modalShown = true;
+              console.log('✅ Auth service modal shown');
+            } catch (error) {
+              console.error('❌ Auth service failed:', error);
+            }
+          }
+
+          // Approach 2: Try mobile auth if auth service failed
+          if (!modalShown && window.mobileAuth && typeof window.mobileAuth.showSignInModal === 'function') {
+            console.log('📱 Trying mobile auth showSignInModal...');
+            try {
+              window.mobileAuth.showSignInModal();
+              modalShown = true;
+              console.log('✅ Mobile auth modal shown');
+            } catch (error) {
+              console.error('❌ Mobile auth failed:', error);
+            }
+          }
+
+          // Approach 3: Create a simple modal directly if both failed
+          if (!modalShown) {
+            console.log('📱 Creating simple modal directly...');
+            const simpleModal = `
+              <div id="simpleSignInModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 400px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0; color: #333;">📱 Sign In</h2>
+                    <button onclick="document.getElementById('simpleSignInModal').remove()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
+                  </div>
+                  
+                  <form id="simpleSignInForm">
+                    <div style="margin-bottom: 15px;">
+                      <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">Email Address</label>
+                      <input type="email" id="simpleEmail" required placeholder="Enter your email" style="width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                      <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">Password</label>
+                      <input type="password" id="simplePassword" required placeholder="Enter your password" style="width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                    
+                    <button type="submit" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">Sign In</button>
+                  </form>
+                  
+                  <div style="text-align: center; margin-top: 15px;">
+                    <p style="font-size: 14px; color: #666;">Don't have an account? <a href="#" onclick="alert('Create Account feature coming soon!'); return false;" style="color: #667eea; text-decoration: none;">Sign up</a></p>
+                  </div>
+                  
+                  <div id="simpleSignInError" style="display: none; background: #ffebee; color: #c62828; padding: 10px; border-radius: 5px; margin-top: 10px; font-size: 14px;"></div>
+                </div>
+              </div>
+            `;
+
+            // Remove any existing modal
+            const existingModal = document.getElementById('simpleSignInModal');
+            if (existingModal) {
+              existingModal.remove();
+            }
+
+            // Add the new modal
+            document.body.insertAdjacentHTML('beforeend', simpleModal);
+
+            // Add form submit handler
+            const form = document.getElementById('simpleSignInForm');
+            if (form) {
+              form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('simpleEmail').value;
+                const password = document.getElementById('simplePassword').value;
+
+                console.log('📱 Simple sign in attempt:', { email });
+
+                // Try to use auth service if available
+                if (window.authService && typeof window.authService.signIn === 'function') {
+                  window.authService.signIn(email, password).then(result => {
+                    if (result.success) {
+                      alert('✅ Signed in successfully!');
+                      document.getElementById('simpleSignInModal').remove();
+                      window.location.reload();
+                    } else {
+                      const errorDiv = document.getElementById('simpleSignInError');
+                      errorDiv.textContent = result.error || 'Sign in failed';
+                      errorDiv.style.display = 'block';
+                    }
+                  });
+                } else {
+                  alert('📱 Sign in functionality is being set up. Please try again in a moment.');
+                }
+              });
+            }
+
+            modalShown = true;
+            console.log('✅ Simple modal created and shown');
+          }
+
+          if (modalShown) {
+            console.log('✅ Sign in modal successfully shown!');
           } else {
-            console.error('❌ Auth service or showSignInModal not available');
-            alert('📱 Sign In: Authentication service not available. Please refresh the page.');
+            console.error('❌ Failed to show any sign in modal');
+            alert('📱 Sign in is temporarily unavailable. Please refresh the page and try again.');
           }
         },
         className: 'auth-action'
@@ -266,18 +376,155 @@ class MobileAuth {
       {
         icon: 'fas fa-user-plus',
         text: 'Create Account',
-        action: () => {
-          console.log('📱 Mobile Create Account clicked - calling auth service');
-          console.log('📱 Auth service:', window.authService);
-          console.log('📱 showSignUpModal method:', typeof window.authService?.showSignUpModal);
+        action: (event) => {
+          console.log('📱 Mobile Create Account clicked - SIMPLE DIRECT APPROACH');
 
+          // Add click animation to the button
+          const createAccountButton = event.target.closest('.mobile-profile-menu-item');
+          if (createAccountButton) {
+            createAccountButton.style.transform = 'translateX(3px) scale(0.95)';
+            createAccountButton.style.transition = 'all 0.1s ease';
+            setTimeout(() => {
+              createAccountButton.style.transform = '';
+              createAccountButton.style.transition = '';
+            }, 150);
+          }
+
+          // Try multiple approaches to show sign up modal
+          let modalShown = false;
+
+          // Approach 1: Try auth service first
           if (window.authService && typeof window.authService.showSignUpModal === 'function') {
-            console.log('📱 Calling showSignUpModal...');
-            window.authService.showSignUpModal();
-            console.log('✅ showSignUpModal called successfully');
+            console.log('📱 Trying auth service showSignUpModal...');
+            try {
+              window.authService.showSignUpModal();
+              modalShown = true;
+              console.log('✅ Auth service modal shown');
+            } catch (error) {
+              console.error('❌ Auth service failed:', error);
+            }
+          }
+
+          // Approach 2: Try mobile auth if auth service failed
+          if (!modalShown && window.mobileAuth && typeof window.mobileAuth.showSignUpModal === 'function') {
+            console.log('📱 Trying mobile auth showSignUpModal...');
+            try {
+              window.mobileAuth.showSignUpModal();
+              modalShown = true;
+              console.log('✅ Mobile auth modal shown');
+            } catch (error) {
+              console.error('❌ Mobile auth failed:', error);
+            }
+          }
+
+          // Approach 3: Create a simple modal directly if both failed
+          if (!modalShown) {
+            console.log('📱 Creating simple sign up modal directly...');
+            const simpleModal = `
+              <div id="simpleSignUpModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 400px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0; color: #333;">📱 Create Account</h2>
+                    <button onclick="document.getElementById('simpleSignUpModal').remove()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
+                  </div>
+                  
+                  <form id="simpleSignUpForm">
+                    <div style="margin-bottom: 15px;">
+                      <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">Full Name</label>
+                      <input type="text" id="simpleDisplayName" required placeholder="Enter your full name" style="width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                      <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">Email Address</label>
+                      <input type="email" id="simpleSignUpEmail" required placeholder="Enter your email" style="width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                      <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">Password</label>
+                      <input type="password" id="simpleSignUpPassword" required placeholder="Enter your password (min 6 chars)" style="width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                      <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">Confirm Password</label>
+                      <input type="password" id="simpleConfirmPassword" required placeholder="Confirm your password" style="width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                    
+                    <button type="submit" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">Create Account</button>
+                  </form>
+                  
+                  <div style="text-align: center; margin-top: 15px;">
+                    <p style="font-size: 14px; color: #666;">Already have an account? <a href="#" onclick="alert('Sign In feature is available!'); return false;" style="color: #667eea; text-decoration: none;">Sign in</a></p>
+                  </div>
+                  
+                  <div id="simpleSignUpError" style="display: none; background: #ffebee; color: #c62828; padding: 10px; border-radius: 5px; margin-top: 10px; font-size: 14px;"></div>
+                </div>
+              </div>
+            `;
+
+            // Remove any existing modal
+            const existingModal = document.getElementById('simpleSignUpModal');
+            if (existingModal) {
+              existingModal.remove();
+            }
+
+            // Add the new modal
+            document.body.insertAdjacentHTML('beforeend', simpleModal);
+
+            // Add form submit handler
+            const form = document.getElementById('simpleSignUpForm');
+            if (form) {
+              form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const displayName = document.getElementById('simpleDisplayName').value;
+                const email = document.getElementById('simpleSignUpEmail').value;
+                const password = document.getElementById('simpleSignUpPassword').value;
+                const confirmPassword = document.getElementById('simpleConfirmPassword').value;
+
+                console.log('📱 Simple sign up attempt:', { displayName, email });
+
+                // Validation
+                if (password.length < 6) {
+                  const errorDiv = document.getElementById('simpleSignUpError');
+                  errorDiv.textContent = 'Password must be at least 6 characters long';
+                  errorDiv.style.display = 'block';
+                  return;
+                }
+
+                if (password !== confirmPassword) {
+                  const errorDiv = document.getElementById('simpleSignUpError');
+                  errorDiv.textContent = 'Passwords do not match';
+                  errorDiv.style.display = 'block';
+                  return;
+                }
+
+                // Try to use auth service if available
+                if (window.authService && typeof window.authService.signUp === 'function') {
+                  window.authService.signUp(email, password, displayName).then(result => {
+                    if (result.success) {
+                      alert('✅ Account created successfully!');
+                      document.getElementById('simpleSignUpModal').remove();
+                      window.location.reload();
+                    } else {
+                      const errorDiv = document.getElementById('simpleSignUpError');
+                      errorDiv.textContent = result.error || 'Account creation failed';
+                      errorDiv.style.display = 'block';
+                    }
+                  });
+                } else {
+                  alert('📱 Account creation functionality is being set up. Please try again in a moment.');
+                }
+              });
+            }
+
+            modalShown = true;
+            console.log('✅ Simple sign up modal created and shown');
+          }
+
+          if (modalShown) {
+            console.log('✅ Sign up modal successfully shown!');
           } else {
-            console.error('❌ Auth service or showSignUpModal not available');
-            alert('📱 Create Account: Authentication service not available. Please refresh the page.');
+            console.error('❌ Failed to show any sign up modal');
+            alert('📱 Create Account is temporarily unavailable. Please refresh the page and try again.');
           }
         },
         className: 'auth-action'
@@ -323,7 +570,7 @@ class MobileAuth {
 
         // Execute the action
         console.log(`📱 Executing action for: ${item.text}`);
-        item.action();
+        item.action(e);
       });
 
       mobileProfileMenu.appendChild(button);
@@ -334,11 +581,23 @@ class MobileAuth {
 
 
 
-  // Show sign in modal - SIMPLIFIED VERSION
+  // Show sign in modal - ENHANCED VERSION
   showSignInModal() {
-    console.log('📱 Mobile Sign In clicked - SIMPLIFIED');
+    console.log('📱 Mobile Sign In clicked - ENHANCED VERSION');
 
-    // Create a simple modal directly
+    // Try to use auth service first
+    if (window.authService && typeof window.authService.showSignInModal === 'function') {
+      console.log('📱 Using auth service showSignInModal...');
+      try {
+        window.authService.showSignInModal();
+        return;
+      } catch (error) {
+        console.error('❌ Error calling auth service showSignInModal:', error);
+      }
+    }
+
+    // Fallback: Create a simple modal directly
+    console.log('📱 Creating fallback sign in modal...');
     const modalHTML = `
       <div id="simpleSignInModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;">
         <div style="background: white; padding: 30px; border-radius: 15px; max-width: 400px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
@@ -410,11 +669,23 @@ class MobileAuth {
     console.log('✅ Simple sign in modal created');
   }
 
-  // Show sign up modal - SIMPLIFIED VERSION
+  // Show sign up modal - ENHANCED VERSION
   showSignUpModal() {
-    console.log('📱 Mobile Create Account clicked - SIMPLIFIED');
+    console.log('📱 Mobile Create Account clicked - ENHANCED VERSION');
 
-    // Create a simple modal directly
+    // Try to use auth service first
+    if (window.authService && typeof window.authService.showSignUpModal === 'function') {
+      console.log('📱 Using auth service showSignUpModal...');
+      try {
+        window.authService.showSignUpModal();
+        return;
+      } catch (error) {
+        console.error('❌ Error calling auth service showSignUpModal:', error);
+      }
+    }
+
+    // Fallback: Create a simple modal directly
+    console.log('📱 Creating fallback sign up modal...');
     const modalHTML = `
       <div id="simpleSignUpModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;">
         <div style="background: white; padding: 30px; border-radius: 15px; max-width: 400px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
@@ -1250,6 +1521,15 @@ window.forceCloseMobileDropdown = function () {
 // Export for module usage
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = MobileAuth;
+}
+
+// Initialize mobile auth globally when script loads
+console.log('📱 Mobile auth script loaded, initializing...');
+try {
+  window.mobileAuth = new MobileAuth();
+  console.log('✅ Mobile auth initialized globally:', window.mobileAuth);
+} catch (error) {
+  console.error('❌ Error initializing mobile auth:', error);
 }
 
 

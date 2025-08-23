@@ -543,6 +543,222 @@
         }
       }, 3000);
     });
+
+    // Side-by-side comparison function for live testing
+    window.enableSignInComparison = function () {
+      console.log('🔍 Enabling sign in comparison monitoring...');
+
+      // Enable mobile test mode
+      document.body.classList.add('mobile-test-mode');
+
+      // Store the flows for comparison
+      window.desktopFlow = [];
+      window.mobileFlow = [];
+
+      // Function to add to desktop flow
+      function addToDesktopFlow(event, details) {
+        const entry = {
+          timestamp: new Date().toISOString(),
+          event: event,
+          details: details
+        };
+        window.desktopFlow.push(entry);
+        console.log(`🖥️ DESKTOP: ${event} - ${details}`);
+      }
+
+      // Function to add to mobile flow
+      function addToMobileFlow(event, details) {
+        const entry = {
+          timestamp: new Date().toISOString(),
+          event: event,
+          details: details
+        };
+        window.mobileFlow.push(entry);
+        console.log(`📱 MOBILE: ${event} - ${details}`);
+      }
+
+      // Monitor Desktop Flow
+      const desktopButton = document.querySelector('.profile-button');
+      if (desktopButton) {
+        addToDesktopFlow('Button Found', 'Desktop profile button exists');
+
+        // Monitor desktop button click
+        desktopButton.addEventListener('click', (e) => {
+          addToDesktopFlow('Button Clicked', 'Desktop profile button clicked');
+        });
+
+        // Monitor desktop dropdown
+        const desktopDropdown = document.querySelector('.profile-dropdown');
+        if (desktopDropdown) {
+          addToDesktopFlow('Dropdown Found', 'Desktop dropdown exists');
+
+          // Monitor dropdown visibility
+          const desktopObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                addToDesktopFlow('Dropdown Style Changed', `Display: ${desktopDropdown.style.display}`);
+              }
+            });
+          });
+          desktopObserver.observe(desktopDropdown, { attributes: true, attributeFilter: ['style'] });
+        }
+
+        // Monitor desktop sign in button
+        setTimeout(() => {
+          const desktopSignInButtons = document.querySelectorAll('.profile-menu-item');
+          desktopSignInButtons.forEach((button) => {
+            if (button.textContent.includes('Sign In')) {
+              addToDesktopFlow('Sign In Button Found', 'Desktop Sign In button exists');
+
+              button.addEventListener('click', (e) => {
+                addToDesktopFlow('Sign In Button Clicked', 'Desktop Sign In button clicked');
+              });
+            }
+          });
+        }, 1000);
+      }
+
+      // Monitor Mobile Flow
+      const mobileButton = document.getElementById('mobileProfileButton');
+      if (mobileButton) {
+        addToMobileFlow('Button Found', 'Mobile profile button exists');
+
+        // Force show mobile button
+        mobileButton.style.display = 'flex';
+        mobileButton.style.visibility = 'visible';
+        mobileButton.style.opacity = '1';
+
+        // Monitor mobile button click
+        mobileButton.addEventListener('click', (e) => {
+          addToMobileFlow('Button Clicked', 'Mobile profile button clicked');
+        });
+
+        // Monitor mobile dropdown
+        const mobileDropdown = document.getElementById('mobileProfileDropdown');
+        if (mobileDropdown) {
+          addToMobileFlow('Dropdown Found', 'Mobile dropdown exists');
+
+          // Force show mobile dropdown
+          mobileDropdown.style.display = 'block';
+          mobileDropdown.style.visibility = 'visible';
+          mobileDropdown.style.opacity = '1';
+
+          // Monitor dropdown visibility
+          const mobileObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              if (mutation.type === 'attributes') {
+                if (mutation.attributeName === 'style') {
+                  addToMobileFlow('Dropdown Style Changed', `Display: ${mobileDropdown.style.display}`);
+                } else if (mutation.attributeName === 'class') {
+                  if (mobileDropdown.classList.contains('show')) {
+                    addToMobileFlow('Dropdown Show Class Added', 'Mobile dropdown SHOW class added');
+                  }
+                }
+              }
+            });
+          });
+          mobileObserver.observe(mobileDropdown, { attributes: true, attributeFilter: ['style', 'class'] });
+        }
+
+        // Monitor mobile sign in button
+        setTimeout(() => {
+          const mobileMenu = document.getElementById('mobileProfileMenu');
+          if (mobileMenu) {
+            const mobileSignInButtons = mobileMenu.querySelectorAll('.profile-menu-item');
+            mobileSignInButtons.forEach((button) => {
+              if (button.textContent.includes('Sign In')) {
+                addToMobileFlow('Sign In Button Found', 'Mobile Sign In button exists');
+
+                button.addEventListener('click', (e) => {
+                  addToMobileFlow('Sign In Button Clicked', 'Mobile Sign In button clicked');
+                });
+              }
+            });
+          } else {
+            addToMobileFlow('Menu Not Found', 'Mobile menu does not exist - trying to populate');
+            if (window.mobileAuth && typeof window.mobileAuth.populateMobileProfileMenu === 'function') {
+              window.mobileAuth.populateMobileProfileMenu();
+              addToMobileFlow('Menu Population Called', 'populateMobileProfileMenu() called');
+            }
+          }
+        }, 1000);
+      }
+
+      // Override auth service showSignInModal for desktop
+      if (window.authService) {
+        const originalDesktopShowSignInModal = window.authService.showSignInModal;
+        window.authService.showSignInModal = function () {
+          addToDesktopFlow('showSignInModal Called', 'Auth service showSignInModal called');
+          addToDesktopFlow('Stack Trace', new Error().stack.split('\n').slice(1, 4).join('\n'));
+
+          if (typeof originalDesktopShowSignInModal === 'function') {
+            addToDesktopFlow('Original Method Called', 'Calling original auth service showSignInModal');
+            return originalDesktopShowSignInModal.call(this);
+          }
+        };
+      }
+
+      // Override mobile auth showSignInModal for mobile
+      if (window.mobileAuth) {
+        const originalMobileShowSignInModal = window.mobileAuth.showSignInModal;
+        window.mobileAuth.showSignInModal = function () {
+          addToMobileFlow('showSignInModal Called', 'Mobile auth showSignInModal called');
+          addToMobileFlow('Stack Trace', new Error().stack.split('\n').slice(1, 4).join('\n'));
+
+          if (typeof originalMobileShowSignInModal === 'function') {
+            addToMobileFlow('Original Method Called', 'Calling original mobile auth showSignInModal');
+            return originalMobileShowSignInModal.call(this);
+          }
+        };
+      }
+
+      console.log('✅ Sign in comparison monitoring enabled!');
+      console.log('🖥️ Click the desktop profile button to see desktop flow');
+      console.log('📱 Click the mobile profile button to see mobile flow');
+      console.log('🔍 Run compareFlows() in console to compare the flows');
+    };
+
+    // Function to compare flows
+    window.compareFlows = function () {
+      console.log('=== FLOW COMPARISON ===');
+      console.log(`Desktop Flow Steps: ${window.desktopFlow ? window.desktopFlow.length : 0}`);
+      console.log(`Mobile Flow Steps: ${window.mobileFlow ? window.mobileFlow.length : 0}`);
+
+      if (window.desktopFlow && window.desktopFlow.length > 0) {
+        console.log('\n🖥️ DESKTOP FLOW:');
+        window.desktopFlow.forEach((entry, index) => {
+          console.log(`${index + 1}. ${entry.event}: ${entry.details}`);
+        });
+      }
+
+      if (window.mobileFlow && window.mobileFlow.length > 0) {
+        console.log('\n📱 MOBILE FLOW:');
+        window.mobileFlow.forEach((entry, index) => {
+          console.log(`${index + 1}. ${entry.event}: ${entry.details}`);
+        });
+      }
+
+      // Find differences
+      if (window.desktopFlow && window.mobileFlow) {
+        console.log('\n🔍 DIFFERENCES:');
+        const desktopEvents = window.desktopFlow.map(e => e.event);
+        const mobileEvents = window.mobileFlow.map(e => e.event);
+
+        const desktopOnly = desktopEvents.filter(e => !mobileEvents.includes(e));
+        const mobileOnly = mobileEvents.filter(e => !desktopEvents.includes(e));
+
+        if (desktopOnly.length > 0) {
+          console.log(`Desktop only: ${desktopOnly.join(', ')}`);
+        }
+        if (mobileOnly.length > 0) {
+          console.log(`Mobile only: ${mobileOnly.join(', ')}`);
+        }
+
+        if (desktopOnly.length === 0 && mobileOnly.length === 0) {
+          console.log('✅ Both flows have the same events');
+        }
+      }
+    };
   </script>
 </body>
 
