@@ -15,8 +15,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   initMap();
   initSearch();
   initFestivalsDropdown();
-  initProfileButton();
-  initMobileProfile();
+
   initMapToolbar();
 
   // Samsung Galaxy S24 Ultra detection and adjustments
@@ -30,46 +29,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   // Initialize Authentication Service
   initializeAuthService();
 
-  // Debug profile dropdown elements
-  setTimeout(() => {
-    const profileButton = document.getElementById('profileButton');
-    const profileDropdown = document.getElementById('profileDropdown');
-    const profileMenu = document.getElementById('profileMenu');
 
-    console.log('🔍 MOBILE/WEB VERSION DEBUG:');
-    console.log('Screen width:', window.innerWidth);
-    console.log('User agent:', navigator.userAgent);
-    console.log('Is mobile viewport:', window.innerWidth <= 768);
-    console.log('');
-    console.log('Profile Elements:');
-    console.log('Profile Button:', profileButton);
-    console.log('Profile Dropdown:', profileDropdown);
-    console.log('Profile Menu:', profileMenu);
-    console.log('Profile Menu innerHTML:', profileMenu ? profileMenu.innerHTML : 'null');
-    console.log('Auth Service:', authService);
-    console.log('');
-
-    if (profileDropdown) {
-      console.log('Dropdown State:');
-      console.log('Classes:', profileDropdown.className);
-      console.log('Display:', window.getComputedStyle(profileDropdown).display);
-      console.log('Z-index:', window.getComputedStyle(profileDropdown).zIndex);
-      console.log('Position:', window.getComputedStyle(profileDropdown).position);
-      console.log('Width:', window.getComputedStyle(profileDropdown).width);
-    }
-
-    // Force populate menu if empty
-    if (profileMenu && profileMenu.innerHTML.trim() === '') {
-      console.log('⚠️ Profile menu is empty! Force populating...');
-      if (authService && authService.updateMenuItemsForGuestUser) {
-        authService.updateMenuItemsForGuestUser();
-        console.log('✅ Forced guest menu population via auth service');
-      } else {
-        console.log('⚠️ Auth service not available, using manual population');
-        forcePopulateProfileMenu();
-      }
-    }
-  }, 2000);
 
   // Wait for Supabase to be initialized before running diagnostics
   const waitForSupabase = async () => {
@@ -223,6 +183,8 @@ async function initializeAuthService() {
 
       // Update UI based on auth state
       updateAuthenticatedUI(user);
+
+
     });
 
     // Force initial UI update for guest user
@@ -240,8 +202,7 @@ async function initializeAuthService() {
 function updateAuthenticatedUI(user) {
   console.log('🎨 Updating UI for auth state:', user ? 'authenticated' : 'guest');
 
-  // Update profile button and menu (handled by auth service)
-  // Additional UI updates can be added here
+
 
   if (user) {
     // User is authenticated - enable protected features
@@ -264,6 +225,8 @@ function updateAuthenticatedUI(user) {
     updateProtectedFeatures(false);
   }
 }
+
+
 
 // Update favorites UI based on auth state
 function updateFavoritesUI(isAuthenticated) {
@@ -936,107 +899,7 @@ function initFestivalsDropdown() {
   }
 }
 
-// Initialize profile button functionality
-function initProfileButton() {
-  const profileButton = document.getElementById('profileButton');
-  const profileDropdown = document.getElementById('profileDropdown');
-  const toggleSwitch = document.getElementById('toggleSwitch');
 
-  if (!profileButton || !profileDropdown) {
-    console.error('❌ Profile elements not found');
-    return;
-  }
-
-  // Profile button click handler with mobile support
-  const handleProfileClick = function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    console.log('Desktop Profile button clicked - Mobile:', false);
-
-    const isOpen = profileDropdown.classList.contains('show');
-    console.log('Desktop dropdown currently open:', isOpen);
-
-    if (isOpen) {
-      profileDropdown.classList.remove('show');
-      console.log('Desktop dropdown closed');
-    } else {
-      profileDropdown.classList.add('show');
-      console.log('Desktop dropdown opened');
-    }
-  };
-
-  // Add both click and touchstart events for mobile compatibility
-  profileButton.addEventListener('click', handleProfileClick);
-  profileButton.addEventListener('touchstart', handleProfileClick, { passive: false });
-
-  // Close dropdown when clicking outside with mobile support
-  const handleOutsideClick = function (e) {
-    // Don't close desktop dropdown if clicking on mobile dropdown elements
-    const mobileProfileButton = document.getElementById('mobileProfileButton');
-    const mobileProfileDropdown = document.getElementById('mobileProfileDropdown');
-
-    // If mobile test mode is enabled, don't interfere with mobile dropdown
-    if (document.body.classList.contains('mobile-test-mode')) {
-      return;
-    }
-
-    // If we're on mobile (screen width <= 480px), don't run desktop dropdown logic
-    if (window.innerWidth <= 480) {
-      return;
-    }
-
-    // If mobile dropdown exists and is visible, don't interfere
-    if (mobileProfileDropdown && mobileProfileDropdown.classList.contains('show')) {
-      return;
-    }
-
-    if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
-      // Check if click is on mobile dropdown elements - if so, don't close desktop dropdown
-      if (mobileProfileButton && mobileProfileButton.contains(e.target)) {
-        return; // Don't close desktop dropdown when clicking mobile button
-      }
-      if (mobileProfileDropdown && mobileProfileDropdown.contains(e.target)) {
-        return; // Don't close desktop dropdown when clicking mobile dropdown
-      }
-
-      profileDropdown.classList.remove('show');
-      console.log('Desktop dropdown closed by outside click');
-    }
-  };
-
-  // Only add desktop dropdown handlers if we're not in mobile mode
-  const isMobileMode = window.innerWidth <= 480 || document.body.classList.contains('mobile-test-mode');
-
-  if (!isMobileMode) {
-    document.addEventListener('click', handleOutsideClick);
-    document.addEventListener('touchend', handleOutsideClick);
-    console.log('✅ Desktop dropdown handlers added (desktop mode)');
-  } else {
-    console.log('📱 Desktop dropdown handlers disabled (mobile mode)');
-  }
-
-  // Toggle switch click handler
-  if (toggleSwitch) {
-    toggleSwitch.addEventListener('click', function () {
-      const isEnabled = this.classList.contains('enabled');
-
-      if (isEnabled) {
-        this.classList.remove('enabled');
-        this.classList.add('disabled');
-        this.setAttribute('aria-checked', 'false');
-        console.log('Toggle switched OFF');
-      } else {
-        this.classList.remove('disabled');
-        this.classList.add('enabled');
-        this.setAttribute('aria-checked', 'true');
-        console.log('Toggle switched ON');
-      }
-    });
-  }
-
-  console.log('✅ Profile button initialized with mobile support');
-}
 
 // Samsung Galaxy S24 Ultra detection and adjustments
 function detectSamsungDevice() {
@@ -1050,12 +913,7 @@ function detectSamsungDevice() {
     // Add Samsung-specific CSS class
     document.body.classList.add('samsung-device');
 
-    // Force vertical layout for Samsung devices
-    const profileContainer = document.querySelector('.profile-container');
-    if (profileContainer) {
-      profileContainer.style.setProperty('flex-direction', 'column', 'important');
-      profileContainer.style.setProperty('align-items', 'center', 'important');
-    }
+
 
     // Adjust search and festival containers - follow 320-360px logic
     const searchContainer = document.querySelector('.search-container');
@@ -1073,228 +931,9 @@ function detectSamsungDevice() {
   }
 }
 
-// Initialize mobile profile functionality
-function initMobileProfile() {
-  const mobileProfileButton = document.getElementById('mobileProfileButton');
-  const mobileProfileDropdown = document.getElementById('mobileProfileDropdown');
-  const mobileProfileMenu = document.getElementById('mobileProfileMenu');
 
-  if (!mobileProfileButton || !mobileProfileDropdown || !mobileProfileMenu) {
-    console.log('Mobile profile elements not found (desktop mode)');
-    return;
-  }
 
-  console.log('📱 Initializing mobile profile...');
 
-  // Populate mobile profile menu
-  populateMobileProfileMenu();
-
-  // Mobile profile button click handler
-  const handleMobileProfileClick = function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    console.log('📱 Mobile profile button clicked');
-
-    const isOpen = mobileProfileDropdown.classList.contains('show');
-    console.log('📱 Mobile dropdown currently open:', isOpen);
-
-    if (isOpen) {
-      mobileProfileDropdown.classList.remove('show');
-      console.log('📱 Mobile dropdown closed');
-    } else {
-      mobileProfileDropdown.classList.add('show');
-      console.log('📱 Mobile dropdown opened');
-    }
-  };
-
-  // Add both click and touchstart events for mobile compatibility
-  mobileProfileButton.addEventListener('click', handleMobileProfileClick);
-  mobileProfileButton.addEventListener('touchstart', handleMobileProfileClick, { passive: false });
-
-  // Close dropdown when clicking outside - REMOVED: This is now handled by mobile-auth.js
-  // The mobile-auth.js module has its own outside click handler that's more robust
-  // and prevents conflicts between multiple handlers
-
-  console.log('✅ Mobile profile initialized');
-}
-
-// Populate mobile profile menu with authentication options
-function populateMobileProfileMenu() {
-  const mobileProfileMenu = document.getElementById('mobileProfileMenu');
-  if (!mobileProfileMenu) return;
-
-  console.log('📱 Populating mobile profile menu...');
-
-  // Clear existing menu items
-  mobileProfileMenu.innerHTML = '';
-
-  // Guest user menu items for mobile
-  const menuItems = [
-    {
-      icon: 'fas fa-sign-in-alt',
-      text: 'Sign In',
-      action: () => showMobileSignIn(),
-      className: 'mobile-auth-action'
-    },
-    {
-      icon: 'fas fa-user-plus',
-      text: 'Create Account',
-      action: () => showMobileCreateAccount(),
-      className: 'mobile-auth-action'
-    },
-    {
-      icon: 'fas fa-question-circle',
-      text: 'Help',
-      action: () => showMobileHelp(),
-      className: ''
-    }
-  ];
-
-  menuItems.forEach(item => {
-    const button = document.createElement('button');
-    button.className = `mobile-profile-menu-item ${item.className}`;
-    button.innerHTML = `
-      <i class="${item.icon}"></i>
-      <span>${item.text}</span>
-    `;
-    button.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log(`📱 Mobile menu item clicked: ${item.text}`);
-
-      // Close dropdown first
-      const dropdown = document.getElementById('mobileProfileDropdown');
-      if (dropdown) dropdown.classList.remove('show');
-
-      // Then execute action
-      item.action();
-    });
-
-    // Add touch event for better mobile response
-    button.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      button.style.backgroundColor = '#e0e0e0';
-    }, { passive: false });
-
-    button.addEventListener('touchend', (e) => {
-      button.style.backgroundColor = '';
-    });
-
-    mobileProfileMenu.appendChild(button);
-  });
-
-  console.log(`✅ Added ${menuItems.length} mobile menu items`);
-}
-
-// Mobile Sign In functionality - Now handled by mobile-auth.js module
-function showMobileSignIn() {
-  console.log('📱 Mobile Sign In clicked - delegating to mobile auth module');
-  if (window.mobileAuth && typeof window.mobileAuth.showSignInModal === 'function') {
-    window.mobileAuth.showSignInModal();
-  } else {
-    console.warn('📱 Mobile auth module not available');
-  }
-}
-
-// Mobile Create Account functionality - Now handled by mobile-auth.js module
-function showMobileCreateAccount() {
-  console.log('📱 Mobile Create Account clicked - delegating to mobile auth module');
-  if (window.mobileAuth && typeof window.mobileAuth.showSignUpModal === 'function') {
-    window.mobileAuth.showSignUpModal();
-  } else {
-    console.warn('📱 Mobile auth module not available');
-  }
-}
-
-// Mobile Help functionality - Now handled by mobile-auth.js module
-function showMobileHelp() {
-  console.log('📱 Mobile Help clicked - delegating to mobile auth module');
-  if (window.mobileAuth && typeof window.mobileAuth.showHelp === 'function') {
-    window.mobileAuth.showHelp();
-  } else {
-    console.warn('📱 Mobile auth module not available');
-  }
-}
-
-// Mobile auth functions now handled by mobile-auth.js module
-// These functions delegate to the mobile auth module
-
-// Make functions globally available for backward compatibility
-window.showMobileSignIn = showMobileSignIn;
-window.showMobileCreateAccount = showMobileCreateAccount;
-window.showMobileHelp = showMobileHelp;
-
-// Test function to manually trigger dropdown
-function testProfileDropdown() {
-  const profileDropdown = document.getElementById('profileDropdown');
-  if (profileDropdown) {
-    console.log('🧪 Testing profile dropdown...');
-    console.log('Before toggle - classes:', profileDropdown.className);
-    console.log('Before toggle - display:', window.getComputedStyle(profileDropdown).display);
-
-    profileDropdown.classList.add('show');
-
-    console.log('After adding show - classes:', profileDropdown.className);
-    console.log('After adding show - display:', window.getComputedStyle(profileDropdown).display);
-
-    setTimeout(() => {
-      profileDropdown.classList.remove('show');
-      console.log('After removing show - classes:', profileDropdown.className);
-    }, 3000);
-  } else {
-    console.error('❌ Profile dropdown not found for testing');
-  }
-}
-
-// Make test function globally available
-window.testProfileDropdown = testProfileDropdown;
-
-// Force populate profile menu function
-function forcePopulateProfileMenu() {
-  console.log('🔧 Forcing profile menu population...');
-
-  const profileMenu = document.getElementById('profileMenu');
-  if (!profileMenu) {
-    console.error('❌ Profile menu not found');
-    return;
-  }
-
-  // Clear existing content
-  profileMenu.innerHTML = '';
-
-  // Add guest menu items manually
-  const menuItems = [
-    { icon: 'fas fa-sign-in-alt', text: 'Sign In', action: 'showSignInModal' },
-    { icon: 'fas fa-user-plus', text: 'Create Account', action: 'showSignUpModal' },
-    { icon: 'fas fa-question-circle', text: 'Help', action: 'showHelp' }
-  ];
-
-  menuItems.forEach(item => {
-    const button = document.createElement('button');
-    button.className = 'profile-menu-item';
-    button.innerHTML = `
-      <i class="${item.icon}"></i>
-      <span>${item.text}</span>
-    `;
-    button.addEventListener('click', () => {
-      console.log(`Menu item clicked: ${item.text}`);
-      if (item.action === 'showSignInModal') {
-        showSignInModal();
-      } else if (item.action === 'showSignUpModal') {
-        showSignUpModal();
-      } else if (item.action === 'showHelp') {
-        alert('Help functionality coming soon!');
-      }
-    });
-    profileMenu.appendChild(button);
-  });
-
-  console.log(`✅ Added ${menuItems.length} menu items manually`);
-}
-
-// Make function globally available
-window.forcePopulateProfileMenu = forcePopulateProfileMenu;
 
 // Initialize map toolbar functionality
 function initMapToolbar() {
@@ -1651,18 +1290,7 @@ function applyResponsiveScaling() {
     }
   });
 
-  // Handle profile container (includes switch and profile button) separately - only scale if screen width is below 320px
-  const profileContainer = document.querySelector('.profile-container');
-  if (profileContainer) {
-    if (screenWidth < 320) {
-      // Scale profile container only for very small screens
-      profileContainer.style.transform = `scale(${scale})`;
-      profileContainer.style.transformOrigin = 'top left';
-    } else {
-      // Remove any scaling for screens 320px and above
-      profileContainer.style.transform = 'none';
-    }
-  }
+
 
   // Handle search bar separately - only scale if screen width is below 320px
   const searchBar = document.querySelector('.search-container');
@@ -1722,7 +1350,7 @@ function applyResponsiveScaling() {
     }
   }
 
-  console.log('Applied responsive scaling:', scale, 'Screen width:', screenWidth, 'Search bar scaled:', screenWidth < 320, 'Festivals scaled:', screenWidth < 320, 'Profile scaled:', screenWidth < 320, 'Toolbar scaled:', screenWidth < 320 ? scale : '0.7 (30% drop)');
+  console.log('Applied responsive scaling:', scale, 'Screen width:', screenWidth, 'Search bar scaled:', screenWidth < 320, 'Festivals scaled:', screenWidth < 320, 'Toolbar scaled:', screenWidth < 320 ? scale : '0.7 (30% drop)');
 
   // Handle judging zone label scaling
   handleJudgingZoneScaling(zoomData.zoom, screenWidth);
