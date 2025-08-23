@@ -7,8 +7,19 @@ let supabase = null;
 // Check if Supabase is properly initialized
 function checkSupabaseConnection() {
   if (!supabase) {
-    throw new Error('Supabase not initialized. Please check your configuration.');
+    // Try to get the global supabase instance
+    if (window.supabase) {
+      supabase = window.supabase;
+    } else {
+      throw new Error('Supabase not initialized. Please check your configuration.');
+    }
   }
+}
+
+// Set the global supabase instance for auth service
+export function setSupabaseInstance(supabaseInstance) {
+  supabase = supabaseInstance;
+  console.log('✅ Supabase instance set for auth service');
 }
 
 // Authentication state

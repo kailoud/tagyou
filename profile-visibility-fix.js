@@ -154,6 +154,11 @@ function ensureModernProfileUI() {
           if (window.modernProfileUI && window.modernProfileUI.showAuthModal) {
             console.log('✅ Calling showAuthModal...');
             window.modernProfileUI.showAuthModal();
+
+            // Ensure auth modal event listeners are set up after modal is shown
+            setTimeout(() => {
+              ensureAuthModalEventListeners();
+            }, 100);
           } else {
             console.error('❌ Modern Profile UI showAuthModal not available');
             console.log('🔍 Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.modernProfileUI)));
@@ -177,6 +182,74 @@ function ensureModernProfileUI() {
   } else {
     console.error('❌ Modern Profile UI not available');
   }
+}
+
+// Function to ensure auth modal event listeners are set up
+function ensureAuthModalEventListeners() {
+  console.log('🔧 Ensuring auth modal event listeners...');
+
+  const authModal = document.getElementById('authModal');
+  if (!authModal) {
+    console.error('❌ Auth modal not found');
+    return;
+  }
+
+  // Set up toggle button event listener
+  const toggleBtn = authModal.querySelector('#authToggleBtn');
+  if (toggleBtn && !toggleBtn._hasToggleListener) {
+    console.log('✅ Setting up toggle button event listener');
+    toggleBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      console.log('🔄 Toggle button clicked');
+      if (window.modernProfileUI && window.modernProfileUI.toggleAuthMode) {
+        window.modernProfileUI.toggleAuthMode();
+      }
+    });
+    toggleBtn._hasToggleListener = true;
+  }
+
+  // Set up forgot password button event listener
+  const forgotBtn = authModal.querySelector('#forgotPasswordBtn');
+  if (forgotBtn && !forgotBtn._hasForgotListener) {
+    console.log('✅ Setting up forgot password button event listener');
+    forgotBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      console.log('🔑 Forgot password button clicked');
+      if (window.modernProfileUI && window.modernProfileUI.handleForgotPassword) {
+        window.modernProfileUI.handleForgotPassword();
+      }
+    });
+    forgotBtn._hasForgotListener = true;
+  }
+
+  // Set up form submit event listener
+  const form = authModal.querySelector('#authForm');
+  if (form && !form._hasSubmitListener) {
+    console.log('✅ Setting up auth form submit event listener');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      console.log('📝 Auth form submitted');
+      if (window.modernProfileUI && window.modernProfileUI.handleAuthSubmit) {
+        window.modernProfileUI.handleAuthSubmit(e);
+      }
+    });
+    form._hasSubmitListener = true;
+  }
+
+  // Set up close button event listener
+  const closeBtn = authModal.querySelector('#authModalClose');
+  if (closeBtn && !closeBtn._hasCloseListener) {
+    console.log('✅ Setting up auth modal close button event listener');
+    closeBtn.addEventListener('click', () => {
+      console.log('❌ Auth modal close button clicked');
+      if (window.modernProfileUI && window.modernProfileUI.hideModal) {
+        window.modernProfileUI.hideModal('authModal');
+      }
+    });
+    closeBtn._hasCloseListener = true;
+  }
+
+  console.log('✅ Auth modal event listeners ensured');
 }
 
 // Function to remove old authentication conflicts
@@ -263,6 +336,7 @@ if (document.readyState === 'loading') {
 // Make functions globally available for testing
 window.forceProfileVisibility = forceProfileVisibility;
 window.ensureModernProfileUI = ensureModernProfileUI;
+window.ensureAuthModalEventListeners = ensureAuthModalEventListeners;
 window.removeOldAuthConflicts = removeOldAuthConflicts;
 window.initializeProfileFix = initializeProfileFix;
 

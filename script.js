@@ -124,6 +124,10 @@ async function initializeSupabase() {
       // Set the global Supabase instance
       setSupabaseInstance(supabaseClient);
 
+      // Also set the Supabase instance for the auth service
+      const { setSupabaseInstance: setAuthSupabaseInstance } = await import('./supabase-auth-service.js');
+      setAuthSupabaseInstance(supabaseClient);
+
       // Initialize Supabase data
       await initializeDefaultData();
       supabaseInitialized = true;
