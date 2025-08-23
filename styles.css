@@ -713,8 +713,8 @@ body {
 }
 
 .festivals-button {
-  background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #f5576c);
-  background-size: 300% 300%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+  background-size: 400% 400%;
   border: 2px solid rgba(255, 255, 255, 0.2);
   color: #fff;
   cursor: pointer;
@@ -735,6 +735,7 @@ body {
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  animation: iconicProfileGlow 6s ease-in-out infinite;
 }
 
 .festivals-button::before {
@@ -753,12 +754,12 @@ body {
 }
 
 .festivals-button:hover {
-  background: linear-gradient(135deg, #7c8ff0, #8a5bb8, #f5a4fc, #f66a7a);
-  background-size: 300% 300%;
+  background: linear-gradient(135deg, #7c8ff0 0%, #8a5bb8 25%, #f5a4fc 50%, #f66a7a 75%, #5fb8fe 100%);
+  background-size: 400% 400%;
   border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
-  animation: searchGradientShift 2.5s ease infinite;
+  animation: iconicProfileGlow 6s ease-in-out infinite;
 }
 
 @keyframes gradientShift {
