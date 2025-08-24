@@ -34,6 +34,30 @@ export class SupabaseAuthService {
     this.authStateListeners = [];
   }
 
+  // Check if profiles table exists
+  async checkProfilesTable() {
+    try {
+      console.log('🔐 Checking if profiles table exists...');
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('count')
+        .limit(1);
+
+      if (error) {
+        console.error('❌ Profiles table error:', error);
+        console.error('❌ Error message:', error.message);
+        console.error('❌ Error code:', error.code);
+        return false;
+      } else {
+        console.log('✅ Profiles table exists and is accessible');
+        return true;
+      }
+    } catch (error) {
+      console.error('❌ Error checking profiles table:', error);
+      return false;
+    }
+  }
+
   // Initialize the auth service
   async initialize() {
     try {
@@ -91,6 +115,9 @@ export class SupabaseAuthService {
       } else {
         console.log('ℹ️ No active session found');
       }
+
+      // Check if profiles table exists
+      await this.checkProfilesTable();
 
       // Set up auth state listener
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -194,7 +221,10 @@ export class SupabaseAuthService {
         // Create profile in profiles table
         try {
           console.log('🔐 Creating user profile in database...');
-          const { error: profileError } = await supabase
+          console.log('🔐 User ID:', data.user.id);
+          console.log('🔐 User Email:', data.user.email);
+
+          const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .insert([
               {
@@ -204,16 +234,21 @@ export class SupabaseAuthService {
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
               }
-            ]);
+            ])
+            .select();
 
           if (profileError) {
             console.error('❌ Profile creation error:', profileError);
+            console.error('❌ Error details:', profileError.message);
+            console.error('❌ Error code:', profileError.code);
             // Don't throw error here as auth was successful
           } else {
             console.log('✅ User profile created successfully');
+            console.log('✅ Profile data:', profileData);
           }
         } catch (profileError) {
           console.error('❌ Profile creation failed:', profileError);
+          console.error('❌ Error details:', profileError.message);
           // Don't throw error here as auth was successful
         }
 

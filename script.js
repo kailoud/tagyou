@@ -137,6 +137,18 @@ async function initializeSupabase() {
       setupRealtimeListeners(RealtimeService);
 
       console.log('✅ Supabase initialization complete!');
+
+      // Test the connection
+      try {
+        const { data, error } = await supabaseClient.from('profiles').select('count').limit(1);
+        if (error) {
+          console.warn('⚠️ Profiles table not found - run the SQL schema first');
+        } else {
+          console.log('✅ Supabase connection and profiles table working!');
+        }
+      } catch (error) {
+        console.warn('⚠️ Could not test profiles table:', error.message);
+      }
     } else {
       throw new Error('Supabase core initialization failed');
     }
@@ -1570,5 +1582,34 @@ function showCarnivalRoute() {
 window.showCarnivalRoute = showCarnivalRoute;
 window.showJudgingZone = showJudgingZone;
 window.showStartFlag = showStartFlag;
+
+// Test Supabase connection function
+window.testSupabaseConnection = async function () {
+  console.log('🔐 Testing Supabase connection...');
+
+  try {
+    // Test basic connection
+    const { data, error } = await window.supabase.from('profiles').select('count').limit(1);
+
+    if (error) {
+      console.error('❌ Supabase connection failed:', error);
+      console.error('❌ Error message:', error.message);
+      console.error('❌ Error code:', error.code);
+
+      if (error.code === 'PGRST116') {
+        console.error('❌ Profiles table does not exist! Please run the SQL schema.');
+      }
+
+      return false;
+    } else {
+      console.log('✅ Supabase connection successful!');
+      console.log('✅ Profiles table accessible');
+      return true;
+    }
+  } catch (error) {
+    console.error('❌ Supabase test failed:', error);
+    return false;
+  }
+};
 
 
