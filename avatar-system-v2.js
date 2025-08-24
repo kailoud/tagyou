@@ -436,19 +436,20 @@ class AvatarSystemV2 {
 
     const modal = document.createElement('div');
     modal.className = 'auth-modal';
+    console.log('🎨 Avatar System V2: Modal element created:', modal);
     modal.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10001;
-      opacity: 0;
-      transition: opacity 0.3s ease;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      background: rgba(0, 0, 0, 0.5) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      z-index: 10001 !important;
+      opacity: 0 !important;
+      transition: opacity 0.3s ease !important;
     `;
 
     modal.innerHTML = `
@@ -537,6 +538,8 @@ class AvatarSystemV2 {
     `;
 
     document.body.appendChild(modal);
+    console.log('🎨 Avatar System V2: Modal added to DOM');
+    console.log('🎨 Avatar System V2: Modal in DOM:', document.querySelector('.auth-modal'));
 
     // Add close button handler
     const closeBtn = modal.querySelector('.close-btn');
@@ -556,6 +559,8 @@ class AvatarSystemV2 {
     // Animate in
     setTimeout(() => {
       modal.style.opacity = '1';
+      console.log('🎨 Avatar System V2: Modal opacity set to 1');
+      console.log('🎨 Avatar System V2: Modal visible:', modal.style.opacity);
     }, 10);
   }
 
