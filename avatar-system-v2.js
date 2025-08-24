@@ -360,18 +360,22 @@ class AvatarSystemV2 {
 
       if (e.target.closest('.signin-btn')) {
         console.log('🎧 Avatar System V2: Sign in button clicked');
+        console.log('🎧 Avatar System V2: Button element:', e.target.closest('.signin-btn'));
         this.showAuthModal = true;
         this.authMode = 'signin';
         this.isDropdownOpen = false;
         this.renderDropdown();
         this.renderAuthModal();
+        console.log('🎧 Avatar System V2: Auth modal should be visible now');
       } else if (e.target.closest('.signup-btn')) {
         console.log('🎧 Avatar System V2: Sign up button clicked');
+        console.log('🎧 Avatar System V2: Button element:', e.target.closest('.signup-btn'));
         this.showAuthModal = true;
         this.authMode = 'signup';
         this.isDropdownOpen = false;
         this.renderDropdown();
         this.renderAuthModal();
+        console.log('🎧 Avatar System V2: Auth modal should be visible now');
       } else if (e.target.closest('[data-action="signout"]')) {
         console.log('🎧 Avatar System V2: Sign out clicked');
         this.handleSignOut();
@@ -414,10 +418,12 @@ class AvatarSystemV2 {
 
   renderAuthModal() {
     console.log('🎨 Avatar System V2: Rendering auth modal, showAuthModal:', this.showAuthModal);
+    console.log('🎨 Avatar System V2: Auth mode:', this.authMode);
 
     // Remove existing modal
     const existingModal = document.querySelector('.auth-modal');
     if (existingModal) {
+      console.log('🎨 Avatar System V2: Removing existing modal');
       existingModal.remove();
     }
 
@@ -425,6 +431,8 @@ class AvatarSystemV2 {
       console.log('🎨 Avatar System V2: Modal not shown, returning');
       return;
     }
+
+    console.log('🎨 Avatar System V2: Creating new auth modal');
 
     const modal = document.createElement('div');
     modal.className = 'auth-modal';
