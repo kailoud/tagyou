@@ -73,9 +73,19 @@ class AvatarSystem {
     try {
       console.log('🔐 Avatar System: Initializing Supabase...');
 
-      // Use the existing SupabaseAuthService
-      const { supabaseAuthService } = await import('./supabase-auth-service.js');
-      this.authService = supabaseAuthService;
+      // Import the auth service
+      const authModule = await import('./supabase-auth-service.js');
+      console.log('🔐 Avatar System: Auth module imported:', authModule);
+
+      // Get the singleton instance
+      this.authService = authModule.supabaseAuthService;
+      console.log('🔐 Avatar System: Auth service assigned:', this.authService);
+
+      // Set the global supabase instance for the auth service
+      if (window.supabase) {
+        authModule.setSupabaseInstance(window.supabase);
+        console.log('🔐 Avatar System: Supabase instance set');
+      }
       console.log('✅ Avatar System: Auth service imported');
 
       // Initialize the auth service
@@ -866,6 +876,9 @@ class AvatarSystem {
         // Step 2: Supabase Signup
         if (this.authService) {
           console.log('🔐 Avatar System: Step 2 - Attempting Supabase signup...');
+          console.log('🔐 Avatar System: Auth service available:', !!this.authService);
+          console.log('🔐 Avatar System: Auth service type:', typeof this.authService);
+          console.log('🔐 Avatar System: Auth service constructor:', this.authService.constructor.name);
           try {
             const result = await this.authService.signUp(this.formData.email, this.formData.password);
             console.log('🔐 Avatar System: Signup result:', result);
