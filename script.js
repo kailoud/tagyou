@@ -11,80 +11,23 @@ let supabaseInitialized = false;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function () {
-  console.log('TagYou2 London Map loaded successfully!');
-
-  // Always initialize the map first
-  initMap();
-  initSearch();
-  initFestivalsDropdown();
-
-  initMapToolbar();
-
-  // Samsung Galaxy S24 Ultra detection and adjustments
-  detectSamsungDevice();
-  initPullUpPanel();
-  initResponsiveZoom();
-
-  // Then try to initialize Supabase (non-blocking)
-  initializeSupabase();
-
-  // Old authentication service removed - using modern profile system
-
-
-
-
-
-  // Wait for Supabase to be initialized before running diagnostics
-  const waitForSupabase = async () => {
-    let attempts = 0;
-    const maxAttempts = 30; // Wait up to 30 seconds
-
-    while (attempts < maxAttempts) {
-      if (supabaseInitialized) {
-        console.log('✅ Supabase initialized, running diagnostics...');
-
-        // Run diagnostic test
-        try {
-          await import('./supabase-diagnostic.js');
-        } catch (error) {
-          console.error('❌ Failed to load diagnostic:', error);
-        }
-
-        // Show data table
-        try {
-          await import('./show-supabase-data.js');
-        } catch (error) {
-          console.error('❌ Failed to load data table:', error);
-        }
-
-        // Test authentication
-        try {
-          await import('./test-supabase-auth.js');
-        } catch (error) {
-          console.error('❌ Failed to load auth test:', error);
-        }
-
-        // Test Supabase connection
-        try {
-          await import('./supabase-connection-test.js');
-        } catch (error) {
-          console.error('❌ Failed to load connection test:', error);
-        }
-
-        break;
-      }
-
-      attempts++;
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
-    }
-
-    if (attempts >= maxAttempts) {
-      console.error('❌ Supabase failed to initialize within 30 seconds');
-    }
-  };
-
-  // Start waiting for Supabase
-  waitForSupabase();
+  console.log('🚀 Initializing TagYou2 London Map...');
+  
+  // Initialize map immediately
+  await initializeMap();
+  
+  // Initialize other components with minimal delays
+  setTimeout(() => {
+    initializeToolbar();
+    console.log('✅ Toolbar initialized');
+  }, 100); // Reduced from 1000ms to 100ms
+  
+  setTimeout(() => {
+    initializeSearch();
+    console.log('✅ Search initialized');
+  }, 200);
+  
+  console.log('🎭 Carnival tracker will initialize automatically');
 });
 
 // Initialize Supabase (non-blocking)

@@ -556,12 +556,17 @@ class CarnivalTracker {
 
 // Initialize the carnival tracker when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-  window.carnivalTracker = new CarnivalTracker();
-
-  // Make it globally accessible
-  window.toggleCarnivalTracker = () => {
-    if (window.carnivalTracker) {
-      window.carnivalTracker.toggle();
-    }
-  };
+  // Small delay to ensure other components are loaded
+  setTimeout(() => {
+    window.carnivalTracker = new CarnivalTracker();
+    
+    // Make it globally accessible
+    window.toggleCarnivalTracker = () => {
+      if (window.carnivalTracker) {
+        window.carnivalTracker.toggle();
+      }
+    };
+    
+    console.log('🎭 Carnival tracker initialized');
+  }, 50); // Reduced delay for faster loading
 });
