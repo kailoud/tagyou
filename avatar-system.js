@@ -439,6 +439,11 @@ class AvatarSystem {
         e.preventDefault();
         // TODO: Implement forgot password functionality
         console.log('Forgot password clicked');
+      } else if (e.target.classList.contains('track-carnival-btn')) {
+        e.preventDefault();
+        e.stopPropagation();
+        const carnivalId = parseInt(e.target.dataset.carnivalId);
+        this.toggleCarnivalTracking(carnivalId);
       }
     });
   }
@@ -458,8 +463,136 @@ class AvatarSystem {
   }
 
   renderCarnivalDropdown() {
-    // Implementation for carnival dropdown
-    console.log('Carnival dropdown toggled');
+    // Remove existing carnival dropdown
+    const existingDropdown = document.querySelector('.carnival-dropdown');
+    if (existingDropdown) {
+      existingDropdown.remove();
+    }
+
+    if (!this.isCarnivalDropdownOpen) return;
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'carnival-dropdown';
+    dropdown.style.cssText = `
+      position: absolute;
+      top: 60px;
+      right: 0;
+      width: 320px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      z-index: 1000;
+      overflow: hidden;
+      transform: translateY(-10px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    `;
+
+    dropdown.innerHTML = this.renderCarnivalContent();
+
+    // Append to avatar container
+    if (this.dropdownRef) {
+      this.dropdownRef.appendChild(dropdown);
+
+      // Trigger animation
+      setTimeout(() => {
+        dropdown.style.transform = 'translateY(0)';
+        dropdown.style.opacity = '1';
+      }, 10);
+    }
+
+    // Add click outside handler
+    document.addEventListener('click', this.handleClickOutside.bind(this));
+  }
+
+  renderCarnivalContent() {
+    const trackedCount = this.trackedCarnivals.size;
+    const totalCount = this.ukCarnivals.length;
+
+    return `
+      <div style="background: linear-gradient(135deg, #8b5cf6, #3b82f6); padding: 24px; color: white;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+            <i class="fas fa-calendar-alt" style="font-size: 32px; color: white;"></i>
+          </div>
+          <div style="flex: 1;">
+            <h3 style="font-weight: bold; font-size: 18px; margin: 0;">UK Carnivals</h3>
+            <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin: 4px 0;">Track your favorite events</p>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+              <span style="font-size: 14px; color: rgba(255,255,255,0.9);">Tracking ${trackedCount} of ${totalCount} carnivals</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding: 16px; max-height: 300px; overflow-y: auto;">
+        ${this.ukCarnivals.map(carnival => `
+          <div class="carnival-item" data-carnival-id="${carnival.id}" style="
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #f3f4f6;
+            background: ${this.trackedCarnivals.has(carnival.id) ? '#f0f9ff' : 'white'};
+          ">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="flex: 1;">
+                <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 600; color: #374151;">
+                  ${carnival.name}
+                </h4>
+                <p style="margin: 0 0 2px 0; font-size: 12px; color: #6b7280;">
+                  📍 ${carnival.location} • 📅 ${carnival.date}
+                </p>
+                <p style="margin: 0; font-size: 11px; color: #9ca3af;">
+                  👥 ${carnival.expectedAttendance}
+                </p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="
+                  padding: 2px 8px;
+                  border-radius: 12px;
+                  font-size: 10px;
+                  font-weight: 500;
+                  background: ${carnival.status === 'active' ? '#dcfce7' : '#fef3c7'};
+                  color: ${carnival.status === 'active' ? '#166534' : '#92400e'};
+                ">
+                  ${carnival.status === 'active' ? 'Active' : 'Upcoming'}
+                </span>
+                <button class="track-carnival-btn" data-carnival-id="${carnival.id}" style="
+                  background: ${this.trackedCarnivals.has(carnival.id) ? '#ef4444' : '#10b981'};
+                  color: white;
+                  border: none;
+                  border-radius: 6px;
+                  padding: 4px 8px;
+                  font-size: 10px;
+                  cursor: pointer;
+                  transition: all 0.2s ease;
+                ">
+                  ${this.trackedCarnivals.has(carnival.id) ? 'Untrack' : 'Track'}
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  toggleCarnivalTracking(carnivalId) {
+    if (this.trackedCarnivals.has(carnivalId)) {
+      this.trackedCarnivals.delete(carnivalId);
+      console.log(`Untracked carnival ${carnivalId}`);
+    } else {
+      this.trackedCarnivals.add(carnivalId);
+      console.log(`Tracked carnival ${carnivalId}`);
+    }
+
+    // Update the carnival dropdown content
+    this.renderCarnivalDropdown();
+
+    // Update the main dropdown to show new count
+    this.renderDropdown();
   }
 
   renderAuthModal() {
