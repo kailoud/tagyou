@@ -310,13 +310,13 @@ class AvatarSystemV2 {
         </div>
         
         <div style="padding: 20px;">
-          <button class="signin-btn" style="width: 100%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 500; cursor: pointer; margin-bottom: 12px;">
-            <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>
+          <button class="signin-btn" style="width: 100%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 500; cursor: pointer; margin-bottom: 12px; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fas fa-sign-in-alt"></i>
             Sign In
           </button>
           
-          <button class="signup-btn" style="width: 100%; background: white; color: #8b5cf6; border: 2px solid #8b5cf6; padding: 12px; border-radius: 8px; font-weight: 500; cursor: pointer;">
-            <i class="fas fa-user-plus" style="margin-right: 8px;"></i>
+          <button class="signup-btn" style="width: 100%; background: white; color: #8b5cf6; border: 2px solid #8b5cf6; padding: 12px; border-radius: 8px; font-weight: 500; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fas fa-user-plus"></i>
             Create Account
           </button>
         </div>
@@ -352,30 +352,40 @@ class AvatarSystemV2 {
   }
 
   setupEventListeners() {
+    console.log('🎧 Avatar System V2: Setting up event listeners...');
+
     // Event delegation for dropdown actions
     document.addEventListener('click', (e) => {
+      console.log('🎧 Avatar System V2: Click event detected on:', e.target);
+
       if (e.target.closest('.signin-btn')) {
+        console.log('🎧 Avatar System V2: Sign in button clicked');
         this.showAuthModal = true;
         this.authMode = 'signin';
         this.isDropdownOpen = false;
         this.renderDropdown();
         this.renderAuthModal();
       } else if (e.target.closest('.signup-btn')) {
+        console.log('🎧 Avatar System V2: Sign up button clicked');
         this.showAuthModal = true;
         this.authMode = 'signup';
         this.isDropdownOpen = false;
         this.renderDropdown();
         this.renderAuthModal();
       } else if (e.target.closest('[data-action="signout"]')) {
+        console.log('🎧 Avatar System V2: Sign out clicked');
         this.handleSignOut();
       } else if (e.target.closest('[data-action="carnivals"]')) {
+        console.log('🎧 Avatar System V2: Carnivals clicked');
         this.toggleCarnivalDropdown();
       }
     });
 
     // Form submission
     document.addEventListener('submit', (e) => {
+      console.log('🎧 Avatar System V2: Form submit event detected on:', e.target);
       if (e.target.classList.contains('auth-form')) {
+        console.log('🎧 Avatar System V2: Auth form submitted');
         e.preventDefault();
         this.handleAuth();
       }
@@ -403,13 +413,18 @@ class AvatarSystemV2 {
   }
 
   renderAuthModal() {
+    console.log('🎨 Avatar System V2: Rendering auth modal, showAuthModal:', this.showAuthModal);
+
     // Remove existing modal
     const existingModal = document.querySelector('.auth-modal');
     if (existingModal) {
       existingModal.remove();
     }
 
-    if (!this.showAuthModal) return;
+    if (!this.showAuthModal) {
+      console.log('🎨 Avatar System V2: Modal not shown, returning');
+      return;
+    }
 
     const modal = document.createElement('div');
     modal.className = 'auth-modal';

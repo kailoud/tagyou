@@ -20,6 +20,30 @@
   <!-- Avatar System -->
   <script type="module" src="avatar-system-v2.js"></script>
 
+  <!-- Test button for debugging -->
+  <script>
+    // Add a test button to check if the system is working
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const testButton = document.createElement('button');
+        testButton.textContent = 'Test Avatar System';
+        testButton.style.cssText = 'position: fixed; top: 10px; left: 10px; z-index: 10000; padding: 10px; background: red; color: white; border: none; cursor: pointer;';
+        testButton.onclick = () => {
+          console.log('Test button clicked');
+          if (window.avatarSystemV2) {
+            console.log('Avatar System V2 found:', window.avatarSystemV2);
+            window.avatarSystemV2.showAuthModal = true;
+            window.avatarSystemV2.authMode = 'signin';
+            window.avatarSystemV2.renderAuthModal();
+          } else {
+            console.log('Avatar System V2 not found');
+          }
+        };
+        document.body.appendChild(testButton);
+      }, 2000);
+    });
+  </script>
+
   <!-- Mobile Authentication Module -->
   <script src="mobile-auth.js"></script>
 
