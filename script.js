@@ -28,11 +28,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   // Old authentication service removed - using modern profile system
 
-  // Initialize Modern Profile Service
-  initializeModernProfileService();
 
-  // Initialize Modern Profile UI
-  initializeModernProfileUI();
 
 
 
@@ -157,41 +153,7 @@ async function initializeSupabase() {
 // Old authentication service removed - using modern profile system instead
 
 // Initialize Modern Profile Service
-async function initializeModernProfileService() {
-  try {
-    console.log('👤 Initializing Modern Profile Service...');
 
-    // Import and initialize modern profile service
-    const { modernProfileService } = await import('./modern-profile-service.js');
-
-    // Initialize the service
-    const success = await modernProfileService.initialize();
-    if (success) {
-      console.log('✅ Modern Profile Service initialized successfully');
-      window.modernProfileService = modernProfileService;
-    } else {
-      console.error('❌ Modern Profile Service initialization failed');
-    }
-  } catch (error) {
-    console.error('❌ Error initializing Modern Profile Service:', error);
-  }
-}
-
-// Initialize Modern Profile UI
-async function initializeModernProfileUI() {
-  try {
-    console.log('🎨 Initializing Modern Profile UI...');
-
-    // Import and initialize modern profile UI
-    const { modernProfileUI } = await import('./modern-profile-ui.js');
-
-    // The UI is auto-initialized in the constructor
-    console.log('✅ Modern Profile UI initialized successfully');
-    window.modernProfileUI = modernProfileUI;
-  } catch (error) {
-    console.error('❌ Error initializing Modern Profile UI:', error);
-  }
-}
 
 // Update UI based on authentication state
 function updateAuthenticatedUI(user) {
@@ -1536,109 +1498,4 @@ function initResponsiveZoom() {
   applyResponsiveScaling();
 }
 
-// Debug function to show what CSS is being applied
-function debugProfileDropdownCSS() {
-  const profileDropdown = document.getElementById('profileDropdown');
-  if (!profileDropdown) {
-    console.error('❌ Profile dropdown not found');
-    return;
-  }
 
-  const computedStyle = window.getComputedStyle(profileDropdown);
-
-  console.log('🔍 PROFILE DROPDOWN CSS DEBUG:');
-  console.log('Screen width:', window.innerWidth);
-  console.log('Screen height:', window.innerHeight);
-  console.log('User agent:', navigator.userAgent);
-  console.log('');
-  console.log('CSS Properties:');
-  console.log('Display:', computedStyle.display);
-  console.log('Position:', computedStyle.position);
-  console.log('Z-index:', computedStyle.zIndex);
-  console.log('Width:', computedStyle.width);
-  console.log('Height:', computedStyle.height);
-  console.log('Top:', computedStyle.top);
-  console.log('Right:', computedStyle.right);
-  console.log('Bottom:', computedStyle.bottom);
-  console.log('Left:', computedStyle.left);
-  console.log('Margin:', computedStyle.margin);
-  console.log('Padding:', computedStyle.padding);
-  console.log('Border-radius:', computedStyle.borderRadius);
-  console.log('Box-shadow:', computedStyle.boxShadow);
-  console.log('Background:', computedStyle.background);
-  console.log('');
-  console.log('Classes:', profileDropdown.className);
-  console.log('Has show class:', profileDropdown.classList.contains('show'));
-
-  // Check if menu items exist
-  const profileMenu = document.getElementById('profileMenu');
-  if (profileMenu) {
-    console.log('Menu items count:', profileMenu.children.length);
-    console.log('Menu innerHTML length:', profileMenu.innerHTML.length);
-  }
-}
-
-// Make debug function globally available
-window.debugProfileDropdownCSS = debugProfileDropdownCSS;
-
-// Universal dropdown test - should work same on all devices
-function testUniversalDropdown() {
-  console.log('🌐 UNIVERSAL DROPDOWN TEST');
-  console.log('Device info:', {
-    width: window.innerWidth,
-    height: window.innerHeight,
-    userAgent: navigator.userAgent,
-    isMobile: window.innerWidth <= 768
-  });
-
-  const profileDropdown = document.getElementById('profileDropdown');
-  const profileMenu = document.getElementById('profileMenu');
-
-  if (!profileDropdown || !profileMenu) {
-    console.error('❌ Required elements not found');
-    return;
-  }
-
-  // Step 1: Force populate menu items
-  console.log('Step 1: Populating menu items...');
-  profileMenu.innerHTML = `
-    <button class="profile-menu-item" onclick="window.modernProfileUI?.showModal('auth', 'signin')">
-      <i class="fas fa-sign-in-alt"></i>
-      <span>Sign In</span>
-    </button>
-    <button class="profile-menu-item" onclick="window.modernProfileUI?.showModal('auth', 'signup')">
-      <i class="fas fa-user-plus"></i>
-      <span>Create Account</span>
-    </button>
-    <button class="profile-menu-item" onclick="console.log('Help clicked')">
-      <i class="fas fa-question-circle"></i>
-      <span>Help</span>
-    </button>
-  `;
-
-  // Step 2: Force show dropdown
-  console.log('Step 2: Showing dropdown...');
-  profileDropdown.classList.add('show');
-  profileDropdown.style.display = 'block';
-  profileDropdown.style.zIndex = '10000';
-
-  // Step 3: Log current state
-  console.log('Step 3: Current state:');
-  console.log('Dropdown display:', window.getComputedStyle(profileDropdown).display);
-  console.log('Dropdown z-index:', window.getComputedStyle(profileDropdown).zIndex);
-  console.log('Menu items count:', profileMenu.children.length);
-
-  // Step 4: Auto-hide after 5 seconds
-  setTimeout(() => {
-    console.log('Step 4: Auto-hiding dropdown...');
-    profileDropdown.classList.remove('show');
-    profileDropdown.style.display = 'none';
-  }, 5000);
-
-  console.log('✅ Universal dropdown test complete - should work on all devices');
-}
-
-// Make function globally available
-window.testUniversalDropdown = testUniversalDropdown;
-
-// Old authentication functions removed - using modern profile system instead

@@ -13,6 +13,17 @@ body {
   overflow: hidden;
 }
 
+
+
+
+
+/* Main container without header */
+.main-container {
+  margin-top: 20px;
+}
+
+
+
 /* Centered Controls Container */
 .controls-container {
   position: fixed;
@@ -51,106 +62,7 @@ body {
 
 
 
-/* ========================================= */
-/* MODERN PROFILE SYSTEM */
-/* ========================================= */
 
-.profile-system {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-/* Guest State */
-.profile-guest {
-  display: flex;
-  align-items: center;
-}
-
-.profile-signin-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  border-radius: 25px;
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-.profile-signin-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-}
-
-.profile-signin-btn i {
-  font-size: 16px;
-}
-
-/* Authenticated State - Simplified */
-.profile-authenticated {
-  position: relative;
-}
-
-.profile-info p {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 13px;
-  margin: 0;
-}
-
-.profile-menu {
-  padding: 8px 0;
-}
-
-.profile-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 12px 20px;
-  background: none;
-  border: none;
-  color: #333;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  text-align: left;
-}
-
-.profile-menu-item:hover {
-  background: #f8f9fa;
-}
-
-.profile-menu-item i {
-  font-size: 16px;
-  width: 20px;
-  color: #667eea;
-}
-
-.profile-menu-item.profile-signout {
-  color: #dc3545;
-}
-
-.profile-menu-item.profile-signout i {
-  color: #dc3545;
-}
-
-.profile-menu-item.profile-signout:hover {
-  background: #fff5f5;
-}
-
-.profile-divider {
-  height: 1px;
-  background: #f0f0f0;
-  margin: 8px 0;
-}
 
 /* Old toggle switch removed - using modern profile system */
 
@@ -2232,165 +2144,12 @@ input:checked+.slider:before {
   /* Old mobile profile elements removed - using modern profile system */
 }
 
-/* Universal Profile Positioning - All Devices */
-.profile-container {
-  position: fixed !important;
-  top: 20px !important;
-  right: 20px !important;
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  z-index: 1000 !important;
-  pointer-events: auto !important;
-}
 
-.profile-system {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  justify-content: center !important;
-  align-items: center !important;
-  pointer-events: auto !important;
-}
 
-.profile-guest {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  justify-content: center !important;
-  align-items: center !important;
-  pointer-events: auto !important;
-}
 
-.profile-authenticated {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  justify-content: center !important;
-  align-items: center !important;
-  pointer-events: auto !important;
-}
-
-.profile-signin-btn {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative !important;
-  margin: 0 auto !important;
-  justify-content: center !important;
-  align-items: center !important;
-  min-width: 120px !important;
-  padding: 12px 20px !important;
-  font-size: 14px !important;
-  white-space: nowrap !important;
-  overflow: visible !important;
-  pointer-events: auto !important;
-  cursor: pointer !important;
-}
-
-.profile-user-btn {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative !important;
-  margin: 0 auto !important;
-  justify-content: center !important;
-  align-items: center !important;
-  min-width: 120px !important;
-  padding: 12px 20px !important;
-  font-size: 14px !important;
-  white-space: nowrap !important;
-  overflow: visible !important;
-  pointer-events: auto !important;
-  cursor: pointer !important;
-}
-
-/* Mobile Devices (320px - 480px) */
-@media (max-width: 480px) {
-  .profile-container {
-    top: 15px !important;
-    right: 15px !important;
-  }
-
-  .profile-signin-btn,
-  .profile-user-btn {
-    min-width: 100px !important;
-    padding: 10px 16px !important;
-    font-size: 13px !important;
-  }
-
-  .profile-user-name {
-    max-width: 60px !important;
-    font-size: 12px !important;
-  }
-}
-
-/* Tablet Devices (481px - 768px) */
-@media (min-width: 481px) and (max-width: 768px) {
-  .profile-container {
-    top: 18px !important;
-    right: 18px !important;
-  }
-
-  .profile-signin-btn,
-  .profile-user-btn {
-    min-width: 110px !important;
-    padding: 11px 18px !important;
-    font-size: 13px !important;
-  }
-
-  .profile-user-name {
-    max-width: 80px !important;
-    font-size: 13px !important;
-  }
-}
-
-/* Desktop Devices (769px - 1024px) */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .profile-container {
-    top: 20px !important;
-    right: 20px !important;
-  }
-
-  .profile-signin-btn,
-  .profile-user-btn {
-    min-width: 120px !important;
-    padding: 12px 20px !important;
-    font-size: 14px !important;
-  }
-
-  .profile-user-name {
-    max-width: 100px !important;
-    font-size: 14px !important;
-  }
-}
-
-/* Large Desktop & Web (1025px+) */
-@media (min-width: 1025px) {
-  .profile-container {
-    top: 25px !important;
-    right: 25px !important;
-  }
-
-  .profile-signin-btn,
-  .profile-user-btn {
-    min-width: 130px !important;
-    padding: 12px 22px !important;
-    font-size: 15px !important;
-  }
-
-  .profile-user-name {
-    max-width: 120px !important;
-    font-size: 15px !important;
-  }
-}
 
 /* Force horizontal layout for larger screens - 481px+ */
 @media (min-width: 481px) {
-  .profile-container {
-    flex-direction: row !important;
-    align-items: center !important;
-  }
 
   /* Maintain festivals dropdown size for larger screens */
   .festivals-dropdown {
