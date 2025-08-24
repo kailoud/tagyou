@@ -599,6 +599,12 @@ class AvatarSystem {
 
     if (!this.showAuthModal) return;
 
+    // Remove any existing auth modal to prevent duplicate IDs
+    const existingModal = document.querySelector('.auth-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
     const modal = document.createElement('div');
     modal.className = 'auth-modal show';
     modal.style.cssText = `
@@ -614,7 +620,7 @@ class AvatarSystem {
       z-index: 10001;
       padding: 16px;
       opacity: 0;
-      transition: opacity 0.2s ease, transform 0.2s ease;
+      transition: opacity 0.3s ease, transform 0.3s ease, background 0.3s ease;
     `;
 
     modal.innerHTML = `
@@ -922,16 +928,17 @@ class AvatarSystem {
     this.showAuthModal = false;
     const modal = document.querySelector('.auth-modal');
     if (modal) {
-      // Add fade-out animation
+      // Smooth fade-out animation for both modal and background
       modal.style.opacity = '0';
       modal.style.transform = 'scale(0.95)';
+      modal.style.background = 'rgba(0, 0, 0, 0)'; // Fade background to transparent
 
       // Remove modal after animation completes
       setTimeout(() => {
         if (modal && modal.parentNode) {
           modal.remove();
         }
-      }, 200);
+      }, 300); // Slightly longer duration for smoother transition
     }
     // Reset form data when modal closes
     this.formData = { email: '', password: '', confirmPassword: '' };
