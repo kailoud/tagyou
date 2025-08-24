@@ -66,6 +66,11 @@ class AvatarSystem {
       }
     ];
 
+    // Create avatar immediately without waiting for async operations
+    this.createAvatarElement();
+    this.setupEventListeners();
+
+    // Initialize authentication in background
     this.init();
   }
 
@@ -73,25 +78,24 @@ class AvatarSystem {
     try {
       console.log('AUTH DEBUG: Initializing Supabase...');
 
-      // Wait for Supabase to be available
+      // Wait for Supabase to be available (reduced timeout)
       let attempts = 0;
-      const maxAttempts = 300;
+      const maxAttempts = 50; // Reduced from 300 to 50 (5 seconds max)
 
       while (!window.supabase && attempts < maxAttempts) {
-        console.log('AUTH DEBUG: Waiting for Supabase to be ready...', attempts + 1);
         await new Promise(resolve => setTimeout(resolve, 100));
         attempts++;
       }
 
       if (!window.supabase) {
-        console.error('AUTH DEBUG: Supabase not available after waiting');
-        throw new Error('Supabase not available after waiting');
+        console.warn('AUTH DEBUG: Supabase not available, will continue without it');
+        this.authService = this.createFallbackAuthService();
+        return;
       }
 
-      // Wait for Supabase client to be fully initialized
+      // Wait for Supabase client to be fully initialized (reduced timeout)
       attempts = 0;
       while (!window.supabaseClient && attempts < maxAttempts) {
-        console.log('AUTH DEBUG: Waiting for Supabase client to be ready...', attempts + 1);
         await new Promise(resolve => setTimeout(resolve, 100));
         attempts++;
       }
@@ -106,21 +110,16 @@ class AvatarSystem {
       let authModule;
       try {
         authModule = await import('./supabase-auth-service.js');
-        console.log('AUTH DEBUG: Auth module imported:', authModule);
         this.authService = authModule.supabaseAuthService;
       } catch (importError) {
-        console.error('AUTH DEBUG: Failed to import auth service, creating fallback:', importError);
-        // Create a fallback auth service if the module doesn't exist
+        console.warn('AUTH DEBUG: Failed to import auth service, creating fallback');
         this.authService = this.createFallbackAuthService();
       }
-
-      console.log('AUTH DEBUG: Auth service assigned:', this.authService);
 
       // Set the global supabase instance for the auth service
       if (window.supabaseClient) {
         if (authModule && authModule.setSupabaseInstance) {
           authModule.setSupabaseInstance(window.supabaseClient);
-          console.log('AUTH DEBUG: Using existing Supabase client');
         }
       } else {
         // Create our own Supabase client if none exists
@@ -134,57 +133,25 @@ class AvatarSystem {
           if (authModule && authModule.setSupabaseInstance) {
             authModule.setSupabaseInstance(supabaseClient);
           }
-          console.log('AUTH DEBUG: Created new Supabase client');
         } catch (error) {
-          console.error('AUTH DEBUG: Failed to create Supabase client:', error);
-          throw error;
+          console.warn('AUTH DEBUG: Failed to create Supabase client, using fallback');
+          this.authService = this.createFallbackAuthService();
+          return;
         }
       }
 
-      // Test Supabase connection
+      // Skip connection test for faster loading
+      console.log('AUTH DEBUG: Supabase client ready');
+
+      // Initialize the auth service (simplified)
       try {
-        const testQuery = await window.supabaseClient.from('users').select('id').limit(1);
-        console.log('AUTH DEBUG: Supabase connection test result:', testQuery.error ? 'FAILED' : 'SUCCESS');
-        if (testQuery.error) {
-          console.log('AUTH DEBUG: Connection error details:', testQuery.error);
+        if (this.authService.initialize) {
+          await this.authService.initialize();
         }
-      } catch (e) {
-        console.log('AUTH DEBUG: Supabase client test failed:', e.message);
-      }
-
-      // Initialize the auth service with retry
-      let initialized = false;
-      let retryCount = 0;
-      const maxRetries = 3;
-
-      while (!initialized && retryCount < maxRetries) {
-        try {
-          if (this.authService.initialize) {
-            initialized = await this.authService.initialize();
-          } else {
-            initialized = true; // Fallback service is always initialized
-          }
-          console.log('AUTH DEBUG: Auth service initialized:', initialized);
-        } catch (error) {
-          retryCount++;
-          console.warn(`AUTH DEBUG: Auth service initialization attempt ${retryCount} failed:`, error);
-          if (retryCount < maxRetries) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-          }
-        }
-      }
-
-      if (initialized) {
-        // Verify auth service methods exist
-        console.log('AUTH DEBUG: Testing auth service methods...');
-        console.log('AUTH DEBUG: signIn method exists:', typeof this.authService.signIn);
-        console.log('AUTH DEBUG: signUp method exists:', typeof this.authService.signUp);
-        console.log('AUTH DEBUG: getCurrentUser method exists:', typeof this.authService.getCurrentUser);
 
         // Set up auth state listener
         if (this.authService.onAuthStateChanged) {
           this.authService.onAuthStateChanged((user) => {
-            console.log('AUTH DEBUG: Auth state changed:', user?.email || 'signed out');
             this.user = user;
             if (user) {
               sessionStorage.setItem('supabase_user', JSON.stringify(user));
@@ -195,9 +162,10 @@ class AvatarSystem {
           });
         }
 
-        console.log('AUTH DEBUG: Supabase Auth Service fully initialized');
-      } else {
-        console.warn('AUTH DEBUG: Auth service failed to initialize');
+        console.log('AUTH DEBUG: Supabase Auth Service initialized');
+      } catch (error) {
+        console.warn('AUTH DEBUG: Auth service initialization failed, using fallback');
+        this.authService = this.createFallbackAuthService();
       }
     } catch (error) {
       console.error('AUTH DEBUG: Error initializing Supabase Auth Service:', error);
@@ -289,10 +257,12 @@ class AvatarSystem {
   }
 
   async init() {
-    await this.initializeSupabase();
-    await this.checkUser();
-    this.createAvatarElement();
-    this.setupEventListeners();
+    // Initialize authentication in background
+    this.initializeSupabase().then(() => {
+      this.checkUser();
+    }).catch(error => {
+      console.warn('AUTH DEBUG: Background initialization failed:', error);
+    });
   }
 
   async checkUser() {
