@@ -14,16 +14,16 @@ document.addEventListener('DOMContentLoaded', async function () {
   console.log('🚀 Initializing TagYou2 London Map...');
   
   // Initialize map immediately
-  await initializeMap();
+  initMap();
   
   // Initialize other components with minimal delays
   setTimeout(() => {
-    initializeToolbar();
+    initMapToolbar();
     console.log('✅ Toolbar initialized');
   }, 100); // Reduced from 1000ms to 100ms
   
   setTimeout(() => {
-    initializeSearch();
+    initSearch();
     console.log('✅ Search initialized');
   }, 200);
   
