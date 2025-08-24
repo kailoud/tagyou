@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avatar System Test</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+
+    .test-info {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .test-button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    .test-button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="test-info">
+    <h1>Avatar System V2 Test</h1>
+    <p>This page tests the avatar system in isolation.</p>
+    <div id="status">Loading...</div>
+  </div>
+
+  <div class="test-info">
+    <h2>Manual Tests</h2>
+    <button class="test-button" onclick="testAvatarSystem()">Test Avatar System</button>
+    <button class="test-button" onclick="showAuthModal()">Show Auth Modal</button>
+    <button class="test-button" onclick="checkElements()">Check Elements</button>
+  </div>
+
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <!-- Supabase Config -->
+  <script type="module" src="supabase-config-secret.js"></script>
+
+  <!-- Avatar System -->
+  <script type="module" src="avatar-system-v2.js"></script>
+
+  <script>
+    function testAvatarSystem() {
+      console.log('🧪 Testing Avatar System...');
+
+      if (window.avatarSystemV2) {
+        console.log('✅ Avatar System V2 found:', window.avatarSystemV2);
+        document.getElementById('status').innerHTML = '✅ Avatar System V2 loaded successfully!';
+      } else {
+        console.log('❌ Avatar System V2 not found');
+        document.getElementById('status').innerHTML = '❌ Avatar System V2 not found';
+      }
+    }
+
+    function showAuthModal() {
+      console.log('🧪 Showing auth modal...');
+
+      if (window.avatarSystemV2) {
+        window.avatarSystemV2.showAuthModal = true;
+        window.avatarSystemV2.authMode = 'signin';
+        window.avatarSystemV2.renderAuthModal();
+        document.getElementById('status').innerHTML = '✅ Auth modal should be visible now';
+      } else {
+        document.getElementById('status').innerHTML = '❌ Avatar System V2 not available';
+      }
+    }
+
+    function checkElements() {
+      console.log('🧪 Checking elements...');
+
+      const avatarContainer = document.querySelector('.avatar-container');
+      const avatarButton = document.querySelector('.avatar-button');
+      const authModal = document.querySelector('.auth-modal');
+
+      console.log('Avatar container:', avatarContainer);
+      console.log('Avatar button:', avatarButton);
+      console.log('Auth modal:', authModal);
+
+      document.getElementById('status').innerHTML = `
+                Avatar container: ${avatarContainer ? '✅' : '❌'}<br>
+                Avatar button: ${avatarButton ? '✅' : '❌'}<br>
+                Auth modal: ${authModal ? '✅' : '❌'}
+            `;
+    }
+
+    // Auto-test on load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        testAvatarSystem();
+        checkElements();
+      }, 2000);
+    });
+  </script>
+</body>
+
+</html>
