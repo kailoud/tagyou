@@ -355,7 +355,6 @@ class AvatarSystem {
 
     const statusIndicator = document.createElement('div');
     statusIndicator.className = 'status-indicator';
-    statusIndicator.id = 'avatar-status-indicator'; // Add ID for easy access
     statusIndicator.style.cssText = `
       position: absolute;
       top: -4px;
@@ -364,13 +363,12 @@ class AvatarSystem {
       height: 16px;
       border-radius: 50%;
       border: 2px solid white;
-      transition: background-color 0.3s ease;
     `;
 
     if (this.user) {
-      statusIndicator.style.backgroundColor = '#10b981'; // Green when logged in
+      statusIndicator.style.backgroundColor = '#4ade80';
     } else {
-      statusIndicator.style.backgroundColor = '#f97316'; // Orange when signed out
+      statusIndicator.style.backgroundColor = '#fb923c';
     }
 
     avatarButton.appendChild(statusIndicator);
@@ -379,18 +377,6 @@ class AvatarSystem {
     avatarContainer.appendChild(avatarButton);
     this.dropdownRef = avatarContainer;
     document.body.appendChild(avatarContainer);
-  }
-
-  // Method to update status indicator without recreating avatar
-  updateStatusIndicator() {
-    const statusIndicator = document.getElementById('avatar-status-indicator');
-    if (statusIndicator) {
-      if (this.user) {
-        statusIndicator.style.backgroundColor = '#10b981'; // Green when logged in
-      } else {
-        statusIndicator.style.backgroundColor = '#f97316'; // Orange when signed out
-      }
-    }
   }
 
   toggleDropdown() {
@@ -956,7 +942,6 @@ class AvatarSystem {
           // Close modal immediately and refresh UI
           setTimeout(() => {
             this.closeAuthModal();
-            this.updateStatusIndicator(); // Update status indicator color
             this.renderDropdown();
           }, 800);
         } else {

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TagYou2 - London Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="auth-styles.css">
+
+  <link rel="stylesheet" href="mobile-styles.css">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <!-- Avatar System -->
+  <script src="avatar-system.js"></script>
+
+
+
+
+
+
+</head>
+
+<body>
+
+
+  <!-- Centered Controls Container -->
+  <div class="controls-container">
+    <!-- Search Bar -->
+    <div class="search-container">
+      <div class="search-bar">
+        <i class="fas fa-search search-icon"></i>
+        <label for="searchInput" class="sr-only">Search London locations</label>
+        <input type="text" id="searchInput" name="search" class="search-input" placeholder="Search London locations...">
+        <button type="button" id="clearButton" class="clear-button" style="display: none;">
+          <i class="fas fa-times"></i>
+        </button>
+        <button type="button" id="searchButton" class="search-button">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Festivals Dropdown -->
+    <div class="festivals-container">
+      <div class="festivals-bar">
+        <button type="button" id="festivalsButton" class="festivals-button">
+          <span class="festivals-text">UK Festivals</span>
+          <i class="fas fa-chevron-down dropdown-icon"></i>
+        </button>
+        <div class="festivals-dropdown" id="festivalsDropdown">
+          <div class="festivals-list">
+            <div class="festival-item available">🎭 Notting Hill Carnival</div>
+            <div class="festival-item coming-soon">🎪 Edinburgh Festival Fringe</div>
+            <div class="festival-item coming-soon">🎸 Glastonbury Festival</div>
+            <div class="festival-item coming-soon">🎵 Reading Festival</div>
+            <div class="festival-item coming-soon">🎤 Leeds Festival</div>
+            <div class="festival-item coming-soon">🤘 Download Festival</div>
+            <div class="festival-item coming-soon">🏝️ Isle of Wight Festival</div>
+            <div class="festival-item coming-soon">🌳 Latitude Festival</div>
+            <div class="festival-item coming-soon">🌈 Bestival</div>
+            <div class="festival-item coming-soon">🎪 Boomtown Fair</div>
+            <div class="festival-item coming-soon">🎧 Creamfields</div>
+            <div class="festival-item coming-soon">🎶 V Festival</div>
+            <div class="festival-item coming-soon">🎤 T in the Park</div>
+            <div class="festival-item coming-soon">🎵 Wireless Festival</div>
+            <div class="festival-item coming-soon">🎉 Parklife Festival</div>
+            <div class="festival-item coming-soon">💕 Lovebox Festival</div>
+            <div class="festival-item coming-soon">🌞 Field Day Festival</div>
+            <div class="festival-item coming-soon">🎨 All Points East</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- Interactive Map Toolbar -->
+    <div class="map-toolbar">
+      <div class="toolbar-section">
+        <button class="toolbar-btn" id="groupsBtn" title="Groups">
+          <i class="fas fa-users"></i>
+        </button>
+        <button class="toolbar-btn" id="foodStallBtn" title="Food Stalls">
+          <i class="fas fa-utensils"></i>
+        </button>
+        <button class="toolbar-btn" id="floatTruckBtn" title="Float Trucks">
+          <i class="fas fa-truck"></i>
+        </button>
+        <button class="toolbar-btn" id="artistBandBtn" title="Artists & Bands">
+          <i class="fas fa-music"></i>
+        </button>
+        <button class="toolbar-btn" id="festivalBtn" title="Festivals">
+          <i class="fas fa-star"></i>
+        </button>
+      </div>
+
+      <div class="toolbar-section">
+        <button class="toolbar-btn location-btn" id="locationCenterBtn" title="Center on Location">
+          <i class="fas fa-crosshairs"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Pull Up Panel -->
+    <div class="pull-up-panel" id="pullUpPanel">
+      <div class="panel-handle">
+        <div class="handle-bar"></div>
+        <span class="handle-text">Pull up for more</span>
+      </div>
+      <div class="panel-content">
+        <div class="panel-header">
+          <h3>Festival Information</h3>
+          <button class="close-panel" id="closePanel">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+          <button class="tab-btn active" data-tab="foodstall">
+            <i class="fas fa-utensils"></i>
+            <span>Food Stalls</span>
+          </button>
+          <button class="tab-btn" data-tab="floattrucks">
+            <i class="fas fa-truck"></i>
+            <span>Float Trucks</span>
+          </button>
+          <button class="tab-btn" data-tab="artist">
+            <i class="fas fa-music"></i>
+            <span>Artists</span>
+          </button>
+          <button class="tab-btn" data-tab="groups">
+            <i class="fas fa-users"></i>
+            <span>Groups</span>
+          </button>
+          <button class="tab-btn" data-tab="settings">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+          <!-- Food Stalls Tab -->
+          <div class="tab-pane active" id="foodstall">
+            <div class="tab-header">
+              <h4>🍽️ Food Stalls</h4>
+              <p>Discover delicious festival food and refreshments</p>
+            </div>
+            <div class="content-list" id="food-stalls-list">
+              <!-- Food stalls will be populated by JavaScript -->
+              <div class="empty-state">
+                <p>No food stalls available yet. Please set up your database.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Float Trucks Tab -->
+          <div class="tab-pane" id="floattrucks">
+            <div class="tab-header">
+              <h4>🚛 Float Trucks</h4>
+              <p>Amazing parade floats and mobile attractions</p>
+            </div>
+            <div class="content-list" id="float-trucks-list">
+              <!-- Float trucks will be populated by JavaScript -->
+              <div class="empty-state">
+                <p>No float trucks available yet. Please set up your database.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Artists Tab -->
+          <div class="tab-pane" id="artist">
+            <div class="tab-header">
+              <h4>🎵 Artists & Bands</h4>
+              <p>Live performances and musical entertainment</p>
+            </div>
+            <div class="content-list" id="artists-list">
+              <!-- Artists will be populated by JavaScript -->
+              <div class="empty-state">
+                <p>No artists available yet. Please set up your database.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Groups Tab -->
+          <div class="tab-pane" id="groups">
+            <div class="tab-header">
+              <h4>👥 Groups & Communities</h4>
+              <p>Connect with festival communities and groups</p>
+            </div>
+            <div class="content-list">
+              <div class="content-item">
+                <div class="item-image">
+                  <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=150&h=100&fit=crop"
+                    alt="LGBTQ+ Community">
+                </div>
+                <div class="item-content">
+                  <div class="item-icon">🏳️‍🌈</div>
+                  <div class="item-info">
+                    <h5>LGBTQ+ Community</h5>
+                    <p>Inclusive space for LGBTQ+ festival-goers</p>
+                    <span class="item-location">📍 Community Hub, All Day</span>
+                  </div>
+                </div>
+              </div>
+              <div class="content-item">
+                <div class="item-image">
+                  <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=150&h=100&fit=crop"
+                    alt="International Visitors">
+                </div>
+                <div class="item-content">
+                  <div class="item-icon">🌍</div>
+                  <div class="item-info">
+                    <h5>International Visitors</h5>
+                    <p>Group for international festival attendees</p>
+                    <span class="item-location">📍 Welcome Center, 10:00 AM</span>
+                  </div>
+                </div>
+              </div>
+              <div class="content-item">
+                <div class="item-image">
+                  <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=150&h=100&fit=crop"
+                    alt="Art & Culture Group">
+                </div>
+                <div class="item-content">
+                  <div class="item-icon">🎨</div>
+                  <div class="item-info">
+                    <h5>Art & Culture Group</h5>
+                    <p>Creative community for art enthusiasts</p>
+                    <span class="item-location">📍 Art Gallery, 2:00 PM</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Settings Tab -->
+          <div class="tab-pane" id="settings">
+            <div class="tab-header">
+              <h4>⚙️ Settings</h4>
+              <p>Customize your festival experience</p>
+            </div>
+            <div class="settings-list">
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h5>Push Notifications</h5>
+                  <p>Get alerts about events and updates</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h5>Location Services</h5>
+                  <p>Share your location for better recommendations</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h5>Dark Mode</h5>
+                  <p>Switch to dark theme for better visibility</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h5>Auto-Save Favorites</h5>
+                  <p>Automatically save your favorite items</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full Scale Map Container -->
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+    <!-- Avatar system removed -->
+
+    <!-- Script verification removed -->
+
+
+
+
+    <script>
+
+
+      // Force show mobile elements (only for testing)
+      function forceShowMobileElements() {
+        console.log('🔧 Force showing mobile elements for testing...');
+
+        // Only show mobile elements if we're in test mode or on mobile
+        const isMobile = window.innerWidth <= 480;
+        const isTestMode = document.body.classList.contains('mobile-test-mode');
+
+        if (!isMobile && !isTestMode) {
+          console.log('📱 Not mobile and not in test mode, skipping force show');
+          return;
+        }
+
+        // Old mobile profile elements removed - using modern profile system
+      }
+
+
+
+      // Auto-test mobile auth on page load
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          console.log('🚀 Page loaded, checking mobile auth...');
+
+          // Force show mobile elements only on mobile
+          if (window.innerWidth <= 480) {
+            forceShowMobileElements();
+          }
+
+          // Old mobileAuth references removed - using modern profile system
+        }, 3000);
+      });
+
+      // Side-by-side comparison function for live testing
+      window.enableSignInComparison = function () {
+        console.log('🔍 Enabling sign in comparison monitoring...');
+
+        // Enable mobile test mode
+        document.body.classList.add('mobile-test-mode');
+
+        // Store the flows for comparison
+        window.desktopFlow = [];
+        window.mobileFlow = [];
+
+        // Function to add to desktop flow
+        function addToDesktopFlow(event, details) {
+          const entry = {
+            timestamp: new Date().toISOString(),
+            event: event,
+            details: details
+          };
+          window.desktopFlow.push(entry);
+          console.log(`🖥️ DESKTOP: ${event} - ${details}`);
+        }
+
+        // Function to add to mobile flow
+        function addToMobileFlow(event, details) {
+          const entry = {
+            timestamp: new Date().toISOString(),
+            event: event,
+            details: details
+          };
+          window.mobileFlow.push(entry);
+          console.log(`📱 MOBILE: ${event} - ${details}`);
+        }
+
+        // Monitor Desktop Flow
+        const desktopButton = document.querySelector('.profile-button');
+        if (desktopButton) {
+          addToDesktopFlow('Button Found', 'Desktop profile button exists');
+
+          // Monitor desktop button click
+          desktopButton.addEventListener('click', (e) => {
+            addToDesktopFlow('Button Clicked', 'Desktop profile button clicked');
+          });
+
+          // Monitor desktop dropdown
+          const desktopDropdown = document.querySelector('.profile-dropdown');
+          if (desktopDropdown) {
+            addToDesktopFlow('Dropdown Found', 'Desktop dropdown exists');
+
+            // Monitor dropdown visibility
+            const desktopObserver = new MutationObserver((mutations) => {
+              mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                  addToDesktopFlow('Dropdown Style Changed', `Display: ${desktopDropdown.style.display}`);
+                }
+              });
+            });
+            desktopObserver.observe(desktopDropdown, { attributes: true, attributeFilter: ['style'] });
+          }
+
+          // Monitor desktop sign in button
+          setTimeout(() => {
+            const desktopSignInButtons = document.querySelectorAll('.profile-menu-item');
+            desktopSignInButtons.forEach((button) => {
+              if (button.textContent.includes('Sign In')) {
+                addToDesktopFlow('Sign In Button Found', 'Desktop Sign In button exists');
+
+                button.addEventListener('click', (e) => {
+                  addToDesktopFlow('Sign In Button Clicked', 'Desktop Sign In button clicked');
+                });
+              }
+            });
+          }, 1000);
+        }
+
+        // Old mobile profile monitoring removed - using modern profile system
+
+        // Old authentication function overrides removed - using modern profile system
+
+        console.log('✅ Sign in comparison monitoring enabled!');
+        console.log('🖥️ Click the desktop profile button to see desktop flow');
+        console.log('📱 Click the mobile profile button to see mobile flow');
+        console.log('🔍 Run compareFlows() in console to compare the flows');
+      };
+
+      // Function to compare flows
+      window.compareFlows = function () {
+        console.log('=== FLOW COMPARISON ===');
+        console.log(`Desktop Flow Steps: ${window.desktopFlow ? window.desktopFlow.length : 0}`);
+        console.log(`Mobile Flow Steps: ${window.mobileFlow ? window.mobileFlow.length : 0}`);
+
+        if (window.desktopFlow && window.desktopFlow.length > 0) {
+          console.log('\n🖥️ DESKTOP FLOW:');
+          window.desktopFlow.forEach((entry, index) => {
+            console.log(`${index + 1}. ${entry.event}: ${entry.details}`);
+          });
+        }
+
+        if (window.mobileFlow && window.mobileFlow.length > 0) {
+          console.log('\n📱 MOBILE FLOW:');
+          window.mobileFlow.forEach((entry, index) => {
+            console.log(`${index + 1}. ${entry.event}: ${entry.details}`);
+          });
+        }
+
+        // Find differences
+        if (window.desktopFlow && window.mobileFlow) {
+          console.log('\n🔍 DIFFERENCES:');
+          const desktopEvents = window.desktopFlow.map(e => e.event);
+          const mobileEvents = window.mobileFlow.map(e => e.event);
+
+          const desktopOnly = desktopEvents.filter(e => !mobileEvents.includes(e));
+          const mobileOnly = mobileEvents.filter(e => !desktopEvents.includes(e));
+
+          if (desktopOnly.length > 0) {
+            console.log(`Desktop only: ${desktopOnly.join(', ')}`);
+          }
+          if (mobileOnly.length > 0) {
+            console.log(`Mobile only: ${mobileOnly.join(', ')}`);
+          }
+
+          if (desktopOnly.length === 0 && mobileOnly.length === 0) {
+            console.log('✅ Both flows have the same events');
+          }
+        }
+      };
+    </script>
+</body>
+
+</html>
