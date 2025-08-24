@@ -15,59 +15,8 @@
   <!-- Supabase SDK -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-  <!-- Authentication handled by Avatar System V2 -->
-
-  <!-- Avatar System -->
-  <script type="module" src="avatar-system-v2.js"></script>
-
-  <!-- Test button removed - form field accessibility fixed -->
-
-  <!-- Debug script to test avatar system -->
-  <script>
-    // Test if avatar system is working
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        console.log('🔍 Testing Avatar System V2...');
-
-        // Check if avatar system exists
-        if (window.avatarSystemV2) {
-          console.log('✅ Avatar System V2 found:', window.avatarSystemV2);
-
-          // Check if avatar element exists
-          const avatarElement = document.querySelector('.avatar-container');
-          console.log('🎯 Avatar element found:', !!avatarElement);
-
-          // Force show auth modal for testing
-          console.log('🧪 Force showing auth modal...');
-          window.avatarSystemV2.showAuthModal = true;
-          window.avatarSystemV2.authMode = 'signin';
-          window.avatarSystemV2.renderAuthModal();
-
-        } else {
-          console.log('❌ Avatar System V2 not found');
-
-          // Create a test button to manually trigger
-          const testBtn = document.createElement('button');
-          testBtn.textContent = 'Test Avatar System';
-          testBtn.style.cssText = 'position: fixed; top: 10px; left: 10px; z-index: 10000; padding: 10px; background: red; color: white; border: none; cursor: pointer;';
-          testBtn.onclick = () => {
-            console.log('🔍 Manual test button clicked');
-            if (window.avatarSystemV2) {
-              window.avatarSystemV2.showAuthModal = true;
-              window.avatarSystemV2.authMode = 'signin';
-              window.avatarSystemV2.renderAuthModal();
-            } else {
-              alert('Avatar System V2 not found!');
-            }
-          };
-          document.body.appendChild(testBtn);
-        }
-      }, 3000);
-    });
-  </script>
-
-  <!-- Mobile Authentication Module -->
-  <script src="mobile-auth.js"></script>
+  <!-- Avatar System V2 removed -->
+  <!-- Mobile Authentication Module removed - file not found -->
 
 
 
@@ -349,7 +298,35 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script>
-    <!-- Old avatar system removed - using avatar-system-v2.js -->
+    <!-- Avatar system removed -->
+
+    <!-- Script connection verification -->
+    <script>
+      console.log('🔗 Script connection verification...');
+
+      // Check if main scripts are loaded
+      if (typeof L !== 'undefined') {
+        console.log('✅ Leaflet.js loaded successfully');
+      } else {
+        console.log('❌ Leaflet.js not loaded');
+      }
+
+      // Check if Supabase is available
+      if (typeof window.supabase !== 'undefined') {
+        console.log('✅ Supabase SDK loaded successfully');
+      } else {
+        console.log('❌ Supabase SDK not loaded');
+      }
+
+      // Check if main script functions are available
+      if (typeof window.showCarnivalRoute !== 'undefined') {
+        console.log('✅ Main script functions loaded');
+      } else {
+        console.log('❌ Main script functions not loaded');
+      }
+
+      console.log('🔗 Script verification complete');
+    </script>
 
 
 
