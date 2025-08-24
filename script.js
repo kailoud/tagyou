@@ -1623,8 +1623,8 @@ window.testAuthFlow = async function () {
   try {
     // Test sign up
     const { data, error } = await window.supabase.auth.signUp({
-      email: 'test@example.com',
-      password: 'testpassword123'
+      email: 'user@gmail.com',
+      password: 'password123'
     });
 
     if (error) {

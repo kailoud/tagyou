@@ -108,7 +108,7 @@ async function testSignUp() {
   console.log('🔐 Testing Sign Up...');
   try {
     const { supabaseAuthService } = await import('./supabase-auth-service.js');
-    const result = await supabaseAuthService.signUp('test@example.com', 'password123');
+    const result = await supabaseAuthService.signUp('user@gmail.com', 'password123');
     console.log('Sign up result:', result);
   } catch (error) {
     console.error('Sign up error:', error.message);
@@ -119,7 +119,7 @@ async function testSignIn() {
   console.log('🔐 Testing Sign In...');
   try {
     const { supabaseAuthService } = await import('./supabase-auth-service.js');
-    const result = await supabaseAuthService.signIn('test@example.com', 'password123');
+    const result = await supabaseAuthService.signIn('user@gmail.com', 'password123');
     console.log('Sign in result:', result);
   } catch (error) {
     console.error('Sign in error:', error.message);
