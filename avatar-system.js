@@ -36,7 +36,7 @@ class AvatarSystem {
         name: "Manchester Caribbean Carnival",
         location: "Manchester",
         date: "Aug 9-10, 2025",
-        status: "upcoming",
+        status: "finished",
         description: "Celebrating Caribbean heritage in the heart of Manchester",
         website: "https://manchestercarnival.com",
         expectedAttendance: "100,000+",
@@ -46,8 +46,8 @@ class AvatarSystem {
         id: 3,
         name: "Leeds West Indian Carnival",
         location: "Leeds",
-        date: "Aug 24, 2025",
-        status: "active",
+        date: "Aug 25, 2025",
+        status: "upcoming",
         description: "One of the oldest Caribbean carnivals in Europe",
         website: "https://leedscarnival.co.uk",
         expectedAttendance: "150,000+",
@@ -554,10 +554,10 @@ class AvatarSystem {
                   border-radius: 12px;
                   font-size: 10px;
                   font-weight: 500;
-                  background: ${carnival.status === 'active' ? '#dcfce7' : '#fef3c7'};
-                  color: ${carnival.status === 'active' ? '#166534' : '#92400e'};
+                  background: ${carnival.status === 'active' ? '#dcfce7' : carnival.status === 'finished' ? '#fee2e2' : '#fef3c7'};
+                  color: ${carnival.status === 'active' ? '#166534' : carnival.status === 'finished' ? '#991b1b' : '#92400e'};
                 ">
-                  ${carnival.status === 'active' ? 'Active' : 'Upcoming'}
+                  ${carnival.status === 'active' ? 'Active' : carnival.status === 'finished' ? 'Finished' : 'Upcoming'}
                 </span>
                 <button class="track-carnival-btn" data-carnival-id="${carnival.id}" style="
                   background: ${this.trackedCarnivals.has(carnival.id) ? '#ef4444' : '#10b981'};
