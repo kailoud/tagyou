@@ -481,7 +481,7 @@ class AvatarSystem {
       background: white;
       border-radius: 16px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-      z-index: 1000;
+      z-index: 10001;
       overflow: hidden;
       transform: translateY(-10px);
       opacity: 0;
