@@ -15,8 +15,8 @@
   <!-- Supabase SDK -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-  <!-- Avatar System V2 removed -->
-  <!-- Mobile Authentication Module removed - file not found -->
+  <!-- Avatar System -->
+  <script src="avatar-system.js"></script>
 
 
 
@@ -324,6 +324,44 @@
       } else {
         console.log('❌ Main script functions not loaded');
       }
+
+      // Check if avatar system is loaded
+      if (typeof window.avatarSystem !== 'undefined') {
+        console.log('✅ Avatar system loaded successfully');
+        console.log('✅ Avatar system object:', window.avatarSystem);
+      } else {
+        console.log('❌ Avatar system not loaded');
+      }
+
+      // Check for avatar button in DOM
+      setTimeout(() => {
+        const avatarButton = document.querySelector('.avatar-button');
+        const avatarContainer = document.querySelector('.avatar-container');
+        console.log('🔍 Avatar button in DOM:', !!avatarButton);
+        console.log('🔍 Avatar container in DOM:', !!avatarContainer);
+
+        if (!avatarButton) {
+          console.log('⚠️ Avatar button not found - checking for errors...');
+          // Try to manually initialize avatar system
+          if (typeof window.avatarSystem === 'undefined') {
+            console.log('⚠️ Avatar system not initialized, trying to create it...');
+            try {
+              // Import and create avatar system manually
+              import('./avatar-system.js').then(() => {
+                console.log('✅ Avatar system imported successfully');
+                if (typeof window.avatarSystem === 'undefined') {
+                  console.log('⚠️ Still no avatar system, creating manually...');
+                  window.avatarSystem = new AvatarSystem();
+                }
+              }).catch(error => {
+                console.error('❌ Failed to import avatar system:', error);
+              });
+            } catch (error) {
+              console.error('❌ Error creating avatar system:', error);
+            }
+          }
+        }
+      }, 2000);
 
       console.log('🔗 Script verification complete');
     </script>

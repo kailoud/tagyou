@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supabase Auth Test</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+
+    .test-container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .test-button {
+      background: #8b5cf6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    .test-button:hover {
+      background: #7c3aed;
+    }
+
+    .status {
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+
+    .success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .info {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Supabase Authentication Test</h1>
+
+  <div class="test-container">
+    <h2>Connection Test</h2>
+    <button class="test-button" onclick="testConnection()">Test Supabase Connection</button>
+    <div id="connection-status"></div>
+  </div>
+
+  <div class="test-container">
+    <h2>Authentication Test</h2>
+    <button class="test-button" onclick="testSignUp()">Test Sign Up</button>
+    <button class="test-button" onclick="testSignIn()">Test Sign In</button>
+    <button class="test-button" onclick="testSignOut()">Test Sign Out</button>
+    <div id="auth-status"></div>
+  </div>
+
+  <div class="test-container">
+    <h2>Avatar System Test</h2>
+    <button class="test-button" onclick="testAvatarSystem()">Test Avatar System</button>
+    <div id="avatar-status"></div>
+  </div>
+
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <!-- Supabase Config -->
+  <script type="module" src="supabase-config-secret.js"></script>
+
+  <!-- Avatar System -->
+  <script src="avatar-system.js"></script>
+
+  <script>
+    let supabaseClient = null;
+
+    async function testConnection() {
+      const statusDiv = document.getElementById('connection-status');
+      statusDiv.innerHTML = '<div class="status info">Testing connection...</div>';
+
+      try {
+        // Test if Supabase SDK is loaded
+        if (!window.supabase) {
+          throw new Error('Supabase SDK not loaded');
+        }
+
+        // Import config
+        const config = await import('./supabase-config-secret.js');
+
+        // Create client
+        supabaseClient = window.supabase.createClient(
+          config.default.supabaseUrl,
+          config.default.supabaseAnonKey
+        );
+
+        // Test connection
+        const { data, error } = await supabaseClient.from('profiles').select('id').limit(1);
+
+        if (error) {
+          throw new Error(`Database error: ${error.message}`);
+        }
+
+        statusDiv.innerHTML = '<div class="status success">✅ Supabase connection successful!</div>';
+        console.log('✅ Supabase connection test passed');
+
+      } catch (error) {
+        statusDiv.innerHTML = `<div class="status error">❌ Connection failed: ${error.message}</div>`;
+        console.error('❌ Supabase connection test failed:', error);
+      }
+    }
+
+    async function testSignUp() {
+      const statusDiv = document.getElementById('auth-status');
+      if (!supabaseClient) {
+        statusDiv.innerHTML = '<div class="status error">❌ Please test connection first</div>';
+        return;
+      }
+
+      statusDiv.innerHTML = '<div class="status info">Testing sign up...</div>';
+
+      try {
+        const testEmail = `test-${Date.now()}@example.com`;
+        const testPassword = 'testpassword123';
+
+        const { data, error } = await supabaseClient.auth.signUp({
+          email: testEmail,
+          password: testPassword
+        });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        statusDiv.innerHTML = `<div class="status success">✅ Sign up successful! Email: ${testEmail}</div>`;
+        console.log('✅ Sign up test passed:', data);
+
+      } catch (error) {
+        statusDiv.innerHTML = `<div class="status error">❌ Sign up failed: ${error.message}</div>`;
+        console.error('❌ Sign up test failed:', error);
+      }
+    }
+
+    async function testSignIn() {
+      const statusDiv = document.getElementById('auth-status');
+      if (!supabaseClient) {
+        statusDiv.innerHTML = '<div class="status error">❌ Please test connection first</div>';
+        return;
+      }
+
+      statusDiv.innerHTML = '<div class="status info">Testing sign in...</div>';
+
+      try {
+        // Use a test account (you'll need to create this first)
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email: 'test@example.com',
+          password: 'testpassword123'
+        });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        statusDiv.innerHTML = `<div class="status success">✅ Sign in successful! User: ${data.user.email}</div>`;
+        console.log('✅ Sign in test passed:', data);
+
+      } catch (error) {
+        statusDiv.innerHTML = `<div class="status error">❌ Sign in failed: ${error.message}</div>`;
+        console.error('❌ Sign in test failed:', error);
+      }
+    }
+
+    async function testSignOut() {
+      const statusDiv = document.getElementById('auth-status');
+      if (!supabaseClient) {
+        statusDiv.innerHTML = '<div class="status error">❌ Please test connection first</div>';
+        return;
+      }
+
+      statusDiv.innerHTML = '<div class="status info">Testing sign out...</div>';
+
+      try {
+        const { error } = await supabaseClient.auth.signOut();
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        statusDiv.innerHTML = '<div class="status success">✅ Sign out successful!</div>';
+        console.log('✅ Sign out test passed');
+
+      } catch (error) {
+        statusDiv.innerHTML = `<div class="status error">❌ Sign out failed: ${error.message}</div>`;
+        console.error('❌ Sign out test failed:', error);
+      }
+    }
+
+    function testAvatarSystem() {
+      const statusDiv = document.getElementById('avatar-status');
+
+      if (typeof window.avatarSystem !== 'undefined') {
+        statusDiv.innerHTML = '<div class="status success">✅ Avatar system loaded successfully!</div>';
+        console.log('✅ Avatar system test passed:', window.avatarSystem);
+      } else {
+        statusDiv.innerHTML = '<div class="status error">❌ Avatar system not loaded</div>';
+        console.error('❌ Avatar system test failed');
+      }
+    }
+
+    // Auto-test on load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        testConnection();
+        testAvatarSystem();
+      }, 1000);
+    });
+  </script>
+</body>
+
+</html>
