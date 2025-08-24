@@ -124,9 +124,7 @@ async function initializeSupabase() {
       // Set the global Supabase instance
       setSupabaseInstance(supabaseClient);
 
-      // Also set the Supabase instance for the auth service
-      const { setSupabaseInstance: setAuthSupabaseInstance } = await import('./supabase-auth-service.js');
-      setAuthSupabaseInstance(supabaseClient);
+      // Avatar System V2 creates its own Supabase client, so no need to set it here
 
       // Initialize Supabase data
       await initializeDefaultData();
