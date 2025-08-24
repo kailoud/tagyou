@@ -790,19 +790,12 @@ function detectSamsungDevice() {
 
 // Initialize map toolbar functionality
 function initMapToolbar() {
-  const groupsBtn = document.getElementById('groupsBtn');
   const foodStallBtn = document.getElementById('foodStallBtn');
   const floatTruckBtn = document.getElementById('floatTruckBtn');
   const artistBandBtn = document.getElementById('artistBandBtn');
   const festivalBtn = document.getElementById('festivalBtn');
   const locationCenterBtn = document.getElementById('locationCenterBtn');
-
-  // Groups button
-  groupsBtn.addEventListener('click', function () {
-    toggleButtonActive(this);
-    console.log('Groups button clicked');
-    // Add functionality to show/hide groups on map
-  });
+  const carnivalTrackerBtn = document.getElementById('carnivalTrackerBtn');
 
   // Food Stalls button
   foodStallBtn.addEventListener('click', function () {
@@ -944,6 +937,26 @@ function initMapToolbar() {
       map.setView([51.5074, -0.1278], 12);
     }
   });
+
+    // Carnival Tracker button (replaces the old Groups button)
+  carnivalTrackerBtn.addEventListener('click', function () {
+    console.log('🎭 Carnival Tracker button clicked');
+    
+    // Toggle carnival tracker visibility using the global function
+    if (window.toggleCarnivalTracker) {
+      window.toggleCarnivalTracker();
+      // Update button active state based on tracker visibility
+      if (window.carnivalTracker && window.carnivalTracker.trackerElement.style.display === 'none') {
+        this.classList.remove('active');
+      } else {
+        this.classList.add('active');
+      }
+    } else {
+      console.log('❌ Carnival tracker not initialized yet');
+    }
+  });
+  
+  console.log('🎭 Carnival tracker button event listener added (replaces Groups button)');
 }
 
 // Toggle button active state
