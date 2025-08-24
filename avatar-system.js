@@ -136,6 +136,7 @@ class AvatarSystem {
   }
 
   createAvatarElement() {
+    console.log('🎨 Avatar System: Creating avatar element...');
     // Create avatar container
     const avatarContainer = document.createElement('div');
     avatarContainer.className = 'avatar-container';
@@ -207,11 +208,13 @@ class AvatarSystem {
   }
 
   toggleDropdown() {
+    console.log('🎨 Avatar System: Toggle dropdown called, current state:', this.isDropdownOpen);
     this.isDropdownOpen = !this.isDropdownOpen;
     this.renderDropdown();
   }
 
   renderDropdown() {
+    console.log('🎨 Avatar System: Rendering dropdown, isOpen:', this.isDropdownOpen);
     // Remove existing dropdown
     const existingDropdown = document.querySelector('.avatar-dropdown');
     if (existingDropdown) {
@@ -338,7 +341,7 @@ class AvatarSystem {
 
       <div style="padding: 16px;">
         <div style="display: flex; flex-direction: column; gap: 12px;">
-          <button class="signin-button" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: #8b5cf6; color: white; padding: 12px 16px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: background 0.2s;">
+          <button class="signin-button auth-submit-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: background 0.2s;">
             <i class="fas fa-user" style="font-size: 20px;"></i>
             <span>Sign In</span>
           </button>
@@ -418,9 +421,24 @@ class AvatarSystem {
     // Event delegation for input changes
     document.addEventListener('input', (e) => {
       if (e.target.classList.contains('auth-input')) {
-        const field = e.target.type === 'email' ? 'email' :
-          e.target.placeholder.includes('Confirm') ? 'confirmPassword' : 'password';
+        const field = e.target.id === 'auth-email' ? 'email' :
+          e.target.id === 'auth-confirm-password' ? 'confirmPassword' : 'password';
         this.formData[field] = e.target.value;
+      }
+    });
+
+    // Event delegation for auth mode toggle
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('auth-mode-toggle')) {
+        e.preventDefault();
+        this.authMode = this.authMode === 'signin' ? 'signup' : 'signin';
+        this.authError = '';
+        this.authSuccess = '';
+        this.renderAuthModal();
+      } else if (e.target.classList.contains('forgot-password-link')) {
+        e.preventDefault();
+        // TODO: Implement forgot password functionality
+        console.log('Forgot password clicked');
       }
     });
   }
@@ -448,16 +466,78 @@ class AvatarSystem {
     if (!this.showAuthModal) return;
 
     const modal = document.createElement('div');
-    modal.className = 'auth-modal';
-    modal.style.cssText = `
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 100000;
-      padding: 16px;
+    modal.className = 'auth-modal show';
+    modal.innerHTML = `
+      <div class="auth-modal-overlay">
+        <div class="auth-modal-content">
+          <button class="auth-modal-close" onclick="window.avatarSystem.closeAuthModal()">
+            <i class="fas fa-times"></i>
+          </button>
+          
+          <div class="auth-modal-header">
+            <h2>${this.authMode === 'signin' ? 'Sign In' : 'Create Account'}</h2>
+            <p>${this.authMode === 'signin'
+        ? 'Welcome back! Please sign in to your account.'
+        : 'Join us to start tracking your favorite carnivals.'}
+            </p>
+          </div>
+
+          ${this.authError ? `
+            <div class="auth-error">
+              <i class="fas fa-exclamation-circle"></i>
+              ${this.authError}
+            </div>
+          ` : ''}
+
+          ${this.authSuccess ? `
+            <div class="auth-success">
+              <i class="fas fa-check-circle"></i>
+              ${this.authSuccess}
+            </div>
+          ` : ''}
+
+          <form class="auth-form">
+            <div class="form-group">
+              <label for="auth-email">Email Address</label>
+              <input type="email" id="auth-email" class="auth-input" required value="${this.formData.email}" placeholder="Enter your email">
+            </div>
+
+            <div class="form-group">
+              <label for="auth-password">Password</label>
+              <input type="password" id="auth-password" class="auth-input" required value="${this.formData.password}" placeholder="Enter your password">
+            </div>
+
+            ${this.authMode === 'signup' ? `
+              <div class="form-group">
+                <label for="auth-confirm-password">Confirm Password</label>
+                <input type="password" id="auth-confirm-password" class="auth-input" required value="${this.formData.confirmPassword}" placeholder="Confirm your password">
+              </div>
+            ` : ''}
+
+            <button type="submit" class="auth-submit-btn" ${this.authLoading ? 'disabled' : ''}>
+              ${this.authLoading ? '<i class="fas fa-spinner fa-spin"></i>' : ''}
+              <i class="fas ${this.authMode === 'signin' ? 'fa-user' : 'fa-user-plus'}"></i>
+              <span>${this.authMode === 'signin' ? 'Sign In' : 'Create Account'}</span>
+            </button>
+          </form>
+
+          <div class="auth-modal-footer">
+            <p>
+              ${this.authMode === 'signin' ? "Don't have an account?" : "Already have an account?"}
+              <a href="#" class="auth-link auth-mode-toggle">
+                ${this.authMode === 'signin' ? 'Create Account' : 'Sign In'}
+              </a>
+            </p>
+            ${this.authMode === 'signin' ? `
+              <p>
+                <a href="#" class="auth-link forgot-password-link">
+                  Forgot Password?
+                </a>
+              </p>
+            ` : ''}
+          </div>
+        </div>
+      </div>
     `;
 
     modal.innerHTML = `
@@ -704,15 +784,27 @@ class AvatarSystem {
     this.showAuthModal = false;
     const modal = document.querySelector('.auth-modal');
     if (modal) {
-      modal.remove();
+      modal.classList.remove('show');
+      setTimeout(() => {
+        modal.remove();
+      }, 300); // Wait for transition to complete
     }
   }
 }
 
 // Initialize avatar system when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  window.avatarSystem = new AvatarSystem();
-});
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!window.avatarSystem) {
+      window.avatarSystem = new AvatarSystem();
+    }
+  });
+} else {
+  // DOM is already loaded
+  if (!window.avatarSystem) {
+    window.avatarSystem = new AvatarSystem();
+  }
+}
 
 // Add CSS animations
 const style = document.createElement('style');
