@@ -471,33 +471,33 @@ class AvatarSystemV2 {
 
           <form class="auth-form" style="display: flex; flex-direction: column; gap: 16px;">
             <div>
-              <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 4px;">
+              <label for="auth-email" style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 4px;">
                 Email Address
               </label>
               <div style="position: relative;">
                 <i class="fas fa-envelope" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 16px;"></i>
-                <input type="email" id="auth-email" required value="${this.formData.email}" class="auth-input" style="width: 100%; padding: 8px 12px 8px 40px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;" placeholder="Enter your email">
+                <input type="email" id="auth-email" name="email" required value="${this.formData.email}" class="auth-input" style="width: 100%; padding: 8px 12px 8px 40px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;" placeholder="Enter your email">
               </div>
             </div>
 
             <div>
-              <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 4px;">
+              <label for="auth-password" style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 4px;">
                 Password
               </label>
               <div style="position: relative;">
                 <i class="fas fa-lock" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 16px;"></i>
-                <input type="password" id="auth-password" required value="${this.formData.password}" class="auth-input" style="width: 100%; padding: 8px 12px 8px 40px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;" placeholder="Enter your password">
+                <input type="password" id="auth-password" name="password" required value="${this.formData.password}" class="auth-input" style="width: 100%; padding: 8px 12px 8px 40px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;" placeholder="Enter your password">
               </div>
             </div>
 
             ${this.authMode === 'signup' ? `
               <div>
-                <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 4px;">
+                <label for="auth-confirm-password" style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 4px;">
                   Confirm Password
                 </label>
                 <div style="position: relative;">
                   <i class="fas fa-lock" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 16px;"></i>
-                  <input type="password" id="auth-confirm-password" required value="${this.formData.confirmPassword}" class="auth-input" style="width: 100%; padding: 8px 12px 8px 40px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;" placeholder="Confirm your password">
+                  <input type="password" id="auth-confirm-password" name="confirmPassword" required value="${this.formData.confirmPassword}" class="auth-input" style="width: 100%; padding: 8px 12px 8px 40px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;" placeholder="Confirm your password">
                 </div>
               </div>
             ` : ''}
