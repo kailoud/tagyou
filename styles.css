@@ -664,20 +664,7 @@ body {
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
 }
 
-/* Groups button - Orange/Red energy */
-#groupsBtn {
-  color: #ff6b35;
-  text-shadow: 0 0 10px rgba(255, 107, 53, 0.6);
-  border: 3px solid rgba(255, 107, 53, 0.8);
-  box-shadow: 0 0 20px rgba(255, 107, 53, 0.4);
-}
 
-#groupsBtn:hover {
-  color: #ff8c42;
-  text-shadow: 0 0 15px rgba(255, 140, 66, 0.8);
-  border: 3px solid rgba(255, 140, 66, 1);
-  box-shadow: 0 0 25px rgba(255, 140, 66, 0.6);
-}
 
 /* Food Stalls button - Green energy */
 #foodStallBtn {
@@ -772,13 +759,6 @@ body {
 }
 
 /* Active states for individual buttons with brighter colors */
-#groupsBtn.active {
-  color: #ff8c42;
-  text-shadow: 0 0 20px rgba(255, 140, 66, 1);
-  border: 3px solid rgba(255, 140, 66, 1);
-  box-shadow: 0 0 30px rgba(255, 140, 66, 0.8);
-  background: linear-gradient(135deg, rgba(255, 140, 66, 0.3), rgba(255, 107, 53, 0.2));
-}
 
 #foodStallBtn.active {
   color: #6ee7df;
