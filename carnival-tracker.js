@@ -87,21 +87,21 @@ class CarnivalTracker {
     this.render();
   }
 
-    createTrackerElement() {
+  createTrackerElement() {
     // Create the main tracker container
     this.trackerElement = document.createElement('div');
     this.trackerElement.id = 'carnival-tracker';
     this.trackerElement.className = 'carnival-tracker';
-    
+
     // Add to the page
     document.body.appendChild(this.trackerElement);
-    
+
     // Start hidden by default
     this.trackerElement.style.display = 'none';
-    
+
     // Update the toolbar count
     this.updateToolbarCount();
-    
+
     console.log('🎭 Carnival tracker element created and added to page');
   }
 
@@ -152,141 +152,229 @@ class CarnivalTracker {
       }
     });
 
-    // Search input
-    this.trackerElement.addEventListener('input', (e) => {
-      if (e.target.matches('.search-input')) {
-        this.searchTerm = e.target.value;
-        this.render();
-      }
-    });
-
-    // Add person form inputs
-    this.trackerElement.addEventListener('input', (e) => {
-      if (e.target.matches('.add-person-input')) {
-        const field = e.target.dataset.field;
-        this.newPerson[field] = e.target.value;
-      }
-    });
+    // Swipe functionality
+    this.setupSwipeEvents();
   }
 
-  generateAvatar(name) {
-    const colors = ["bg-red-500", "bg-blue-500", "bg-green-500", "bg-yellow-500", "bg-purple-500", "bg-pink-500"];
-    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
-    const colorIndex = name.length % colors.length;
+  setupSwipeEvents() {
+    let startY = 0;
+    let currentY = 0;
+    let isDragging = false;
+    let isExpanded = false;
 
-    return {
-      bgColor: colors[colorIndex],
-      initials: initials.slice(0, 2)
+    const handleTouchStart = (e) => {
+      e.preventDefault();
+      startY = e.touches[0].clientY;
+      isDragging = true;
+    };
+
+    const handleTouchMove = (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      currentY = e.touches[0].clientY;
+      const deltaY = currentY - startY;
+
+      if (isExpanded && deltaY > 50) {
+        // Dragging down from expanded state
+        this.collapseTracker();
+        isDragging = false;
+      } else if (!isExpanded && deltaY < -50) {
+        // Dragging up from collapsed state
+        this.expandTracker();
+        isDragging = false;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      isDragging = false;
+    };
+
+    const handleMouseDown = (e) => {
+      e.preventDefault();
+      startY = e.clientY;
+      isDragging = true;
+    };
+
+    const handleMouseMove = (e) => {
+      if (!isDragging) return;
+      currentY = e.clientY;
+      const deltaY = currentY - startY;
+
+      if (isExpanded && deltaY > 50) {
+        this.collapseTracker();
+        isDragging = false;
+      } else if (!isExpanded && deltaY < -50) {
+        this.expandTracker();
+        isDragging = false;
+      }
+    };
+
+    const handleMouseUp = () => {
+      isDragging = false;
+    };
+
+    // Add event listeners when tracker is rendered
+    this.trackerElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+    this.trackerElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+    this.trackerElement.addEventListener('touchend', handleTouchEnd);
+    this.trackerElement.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    // Store references for cleanup
+    this.swipeEventHandlers = {
+      handleTouchStart,
+      handleTouchMove,
+      handleTouchEnd,
+      handleMouseDown,
+      handleMouseMove,
+      handleMouseUp
     };
   }
 
-  getLocationStatus(person) {
-    if (!person.isSharing) return { status: "offline", color: "text-gray-400", bgColor: "bg-gray-400" };
-    const minutesSinceUpdate = Math.floor((new Date() - person.lastUpdate) / 60000);
-    if (minutesSinceUpdate < 3) return { status: "live", color: "text-green-500", bgColor: "bg-green-500" };
-    if (minutesSinceUpdate < 10) return { status: "recent", color: "text-yellow-500", bgColor: "bg-yellow-500" };
-    return { status: "outdated", color: "text-red-500", bgColor: "bg-red-500" };
-  }
-
-  getTimeSince(timestamp) {
-    const minutes = Math.floor((new Date() - timestamp) / 60000);
-    if (minutes < 1) return "now";
-    if (minutes < 60) return `${minutes}m`;
-    const hours = Math.floor(minutes / 60);
-    return `${hours}h`;
-  }
-
-  addPerson() {
-    if (this.newPerson.name && this.newPerson.phone && this.newPerson.relationship) {
-      const avatar = this.generateAvatar(this.newPerson.name);
-      this.people.push({
-        ...this.newPerson,
-        id: Date.now(),
-        lastUpdate: new Date(),
-        isSharing: false,
-        location: null,
-        avatar
-      });
-      this.newPerson = { name: "", phone: "", relationship: "", attending: true, notes: "" };
-      this.showAddForm = false;
+    // Search input
+    this.trackerElement.addEventListener('input', (e) => {
+    if (e.target.matches('.search-input')) {
+      this.searchTerm = e.target.value;
       this.render();
-      this.updateToolbarCount();
     }
+  });
+
+// Add person form inputs
+this.trackerElement.addEventListener('input', (e) => {
+  if (e.target.matches('.add-person-input')) {
+    const field = e.target.dataset.field;
+    this.newPerson[field] = e.target.value;
+  }
+});
   }
 
-  requestLocationSharing(personId) {
-    this.people = this.people.map(person =>
-      person.id === personId
-        ? {
-          ...person,
-          isSharing: true,
-          lastUpdate: new Date(),
-          location: {
-            area: this.carnivalAreas[Math.floor(Math.random() * this.carnivalAreas.length)],
-            street: "Unknown Street",
-            postcodeArea: "W10"
-          }
-        }
-        : person
-    );
+generateAvatar(name) {
+  const colors = ["bg-red-500", "bg-blue-500", "bg-green-500", "bg-yellow-500", "bg-purple-500", "bg-pink-500"];
+  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+  const colorIndex = name.length % colors.length;
+
+  return {
+    bgColor: colors[colorIndex],
+    initials: initials.slice(0, 2)
+  };
+}
+
+getLocationStatus(person) {
+  if (!person.isSharing) return { status: "offline", color: "text-gray-400", bgColor: "bg-gray-400" };
+  const minutesSinceUpdate = Math.floor((new Date() - person.lastUpdate) / 60000);
+  if (minutesSinceUpdate < 3) return { status: "live", color: "text-green-500", bgColor: "bg-green-500" };
+  if (minutesSinceUpdate < 10) return { status: "recent", color: "text-yellow-500", bgColor: "bg-yellow-500" };
+  return { status: "outdated", color: "text-red-500", bgColor: "bg-red-500" };
+}
+
+getTimeSince(timestamp) {
+  const minutes = Math.floor((new Date() - timestamp) / 60000);
+  if (minutes < 1) return "now";
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  return `${hours}h`;
+}
+
+addPerson() {
+  if (this.newPerson.name && this.newPerson.phone && this.newPerson.relationship) {
+    const avatar = this.generateAvatar(this.newPerson.name);
+    this.people.push({
+      ...this.newPerson,
+      id: Date.now(),
+      lastUpdate: new Date(),
+      isSharing: false,
+      location: null,
+      avatar
+    });
+    this.newPerson = { name: "", phone: "", relationship: "", attending: true, notes: "" };
+    this.showAddForm = false;
     this.render();
     this.updateToolbarCount();
   }
+}
 
-  getFilteredPeople() {
-    return this.people.filter(person =>
-      person.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      person.phone.includes(this.searchTerm) ||
-      (person.location?.area && person.location.area.toLowerCase().includes(this.searchTerm.toLowerCase()))
-    );
-  }
-
-  render() {
-    if (this.isMinimized) {
-      this.renderMinimized();
-    } else {
-      this.renderFull();
-    }
-
-    if (this.showAddForm) {
-      this.renderAddForm();
-    }
-    
-    // Always update the toolbar count
-    this.updateToolbarCount();
-  }
-
-  updateToolbarCount() {
-    const trackerCount = document.getElementById('trackerCount');
-    if (trackerCount) {
-      const sharingCount = this.people.filter(p => p.isSharing).length;
-      trackerCount.textContent = sharingCount;
-      
-      // Update button state
-      const trackerBtn = document.getElementById('carnivalTrackerBtn');
-      if (trackerBtn) {
-        if (this.trackerElement.style.display === 'none') {
-          trackerBtn.classList.remove('active');
-        } else {
-          trackerBtn.classList.add('active');
+requestLocationSharing(personId) {
+  this.people = this.people.map(person =>
+    person.id === personId
+      ? {
+        ...person,
+        isSharing: true,
+        lastUpdate: new Date(),
+        location: {
+          area: this.carnivalAreas[Math.floor(Math.random() * this.carnivalAreas.length)],
+          street: "Unknown Street",
+          postcodeArea: "W10"
         }
+      }
+      : person
+  );
+  this.render();
+  this.updateToolbarCount();
+}
+
+getFilteredPeople() {
+  return this.people.filter(person =>
+    person.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+    person.phone.includes(this.searchTerm) ||
+    (person.location?.area && person.location.area.toLowerCase().includes(this.searchTerm.toLowerCase()))
+  );
+}
+
+render() {
+  if (this.isMinimized) {
+    this.renderMinimized();
+  } else {
+    this.renderFull();
+    // Start in collapsed state
+    setTimeout(() => {
+      const trackerFull = this.trackerElement.querySelector('.carnival-tracker-full');
+      if (trackerFull) {
+        trackerFull.classList.add('collapsed');
+      }
+    }, 100);
+  }
+
+  if (this.showAddForm) {
+    this.renderAddForm();
+  }
+
+  // Always update the toolbar count
+  this.updateToolbarCount();
+}
+
+updateToolbarCount() {
+  const trackerCount = document.getElementById('trackerCount');
+  if (trackerCount) {
+    const sharingCount = this.people.filter(p => p.isSharing).length;
+    trackerCount.textContent = sharingCount;
+
+    // Update button state
+    const trackerBtn = document.getElementById('carnivalTrackerBtn');
+    if (trackerBtn) {
+      if (this.trackerElement.style.display === 'none') {
+        trackerBtn.classList.remove('active');
+      } else {
+        trackerBtn.classList.add('active');
       }
     }
   }
+}
 
-  renderMinimized() {
-    // No longer needed since we're using the toolbar button
-    this.trackerElement.style.display = 'none';
-    this.updateToolbarCount();
-  }
+renderMinimized() {
+  // No longer needed since we're using the toolbar button
+  this.trackerElement.style.display = 'none';
+  this.updateToolbarCount();
+}
 
-  renderFull() {
-    const filteredPeople = this.getFilteredPeople();
+renderFull() {
+  const filteredPeople = this.getFilteredPeople();
 
-    this.trackerElement.innerHTML = `
+  this.trackerElement.innerHTML = `
       <div class="carnival-tracker-full">
         <!-- Header -->
         <div class="tracker-header">
+          <div class="tracker-drag-handle"></div>
           <div class="tracker-title">
             <i class="fas fa-users"></i>
             <div>
@@ -322,10 +410,10 @@ class CarnivalTracker {
         </div>
       </div>
     `;
-  }
+}
 
-  renderTrackerTab(filteredPeople) {
-    return `
+renderTrackerTab(filteredPeople) {
+  return `
       <div class="tracker-tab-content">
         <!-- Search -->
         <div class="tracker-search">
@@ -346,12 +434,12 @@ class CarnivalTracker {
         ` : ''}
       </div>
     `;
-  }
+}
 
-  renderPersonCard(person) {
-    const locationStatus = this.getLocationStatus(person);
+renderPersonCard(person) {
+  const locationStatus = this.getLocationStatus(person);
 
-    return `
+  return `
       <div class="person-card">
         <div class="person-avatar">
           ${person.avatar.imageUrl ? `
@@ -398,10 +486,10 @@ class CarnivalTracker {
         </div>
       </div>
     `;
-  }
+}
 
-  renderNotificationsTab() {
-    return `
+renderNotificationsTab() {
+  return `
       <div class="notifications-tab-content">
         ${this.notifications.map(notification => `
           <div class="notification-item">
@@ -421,12 +509,12 @@ class CarnivalTracker {
         ` : ''}
       </div>
     `;
-  }
+}
 
-  renderAddForm() {
-    const modal = document.createElement('div');
-    modal.className = 'add-person-modal';
-    modal.innerHTML = `
+renderAddForm() {
+  const modal = document.createElement('div');
+  modal.className = 'add-person-modal';
+  modal.innerHTML = `
       <div class="modal-overlay">
         <div class="modal-content">
           <div class="modal-header">
@@ -449,35 +537,53 @@ class CarnivalTracker {
       </div>
     `;
 
-    document.body.appendChild(modal);
+  document.body.appendChild(modal);
 
-    // Remove modal when clicking overlay or close button
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal || e.target.closest('.close-add-form')) {
-        document.body.removeChild(modal);
-        this.showAddForm = false;
-      }
-    });
-  }
-
-  // Public methods to show/hide the tracker
-  show() {
-    this.trackerElement.style.display = 'block';
-    console.log('🎭 Carnival tracker shown');
-  }
-
-  hide() {
-    this.trackerElement.style.display = 'none';
-    console.log('🎭 Carnival tracker hidden');
-  }
-
-  toggle() {
-    if (this.trackerElement.style.display === 'none') {
-      this.show();
-    } else {
-      this.hide();
+  // Remove modal when clicking overlay or close button
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal || e.target.closest('.close-add-form')) {
+      document.body.removeChild(modal);
+      this.showAddForm = false;
     }
+  });
+}
+
+// Public methods to show/hide the tracker
+show() {
+  this.trackerElement.style.display = 'block';
+  console.log('🎭 Carnival tracker shown');
+}
+
+hide() {
+  this.trackerElement.style.display = 'none';
+  console.log('🎭 Carnival tracker hidden');
+}
+
+toggle() {
+  if (this.trackerElement.style.display === 'none') {
+    this.show();
+  } else {
+    this.hide();
   }
+}
+
+expandTracker() {
+  const trackerFull = this.trackerElement.querySelector('.carnival-tracker-full');
+  if (trackerFull) {
+    trackerFull.classList.add('expanded');
+    trackerFull.classList.remove('collapsed');
+    console.log('🎭 Carnival tracker expanded');
+  }
+}
+
+collapseTracker() {
+  const trackerFull = this.trackerElement.querySelector('.carnival-tracker-full');
+  if (trackerFull) {
+    trackerFull.classList.remove('expanded');
+    trackerFull.classList.add('collapsed');
+    console.log('🎭 Carnival tracker collapsed');
+  }
+}
 }
 
 // Initialize the carnival tracker when the page loads

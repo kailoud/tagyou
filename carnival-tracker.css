@@ -33,6 +33,16 @@
   max-height: 400px;
   overflow: hidden;
   animation: slideUp 0.3s ease-out;
+  transform: translateY(calc(100% - 80px));
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.carnival-tracker-full.expanded {
+  transform: translateY(0);
+}
+
+.carnival-tracker-full.collapsed {
+  transform: translateY(calc(100% - 80px));
 }
 
 @keyframes slideUp {
@@ -53,6 +63,24 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  cursor: grab;
+  user-select: none;
+}
+
+.tracker-header:active {
+  cursor: grabbing;
+}
+
+.tracker-drag-handle {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 2px;
+  cursor: grab;
 }
 
 .tracker-title {
