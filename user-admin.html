@@ -307,7 +307,7 @@
 
     async function testSignIn() {
       try {
-        const result = await authService.signIn('user@gmail.com', 'password123');
+        const result = await authService.signIn('your-email@gmail.com', 'your-password');
         if (result.success) {
           alert('✅ Test sign in successful!');
           showCurrentUser();

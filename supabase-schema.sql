@@ -344,7 +344,7 @@ GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO anon, authenticated;
 
 -- Insert some sample data for testing (optional)
 -- INSERT INTO profiles (id, email, display_name, bio, location) VALUES 
---     ('00000000-0000-0000-0000-000000000001', 'demo@example.com', 'Demo User', 'This is a demo profile', 'London, UK');
+--     ('00000000-0000-0000-0000-000000000001', 'your-email@gmail.com', 'Your Name', 'Your profile description', 'Your Location');
 
 -- Create comments for documentation
 COMMENT ON TABLE profiles IS 'User profiles with preferences and settings';

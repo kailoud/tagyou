@@ -145,6 +145,6 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
 
 -- Insert some sample data for testing (optional)
 -- INSERT INTO profiles (id, email, display_name) VALUES 
---   ('00000000-0000-0000-0000-000000000001', 'user@gmail.com', 'User');
+--   ('00000000-0000-0000-0000-000000000001', 'your-email@gmail.com', 'Your Name');
 
 SELECT 'Schema created successfully!' as status;
