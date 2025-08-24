@@ -16,7 +16,7 @@ class AvatarSystem {
     this.selectedCarnival = null;
     this.showCarnivalDetails = false;
     this.dropdownRef = null;
-    this.supabase = null;
+    this.authService = null;
 
     // UK Carnival data
     this.ukCarnivals = [
@@ -71,59 +71,41 @@ class AvatarSystem {
 
   async initializeSupabase() {
     try {
-      // Check if Supabase is available globally
-      if (window.supabase) {
-        this.supabase = window.supabase;
-        console.log('✅ Supabase client found globally');
-        return;
-      }
+      console.log('🔐 Avatar System: Initializing Supabase...');
 
-      // Try to import Supabase config
-      try {
-        const supabaseModule = await import('./supabase-config.js');
-        if (supabaseModule.supabase) {
-          this.supabase = supabaseModule.supabase;
-          console.log('✅ Supabase client loaded from config');
-          return;
-        }
-      } catch (error) {
-        console.log('⚠️ Could not load Supabase config:', error);
-      }
+      // Use the existing SupabaseAuthService
+      const { supabaseAuthService } = await import('./supabase-auth-service.js');
+      this.authService = supabaseAuthService;
+      console.log('✅ Avatar System: Auth service imported');
 
-      // Try to import Supabase service
-      try {
-        const supabaseService = await import('./supabase-service.js');
-        if (supabaseService.supabase) {
-          this.supabase = supabaseService.supabase;
-          console.log('✅ Supabase client loaded from service');
-          return;
-        }
-      } catch (error) {
-        console.log('⚠️ Could not load Supabase service:', error);
-      }
+      // Initialize the auth service
+      const initialized = await this.authService.initialize();
+      console.log('✅ Avatar System: Auth service initialized:', initialized);
 
-      console.warn('⚠️ No Supabase client found, using fallback authentication');
+      if (initialized) {
+        // Set up auth state listener
+        this.authService.onAuthStateChanged((user) => {
+          console.log('Avatar System: Auth state changed:', user?.email);
+          this.user = user;
+          if (user) {
+            sessionStorage.setItem('supabase_user', JSON.stringify(user));
+          } else {
+            sessionStorage.removeItem('supabase_user');
+          }
+          this.renderDropdown();
+        });
+
+        console.log('✅ Avatar System: Supabase Auth Service fully initialized');
+      } else {
+        console.warn('⚠️ Avatar System: Auth service failed to initialize');
+      }
     } catch (error) {
-      console.error('❌ Error initializing Supabase:', error);
+      console.error('❌ Avatar System: Error initializing Supabase Auth Service:', error);
     }
   }
 
   setupAuthListener() {
-    if (this.supabase) {
-      this.supabase.auth.onAuthStateChange((event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
-
-        if (event === 'SIGNED_IN' && session?.user) {
-          this.user = session.user;
-          sessionStorage.setItem('supabase_user', JSON.stringify(session.user));
-          this.renderDropdown();
-        } else if (event === 'SIGNED_OUT') {
-          this.user = null;
-          sessionStorage.removeItem('supabase_user');
-          this.renderDropdown();
-        }
-      });
-    }
+    // Auth listener is now handled in initializeSupabase()
   }
 
   async init() {
@@ -136,15 +118,9 @@ class AvatarSystem {
 
   async checkUser() {
     try {
-      if (this.supabase) {
-        // Use Supabase auth
-        const { data: { user }, error } = await this.supabase.auth.getUser();
-        if (error) {
-          console.error('Error getting user:', error);
-        } else if (user) {
-          this.user = user;
-          sessionStorage.setItem('supabase_user', JSON.stringify(user));
-        }
+      if (this.authService) {
+        // Use the auth service
+        this.user = this.authService.getCurrentUser();
       } else {
         // Fallback to sessionStorage
         const storedUser = sessionStorage.getItem('supabase_user');
@@ -421,6 +397,30 @@ class AvatarSystem {
         this.handleSignOut();
       } else if (e.target.closest('.carnival-button')) {
         this.toggleCarnivalDropdown();
+      } else if (e.target.closest('.auth-mode-toggle')) {
+        this.authMode = this.authMode === 'signin' ? 'signup' : 'signin';
+        this.authError = '';
+        this.authSuccess = '';
+        this.renderAuthModal();
+      } else if (e.target.closest('.auth-modal') && !e.target.closest('.auth-modal > div')) {
+        this.closeAuthModal();
+      }
+    });
+
+    // Event delegation for form submission
+    document.addEventListener('submit', (e) => {
+      if (e.target.classList.contains('auth-form')) {
+        e.preventDefault();
+        this.handleAuth();
+      }
+    });
+
+    // Event delegation for input changes
+    document.addEventListener('input', (e) => {
+      if (e.target.classList.contains('auth-input')) {
+        const field = e.target.type === 'email' ? 'email' :
+          e.target.placeholder.includes('Confirm') ? 'confirmPassword' : 'password';
+        this.formData[field] = e.target.value;
       }
     });
   }
@@ -582,6 +582,10 @@ class AvatarSystem {
   }
 
   async handleAuth() {
+    console.log('🔐 Avatar System: handleAuth called, mode:', this.authMode);
+    console.log('🔐 Avatar System: formData:', this.formData);
+    console.log('🔐 Avatar System: authService available:', !!this.authService);
+
     this.authLoading = true;
     this.authError = '';
     this.authSuccess = '';
@@ -593,31 +597,20 @@ class AvatarSystem {
           return;
         }
 
-        if (this.supabase) {
-          // Use Supabase signup
-          const { data, error } = await this.supabase.auth.signUp({
-            email: this.formData.email,
-            password: this.formData.password,
-            options: {
-              data: {
-                full_name: this.formData.email.split('@')[0].charAt(0).toUpperCase() + this.formData.email.split('@')[0].slice(1)
-              }
+        if (this.authService) {
+          // Use existing auth service signup
+          try {
+            const result = await this.authService.signUp(this.formData.email, this.formData.password);
+
+            if (result.success) {
+              this.authSuccess = 'Account created successfully! Please check your email to confirm your account.';
+              this.closeAuthModal();
+              this.renderDropdown();
+            } else {
+              this.authError = result.error || 'Sign up failed';
             }
-          });
-
-          if (error) {
-            this.authError = error.message;
-            return;
-          }
-
-          if (data.user) {
-            this.authSuccess = 'Account created successfully! Please check your email to confirm your account.';
-            this.user = data.user;
-            sessionStorage.setItem('supabase_user', JSON.stringify(data.user));
-            this.closeAuthModal();
-            this.renderDropdown();
-          } else {
-            this.authSuccess = 'Account created successfully! Please check your email to confirm your account.';
+          } catch (error) {
+            this.authError = error.message || 'Sign up failed';
           }
         } else {
           // Fallback signup
@@ -644,24 +637,23 @@ class AvatarSystem {
           return;
         }
 
-        if (this.supabase) {
-          // Use Supabase signin
-          const { data, error } = await this.supabase.auth.signInWithPassword({
-            email: this.formData.email,
-            password: this.formData.password
-          });
+        if (this.authService) {
+          // Use existing auth service signin
+          console.log('🔐 Avatar System: Attempting sign in with auth service...');
+          try {
+            const result = await this.authService.signIn(this.formData.email, this.formData.password);
+            console.log('🔐 Avatar System: Sign in result:', result);
 
-          if (error) {
-            this.authError = error.message;
-            return;
-          }
-
-          if (data.user) {
-            this.authSuccess = 'Signed in successfully!';
-            this.user = data.user;
-            sessionStorage.setItem('supabase_user', JSON.stringify(data.user));
-            this.closeAuthModal();
-            this.renderDropdown();
+            if (result.success) {
+              this.authSuccess = 'Signed in successfully!';
+              this.closeAuthModal();
+              this.renderDropdown();
+            } else {
+              this.authError = result.error || 'Sign in failed';
+            }
+          } catch (error) {
+            console.error('🔐 Avatar System: Sign in error:', error);
+            this.authError = error.message || 'Sign in failed';
           }
         } else {
           // Fallback signin
@@ -692,12 +684,9 @@ class AvatarSystem {
   async handleSignOut() {
     this.authLoading = true;
     try {
-      if (this.supabase) {
-        // Use Supabase signout
-        const { error } = await this.supabase.auth.signOut();
-        if (error) {
-          console.error('Error signing out:', error);
-        }
+      if (this.authService) {
+        // Use existing auth service signout
+        await this.authService.signOut();
       }
 
       sessionStorage.removeItem('supabase_user');
