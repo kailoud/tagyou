@@ -1,6 +1,5 @@
 class CarnivalTracker {
   constructor() {
-    this.isMinimized = true; // Start minimized
     this.people = [
       {
         id: 1,
@@ -52,7 +51,7 @@ class CarnivalTracker {
       }
     ];
 
-    this.isMinimized = false;
+    this.isVisible = false;
     this.activeTab = "tracker";
     this.searchTerm = "";
     this.showAddForm = false;
@@ -84,7 +83,7 @@ class CarnivalTracker {
   init() {
     this.createTrackerElement();
     this.setupEventListeners();
-    this.render();
+    this.updateToolbarCount();
   }
 
   createTrackerElement() {
@@ -98,26 +97,14 @@ class CarnivalTracker {
 
     // Start hidden by default
     this.trackerElement.style.display = 'none';
-
-    // Update the toolbar count
-    this.updateToolbarCount();
-
-    console.log('🎭 Carnival tracker element created and added to page');
   }
 
   setupEventListeners() {
     // Event delegation for dynamic elements
     this.trackerElement.addEventListener('click', (e) => {
-      // Minimize button
-      if (e.target.closest('.minimize-btn')) {
-        this.isMinimized = true;
-        this.render();
-      }
-
-      // Expand button (from minimized state)
-      if (e.target.closest('.expand-btn')) {
-        this.isMinimized = false;
-        this.render();
+      // Close button
+      if (e.target.closest('.close-btn')) {
+        this.hide();
       }
 
       // Add person button
@@ -145,6 +132,22 @@ class CarnivalTracker {
         this.requestLocationSharing(personId);
       }
 
+      // Phone button - show call/WhatsApp options
+      if (e.target.closest('.phone-btn')) {
+        const button = e.target.closest('.phone-btn');
+        const phoneNumber = button.dataset.phone;
+        const personName = button.dataset.name;
+        this.showPhoneOptions(phoneNumber, personName);
+      }
+
+      // WhatsApp button
+      if (e.target.closest('.whatsapp-btn')) {
+        const button = e.target.closest('.whatsapp-btn');
+        const phoneNumber = button.dataset.phone;
+        const personName = button.dataset.name;
+        this.openWhatsApp(phoneNumber, personName);
+      }
+
       // Add person form submit
       if (e.target.closest('.add-person-submit')) {
         e.preventDefault();
@@ -152,229 +155,124 @@ class CarnivalTracker {
       }
     });
 
-    // Swipe functionality
-    this.setupSwipeEvents();
-  }
-
-  setupSwipeEvents() {
-    let startY = 0;
-    let currentY = 0;
-    let isDragging = false;
-    let isExpanded = false;
-
-    const handleTouchStart = (e) => {
-      e.preventDefault();
-      startY = e.touches[0].clientY;
-      isDragging = true;
-    };
-
-    const handleTouchMove = (e) => {
-      if (!isDragging) return;
-      e.preventDefault();
-      currentY = e.touches[0].clientY;
-      const deltaY = currentY - startY;
-
-      if (isExpanded && deltaY > 50) {
-        // Dragging down from expanded state
-        this.collapseTracker();
-        isDragging = false;
-      } else if (!isExpanded && deltaY < -50) {
-        // Dragging up from collapsed state
-        this.expandTracker();
-        isDragging = false;
-      }
-    };
-
-    const handleTouchEnd = () => {
-      isDragging = false;
-    };
-
-    const handleMouseDown = (e) => {
-      e.preventDefault();
-      startY = e.clientY;
-      isDragging = true;
-    };
-
-    const handleMouseMove = (e) => {
-      if (!isDragging) return;
-      currentY = e.clientY;
-      const deltaY = currentY - startY;
-
-      if (isExpanded && deltaY > 50) {
-        this.collapseTracker();
-        isDragging = false;
-      } else if (!isExpanded && deltaY < -50) {
-        this.expandTracker();
-        isDragging = false;
-      }
-    };
-
-    const handleMouseUp = () => {
-      isDragging = false;
-    };
-
-    // Add event listeners when tracker is rendered
-    this.trackerElement.addEventListener('touchstart', handleTouchStart, { passive: false });
-    this.trackerElement.addEventListener('touchmove', handleTouchMove, { passive: false });
-    this.trackerElement.addEventListener('touchend', handleTouchEnd);
-    this.trackerElement.addEventListener('mousedown', handleMouseDown);
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-
-    // Store references for cleanup
-    this.swipeEventHandlers = {
-      handleTouchStart,
-      handleTouchMove,
-      handleTouchEnd,
-      handleMouseDown,
-      handleMouseMove,
-      handleMouseUp
-    };
-  }
-
     // Search input
     this.trackerElement.addEventListener('input', (e) => {
-    if (e.target.matches('.search-input')) {
-      this.searchTerm = e.target.value;
-      this.render();
-    }
-  });
-
-// Add person form inputs
-this.trackerElement.addEventListener('input', (e) => {
-  if (e.target.matches('.add-person-input')) {
-    const field = e.target.dataset.field;
-    this.newPerson[field] = e.target.value;
-  }
-});
-  }
-
-generateAvatar(name) {
-  const colors = ["bg-red-500", "bg-blue-500", "bg-green-500", "bg-yellow-500", "bg-purple-500", "bg-pink-500"];
-  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
-  const colorIndex = name.length % colors.length;
-
-  return {
-    bgColor: colors[colorIndex],
-    initials: initials.slice(0, 2)
-  };
-}
-
-getLocationStatus(person) {
-  if (!person.isSharing) return { status: "offline", color: "text-gray-400", bgColor: "bg-gray-400" };
-  const minutesSinceUpdate = Math.floor((new Date() - person.lastUpdate) / 60000);
-  if (minutesSinceUpdate < 3) return { status: "live", color: "text-green-500", bgColor: "bg-green-500" };
-  if (minutesSinceUpdate < 10) return { status: "recent", color: "text-yellow-500", bgColor: "bg-yellow-500" };
-  return { status: "outdated", color: "text-red-500", bgColor: "bg-red-500" };
-}
-
-getTimeSince(timestamp) {
-  const minutes = Math.floor((new Date() - timestamp) / 60000);
-  if (minutes < 1) return "now";
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  return `${hours}h`;
-}
-
-addPerson() {
-  if (this.newPerson.name && this.newPerson.phone && this.newPerson.relationship) {
-    const avatar = this.generateAvatar(this.newPerson.name);
-    this.people.push({
-      ...this.newPerson,
-      id: Date.now(),
-      lastUpdate: new Date(),
-      isSharing: false,
-      location: null,
-      avatar
+      if (e.target.matches('.search-input')) {
+        this.searchTerm = e.target.value;
+        this.render();
+      }
     });
-    this.newPerson = { name: "", phone: "", relationship: "", attending: true, notes: "" };
-    this.showAddForm = false;
+
+    // Add person form inputs
+    this.trackerElement.addEventListener('input', (e) => {
+      if (e.target.matches('.add-person-input')) {
+        const field = e.target.dataset.field;
+        this.newPerson[field] = e.target.value;
+      }
+    });
+  }
+
+  generateAvatar(name) {
+    const colors = ["bg-red-500", "bg-blue-500", "bg-green-500", "bg-yellow-500", "bg-purple-500", "bg-pink-500"];
+    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+    const colorIndex = name.length % colors.length;
+
+    return {
+      bgColor: colors[colorIndex],
+      initials: initials.slice(0, 2)
+    };
+  }
+
+  getLocationStatus(person) {
+    if (!person.isSharing) return { status: "offline", color: "text-gray-400", bgColor: "bg-gray-400" };
+    const minutesSinceUpdate = Math.floor((new Date() - person.lastUpdate) / 60000);
+    if (minutesSinceUpdate < 3) return { status: "live", color: "text-green-500", bgColor: "bg-green-500" };
+    if (minutesSinceUpdate < 10) return { status: "recent", color: "text-yellow-500", bgColor: "bg-yellow-500" };
+    return { status: "outdated", color: "text-red-500", bgColor: "bg-red-500" };
+  }
+
+  getTimeSince(timestamp) {
+    const minutes = Math.floor((new Date() - timestamp) / 60000);
+    if (minutes < 1) return "now";
+    if (minutes < 60) return `${minutes}m`;
+    const hours = Math.floor(minutes / 60);
+    return `${hours}h`;
+  }
+
+  addPerson() {
+    if (this.newPerson.name && this.newPerson.phone && this.newPerson.relationship) {
+      const avatar = this.generateAvatar(this.newPerson.name);
+      this.people.push({
+        ...this.newPerson,
+        id: Date.now(),
+        lastUpdate: new Date(),
+        isSharing: false,
+        location: null,
+        avatar
+      });
+      this.newPerson = { name: "", phone: "", relationship: "", attending: true, notes: "" };
+      this.showAddForm = false;
+      this.render();
+      this.updateToolbarCount();
+    }
+  }
+
+  requestLocationSharing(personId) {
+    this.people = this.people.map(person =>
+      person.id === personId
+        ? {
+          ...person,
+          isSharing: true,
+          lastUpdate: new Date(),
+          location: {
+            area: this.carnivalAreas[Math.floor(Math.random() * this.carnivalAreas.length)],
+            street: "Unknown Street",
+            postcodeArea: "W10"
+          }
+        }
+        : person
+    );
     this.render();
     this.updateToolbarCount();
   }
-}
 
-requestLocationSharing(personId) {
-  this.people = this.people.map(person =>
-    person.id === personId
-      ? {
-        ...person,
-        isSharing: true,
-        lastUpdate: new Date(),
-        location: {
-          area: this.carnivalAreas[Math.floor(Math.random() * this.carnivalAreas.length)],
-          street: "Unknown Street",
-          postcodeArea: "W10"
-        }
-      }
-      : person
-  );
-  this.render();
-  this.updateToolbarCount();
-}
-
-getFilteredPeople() {
-  return this.people.filter(person =>
-    person.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-    person.phone.includes(this.searchTerm) ||
-    (person.location?.area && person.location.area.toLowerCase().includes(this.searchTerm.toLowerCase()))
-  );
-}
-
-render() {
-  if (this.isMinimized) {
-    this.renderMinimized();
-  } else {
-    this.renderFull();
-    // Start in collapsed state
-    setTimeout(() => {
-      const trackerFull = this.trackerElement.querySelector('.carnival-tracker-full');
-      if (trackerFull) {
-        trackerFull.classList.add('collapsed');
-      }
-    }, 100);
+  getFilteredPeople() {
+    return this.people.filter(person =>
+      person.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      person.phone.includes(this.searchTerm) ||
+      (person.location?.area && person.location.area.toLowerCase().includes(this.searchTerm.toLowerCase()))
+    );
   }
 
-  if (this.showAddForm) {
-    this.renderAddForm();
-  }
-
-  // Always update the toolbar count
-  this.updateToolbarCount();
-}
-
-updateToolbarCount() {
-  const trackerCount = document.getElementById('trackerCount');
-  if (trackerCount) {
-    const sharingCount = this.people.filter(p => p.isSharing).length;
-    trackerCount.textContent = sharingCount;
-
-    // Update button state
-    const trackerBtn = document.getElementById('carnivalTrackerBtn');
-    if (trackerBtn) {
-      if (this.trackerElement.style.display === 'none') {
-        trackerBtn.classList.remove('active');
-      } else {
-        trackerBtn.classList.add('active');
-      }
+  updateToolbarCount() {
+    const trackerCount = document.getElementById('trackerCount');
+    if (trackerCount) {
+      const sharingCount = this.people.filter(p => p.isSharing).length;
+      trackerCount.textContent = sharingCount;
     }
   }
-}
 
-renderMinimized() {
-  // No longer needed since we're using the toolbar button
-  this.trackerElement.style.display = 'none';
-  this.updateToolbarCount();
-}
+  render() {
+    if (!this.isVisible) {
+      this.trackerElement.style.display = 'none';
+      return;
+    }
 
-renderFull() {
-  const filteredPeople = this.getFilteredPeople();
+    this.trackerElement.style.display = 'block';
+    this.renderFull();
 
-  this.trackerElement.innerHTML = `
+    if (this.showAddForm) {
+      this.renderAddForm();
+    }
+  }
+
+  renderFull() {
+    const filteredPeople = this.getFilteredPeople();
+
+    this.trackerElement.innerHTML = `
       <div class="carnival-tracker-full">
         <!-- Header -->
         <div class="tracker-header">
-          <div class="tracker-drag-handle"></div>
           <div class="tracker-title">
             <i class="fas fa-users"></i>
             <div>
@@ -387,8 +285,8 @@ renderFull() {
             <button class="add-person-btn" title="Add Person">
               <i class="fas fa-plus"></i>
             </button>
-            <button class="minimize-btn" title="Minimize">
-              <i class="fas fa-minus"></i>
+            <button class="close-btn" title="Close">
+              <i class="fas fa-times"></i>
             </button>
           </div>
         </div>
@@ -410,10 +308,10 @@ renderFull() {
         </div>
       </div>
     `;
-}
+  }
 
-renderTrackerTab(filteredPeople) {
-  return `
+  renderTrackerTab(filteredPeople) {
+    return `
       <div class="tracker-tab-content">
         <!-- Search -->
         <div class="tracker-search">
@@ -434,12 +332,12 @@ renderTrackerTab(filteredPeople) {
         ` : ''}
       </div>
     `;
-}
+  }
 
-renderPersonCard(person) {
-  const locationStatus = this.getLocationStatus(person);
+  renderPersonCard(person) {
+    const locationStatus = this.getLocationStatus(person);
 
-  return `
+    return `
       <div class="person-card">
         <div class="person-avatar">
           ${person.avatar.imageUrl ? `
@@ -476,20 +374,20 @@ renderPersonCard(person) {
             <div class="location-status ${locationStatus.bgColor} ${locationStatus.status === 'live' ? 'pulse' : ''}"></div>
           `}
           
-          <a href="tel:${person.phone}" class="action-btn call-btn" title="Call">
+          <button class="action-btn phone-btn" title="Call or WhatsApp" data-phone="${person.phone}" data-name="${person.name}">
             <i class="fas fa-phone"></i>
-          </a>
+          </button>
           
-          <button class="action-btn message-btn" title="Message">
-            <i class="fas fa-comment"></i>
+          <button class="action-btn whatsapp-btn" title="Message on WhatsApp" data-phone="${person.phone}" data-name="${person.name}">
+            <i class="fab fa-whatsapp"></i>
           </button>
         </div>
       </div>
     `;
-}
+  }
 
-renderNotificationsTab() {
-  return `
+  renderNotificationsTab() {
+    return `
       <div class="notifications-tab-content">
         ${this.notifications.map(notification => `
           <div class="notification-item">
@@ -509,12 +407,12 @@ renderNotificationsTab() {
         ` : ''}
       </div>
     `;
-}
+  }
 
-renderAddForm() {
-  const modal = document.createElement('div');
-  modal.className = 'add-person-modal';
-  modal.innerHTML = `
+  renderAddForm() {
+    const modal = document.createElement('div');
+    modal.className = 'add-person-modal';
+    modal.innerHTML = `
       <div class="modal-overlay">
         <div class="modal-content">
           <div class="modal-header">
@@ -537,69 +435,133 @@ renderAddForm() {
       </div>
     `;
 
-  document.body.appendChild(modal);
+    document.body.appendChild(modal);
 
-  // Remove modal when clicking overlay or close button
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal || e.target.closest('.close-add-form')) {
-      document.body.removeChild(modal);
-      this.showAddForm = false;
+    // Remove modal when clicking overlay or close button
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal || e.target.closest('.close-add-form')) {
+        document.body.removeChild(modal);
+        this.showAddForm = false;
+      }
+    });
+  }
+
+  openWhatsApp(phoneNumber, personName) {
+    // Clean phone number (remove spaces, dashes, parentheses)
+    const cleanPhone = phoneNumber.replace(/[\s\-\(\)]/g, '');
+
+    // Create WhatsApp message
+    let message = `Hi ${personName}! 👋`;
+
+    // Add location if available
+    const person = this.people.find(p => p.phone === phoneNumber);
+    if (person && person.isSharing && person.location) {
+      message += `\n\n📍 I can see you're at ${person.location.area}`;
+      message += `\n🎭 How's the carnival going?`;
+    } else {
+      message += `\n\n🎭 How's the carnival going?`;
+      message += `\n📍 Where are you at the moment?`;
     }
-  });
-}
 
-// Public methods to show/hide the tracker
-show() {
-  this.trackerElement.style.display = 'block';
-  console.log('🎭 Carnival tracker shown');
-}
+    message += `\n\n#NottingHillCarnival #CarnivalSquad`;
 
-hide() {
-  this.trackerElement.style.display = 'none';
-  console.log('🎭 Carnival tracker hidden');
-}
+    // Encode message for URL
+    const encodedMessage = encodeURIComponent(message);
 
-toggle() {
-  if (this.trackerElement.style.display === 'none') {
-    this.show();
-  } else {
-    this.hide();
+    // Create WhatsApp URL
+    const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
+
+    // Open WhatsApp
+    window.open(whatsappUrl, '_blank');
+
+    console.log(`📱 Opening WhatsApp for ${personName} (${cleanPhone})`);
   }
-}
 
-expandTracker() {
-  const trackerFull = this.trackerElement.querySelector('.carnival-tracker-full');
-  if (trackerFull) {
-    trackerFull.classList.add('expanded');
-    trackerFull.classList.remove('collapsed');
-    console.log('🎭 Carnival tracker expanded');
-  }
-}
+  showPhoneOptions(phoneNumber, personName) {
+    // Remove any existing phone options modal
+    const existingModal = document.querySelector('.phone-options-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
 
-collapseTracker() {
-  const trackerFull = this.trackerElement.querySelector('.carnival-tracker-full');
-  if (trackerFull) {
-    trackerFull.classList.remove('expanded');
-    trackerFull.classList.add('collapsed');
-    console.log('🎭 Carnival tracker collapsed');
+    const modal = document.createElement('div');
+    modal.className = 'phone-options-modal';
+    modal.innerHTML = `
+      <div class="phone-options-overlay">
+        <div class="phone-options-content">
+          <div class="phone-options-header">
+            <h3>Contact ${personName}</h3>
+            <button class="close-phone-options">×</button>
+          </div>
+          
+          <div class="phone-options-buttons">
+            <button class="phone-option-btn call-option" data-phone="${phoneNumber}">
+              <i class="fas fa-phone"></i>
+              <span>Call ${personName}</span>
+            </button>
+            
+            <button class="phone-option-btn whatsapp-option" data-phone="${phoneNumber}" data-name="${personName}">
+              <i class="fab fa-whatsapp"></i>
+              <span>WhatsApp ${personName}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Add event listeners
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal || e.target.closest('.close-phone-options')) {
+        modal.remove();
+      }
+
+      if (e.target.closest('.call-option')) {
+        const phone = e.target.closest('.call-option').dataset.phone;
+        window.location.href = `tel:${phone}`;
+        modal.remove();
+      }
+
+      if (e.target.closest('.whatsapp-option')) {
+        const phone = e.target.closest('.whatsapp-option').dataset.phone;
+        const name = e.target.closest('.whatsapp-option').dataset.name;
+        this.openWhatsApp(phone, name);
+        modal.remove();
+      }
+    });
   }
-}
+
+  // Public methods to show/hide the tracker
+  show() {
+    this.isVisible = true;
+    this.render();
+    console.log('🎭 Carnival tracker shown');
+  }
+
+  hide() {
+    this.isVisible = false;
+    this.render();
+    console.log('🎭 Carnival tracker hidden');
+  }
+
+  toggle() {
+    if (this.isVisible) {
+      this.hide();
+    } else {
+      this.show();
+    }
+  }
 }
 
 // Initialize the carnival tracker when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🎭 Initializing carnival tracker...');
   window.carnivalTracker = new CarnivalTracker();
 
   // Make it globally accessible
   window.toggleCarnivalTracker = () => {
     if (window.carnivalTracker) {
       window.carnivalTracker.toggle();
-    } else {
-      console.log('❌ Carnival tracker not initialized');
     }
   };
-
-  console.log('🎭 Carnival tracker initialized and ready!');
-  console.log('🎭 Click the users icon (👥) in the toolbar to show/hide the tracker');
 });

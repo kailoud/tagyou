@@ -758,6 +758,31 @@ body {
   border: 3px solid rgba(255, 255, 255, 0.8);
 }
 
+/* Carnival Tracker button - Purple gradient */
+#carnivalTrackerBtn {
+  color: #a855f7;
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+  border: 3px solid rgba(168, 85, 247, 0.8);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.1));
+}
+
+#carnivalTrackerBtn:hover {
+  color: #c084fc;
+  text-shadow: 0 0 15px rgba(192, 132, 252, 0.8);
+  border: 3px solid rgba(192, 132, 252, 1);
+  box-shadow: 0 0 25px rgba(192, 132, 252, 0.6);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.2));
+}
+
+#carnivalTrackerBtn.active {
+  color: #c084fc;
+  text-shadow: 0 0 15px rgba(192, 132, 252, 0.8);
+  border: 3px solid rgba(192, 132, 252, 1);
+  box-shadow: 0 0 25px rgba(192, 132, 252, 0.6);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(236, 72, 153, 0.3));
+}
+
 /* Active states for individual buttons with brighter colors */
 
 #foodStallBtn.active {

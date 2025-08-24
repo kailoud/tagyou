@@ -938,24 +938,19 @@ function initMapToolbar() {
     }
   });
 
-    // Carnival Tracker button (replaces the old Groups button)
+  // Carnival Tracker button (replaces the old Groups button)
   carnivalTrackerBtn.addEventListener('click', function () {
     console.log('🎭 Carnival Tracker button clicked');
-    
+    toggleButtonActive(this);
+
     // Toggle carnival tracker visibility using the global function
     if (window.toggleCarnivalTracker) {
       window.toggleCarnivalTracker();
-      // Update button active state based on tracker visibility
-      if (window.carnivalTracker && window.carnivalTracker.trackerElement.style.display === 'none') {
-        this.classList.remove('active');
-      } else {
-        this.classList.add('active');
-      }
     } else {
       console.log('❌ Carnival tracker not initialized yet');
     }
   });
-  
+
   console.log('🎭 Carnival tracker button event listener added (replaces Groups button)');
 }
 
