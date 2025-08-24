@@ -160,6 +160,8 @@ class AvatarSystemV2 {
       z-index: 9999;
     `;
 
+    console.log('🎨 Avatar System V2: Avatar container created');
+
     // Create avatar button
     const avatarButton = document.createElement('button');
     avatarButton.className = 'avatar-button';
@@ -191,6 +193,10 @@ class AvatarSystemV2 {
 
     avatarContainer.appendChild(avatarButton);
     document.body.appendChild(avatarContainer);
+
+    console.log('🎨 Avatar System V2: Avatar element added to DOM');
+    console.log('🎨 Avatar System V2: Avatar container found:', !!document.querySelector('.avatar-container'));
+    console.log('🎨 Avatar System V2: Avatar button found:', !!document.querySelector('.avatar-button'));
   }
 
   updateAvatarContent(button) {
