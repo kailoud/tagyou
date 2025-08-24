@@ -75,7 +75,7 @@ class AvatarSystem {
 
       // Wait for Supabase to be available
       let attempts = 0;
-      const maxAttempts = 50; // 5 seconds max wait
+      const maxAttempts = 300; // 30 seconds max wait (matching script.js timeout)
 
       while (!window.supabase && attempts < maxAttempts) {
         console.log('🔐 Avatar System: Waiting for Supabase to be ready...', attempts + 1);
@@ -85,6 +85,18 @@ class AvatarSystem {
 
       if (!window.supabase) {
         throw new Error('Supabase not available after waiting');
+      }
+
+      // Wait for Supabase client to be fully initialized
+      attempts = 0;
+      while (!window.supabaseClient && attempts < maxAttempts) {
+        console.log('🔐 Avatar System: Waiting for Supabase client to be ready...', attempts + 1);
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+
+      if (!window.supabaseClient) {
+        console.warn('⚠️ Avatar System: Supabase client not available, will try to create one');
       }
 
       console.log('🔐 Avatar System: Supabase is ready, proceeding with initialization...');
@@ -98,12 +110,42 @@ class AvatarSystem {
       console.log('🔐 Avatar System: Auth service assigned:', this.authService);
 
       // Set the global supabase instance for the auth service
-      authModule.setSupabaseInstance(window.supabase);
-      console.log('🔐 Avatar System: Supabase instance set');
+      if (window.supabaseClient) {
+        authModule.setSupabaseInstance(window.supabaseClient);
+        console.log('🔐 Avatar System: Using existing Supabase client');
+      } else {
+        // Create our own Supabase client if none exists
+        try {
+          const config = await import('./supabase-config-secret.js');
+          const supabaseClient = window.supabase.createClient(
+            config.default.supabaseUrl,
+            config.default.supabaseAnonKey
+          );
+          authModule.setSupabaseInstance(supabaseClient);
+          console.log('🔐 Avatar System: Created new Supabase client');
+        } catch (error) {
+          console.error('🔐 Avatar System: Failed to create Supabase client:', error);
+          throw error;
+        }
+      }
 
-      // Initialize the auth service
-      const initialized = await this.authService.initialize();
-      console.log('✅ Avatar System: Auth service initialized:', initialized);
+      // Initialize the auth service with retry
+      let initialized = false;
+      let retryCount = 0;
+      const maxRetries = 3;
+
+      while (!initialized && retryCount < maxRetries) {
+        try {
+          initialized = await this.authService.initialize();
+          console.log('✅ Avatar System: Auth service initialized:', initialized);
+        } catch (error) {
+          retryCount++;
+          console.warn(`⚠️ Avatar System: Auth service initialization attempt ${retryCount} failed:`, error);
+          if (retryCount < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+          }
+        }
+      }
 
       if (initialized) {
         // Set up auth state listener
@@ -911,7 +953,9 @@ class AvatarSystem {
           }
         } else {
           console.error('🔐 Avatar System: Auth service not properly initialized');
-          this.authError = 'Authentication service not ready. Please refresh the page and try again.';
+          this.authError = 'Authentication service is still initializing. Please wait a moment and try again.';
+          this.authLoading = false;
+          this.renderAuthModal();
           return;
         }
 
@@ -946,7 +990,9 @@ class AvatarSystem {
           }
         } else {
           console.error('🔐 Avatar System: Auth service not properly initialized');
-          this.authError = 'Authentication service not ready. Please refresh the page and try again.';
+          this.authError = 'Authentication service is still initializing. Please wait a moment and try again.';
+          this.authLoading = false;
+          this.renderAuthModal();
           return;
         }
       }
