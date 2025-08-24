@@ -224,18 +224,18 @@ class AvatarSystem {
             email,
             password
           });
-          
+
           console.log('AUTH DEBUG: Supabase signIn response:', { data, error });
-          
+
           if (error) {
             return { success: false, error: error.message };
           }
-          
+
           if (data.user) {
             sessionStorage.setItem('supabase_user', JSON.stringify(data.user));
             return { success: true, user: data.user };
           }
-          
+
           return { success: false, error: 'No user returned from sign in' };
         } catch (error) {
           console.error('AUTH DEBUG: Fallback signIn error:', error);
@@ -249,13 +249,13 @@ class AvatarSystem {
             email,
             password
           });
-          
+
           console.log('AUTH DEBUG: Supabase signUp response:', { data, error });
-          
+
           if (error) {
             return { success: false, error: error.message };
           }
-          
+
           return { success: true, user: data.user };
         } catch (error) {
           console.error('AUTH DEBUG: Fallback signUp error:', error);
@@ -283,7 +283,7 @@ class AvatarSystem {
             callback(session?.user || null);
           });
         }
-        return { data: { subscription: { unsubscribe: () => {} } } };
+        return { data: { subscription: { unsubscribe: () => { } } } };
       }
     };
   }
@@ -596,7 +596,7 @@ class AvatarSystem {
 
   renderAuthModal() {
     console.log('UI DEBUG: Rendering auth modal, mode:', this.authMode);
-    
+
     if (!this.showAuthModal) return;
 
     const modal = document.createElement('div');
@@ -613,6 +613,8 @@ class AvatarSystem {
       justify-content: center;
       z-index: 10001;
       padding: 16px;
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.2s ease;
     `;
 
     modal.innerHTML = `
@@ -623,9 +625,9 @@ class AvatarSystem {
           </h2>
           <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin: 8px 0 0 0;">
             ${this.authMode === 'signin'
-              ? 'Welcome back! Please sign in to your account.'
-              : 'Join us to start tracking your favorite carnivals.'
-            }
+        ? 'Welcome back! Please sign in to your account.'
+        : 'Join us to start tracking your favorite carnivals.'
+      }
           </p>
           ${this.authLoading ? `
             <div style="display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 8px 12px; background: rgba(139, 92, 246, 0.1); border-radius: 8px; color: #8b5cf6; font-size: 14px; font-weight: 500;">
@@ -692,9 +694,9 @@ class AvatarSystem {
           <div style="margin-top: 16px; text-align: center;">
             <button class="auth-mode-toggle" style="background: none; border: none; color: #8b5cf6; font-size: 14px; cursor: pointer; transition: color 0.2s;">
               ${this.authMode === 'signin'
-                ? "Don't have an account? Sign up"
-                : 'Already have an account? Sign in'
-              }
+        ? "Don't have an account? Sign up"
+        : 'Already have an account? Sign in'
+      }
             </button>
           </div>
         </div>
@@ -708,6 +710,11 @@ class AvatarSystem {
     `;
 
     document.body.appendChild(modal);
+
+    // Add fade-in animation
+    setTimeout(() => {
+      modal.style.opacity = '1';
+    }, 10);
 
     // FIXED: Proper event listeners for the modal
     modal.addEventListener('click', (e) => {
@@ -820,10 +827,10 @@ class AvatarSystem {
         if (result.success) {
           this.authSuccess = 'Account created successfully! Please check your email to verify your account.';
           console.log('AUTH DEBUG: Signup successful');
-          // Don't close modal immediately, let user see success message
+          // Close modal quickly after showing success message
           setTimeout(() => {
             this.closeAuthModal();
-          }, 3000);
+          }, 1000);
         } else {
           this.authError = result.error || 'Failed to create account. Please try again.';
           console.log('AUTH DEBUG: Signup failed:', result.error);
@@ -861,12 +868,12 @@ class AvatarSystem {
           this.authSuccess = 'Signed in successfully! Welcome back!';
           this.user = result.user;
           console.log('AUTH DEBUG: Signin successful, user:', this.user?.email);
-          
-          // Close modal and refresh UI
+
+          // Close modal immediately and refresh UI
           setTimeout(() => {
             this.closeAuthModal();
             this.renderDropdown();
-          }, 1500);
+          }, 800);
         } else {
           this.authError = result.error || 'Sign in failed. Please check your credentials and try again.';
           console.log('AUTH DEBUG: Signin failed:', result.error);
@@ -886,7 +893,7 @@ class AvatarSystem {
   async handleSignOut() {
     console.log('AUTH DEBUG: Sign out initiated');
     this.authLoading = true;
-    
+
     try {
       if (this.authService && this.authService.signOut) {
         const result = await this.authService.signOut();
@@ -897,11 +904,11 @@ class AvatarSystem {
       sessionStorage.removeItem('supabase_user');
       this.user = null;
       this.isDropdownOpen = false;
-      
+
       // Update UI
       this.createAvatarElement(); // Recreate avatar with guest styling
       this.renderDropdown();
-      
+
       console.log('AUTH DEBUG: Sign out completed');
     } catch (error) {
       console.error('AUTH DEBUG: Error during sign out:', error);
@@ -915,7 +922,16 @@ class AvatarSystem {
     this.showAuthModal = false;
     const modal = document.querySelector('.auth-modal');
     if (modal) {
-      modal.remove();
+      // Add fade-out animation
+      modal.style.opacity = '0';
+      modal.style.transform = 'scale(0.95)';
+
+      // Remove modal after animation completes
+      setTimeout(() => {
+        if (modal && modal.parentNode) {
+          modal.remove();
+        }
+      }, 200);
     }
     // Reset form data when modal closes
     this.formData = { email: '', password: '', confirmPassword: '' };
@@ -962,6 +978,47 @@ class AvatarSystem {
         dropdown.style.transform = 'translateY(0)';
         dropdown.style.opacity = '1';
       }, 10);
+
+      // Add click handlers for carnival items
+      const carnivalItems = dropdown.querySelectorAll('.carnival-item');
+      carnivalItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const carnivalName = item.dataset.carnivalName;
+          console.log('🎭 Carnival item clicked:', carnivalName);
+
+          // Special handling for Notting Hill Carnival
+          if (carnivalName === 'Notting Hill Carnival') {
+            console.log('🎭 Notting Hill Carnival clicked - toggling route');
+            this.toggleCarnivalRoute();
+          } else {
+            console.log('🎭 Other carnival clicked:', carnivalName);
+            // Add tracking functionality for other carnivals
+            const carnivalId = item.dataset.carnivalId;
+            if (this.trackedCarnivals.has(carnivalId)) {
+              this.trackedCarnivals.delete(carnivalId);
+              item.style.background = 'white';
+            } else {
+              this.trackedCarnivals.add(carnivalId);
+              item.style.background = '#f0f9ff';
+            }
+          }
+
+          // Close the carnival dropdown
+          this.isCarnivalDropdownOpen = false;
+          this.renderCarnivalDropdown();
+        });
+
+        // Add hover effects
+        item.addEventListener('mouseenter', () => {
+          item.style.transform = 'translateY(-2px)';
+          item.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+        });
+
+        item.addEventListener('mouseleave', () => {
+          item.style.transform = 'translateY(0)';
+          item.style.boxShadow = 'none';
+        });
+      });
     }
   }
 
@@ -993,13 +1050,15 @@ class AvatarSystem {
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
-            border: 1px solid #f3f4f6;
+            border: 1px solid ${carnival.name === 'Notting Hill Carnival' && window.carnivalRouteActive ? '#8b5cf6' : '#f3f4f6'};
             background: ${this.trackedCarnivals.has(carnival.id) ? '#f0f9ff' : 'white'};
+            ${carnival.name === 'Notting Hill Carnival' && window.carnivalRouteActive ? 'box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);' : ''}
           ">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div style="flex: 1;">
-                <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 600; color: #374151;">
+                <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 600; color: #374151; display: flex; align-items: center; gap: 8px;">
                   ${carnival.name}
+                  ${carnival.name === 'Notting Hill Carnival' && window.carnivalRouteActive ? '<i class="fas fa-star" style="color: #8b5cf6; font-size: 12px;"></i>' : ''}
                 </h4>
                 <p style="margin: 0 0 2px 0; font-size: 12px; color: #6b7280;">
                   📍 ${carnival.location} • 📅 ${carnival.date}
@@ -1053,6 +1112,11 @@ class AvatarSystem {
         }
 
         console.log('🎭 Carnival route hidden');
+
+        // Refresh carnival dropdown if it's open
+        if (this.isCarnivalDropdownOpen) {
+          this.renderCarnivalDropdown();
+        }
       } else {
         window.showCarnivalRoute();
         window.showJudgingZone();
@@ -1064,6 +1128,11 @@ class AvatarSystem {
         }
 
         console.log('🎭 Carnival route activated');
+
+        // Refresh carnival dropdown if it's open
+        if (this.isCarnivalDropdownOpen) {
+          this.renderCarnivalDropdown();
+        }
       }
     } else {
       console.warn('🎭 Carnival route functions not found. Make sure the main script is loaded.');
