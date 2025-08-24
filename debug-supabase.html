@@ -165,7 +165,7 @@
       }
 
       try {
-        const testEmail = 'test-' + Date.now() + '@example.com';
+        const testEmail = 'test-' + Date.now() + '@gmail.com';
         const { data, error } = await supabaseClient.auth.signUp({
           email: testEmail,
           password: 'testpassword123'
@@ -194,7 +194,7 @@
 
       try {
         // First create a user
-        const testEmail = 'test-' + Date.now() + '@example.com';
+        const testEmail = 'test-' + Date.now() + '@gmail.com';
         const { data: authData, error: authError } = await supabaseClient.auth.signUp({
           email: testEmail,
           password: 'testpassword123'
