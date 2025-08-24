@@ -532,10 +532,26 @@ class AvatarSystem {
             margin-bottom: 8px;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             border: 1px solid #f3f4f6;
             background: ${this.trackedCarnivals.has(carnival.id) ? '#f0f9ff' : 'white'};
+            ${carnival.name === 'Notting Hill Carnival' ? `
+              position: relative;
+              overflow: hidden;
+            ` : ''}
           ">
+            ${carnival.name === 'Notting Hill Carnival' ? `
+              <div class="notting-hill-hover" style="
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+                transition: left 0.5s ease;
+                pointer-events: none;
+              "></div>
+            ` : ''}
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div style="flex: 1;">
                 <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 600; color: #374151;">
@@ -970,6 +986,24 @@ style.textContent = `
   
   .close-modal:hover {
     color: #374151;
+  }
+  
+  /* Notting Hill Carnival Special Hover Effect */
+  .carnival-item:hover .notting-hill-hover {
+    left: 100%;
+  }
+  
+  .carnival-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #8b5cf6;
+  }
+  
+  /* Special effect for Notting Hill Carnival */
+  .carnival-item[data-carnival-id="1"]:hover {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-color: #8b5cf6;
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
   }
 `;
 document.head.appendChild(style);
