@@ -16,6 +16,7 @@ class AvatarSystem {
     this.selectedCarnival = null;
     this.showCarnivalDetails = false;
     this.dropdownRef = null;
+    this.supabase = null;
 
     // UK Carnival data
     this.ukCarnivals = [
@@ -68,18 +69,94 @@ class AvatarSystem {
     this.init();
   }
 
-  init() {
-    this.checkUser();
-    this.createAvatarElement();
-    this.setupEventListeners();
+  async initializeSupabase() {
+    try {
+      // Check if Supabase is available globally
+      if (window.supabase) {
+        this.supabase = window.supabase;
+        console.log('✅ Supabase client found globally');
+        return;
+      }
+
+      // Try to import Supabase config
+      try {
+        const supabaseModule = await import('./supabase-config.js');
+        if (supabaseModule.supabase) {
+          this.supabase = supabaseModule.supabase;
+          console.log('✅ Supabase client loaded from config');
+          return;
+        }
+      } catch (error) {
+        console.log('⚠️ Could not load Supabase config:', error);
+      }
+
+      // Try to import Supabase service
+      try {
+        const supabaseService = await import('./supabase-service.js');
+        if (supabaseService.supabase) {
+          this.supabase = supabaseService.supabase;
+          console.log('✅ Supabase client loaded from service');
+          return;
+        }
+      } catch (error) {
+        console.log('⚠️ Could not load Supabase service:', error);
+      }
+
+      console.warn('⚠️ No Supabase client found, using fallback authentication');
+    } catch (error) {
+      console.error('❌ Error initializing Supabase:', error);
+    }
   }
 
-  checkUser() {
-    const storedUser = sessionStorage.getItem('supabase_user');
-    if (storedUser) {
-      this.user = JSON.parse(storedUser);
+  setupAuthListener() {
+    if (this.supabase) {
+      this.supabase.auth.onAuthStateChange((event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
+
+        if (event === 'SIGNED_IN' && session?.user) {
+          this.user = session.user;
+          sessionStorage.setItem('supabase_user', JSON.stringify(session.user));
+          this.renderDropdown();
+        } else if (event === 'SIGNED_OUT') {
+          this.user = null;
+          sessionStorage.removeItem('supabase_user');
+          this.renderDropdown();
+        }
+      });
     }
-    this.loading = false;
+  }
+
+  async init() {
+    await this.initializeSupabase();
+    await this.checkUser();
+    this.createAvatarElement();
+    this.setupEventListeners();
+    this.setupAuthListener();
+  }
+
+  async checkUser() {
+    try {
+      if (this.supabase) {
+        // Use Supabase auth
+        const { data: { user }, error } = await this.supabase.auth.getUser();
+        if (error) {
+          console.error('Error getting user:', error);
+        } else if (user) {
+          this.user = user;
+          sessionStorage.setItem('supabase_user', JSON.stringify(user));
+        }
+      } else {
+        // Fallback to sessionStorage
+        const storedUser = sessionStorage.getItem('supabase_user');
+        if (storedUser) {
+          this.user = JSON.parse(storedUser);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking user:', error);
+    } finally {
+      this.loading = false;
+    }
   }
 
   createAvatarElement() {
@@ -516,46 +593,96 @@ class AvatarSystem {
           return;
         }
 
-        // Simulate signup
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const user = {
-          id: Math.random().toString(36).substr(2, 9),
-          email: this.formData.email,
-          user_metadata: {
-            full_name: this.formData.email.split('@')[0].charAt(0).toUpperCase() + this.formData.email.split('@')[0].slice(1)
-          }
-        };
+        if (this.supabase) {
+          // Use Supabase signup
+          const { data, error } = await this.supabase.auth.signUp({
+            email: this.formData.email,
+            password: this.formData.password,
+            options: {
+              data: {
+                full_name: this.formData.email.split('@')[0].charAt(0).toUpperCase() + this.formData.email.split('@')[0].slice(1)
+              }
+            }
+          });
 
-        this.authSuccess = 'Account created successfully!';
-        sessionStorage.setItem('supabase_user', JSON.stringify(user));
-        this.user = user;
-        this.closeAuthModal();
-        this.renderDropdown();
+          if (error) {
+            this.authError = error.message;
+            return;
+          }
+
+          if (data.user) {
+            this.authSuccess = 'Account created successfully! Please check your email to confirm your account.';
+            this.user = data.user;
+            sessionStorage.setItem('supabase_user', JSON.stringify(data.user));
+            this.closeAuthModal();
+            this.renderDropdown();
+          } else {
+            this.authSuccess = 'Account created successfully! Please check your email to confirm your account.';
+          }
+        } else {
+          // Fallback signup
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          const user = {
+            id: Math.random().toString(36).substr(2, 9),
+            email: this.formData.email,
+            user_metadata: {
+              full_name: this.formData.email.split('@')[0].charAt(0).toUpperCase() + this.formData.email.split('@')[0].slice(1)
+            }
+          };
+
+          this.authSuccess = 'Account created successfully!';
+          sessionStorage.setItem('supabase_user', JSON.stringify(user));
+          this.user = user;
+          this.closeAuthModal();
+          this.renderDropdown();
+        }
 
       } else {
-        // Simulate signin
+        // Sign in
         if (!this.formData.email || !this.formData.password || !this.formData.email.includes('@') || this.formData.password.length < 6) {
           this.authError = 'Please enter a valid email and password (min 6 characters)';
           return;
         }
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const user = {
-          id: Math.random().toString(36).substr(2, 9),
-          email: this.formData.email,
-          user_metadata: {
-            full_name: this.formData.email.split('@')[0].charAt(0).toUpperCase() + this.formData.email.split('@')[0].slice(1)
-          }
-        };
+        if (this.supabase) {
+          // Use Supabase signin
+          const { data, error } = await this.supabase.auth.signInWithPassword({
+            email: this.formData.email,
+            password: this.formData.password
+          });
 
-        this.authSuccess = 'Signed in successfully!';
-        sessionStorage.setItem('supabase_user', JSON.stringify(user));
-        this.user = user;
-        this.closeAuthModal();
-        this.renderDropdown();
+          if (error) {
+            this.authError = error.message;
+            return;
+          }
+
+          if (data.user) {
+            this.authSuccess = 'Signed in successfully!';
+            this.user = data.user;
+            sessionStorage.setItem('supabase_user', JSON.stringify(data.user));
+            this.closeAuthModal();
+            this.renderDropdown();
+          }
+        } else {
+          // Fallback signin
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          const user = {
+            id: Math.random().toString(36).substr(2, 9),
+            email: this.formData.email,
+            user_metadata: {
+              full_name: this.formData.email.split('@')[0].charAt(0).toUpperCase() + this.formData.email.split('@')[0].slice(1)
+            }
+          };
+
+          this.authSuccess = 'Signed in successfully!';
+          sessionStorage.setItem('supabase_user', JSON.stringify(user));
+          this.user = user;
+          this.closeAuthModal();
+          this.renderDropdown();
+        }
       }
     } catch (error) {
-      this.authError = error.message;
+      this.authError = error.message || 'An unexpected error occurred';
     } finally {
       this.authLoading = false;
       this.renderAuthModal();
@@ -565,7 +692,14 @@ class AvatarSystem {
   async handleSignOut() {
     this.authLoading = true;
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      if (this.supabase) {
+        // Use Supabase signout
+        const { error } = await this.supabase.auth.signOut();
+        if (error) {
+          console.error('Error signing out:', error);
+        }
+      }
+
       sessionStorage.removeItem('supabase_user');
       this.user = null;
       this.isDropdownOpen = false;
