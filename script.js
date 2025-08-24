@@ -97,10 +97,12 @@ async function initializeSupabase() {
     }
 
     // Import and initialize Supabase config first
+    console.log('🔐 Loading Supabase configuration...');
     const supabaseModule = await import('./supabase-config.js');
     const { initializeSupabase: initSupabase, supabase: supabaseClient } = supabaseModule;
 
     // Initialize Supabase using the exported function
+    console.log('🔐 Initializing Supabase client...');
     const success = await initSupabase();
 
     if (success) {
@@ -1586,6 +1588,8 @@ window.showStartFlag = showStartFlag;
 // Test Supabase connection function
 window.testSupabaseConnection = async function () {
   console.log('🔐 Testing Supabase connection...');
+  console.log('🔐 Checking if Supabase client exists:', !!window.supabase);
+  console.log('🔐 Checking if supabaseClient exists:', !!window.supabaseClient);
 
   try {
     // Test basic connection
@@ -1608,6 +1612,46 @@ window.testSupabaseConnection = async function () {
     }
   } catch (error) {
     console.error('❌ Supabase test failed:', error);
+    return false;
+  }
+};
+
+// Test authentication flow
+window.testAuthFlow = async function () {
+  console.log('🔐 Testing authentication flow...');
+
+  try {
+    // Test sign up
+    const { data, error } = await window.supabase.auth.signUp({
+      email: 'test@example.com',
+      password: 'testpassword123'
+    });
+
+    if (error) {
+      console.error('❌ Sign up test failed:', error);
+    } else {
+      console.log('✅ Sign up test successful:', data);
+    }
+
+    return { data, error };
+  } catch (error) {
+    console.error('❌ Auth flow test failed:', error);
+    return { error };
+  }
+};
+
+// Simple connection test
+window.simpleTest = function () {
+  console.log('🔐 Simple Supabase test...');
+  console.log('🔐 window.supabase exists:', !!window.supabase);
+  console.log('🔐 window.supabase.auth exists:', !!(window.supabase && window.supabase.auth));
+  console.log('🔐 window.supabase.from exists:', !!(window.supabase && window.supabase.from));
+
+  if (window.supabase) {
+    console.log('✅ Supabase client is available');
+    return true;
+  } else {
+    console.error('❌ Supabase client is not available');
     return false;
   }
 };
