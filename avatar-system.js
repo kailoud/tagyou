@@ -466,13 +466,7 @@ class AvatarSystem {
           </button>
         </div>
         
-        <button class="menu-button" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 12px; border: none; background: none; cursor: pointer; border-radius: 8px; transition: background 0.2s;">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <i class="fas fa-bell" style="color: #8b5cf6; font-size: 20px;"></i>
-            <span style="font-size: 14px; font-weight: 500; color: #374151;">Notifications</span>
-          </div>
-          <span style="background: #ef4444; color: white; font-size: 12px; padding: 2px 8px; border-radius: 12px;">3</span>
-        </button>
+
       </div>
 
       <div style="border-top: 1px solid #f3f4f6; margin: 8px 0;"></div>
@@ -538,7 +532,7 @@ class AvatarSystem {
 
         <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f3f4f6;">
           <p style="font-size: 14px; color: #6b7280; text-align: center; margin: 0;">
-            Sign in to access carnival tracking, notifications, and personalized features.
+            Sign in to access carnival tracking and personalized features.
           </p>
         </div>
 
@@ -549,10 +543,7 @@ class AvatarSystem {
               <i class="fas fa-map-marker-alt" style="color: #8b5cf6; font-size: 16px;"></i>
               <span>Track UK carnival events</span>
             </li>
-            <li style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #6b7280;">
-              <i class="fas fa-bell" style="color: #8b5cf6; font-size: 16px;"></i>
-              <span>Get event notifications</span>
-            </li>
+
             <li style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #6b7280;">
               <i class="fas fa-edit" style="color: #8b5cf6; font-size: 16px;"></i>
               <span>Add personal notes</span>
