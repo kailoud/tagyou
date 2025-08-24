@@ -444,6 +444,20 @@ class AvatarSystem {
         e.stopPropagation();
         const carnivalId = parseInt(e.target.dataset.carnivalId);
         this.toggleCarnivalTracking(carnivalId);
+      } else if (e.target.closest('.carnival-item')) {
+        const carnivalItem = e.target.closest('.carnival-item');
+        const carnivalName = carnivalItem.dataset.carnivalName;
+
+        if (carnivalName === 'Notting Hill Carnival') {
+          this.toggleCarnivalRoute();
+        }
+
+        // Close carnival dropdown after selection
+        this.isCarnivalDropdownOpen = false;
+        const existingDropdown = document.querySelector('.carnival-dropdown');
+        if (existingDropdown) {
+          existingDropdown.remove();
+        }
       }
     });
   }
@@ -454,6 +468,15 @@ class AvatarSystem {
       this.isCarnivalDropdownOpen = false;
       this.renderDropdown();
       document.removeEventListener('click', this.handleClickOutside);
+    }
+  }
+
+  handleCarnivalClickOutside(event) {
+    const carnivalDropdown = document.querySelector('.carnival-dropdown');
+    if (carnivalDropdown && !carnivalDropdown.contains(event.target) && !this.dropdownRef.contains(event.target)) {
+      this.isCarnivalDropdownOpen = false;
+      carnivalDropdown.remove();
+      document.removeEventListener('click', this.handleCarnivalClickOutside);
     }
   }
 
@@ -501,8 +524,8 @@ class AvatarSystem {
       }, 10);
     }
 
-    // Add click outside handler
-    document.addEventListener('click', this.handleClickOutside.bind(this));
+    // Add click outside handler for carnival dropdown
+    document.addEventListener('click', this.handleCarnivalClickOutside.bind(this));
   }
 
   renderCarnivalContent() {
@@ -527,7 +550,7 @@ class AvatarSystem {
 
       <div style="padding: 16px; max-height: 300px; overflow-y: auto;">
         ${this.ukCarnivals.map(carnival => `
-          <div class="carnival-item" data-carnival-id="${carnival.id}" style="
+          <div class="carnival-item" data-carnival-id="${carnival.id}" data-carnival-name="${carnival.name}" style="
             padding: 12px;
             margin-bottom: 8px;
             border-radius: 8px;
@@ -629,6 +652,12 @@ class AvatarSystem {
         ? 'Welcome back! Please sign in to your account.'
         : 'Join us to start tracking your favorite carnivals.'}
             </p>
+            ${this.authLoading ? `
+              <div class="auth-loading-indicator">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>${this.authMode === 'signin' ? 'Signing in...' : 'Creating account...'}</span>
+              </div>
+            ` : ''}
           </div>
 
           ${this.authError ? `
@@ -821,28 +850,42 @@ class AvatarSystem {
 
     try {
       if (this.authMode === 'signup') {
+        // Step 1: Validation
+        console.log('🔐 Avatar System: Step 1 - Validating signup data...');
+
+        if (!this.formData.email || !this.formData.password || !this.formData.confirmPassword || !this.formData.email.includes('@') || this.formData.password.length < 6) {
+          this.authError = 'Please fill in all fields correctly. Email must be valid and password must be at least 6 characters.';
+          return;
+        }
+
         if (this.formData.password !== this.formData.confirmPassword) {
           this.authError = 'Passwords do not match';
           return;
         }
 
+        // Step 2: Supabase Signup
         if (this.authService) {
-          // Use existing auth service signup
+          console.log('🔐 Avatar System: Step 2 - Attempting Supabase signup...');
           try {
             const result = await this.authService.signUp(this.formData.email, this.formData.password);
+            console.log('🔐 Avatar System: Signup result:', result);
 
             if (result.success) {
-              this.authSuccess = 'Account created successfully! Please check your email to confirm your account.';
+              this.authSuccess = '🎉 Account created successfully! Please check your email to confirm your account.';
+              console.log('🔐 Avatar System: Signup successful, email confirmation required');
               this.closeAuthModal();
               this.renderDropdown();
             } else {
-              this.authError = result.error || 'Sign up failed';
+              this.authError = result.error || 'Sign up failed. Please try again.';
+              console.error('🔐 Avatar System: Signup failed:', result.error);
             }
           } catch (error) {
-            this.authError = error.message || 'Sign up failed';
+            console.error('🔐 Avatar System: Signup error:', error);
+            this.authError = error.message || 'Sign up failed. Please try again.';
           }
         } else {
-          // Fallback signup
+          // Fallback signup (for testing)
+          console.log('🔐 Avatar System: Step 2 - Using fallback signup...');
           await new Promise(resolve => setTimeout(resolve, 1000));
           const user = {
             id: Math.random().toString(36).substr(2, 9),
@@ -852,7 +895,7 @@ class AvatarSystem {
             }
           };
 
-          this.authSuccess = 'Account created successfully!';
+          this.authSuccess = '🎉 Account created successfully!';
           sessionStorage.setItem('supabase_user', JSON.stringify(user));
           this.user = user;
           this.closeAuthModal();
@@ -860,32 +903,37 @@ class AvatarSystem {
         }
 
       } else {
-        // Sign in
+        // Step 1: Validation
+        console.log('🔐 Avatar System: Step 1 - Validating signin data...');
+
         if (!this.formData.email || !this.formData.password || !this.formData.email.includes('@') || this.formData.password.length < 6) {
           this.authError = 'Please enter a valid email and password (min 6 characters)';
           return;
         }
 
+        // Step 2: Supabase Signin
         if (this.authService) {
-          // Use existing auth service signin
-          console.log('🔐 Avatar System: Attempting sign in with auth service...');
+          console.log('🔐 Avatar System: Step 2 - Attempting Supabase signin...');
           try {
             const result = await this.authService.signIn(this.formData.email, this.formData.password);
-            console.log('🔐 Avatar System: Sign in result:', result);
+            console.log('🔐 Avatar System: Signin result:', result);
 
             if (result.success) {
-              this.authSuccess = 'Signed in successfully!';
+              this.authSuccess = '🎉 Signed in successfully! Welcome back!';
+              console.log('🔐 Avatar System: Signin successful');
               this.closeAuthModal();
               this.renderDropdown();
             } else {
-              this.authError = result.error || 'Sign in failed';
+              this.authError = result.error || 'Sign in failed. Please check your credentials.';
+              console.error('🔐 Avatar System: Signin failed:', result.error);
             }
           } catch (error) {
-            console.error('🔐 Avatar System: Sign in error:', error);
-            this.authError = error.message || 'Sign in failed';
+            console.error('🔐 Avatar System: Signin error:', error);
+            this.authError = error.message || 'Sign in failed. Please check your credentials.';
           }
         } else {
-          // Fallback signin
+          // Fallback signin (for testing)
+          console.log('🔐 Avatar System: Step 2 - Using fallback signin...');
           await new Promise(resolve => setTimeout(resolve, 1000));
           const user = {
             id: Math.random().toString(36).substr(2, 9),
@@ -895,7 +943,7 @@ class AvatarSystem {
             }
           };
 
-          this.authSuccess = 'Signed in successfully!';
+          this.authSuccess = '🎉 Signed in successfully! Welcome back!';
           sessionStorage.setItem('supabase_user', JSON.stringify(user));
           this.user = user;
           this.closeAuthModal();
@@ -903,7 +951,8 @@ class AvatarSystem {
         }
       }
     } catch (error) {
-      this.authError = error.message || 'An unexpected error occurred';
+      console.error('🔐 Avatar System: Unexpected error:', error);
+      this.authError = error.message || 'An unexpected error occurred. Please try again.';
     } finally {
       this.authLoading = false;
       this.renderAuthModal();
@@ -937,6 +986,57 @@ class AvatarSystem {
       setTimeout(() => {
         modal.remove();
       }, 300); // Wait for transition to complete
+    }
+  }
+
+  toggleCarnivalRoute() {
+    // Check if global functions exist
+    if (typeof window.showCarnivalRoute === 'function' &&
+      typeof window.showJudgingZone === 'function' &&
+      typeof window.showStartFlag === 'function') {
+
+      // Toggle carnival route visibility using global state
+      if (window.carnivalRouteActive) {
+        // Route is visible, hide it
+        if (window.carnivalRoute && window.map) {
+          window.map.removeLayer(window.carnivalRoute);
+          window.carnivalRoute = null;
+        }
+        if (window.startFlag && window.map) {
+          window.map.removeLayer(window.startFlag);
+          window.startFlag = null;
+        }
+        // Remove judging zone (it's a text overlay, so we need to find and remove it)
+        const judgingZone = document.querySelector('.judging-zone-label');
+        if (judgingZone) {
+          judgingZone.remove();
+        }
+        // Update global state
+        window.carnivalRouteActive = false;
+
+        // Synchronize star button state
+        const starButton = document.getElementById('festivalBtn');
+        if (starButton) {
+          starButton.classList.remove('active');
+        }
+
+        console.log('🎭 Carnival route hidden');
+      } else {
+        // Route is hidden, show it
+        window.showCarnivalRoute();
+        window.showJudgingZone();
+        window.showStartFlag();
+
+        // Synchronize star button state
+        const starButton = document.getElementById('festivalBtn');
+        if (starButton) {
+          starButton.classList.add('active');
+        }
+
+        console.log('🎭 Carnival route activated');
+      }
+    } else {
+      console.warn('🎭 Carnival route functions not found. Make sure the main script is loaded.');
     }
   }
 }
@@ -986,6 +1086,24 @@ style.textContent = `
   
   .close-modal:hover {
     color: #374151;
+  }
+  
+  /* Authentication Loading Indicator */
+  .auth-loading-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 8px;
+    color: #8b5cf6;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  .auth-loading-indicator i {
+    font-size: 16px;
   }
   
   /* Notting Hill Carnival Special Hover Effect */

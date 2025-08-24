@@ -41,6 +41,24 @@ export class SupabaseAuthService {
 
       console.log('🔐 Initializing Supabase Auth Service...');
 
+      // Check if profiles table exists
+      try {
+        console.log('🔐 Checking profiles table...');
+        const { error: tableCheckError } = await supabase
+          .from('profiles')
+          .select('id')
+          .limit(1);
+
+        if (tableCheckError) {
+          console.error('❌ Profiles table not found:', tableCheckError);
+          console.warn('⚠️ Please run the supabase-schema.sql in your Supabase SQL editor');
+        } else {
+          console.log('✅ Profiles table exists');
+        }
+      } catch (error) {
+        console.error('❌ Error checking profiles table:', error);
+      }
+
       // Get current session
       const { data: { session }, error } = await supabase.auth.getSession();
 
@@ -52,6 +70,23 @@ export class SupabaseAuthService {
       if (session) {
         this.currentUser = session.user;
         console.log('✅ User session found:', this.currentUser.email);
+
+        // Fetch profile data for existing session
+        try {
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+          if (!profileError && profileData) {
+            console.log('✅ User profile found:', profileData);
+            this.currentUser = { ...this.currentUser, profile: profileData };
+          }
+        } catch (profileError) {
+          console.error('❌ Profile fetch error:', profileError);
+        }
+
         this.notifyAuthStateListeners();
       } else {
         console.log('ℹ️ No active session found');
@@ -103,6 +138,27 @@ export class SupabaseAuthService {
       if (data.user) {
         this.currentUser = data.user;
         console.log('✅ Sign in successful:', this.currentUser.email);
+
+        // Fetch user profile data
+        try {
+          console.log('🔐 Fetching user profile from database...');
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', data.user.id)
+            .single();
+
+          if (profileError) {
+            console.error('❌ Profile fetch error:', profileError);
+          } else {
+            console.log('✅ User profile fetched:', profileData);
+            // Merge profile data with user data
+            this.currentUser = { ...this.currentUser, profile: profileData };
+          }
+        } catch (profileError) {
+          console.error('❌ Profile fetch failed:', profileError);
+        }
+
         this.notifyAuthStateListeners();
         return { success: true, user: this.currentUser };
       }
@@ -134,6 +190,33 @@ export class SupabaseAuthService {
       if (data.user) {
         this.currentUser = data.user;
         console.log('✅ Sign up successful:', this.currentUser.email);
+
+        // Create profile in profiles table
+        try {
+          console.log('🔐 Creating user profile in database...');
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert([
+              {
+                id: data.user.id,
+                email: data.user.email,
+                display_name: data.user.email.split('@')[0].charAt(0).toUpperCase() + data.user.email.split('@')[0].slice(1),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              }
+            ]);
+
+          if (profileError) {
+            console.error('❌ Profile creation error:', profileError);
+            // Don't throw error here as auth was successful
+          } else {
+            console.log('✅ User profile created successfully');
+          }
+        } catch (profileError) {
+          console.error('❌ Profile creation failed:', profileError);
+          // Don't throw error here as auth was successful
+        }
+
         this.notifyAuthStateListeners();
         return { success: true, user: this.currentUser };
       }

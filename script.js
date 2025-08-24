@@ -1,5 +1,7 @@
 // TagYou2 London Map - Supabase Integration
 let map;
+// Make map globally accessible
+window.map = map;
 let currentUser = null; // Will be set when user authentication is implemented
 // Old authService variable removed - using modern profile system
 let foodStallsData = [];
@@ -300,6 +302,9 @@ function initMap() {
     keyboard: true,           // Allow keyboard navigation
     tap: true                 // Allow tap zoom
   }).setView([51.5074, -0.1278], 12); // London coordinates, zoom level 12
+
+  // Make map globally accessible
+  window.map = map;
 
   // Add OpenStreetMap tiles
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -637,12 +642,20 @@ function initFestivalsDropdown() {
   });
 
   // Close dropdown when clicking outside
-  document.addEventListener('click', function (e) {
-    if (!festivalsButton.contains(e.target) && !festivalsDropdown.contains(e.target)) {
-      festivalsDropdown.classList.remove('show');
-      dropdownIcon.style.transform = 'rotate(0deg)';
+  function handleClickOutside(e) {
+    // Check if dropdown is currently open
+    if (festivalsDropdown.classList.contains('show')) {
+      // Check if click is outside both the button and dropdown
+      if (!festivalsButton.contains(e.target) && !festivalsDropdown.contains(e.target)) {
+        festivalsDropdown.classList.remove('show');
+        dropdownIcon.style.transform = 'rotate(0deg)';
+        console.log('Dropdown closed by clicking outside');
+      }
     }
-  });
+  }
+
+  // Add click outside listener
+  document.addEventListener('click', handleClickOutside);
 
   // Festival item click handlers
   const festivalItems = document.querySelectorAll('.festival-item');
@@ -723,137 +736,8 @@ function initFestivalsDropdown() {
     });
   });
 
-  // Function to show carnival route
-  function showCarnivalRoute() {
-    // Remove existing route if any
-    if (carnivalRoute) {
-      map.removeLayer(carnivalRoute);
-    }
 
-    // Carnival route coordinates
-    const carnivalRouteCoords = [
-      [51.512565, -0.206491], // A1 - Ladbroke Grove
-      [51.513412, -0.207095], // A2
-      [51.513876, -0.207439], // A3
-      [51.514257, -0.207705], // A4
-      [51.515175, -0.208372], // A5
-      [51.516227, -0.209131], // A6
-      [51.516945, -0.209692], // A7
-      [51.517616, -0.210155], // A8
-      [51.517915, -0.210328], // A9
-      [51.518306, -0.210546], // A10
-      [51.518959, -0.210919], // A11
-      [51.519609, -0.211299], // A12
-      [51.520169, -0.211619], // A13
-      [51.520670, -0.211909], // A14
-      [51.521160, -0.212196], // A15
-      [51.521639, -0.212464], // A16
-      [51.522116, -0.212742], // A17
-      [51.522353, -0.212883], // A18
-      [51.522966, -0.213237], // A19
-      [51.523684, -0.213660], // A20
-      [51.524082, -0.213921], // A21
-      [51.524327, -0.213996], // A22
-      [51.525289, -0.214583], // A23
-      [51.525740, -0.214874], // A24
-      [51.525909, -0.215061], // A25
-      [51.526085, -0.215144], // A26
-      [51.526336, -0.215253], // A29 - Kensal Rd
-      [51.526310, -0.213861], // B1
-      [51.526270, -0.212296], // B2
-      [51.526242, -0.211541], // B3
-      [51.526186, -0.210546], // B4
-      [51.526127, -0.209911], // B5
-      [51.526004, -0.209122], // B6
-      [51.525930, -0.208710], // B7
-      [51.525820, -0.208111], // B8
-      [51.525691, -0.207379], // B9
-      [51.525598, -0.206951], // B10
-      [51.525475, -0.206583], // B11
-      [51.525399, -0.206423], // B12
-      [51.525235, -0.206137], // B13
-      [51.524480, -0.205508], // B14
-      [51.524295, -0.205380], // C1 - Golbourne Rd
-      [51.524214, -0.205371], // C2
-      [51.524129, -0.205661], // C3
-      [51.524048, -0.205953], // C4
-      [51.523901, -0.206208], // C5
-      [51.523697, -0.206490], // C6
-      [51.523589, -0.206582], // C7
-      [51.523308, -0.206721], // C8
-      [51.523212, -0.206733], // C9
-      [51.523150, -0.206637], // C10
-      [51.523124, -0.206516], // D1 - Elkstone Road
-      [51.523059, -0.206407], // D2
-      [51.522984, -0.206246], // D3
-      [51.522871, -0.206050], // D4
-      [51.522714, -0.205583], // D5
-      [51.522626, -0.205293], // D6
-      [51.522480, -0.204769], // D7
-      [51.522359, -0.204341], // D8
-      [51.522286, -0.204071], // D9
-      [51.522257, -0.203941], // D10
-      [51.522244, -0.203688], // D11
-      [51.522315, -0.203307], // D12
-      [51.522393, -0.203068], // D13
-      [51.522420, -0.202845], // D14
-      [51.522409, -0.202589], // D15
-      [51.522330, -0.202250], // D16
-      [51.522233, -0.201823], // D17
-      [51.522189, -0.201602], // D18
-      [51.522114, -0.201366], // D19
-      [51.521849, -0.201236], // E1
-      [51.521627, -0.201093], // E2
-      [51.521353, -0.200893], // E3
-      [51.521025, -0.200637], // E4
-      [51.520742, -0.200437], // E5
-      [51.518595, -0.198448], // E6
-      [51.518613, -0.198423], // F - Westbourne Park Road
-      [51.519079, -0.196369], // G - Westbourne Park Road
-      [51.515062, -0.195045], // H - Chepstow Rd
-      [51.514405, -0.200323], // I - Westbourne Grove
-      [51.512588, -0.206464]  // J - Ladbroke Gardens (back to A1)
-    ];
 
-    // Create polyline for the route
-    carnivalRoute = L.polyline(carnivalRouteCoords, {
-      color: '#ff6b35',
-      weight: 6,
-      opacity: 0.8,
-      lineCap: 'round',
-      lineJoin: 'round'
-    }).addTo(map);
-
-    // Add orange markers for key points
-    const keyPoints = [
-      { lat: 51.512565, lng: -0.206491, title: 'Start - Ladbroke Grove' },
-      { lat: 51.526336, lng: -0.215253, title: 'Kensal Road' },
-      { lat: 51.524295, lng: -0.205380, title: 'Golbourne Road' },
-      { lat: 51.523124, lng: -0.206516, title: 'Elkstone Road' },
-      { lat: 51.518613, lng: -0.198423, title: 'Westbourne Park Road' },
-      { lat: 51.512588, lng: -0.206464, title: 'End - Ladbroke Gardens' }
-    ];
-
-    // Custom orange marker icon
-    const orangeIcon = L.divIcon({
-      className: 'carnival-marker',
-      html: '<div style="background: #ff6b35; width: 12px; height: 12px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);"></div>',
-      iconSize: [12, 12],
-      iconAnchor: [6, 6]
-    });
-
-    // Add markers for key points
-    keyPoints.forEach(point => {
-      L.marker([point.lat, point.lng], { icon: orangeIcon })
-        .bindPopup(`<b>${point.title}</b><br>Notting Hill Carnival Route`)
-        .addTo(map);
-    });
-
-    // Fit map to show the entire route
-    map.fitBounds(carnivalRoute.getBounds(), { padding: [20, 20] });
-
-    console.log('Notting Hill Carnival route displayed');
-  }
 }
 
 
@@ -939,19 +823,63 @@ function initMapToolbar() {
     }
   });
 
-  // Festival button
+  // Festival button - Simple ON/OFF switch for carnival route
   festivalBtn.addEventListener('click', function () {
-    toggleButtonActive(this);
     console.log('Festival button clicked');
+    console.log('Current carnival route state:', window.carnivalRouteActive);
+    console.log('Global functions available:', {
+      showCarnivalRoute: typeof window.showCarnivalRoute,
+      showJudgingZone: typeof window.showJudgingZone,
+      showStartFlag: typeof window.showStartFlag
+    });
 
-    // Automatically select Notting Hill Carnival when festival button is clicked
-    const nottingHillItem = document.querySelector('.festival-item.available');
-    if (nottingHillItem) {
-      // Simulate click on Notting Hill Carnival item
-      nottingHillItem.click();
-      console.log('Notting Hill Carnival automatically selected via festival button');
+    // Toggle carnival route visibility
+    // Check if route is actually visible on the map
+    const isRouteVisible = window.carnivalRouteActive || (window.carnivalRoute && window.map.hasLayer(window.carnivalRoute));
+    console.log('Route visibility check:', {
+      carnivalRouteActive: window.carnivalRouteActive,
+      carnivalRouteExists: !!window.carnivalRoute,
+      hasLayer: window.carnivalRoute ? window.map.hasLayer(window.carnivalRoute) : false,
+      isRouteVisible: isRouteVisible
+    });
+
+    if (isRouteVisible) {
+      // Route is visible, hide it
+      console.log('Attempting to hide carnival route...');
+
+      if (window.carnivalRoute && window.map) {
+        console.log('Removing carnival route from map');
+        window.map.removeLayer(window.carnivalRoute);
+        window.carnivalRoute = null;
+      }
+      if (window.startFlag && window.map) {
+        console.log('Removing start flag from map');
+        window.map.removeLayer(window.startFlag);
+        window.startFlag = null;
+      }
+      // Remove judging zone
+      const judgingZone = document.querySelector('.judging-zone-label');
+      if (judgingZone) {
+        console.log('Removing judging zone');
+        judgingZone.remove();
+      }
+      // Update global state
+      window.carnivalRouteActive = false;
+      this.classList.remove('active');
+      console.log('🎭 Carnival route hidden via star button');
+      console.log('Updated carnival route state:', window.carnivalRouteActive);
     } else {
-      console.log('Notting Hill Carnival item not found');
+      // Route is hidden, show it
+      if (typeof window.showCarnivalRoute === 'function' &&
+        typeof window.showJudgingZone === 'function' &&
+        typeof window.showStartFlag === 'function') {
+        window.showCarnivalRoute();
+        window.showJudgingZone();
+        window.showStartFlag();
+        this.classList.add('active');
+        console.log('🎭 Carnival route activated via star button');
+        console.log('Updated carnival route state:', window.carnivalRouteActive);
+      }
     }
   });
 
@@ -1497,5 +1425,150 @@ function initResponsiveZoom() {
   // Initial calculation
   applyResponsiveScaling();
 }
+
+// Global carnival route state
+window.carnivalRouteActive = false;
+window.carnivalRoute = null;
+
+// Global carnival route function
+function showCarnivalRoute() {
+  // Remove existing route if any
+  if (window.carnivalRoute) {
+    map.removeLayer(window.carnivalRoute);
+  }
+
+  // Carnival route coordinates
+  const carnivalRouteCoords = [
+    [51.512565, -0.206491], // A1 - Ladbroke Grove
+    [51.513412, -0.207095], // A2
+    [51.513876, -0.207439], // A3
+    [51.514257, -0.207705], // A4
+    [51.515175, -0.208372], // A5
+    [51.516227, -0.209131], // A6
+    [51.516945, -0.209692], // A7
+    [51.517616, -0.210155], // A8
+    [51.517915, -0.210328], // A9
+    [51.518306, -0.210546], // A10
+    [51.518959, -0.210919], // A11
+    [51.519609, -0.211299], // A12
+    [51.520169, -0.211619], // A13
+    [51.520670, -0.211909], // A14
+    [51.521160, -0.212196], // A15
+    [51.521639, -0.212464], // A16
+    [51.522116, -0.212742], // A17
+    [51.522353, -0.212883], // A18
+    [51.522966, -0.213237], // A19
+    [51.523684, -0.213660], // A20
+    [51.524082, -0.213921], // A21
+    [51.524327, -0.213996], // A22
+    [51.525289, -0.214583], // A23
+    [51.525740, -0.214874], // A24
+    [51.525909, -0.215061], // A25
+    [51.526085, -0.215144], // A26
+    [51.526336, -0.215253], // A29 - Kensal Rd
+    [51.526310, -0.213861], // B1
+    [51.526270, -0.212296], // B2
+    [51.526242, -0.211541], // B3
+    [51.526186, -0.210546], // B4
+    [51.526127, -0.209911], // B5
+    [51.526004, -0.209122], // B6
+    [51.525930, -0.208710], // B7
+    [51.525820, -0.208111], // B8
+    [51.525691, -0.207379], // B9
+    [51.525598, -0.206951], // B10
+    [51.525475, -0.206583], // B11
+    [51.525399, -0.206423], // B12
+    [51.525235, -0.206137], // B13
+    [51.524480, -0.205508], // B14
+    [51.524295, -0.205380], // C1 - Golbourne Rd
+    [51.524214, -0.205371], // C2
+    [51.524129, -0.205661], // C3
+    [51.524048, -0.205953], // C4
+    [51.523901, -0.206208], // C5
+    [51.523697, -0.206490], // C6
+    [51.523589, -0.206582], // C7
+    [51.523308, -0.206721], // C8
+    [51.523212, -0.206733], // C9
+    [51.523150, -0.206637], // C10
+    [51.523124, -0.206516], // D1 - Elkstone Road
+    [51.523059, -0.206407], // D2
+    [51.522984, -0.206246], // D3
+    [51.522871, -0.206050], // D4
+    [51.522714, -0.205583], // D5
+    [51.522626, -0.205293], // D6
+    [51.522480, -0.204769], // D7
+    [51.522359, -0.204341], // D8
+    [51.522286, -0.204071], // D9
+    [51.522257, -0.203941], // D10
+    [51.522244, -0.203688], // D11
+    [51.522315, -0.203307], // D12
+    [51.522393, -0.203068], // D13
+    [51.522420, -0.202845], // D14
+    [51.522409, -0.202589], // D15
+    [51.522330, -0.202250], // D16
+    [51.522233, -0.201823], // D17
+    [51.522189, -0.201602], // D18
+    [51.522114, -0.201366], // D19
+    [51.521849, -0.201236], // E1
+    [51.521627, -0.201093], // E2
+    [51.521353, -0.200893], // E3
+    [51.521025, -0.200637], // E4
+    [51.520742, -0.200437], // E5
+    [51.518595, -0.198448], // E6
+    [51.518613, -0.198423], // F - Westbourne Park Road
+    [51.519079, -0.196369], // G - Westbourne Park Road
+    [51.515062, -0.195045], // H - Chepstow Rd
+    [51.514405, -0.200323], // I - Westbourne Grove
+    [51.512588, -0.206464]  // J - Ladbroke Gardens (back to A1)
+  ];
+
+  // Create polyline for the route
+  window.carnivalRoute = L.polyline(carnivalRouteCoords, {
+    color: '#ff6b35',
+    weight: 6,
+    opacity: 0.8,
+    lineCap: 'round',
+    lineJoin: 'round'
+  }).addTo(map);
+
+  // Add orange markers for key points
+  const keyPoints = [
+    { lat: 51.512565, lng: -0.206491, title: 'Start - Ladbroke Grove' },
+    { lat: 51.526336, lng: -0.215253, title: 'Kensal Road' },
+    { lat: 51.524295, lng: -0.205380, title: 'Golbourne Road' },
+    { lat: 51.523124, lng: -0.206516, title: 'Elkstone Road' },
+    { lat: 51.518613, lng: -0.198423, title: 'Westbourne Park Road' },
+    { lat: 51.512588, lng: -0.206464, title: 'End - Ladbroke Gardens' }
+  ];
+
+  // Custom orange marker icon
+  const orangeIcon = L.divIcon({
+    className: 'carnival-marker',
+    html: '<div style="background: #ff6b35; width: 12px; height: 12px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);"></div>',
+    iconSize: [12, 12],
+    iconAnchor: [6, 6]
+  });
+
+  // Add markers for key points
+  keyPoints.forEach(point => {
+    L.marker([point.lat, point.lng], { icon: orangeIcon })
+      .bindPopup(`<b>${point.title}</b><br>Notting Hill Carnival Route`)
+      .addTo(map);
+  });
+
+  // Fit map to show the entire route
+  map.fitBounds(window.carnivalRoute.getBounds(), { padding: [20, 20] });
+
+  // Set global state
+  window.carnivalRouteActive = true;
+
+  console.log('Notting Hill Carnival route displayed');
+  console.log('Global carnival route state set to:', window.carnivalRouteActive);
+}
+
+// Expose carnival route functions globally for avatar system
+window.showCarnivalRoute = showCarnivalRoute;
+window.showJudgingZone = showJudgingZone;
+window.showStartFlag = showStartFlag;
 
 
