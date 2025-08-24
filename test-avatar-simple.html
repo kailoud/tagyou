@@ -46,6 +46,7 @@
 
   <div class="test-info">
     <h2>Manual Tests</h2>
+    <button class="test-button" onclick="testSupabase()">Test Supabase</button>
     <button class="test-button" onclick="testAvatarSystem()">Test Avatar System</button>
     <button class="test-button" onclick="showAuthModal()">Show Auth Modal</button>
     <button class="test-button" onclick="checkElements()">Check Elements</button>
@@ -61,6 +62,18 @@
   <script type="module" src="avatar-system-v2.js"></script>
 
   <script>
+    // Global error handler
+    window.addEventListener('error', (event) => {
+      console.error('❌ Global error:', event.error);
+      document.getElementById('status').innerHTML = `❌ Error: ${event.error.message}`;
+    });
+
+    // Unhandled promise rejection handler
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('❌ Unhandled promise rejection:', event.reason);
+      document.getElementById('status').innerHTML = `❌ Promise error: ${event.reason}`;
+    });
+
     function testAvatarSystem() {
       console.log('🧪 Testing Avatar System...');
 
@@ -98,19 +111,38 @@
       console.log('Auth modal:', authModal);
 
       document.getElementById('status').innerHTML = `
-                Avatar container: ${avatarContainer ? '✅' : '❌'}<br>
-                Avatar button: ${avatarButton ? '✅' : '❌'}<br>
-                Auth modal: ${authModal ? '✅' : '❌'}
-            `;
+        Avatar container: ${avatarContainer ? '✅' : '❌'}<br>
+        Avatar button: ${avatarButton ? '✅' : '❌'}<br>
+        Auth modal: ${authModal ? '✅' : '❌'}
+      `;
+    }
+
+    function testSupabase() {
+      console.log('🧪 Testing Supabase...');
+
+      if (window.supabase) {
+        console.log('✅ Supabase SDK loaded:', window.supabase);
+        document.getElementById('status').innerHTML += '<br>✅ Supabase SDK loaded';
+      } else {
+        console.log('❌ Supabase SDK not loaded');
+        document.getElementById('status').innerHTML += '<br>❌ Supabase SDK not loaded';
+      }
     }
 
     // Auto-test on load
     window.addEventListener('load', () => {
+      console.log('🚀 Page loaded, starting tests...');
+      document.getElementById('status').innerHTML = '🚀 Page loaded, testing...';
+
       setTimeout(() => {
+        testSupabase();
         testAvatarSystem();
         checkElements();
       }, 2000);
     });
+
+    // Test immediately
+    console.log('📝 Script loaded, DOM ready state:', document.readyState);
   </script>
 </body>
 
