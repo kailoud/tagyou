@@ -165,11 +165,9 @@
       }
 
       try {
-        const testEmail = 'test-' + Date.now() + '@gmail.com';
-        const { data, error } = await supabaseClient.auth.signUp({
-          email: testEmail,
-          password: 'testpassword123'
-        });
+        result.innerHTML = '<div class="warning">⚠️ Please enter a real email address to test authentication</div>';
+        result.innerHTML += '<div class="warning">⚠️ Test email generation has been disabled</div>';
+        return;
 
         if (error) {
           result.innerHTML = '<div class="error">❌ Authentication error: ' + error.message + '</div>';
@@ -194,11 +192,9 @@
 
       try {
         // First create a user
-        const testEmail = 'test-' + Date.now() + '@gmail.com';
-        const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-          email: testEmail,
-          password: 'testpassword123'
-        });
+        result.innerHTML = '<div class="warning">⚠️ Please enter a real email address to test profile creation</div>';
+        result.innerHTML += '<div class="warning">⚠️ Test email generation has been disabled</div>';
+        return;
 
         if (authError) {
           result.innerHTML = '<div class="error">❌ Auth error: ' + authError.message + '</div>';
