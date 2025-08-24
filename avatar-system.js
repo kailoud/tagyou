@@ -73,6 +73,22 @@ class AvatarSystem {
     try {
       console.log('🔐 Avatar System: Initializing Supabase...');
 
+      // Wait for Supabase to be available
+      let attempts = 0;
+      const maxAttempts = 50; // 5 seconds max wait
+
+      while (!window.supabase && attempts < maxAttempts) {
+        console.log('🔐 Avatar System: Waiting for Supabase to be ready...', attempts + 1);
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+
+      if (!window.supabase) {
+        throw new Error('Supabase not available after waiting');
+      }
+
+      console.log('🔐 Avatar System: Supabase is ready, proceeding with initialization...');
+
       // Import the auth service
       const authModule = await import('./supabase-auth-service.js');
       console.log('🔐 Avatar System: Auth module imported:', authModule);
@@ -82,11 +98,8 @@ class AvatarSystem {
       console.log('🔐 Avatar System: Auth service assigned:', this.authService);
 
       // Set the global supabase instance for the auth service
-      if (window.supabase) {
-        authModule.setSupabaseInstance(window.supabase);
-        console.log('🔐 Avatar System: Supabase instance set');
-      }
-      console.log('✅ Avatar System: Auth service imported');
+      authModule.setSupabaseInstance(window.supabase);
+      console.log('🔐 Avatar System: Supabase instance set');
 
       // Initialize the auth service
       const initialized = await this.authService.initialize();
@@ -874,7 +887,7 @@ class AvatarSystem {
         }
 
         // Step 2: Supabase Signup
-        if (this.authService) {
+        if (this.authService && this.authService.isInitialized) {
           console.log('🔐 Avatar System: Step 2 - Attempting Supabase signup...');
           console.log('🔐 Avatar System: Auth service available:', !!this.authService);
           console.log('🔐 Avatar System: Auth service type:', typeof this.authService);
@@ -897,22 +910,9 @@ class AvatarSystem {
             this.authError = error.message || 'Sign up failed. Please try again.';
           }
         } else {
-          // Fallback signup (for testing)
-          console.log('🔐 Avatar System: Step 2 - Using fallback signup...');
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          const user = {
-            id: Math.random().toString(36).substr(2, 9),
-            email: this.formData.email,
-            user_metadata: {
-              full_name: this.formData.email.split('@')[0].charAt(0).toUpperCase() + this.formData.email.split('@')[0].slice(1)
-            }
-          };
-
-          this.authSuccess = '🎉 Account created successfully!';
-          sessionStorage.setItem('supabase_user', JSON.stringify(user));
-          this.user = user;
-          this.closeAuthModal();
-          this.renderDropdown();
+          console.error('🔐 Avatar System: Auth service not properly initialized');
+          this.authError = 'Authentication service not ready. Please refresh the page and try again.';
+          return;
         }
 
       } else {
@@ -925,7 +925,7 @@ class AvatarSystem {
         }
 
         // Step 2: Supabase Signin
-        if (this.authService) {
+        if (this.authService && this.authService.isInitialized) {
           console.log('🔐 Avatar System: Step 2 - Attempting Supabase signin...');
           try {
             const result = await this.authService.signIn(this.formData.email, this.formData.password);
@@ -945,22 +945,9 @@ class AvatarSystem {
             this.authError = error.message || 'Sign in failed. Please check your credentials.';
           }
         } else {
-          // Fallback signin (for testing)
-          console.log('🔐 Avatar System: Step 2 - Using fallback signin...');
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          const user = {
-            id: Math.random().toString(36).substr(2, 9),
-            email: this.formData.email,
-            user_metadata: {
-              full_name: this.formData.email.split('@')[0].charAt(0).toUpperCase() + this.formData.email.split('@')[0].slice(1)
-            }
-          };
-
-          this.authSuccess = '🎉 Signed in successfully! Welcome back!';
-          sessionStorage.setItem('supabase_user', JSON.stringify(user));
-          this.user = user;
-          this.closeAuthModal();
-          this.renderDropdown();
+          console.error('🔐 Avatar System: Auth service not properly initialized');
+          this.authError = 'Authentication service not ready. Please refresh the page and try again.';
+          return;
         }
       }
     } catch (error) {
