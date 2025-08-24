@@ -172,6 +172,12 @@ class AvatarSystem {
     }
   }
 
+  // Email validation function
+  isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
   // Fallback auth service for when the module is missing
   createFallbackAuthService() {
     return {
@@ -726,6 +732,12 @@ class AvatarSystem {
       emailInput.addEventListener('input', (e) => {
         console.log('INPUT DEBUG: Email changed:', e.target.value);
         this.formData.email = e.target.value;
+
+        // Reset styling when user starts typing
+        if (e.target.style.borderColor === 'rgb(239, 68, 68)') {
+          e.target.style.borderColor = '#d1d5db';
+          e.target.placeholder = 'Enter your email';
+        }
       });
     }
 
@@ -776,9 +788,20 @@ class AvatarSystem {
           return;
         }
 
-        if (!this.formData.email.includes('@')) {
-          this.authError = 'Please enter a valid email address';
+        if (!this.isValidEmail(this.formData.email)) {
+          this.authError = 'Please enter a valid email address (e.g., user@domain.com)';
           console.log('AUTH DEBUG: Validation failed - invalid email format');
+          // Clear email field and focus on it
+          this.formData.email = '';
+          this.renderAuthModal();
+          setTimeout(() => {
+            const emailInput = document.querySelector('#auth-email');
+            if (emailInput) {
+              emailInput.focus();
+              emailInput.placeholder = 'Enter a valid email address';
+              emailInput.style.borderColor = '#ef4444';
+            }
+          }, 100);
           return;
         }
 
@@ -822,9 +845,20 @@ class AvatarSystem {
           return;
         }
 
-        if (!this.formData.email.includes('@')) {
-          this.authError = 'Please enter a valid email address';
+        if (!this.isValidEmail(this.formData.email)) {
+          this.authError = 'Please enter a valid email address (e.g., user@domain.com)';
           console.log('AUTH DEBUG: Validation failed - invalid email format');
+          // Clear email field and focus on it
+          this.formData.email = '';
+          this.renderAuthModal();
+          setTimeout(() => {
+            const emailInput = document.querySelector('#auth-email');
+            if (emailInput) {
+              emailInput.focus();
+              emailInput.placeholder = 'Enter a valid email address';
+              emailInput.style.borderColor = '#ef4444';
+            }
+          }, 100);
           return;
         }
 
