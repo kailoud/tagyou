@@ -18,6 +18,8 @@ class AvatarSystem {
     this.dropdownRef = null;
     this.authService = null;
     this.rememberMe = false; // Remember Me functionality
+    this.userTier = 'Basic'; // 'Basic' or 'Premium'
+    this.isPremium = false;
 
     // UK Carnival data
     this.ukCarnivals = [
@@ -285,6 +287,117 @@ class AvatarSystem {
     }).catch(error => {
       console.warn('AUTH DEBUG: Background initialization failed:', error);
     });
+    
+    // Check premium status after user is loaded
+    this.checkPremiumStatus();
+  }
+
+  async checkPremiumStatus() {
+    try {
+      if (!this.user || !this.user.email) {
+        this.setUserTier('Basic');
+        return;
+      }
+
+      // First check localStorage for premium status (for immediate updates after payment)
+      const premiumStatus = localStorage.getItem(`premium_${this.user.email}`);
+      if (premiumStatus === 'true') {
+        console.log('💎 Premium user detected in avatar system from localStorage:', this.user.email);
+        this.setUserTier('Premium');
+        return;
+      }
+
+      // Check Supabase for premium status
+      if (window.PremiumUsersService) {
+        try {
+          const isPremium = await window.PremiumUsersService.isPremiumUser(this.user.email);
+          if (isPremium) {
+            console.log('💎 Premium user detected in avatar system from Supabase:', this.user.email);
+            this.setUserTier('Premium');
+            // Cache in localStorage for faster future checks
+            localStorage.setItem(`premium_${this.user.email}`, 'true');
+            return;
+          }
+        } catch (error) {
+          console.log('⚠️ Supabase check failed in avatar system, falling back to local list:', error);
+        }
+      } else {
+        // Wait for PremiumUsersService to be loaded
+        console.log('⏳ PremiumUsersService not loaded yet, waiting...');
+        let attempts = 0;
+        const maxAttempts = 10;
+        while (attempts < maxAttempts && !window.PremiumUsersService) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+        
+        if (window.PremiumUsersService) {
+          try {
+            const isPremium = await window.PremiumUsersService.isPremiumUser(this.user.email);
+            if (isPremium) {
+              console.log('💎 Premium user detected in avatar system from Supabase (after waiting):', this.user.email);
+              this.setUserTier('Premium');
+              localStorage.setItem(`premium_${this.user.email}`, 'true');
+              return;
+            }
+          } catch (error) {
+            console.log('⚠️ Supabase check failed after waiting, falling back to local list:', error);
+          }
+        }
+      }
+
+      // Fallback to local premium emails list
+      const premiumEmails = [
+        'kaycheckmate@gmail.com',
+        'truesliks@gmail.com',
+        // Add payment emails here - these users have paid for premium
+        // Add your payment email below:
+        // 'your-payment-email@example.com',
+        // Add more premium emails here
+      ];
+
+      if (premiumEmails.includes(this.user.email.toLowerCase())) {
+        console.log('💎 Premium user detected in avatar system from local list:', this.user.email);
+        this.setUserTier('Premium');
+        // Store in localStorage for future checks
+        localStorage.setItem(`premium_${this.user.email}`, 'true');
+      } else {
+        console.log('📱 Basic user detected in avatar system:', this.user.email);
+        this.setUserTier('Basic');
+      }
+    } catch (error) {
+      console.error('❌ Error checking premium status:', error);
+      this.setUserTier('Basic');
+    }
+  }
+
+  setPremiumStatus(email, isPremium) {
+    if (email) {
+      localStorage.setItem(`premium_${email}`, isPremium ? 'true' : 'false');
+      console.log(`💎 Avatar system premium status set for ${email}: ${isPremium ? 'Premium' : 'Basic'}`);
+      
+      // Update current user tier if email matches
+      if (this.user?.email === email) {
+        this.setUserTier(isPremium ? 'Premium' : 'Basic');
+      }
+    }
+  }
+
+  setUserTier(tier) {
+    this.userTier = tier;
+    this.isPremium = tier === 'Premium';
+    console.log(`🎯 Avatar system user tier set to: ${tier}`);
+    
+    // Update dropdown if it's currently open
+    if (this.isDropdownOpen) {
+      this.renderDropdown();
+    }
+  }
+
+  // Force refresh premium status from Supabase
+  async refreshPremiumStatus() {
+    console.log('🔄 Forcing premium status refresh...');
+    await this.checkPremiumStatus();
   }
 
   async checkUser() {
@@ -301,6 +414,8 @@ class AvatarSystem {
             this.user = userData.user;
             this.rememberMe = true;
             console.log('AUTH DEBUG: Restored remembered user session');
+            // Check premium status after user is loaded
+            await this.checkPremiumStatus();
             return;
           } else {
             // Session expired, remove it
@@ -324,6 +439,9 @@ class AvatarSystem {
           console.log('AUTH DEBUG: Current user from session storage:', this.user?.email || 'none');
         }
       }
+      
+      // Check premium status after user is loaded
+      await this.checkPremiumStatus();
     } catch (error) {
       console.error('AUTH DEBUG: Error checking user:', error);
     } finally {
@@ -397,6 +515,14 @@ class AvatarSystem {
   toggleDropdown() {
     console.log('UI DEBUG: Toggle dropdown called, current state:', this.isDropdownOpen);
     this.isDropdownOpen = !this.isDropdownOpen;
+    
+    // Force check premium status when dropdown opens (non-blocking)
+    if (this.isDropdownOpen && this.user) {
+      this.refreshPremiumStatus().catch(error => {
+        console.error('Error refreshing premium status:', error);
+      });
+    }
+    
     this.renderDropdown();
   }
 
@@ -449,8 +575,13 @@ class AvatarSystem {
             <h3 style="font-weight: bold; font-size: 18px; margin: 0;">${this.user.user_metadata?.full_name || 'User'}</h3>
             <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin: 4px 0;">${this.user.email}</p>
             <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
-              <i class="fas fa-star" style="color: #fbbf24;"></i>
-              <span style="font-size: 14px; color: rgba(255,255,255,0.9);">Premium User</span>
+              ${this.isPremium ? `
+                <i class="fas fa-star" style="color: #fbbf24;"></i>
+                <span style="font-size: 14px; color: rgba(255,255,255,0.9);">Premium User</span>
+              ` : `
+                <i class="fas fa-user" style="color: #9ca3af;"></i>
+                <span style="font-size: 14px; color: rgba(255,255,255,0.9);">Basic User</span>
+              `}
             </div>
           </div>
         </div>
@@ -490,11 +621,20 @@ class AvatarSystem {
       <div style="background: #f9fafb; padding: 16px; border-top: 1px solid #f3f4f6;">
         <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #6b7280; margin-bottom: 12px;">
           <span>Joined Today</span>
-          <span>Free Plan</span>
+          <span>${this.isPremium ? 'Premium Plan' : 'Free Plan'}</span>
         </div>
-        <button class="avatar-upgrade-btn" style="width: 100%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; padding: 8px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s;">
-          Upgrade 💎
-        </button>
+        ${this.isPremium ? `
+          <button class="avatar-premium-btn" style="width: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; padding: 8px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: default; transition: all 0.3s;">
+            Premium 💎
+          </button>
+        ` : `
+          <button class="avatar-upgrade-btn" style="width: 100%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; padding: 8px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s;">
+            Upgrade 💎
+          </button>
+          <button class="refresh-premium-btn" style="width: 100%; background: #f3f4f6; color: #6b7280; padding: 4px 8px; border: none; border-radius: 4px; font-size: 12px; margin-top: 8px; cursor: pointer; transition: all 0.3s;">
+            🔄 Refresh Premium Status
+          </button>
+        `}
       </div>
     `;
   }
@@ -580,6 +720,9 @@ class AvatarSystem {
         this.handleSignOut();
       } else if (e.target.closest('.avatar-upgrade-btn')) {
         this.handleUpgradeClick();
+      } else if (e.target.closest('.refresh-premium-btn')) {
+        console.log('UI DEBUG: Refresh premium status button clicked');
+        this.refreshPremiumStatus();
       } else if (e.target.closest('.carnival-button')) {
         this.toggleCarnivalDropdown();
       } else if (e.target.closest('.auth-modal') && !e.target.closest('.auth-modal > div')) {
