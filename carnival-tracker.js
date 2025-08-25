@@ -341,10 +341,17 @@ class CarnivalTracker {
         email = window.currentUser.email;
         userId = window.currentUser.id || 'anonymous';
         console.log('✅ Got email from window.currentUser:', email);
-      } else if (window.supabase?.auth?.session()?.user?.email) {
-        email = window.supabase.auth.session().user.email;
-        userId = window.supabase.auth.session().user.id || 'anonymous';
-        console.log('✅ Got email from Supabase session:', email);
+      } else if (window.supabase?.auth?.getSession) {
+        try {
+          const { data: { session } } = await window.supabase.auth.getSession();
+          if (session?.user?.email) {
+            email = session.user.email;
+            userId = session.user.id || 'anonymous';
+            console.log('✅ Got email from Supabase session:', email);
+          }
+        } catch (e) {
+          console.log('❌ Failed to get Supabase session:', e);
+        }
       } else {
         // Try to get from localStorage or sessionStorage
         const storedUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
