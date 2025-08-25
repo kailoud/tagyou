@@ -14,7 +14,7 @@
 /* Avatar System Styles */
 .avatar-container {
   position: fixed !important;
-  top: 50px !important;
+  top: 35px !important;
   right: 40px !important;
   z-index: 9999 !important;
 }
@@ -82,10 +82,10 @@
   left: 0;
   right: 0;
   width: 100vw;
-  height: 30px;
-  background-color: #6b7280;
+  height: 15px;
+  background-color: transparent;
   z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
 }
 
 /* Reset and base styles */
@@ -117,7 +117,7 @@ body {
 /* Centered Controls Container */
 .controls-container {
   position: fixed;
-  top: 50px;
+  top: 35px;
   left: 0;
   right: 0;
   z-index: 1000;
