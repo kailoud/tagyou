@@ -325,6 +325,8 @@ class AvatarSystem {
       const premiumEmails = [
         'kaycheckmate@gmail.com',
         'truesliks@gmail.com',
+        'test@tagyou.app', // Sample test user
+        'demo@tagyou.app', // Demo premium user
         // Add more premium emails here
       ];
 
