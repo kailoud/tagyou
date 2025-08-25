@@ -89,6 +89,8 @@ class Compass {
   rotateCompass() {
     const compassRose = document.getElementById('compassRose');
     if (compassRose) {
+      // Clear any existing transforms and apply rotation
+      compassRose.style.transform = '';
       compassRose.style.transform = `rotate(${this.rotation}deg)`;
       console.log('🧭 Rotating compass to:', this.rotation + '°');
     } else {
