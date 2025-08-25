@@ -28,7 +28,10 @@ class Compass {
     // Start hidden by default
     compassContainer.style.display = 'none';
 
-    console.log('🧭 Compass created successfully');
+    // Initialize to point north
+    this.resetToNorth();
+
+    console.log('🧭 Compass created successfully and pointing north');
   }
 
   // Get compass HTML
@@ -87,6 +90,9 @@ class Compass {
     const compassRose = document.getElementById('compassRose');
     if (compassRose) {
       compassRose.style.transform = `rotate(${this.rotation}deg)`;
+      console.log('🧭 Rotating compass to:', this.rotation + '°');
+    } else {
+      console.log('🧭 Warning: Compass rose element not found');
     }
   }
 
@@ -138,6 +144,12 @@ class Compass {
     this.rotation = 0;
     this.rotateCompass();
     console.log('🧭 Fixed scale compass pointing north (0°)');
+
+    // Verify the rotation was applied
+    const compassRose = document.getElementById('compassRose');
+    if (compassRose) {
+      console.log('🧭 Compass rotation applied:', compassRose.style.transform);
+    }
   }
 
   // Get cardinal direction
