@@ -71,7 +71,7 @@ async function checkSupabaseConnection() {
 export class PremiumUsersService {
   static async getPremiumUser(email) {
     try {
-      await await checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('premium_users')
@@ -94,7 +94,7 @@ export class PremiumUsersService {
 
   static async addPremiumUser(email, paymentData = {}) {
     try {
-      await await checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const premiumUser = {
         email: email.toLowerCase(),
@@ -131,7 +131,7 @@ export class PremiumUsersService {
 
   static async updatePremiumUser(email, updates) {
     try {
-      await await checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('premium_users')
@@ -154,7 +154,7 @@ export class PremiumUsersService {
 
   static async removePremiumUser(email) {
     try {
-      await await checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { error } = await supabase
         .from('premium_users')
@@ -176,7 +176,7 @@ export class PremiumUsersService {
 
   static async getAllPremiumUsers() {
     try {
-      await await checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('premium_users')
@@ -232,7 +232,7 @@ export class PremiumUsersService {
 export class FoodStallsService {
   static async getAllFoodStalls() {
     try {
-      await await checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('food_stalls')
@@ -254,7 +254,7 @@ export class FoodStallsService {
 
   static async addFoodStall(foodStall) {
     try {
-      await await checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('food_stalls')
@@ -605,7 +605,7 @@ export class UserFavoritesService {
 
 // Real-time Service
 export class RealtimeService {
-  static subscribeToFoodStalls(callback) {
+  static async subscribeToFoodStalls(callback) {
     try {
       await checkSupabaseConnection();
 
@@ -625,7 +625,7 @@ export class RealtimeService {
     }
   }
 
-  static subscribeToArtists(callback) {
+  static async subscribeToArtists(callback) {
     try {
       await checkSupabaseConnection();
 
@@ -645,7 +645,7 @@ export class RealtimeService {
     }
   }
 
-  static subscribeToFloatTrucks(callback) {
+  static async subscribeToFloatTrucks(callback) {
     try {
       await checkSupabaseConnection();
 
@@ -665,7 +665,7 @@ export class RealtimeService {
     }
   }
 
-  static subscribeToUserFavorites(userId, callback) {
+  static async subscribeToUserFavorites(userId, callback) {
     try {
       await checkSupabaseConnection();
 
