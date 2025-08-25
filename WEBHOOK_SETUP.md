@@ -16,9 +16,23 @@ ngrok http 3000
 You'll see something like: `https://abc123.ngrok.io`
 
 ### 4. Set up webhook in Stripe Dashboard
+
+#### For Local Development (ngrok):
 1. Go to **Stripe Dashboard** → **Developers** → **Webhooks**
 2. Click **"+ Add endpoint"**
 3. **Endpoint URL**: `https://your-ngrok-url.ngrok.io/api/webhook`
+4. **Events to send**:
+   - ✅ `checkout.session.completed`
+   - ✅ `customer.subscription.created`
+   - ✅ `customer.subscription.updated`
+   - ✅ `customer.subscription.deleted`
+   - ✅ `payment_intent.succeeded`
+   - ✅ `payment_intent.payment_failed`
+
+#### For Production (Netlify):
+1. Go to **Stripe Dashboard** → **Developers** → **Webhooks**
+2. Click **"+ Add endpoint"**
+3. **Endpoint URL**: `https://yourdomain.com/.netlify/functions/webhook`
 4. **Events to send**:
    - ✅ `checkout.session.completed`
    - ✅ `customer.subscription.created`
@@ -69,21 +83,39 @@ npm start
 ## 🎯 What Webhooks Do
 
 ### `checkout.session.completed`
-- Triggered when payment is successful
-- Updates user premium status
-- Sends confirmation email
+- ✅ **Triggered when payment is successful**
+- ✅ **Logs customer email and user ID**
+- ✅ **Extracts offer type from metadata**
+- ✅ **Ready for database updates**
+- 🔄 **Future**: Update user premium status in database
+- 🔄 **Future**: Send confirmation email
 
 ### `customer.subscription.created`
-- Triggered when subscription starts
-- Sets up recurring billing
+- ✅ **Triggered when subscription starts**
+- ✅ **Logs subscription details**
+- 🔄 **Future**: Set up recurring billing
+- 🔄 **Future**: Activate premium features
 
 ### `customer.subscription.updated`
-- Triggered when subscription changes
-- Updates billing information
+- ✅ **Triggered when subscription changes**
+- ✅ **Logs subscription status changes**
+- 🔄 **Future**: Update billing information
+- 🔄 **Future**: Modify premium access
 
 ### `customer.subscription.deleted`
-- Triggered when subscription is cancelled
-- Removes premium access
+- ✅ **Triggered when subscription is cancelled**
+- ✅ **Logs cancellation details**
+- 🔄 **Future**: Remove premium access
+- 🔄 **Future**: Send cancellation email
+
+### `payment_intent.succeeded`
+- ✅ **Triggered when payment succeeds**
+- ✅ **Logs payment amount and details**
+
+### `payment_intent.payment_failed`
+- ✅ **Triggered when payment fails**
+- ✅ **Logs failure reason**
+- 🔄 **Future**: Handle failed payment retry
 
 ## 🛡️ Security
 

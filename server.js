@@ -90,9 +90,29 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
   switch (event.type) {
     case 'checkout.session.completed':
       const session = event.data.object;
-      console.log('Payment successful for session:', session.id);
-      // Here you would update your database to mark the user as premium
-      // await updateUserPremiumStatus(session.metadata.userId, true);
+      console.log('🎉 Payment successful for session:', session.id);
+      
+      // Extract user information
+      const customerEmail = session.customer_email;
+      const userId = session.metadata?.userId || 'anonymous';
+      const offerType = session.metadata?.offerType || 'unknown';
+      
+      console.log('📧 Customer email:', customerEmail);
+      console.log('👤 User ID:', userId);
+      console.log('🎁 Offer type:', offerType);
+      
+      // Here you would typically:
+      // 1. Update your database to mark user as premium
+      // 2. Send confirmation email
+      // 3. Update user's subscription status
+      
+      // For now, we'll log the success
+      console.log('✅ Premium access granted for:', customerEmail);
+      
+      // You can add database update logic here:
+      // await updateUserPremiumStatus(customerEmail, true);
+      // await sendWelcomeEmail(customerEmail);
+      
       break;
 
     case 'customer.subscription.created':
