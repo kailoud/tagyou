@@ -749,7 +749,9 @@ class AvatarSystem {
         this.refreshPremiumStatus();
       } else if (e.target.closest('.profile-edit-btn')) {
         console.log('UI DEBUG: Profile edit button clicked');
-        this.showProfileEditModal();
+        this.showProfileEditModal().catch(error => {
+          console.error('Error showing profile edit modal:', error);
+        });
       } else if (e.target.closest('.carnival-button')) {
         this.toggleCarnivalDropdown();
       } else if (e.target.closest('.auth-modal') && !e.target.closest('.auth-modal > div')) {
@@ -1468,17 +1470,45 @@ class AvatarSystem {
     });
   }
 
-  showProfileEditModal() {
+  async showProfileEditModal() {
     // Remove any existing modals
     const existingModal = document.querySelector('.profile-edit-modal');
     if (existingModal) {
       existingModal.remove();
     }
 
-    // Get current user data
-    const currentName = this.user?.user_metadata?.full_name || '';
+    // Get current user data from multiple sources
+    let currentName = this.user?.user_metadata?.full_name || '';
     const currentEmail = this.user?.email || '';
-    const currentAvatar = this.user?.user_metadata?.avatar_url || '';
+    let currentAvatar = this.user?.user_metadata?.avatar_url || '';
+
+    // Try to get saved profile data
+    if (this.user) {
+      // Check localStorage first
+      const storedProfile = localStorage.getItem(`profile_${this.user.email}`);
+      if (storedProfile) {
+        try {
+          const profile = JSON.parse(storedProfile);
+          if (profile.full_name) currentName = profile.full_name;
+          if (profile.avatar_url) currentAvatar = profile.avatar_url;
+        } catch (error) {
+          console.error('Error parsing stored profile:', error);
+        }
+      }
+
+      // Check Supabase profile if available
+      if (window.profileService) {
+        try {
+          const profile = await window.profileService.getUserProfile(this.user.id);
+          if (profile) {
+            if (profile.avatar_url) currentAvatar = profile.avatar_url;
+            // Note: We don't have full_name in the profiles table, so we keep the one from metadata/localStorage
+          }
+        } catch (error) {
+          console.error('Error loading profile from Supabase:', error);
+        }
+      }
+    }
 
     const modal = document.createElement('div');
     modal.className = 'profile-edit-modal';
