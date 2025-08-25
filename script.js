@@ -177,6 +177,22 @@ async function loadInitialData(FoodStallsService, ArtistsService, FloatTrucksSer
     console.log('✅ Loaded float trucks from Supabase:', floatTrucksData.length);
     console.log('📊 Float trucks data:', floatTrucksData);
 
+    // If no data from Supabase, load sample data for testing
+    if (foodStallsData.length === 0) {
+      console.log('📝 Loading sample food stalls data...');
+      foodStallsData = getSampleFoodStalls();
+    }
+    
+    if (artistsData.length === 0) {
+      console.log('📝 Loading sample artists data...');
+      artistsData = getSampleArtists();
+    }
+    
+    if (floatTrucksData.length === 0) {
+      console.log('📝 Loading sample float trucks data...');
+      floatTrucksData = getSampleFloatTrucks();
+    }
+
     // Check if data is properly structured
     if (foodStallsData.length > 0) {
       console.log('🔍 Sample food stall structure:', foodStallsData[0]);
@@ -188,14 +204,187 @@ async function loadInitialData(FoodStallsService, ArtistsService, FloatTrucksSer
       console.log('🔍 Sample float truck structure:', floatTrucksData[0]);
     }
 
+    // Populate the pull-up panel with data
+    populatePullUpPanel();
+
   } catch (error) {
     console.error('❌ Error loading data from Supabase:', error);
-    console.log('🔄 No data available - please set up your database tables');
-    // Initialize empty arrays
-    foodStallsData = [];
-    artistsData = [];
-    floatTrucksData = [];
+    console.log('🔄 Loading sample data for testing...');
+    // Initialize with sample data
+    foodStallsData = getSampleFoodStalls();
+    artistsData = getSampleArtists();
+    floatTrucksData = getSampleFloatTrucks();
+    
+    // Populate the pull-up panel with sample data
+    populatePullUpPanel();
   }
+}
+
+// Sample data functions for testing
+function getSampleFoodStalls() {
+  return [
+    {
+      id: 1,
+      name: "Caribbean Delights",
+      cuisine: "Caribbean",
+      location: "Ladbroke Grove",
+      description: "Authentic Caribbean jerk chicken and rice & peas",
+      rating: 4.8,
+      price_range: "££",
+      image_url: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=150&h=100&fit=crop"
+    },
+    {
+      id: 2,
+      name: "Street Food Fusion",
+      cuisine: "International",
+      location: "Portobello Road",
+      description: "Global street food with a carnival twist",
+      rating: 4.6,
+      price_range: "£",
+      image_url: "https://images.unsplash.com/photo-1504674900244-1b47f22f8f54?w=150&h=100&fit=crop"
+    },
+    {
+      id: 3,
+      name: "Sweet Treats Corner",
+      cuisine: "Desserts",
+      location: "Westbourne Park",
+      description: "Homemade cakes, ice cream, and carnival sweets",
+      rating: 4.9,
+      price_range: "£",
+      image_url: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=150&h=100&fit=crop"
+    }
+  ];
+}
+
+function getSampleArtists() {
+  return [
+    {
+      id: 1,
+      name: "Steel Pulse",
+      genre: "Reggae",
+      stage: "Main Stage",
+      time: "14:00",
+      description: "Legendary reggae band from Birmingham",
+      image_url: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=100&fit=crop"
+    },
+    {
+      id: 2,
+      name: "Soca Warriors",
+      genre: "Soca",
+      stage: "Dance Arena",
+      time: "16:30",
+      description: "High-energy soca music and dance",
+      image_url: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=150&h=100&fit=crop"
+    },
+    {
+      id: 3,
+      name: "Carnival Collective",
+      genre: "World Music",
+      stage: "Community Stage",
+      time: "18:00",
+      description: "Local artists celebrating carnival culture",
+      image_url: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=100&fit=crop"
+    }
+  ];
+}
+
+function getSampleFloatTrucks() {
+  return [
+    {
+      id: 1,
+      name: "Dragon Float",
+      theme: "Mythical Creatures",
+      route: "Main Parade Route",
+      description: "Spectacular dragon float with fire effects",
+      image_url: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=150&h=100&fit=crop"
+    },
+    {
+      id: 2,
+      name: "Ocean Waves",
+      theme: "Under the Sea",
+      route: "Secondary Route",
+      description: "Beautiful ocean-themed float with marine life",
+      image_url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=150&h=100&fit=crop"
+    },
+    {
+      id: 3,
+      name: "Cultural Heritage",
+      theme: "Caribbean History",
+      route: "Main Parade Route",
+      description: "Celebrating Caribbean culture and history",
+      image_url: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=150&h=100&fit=crop"
+    }
+  ];
+}
+
+// Populate the pull-up panel with data
+function populatePullUpPanel() {
+  console.log('🎭 Populating pull-up panel with festival data...');
+  
+  // Populate food stalls
+  const foodStallsList = document.getElementById('food-stalls-list');
+  if (foodStallsList && foodStallsData.length > 0) {
+    foodStallsList.innerHTML = foodStallsData.map(stall => `
+      <div class="content-item">
+        <div class="item-image">
+          <img src="${stall.image_url}" alt="${stall.name}">
+        </div>
+        <div class="item-content">
+          <div class="item-icon">🍽️</div>
+          <div class="item-info">
+            <h5>${stall.name}</h5>
+            <p>${stall.description}</p>
+            <div class="item-location">📍 ${stall.location}</div>
+            <div class="item-rating">⭐ ${stall.rating} • ${stall.price_range}</div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Populate artists
+  const artistsList = document.getElementById('artists-list');
+  if (artistsList && artistsData.length > 0) {
+    artistsList.innerHTML = artistsData.map(artist => `
+      <div class="content-item">
+        <div class="item-image">
+          <img src="${artist.image_url}" alt="${artist.name}">
+        </div>
+        <div class="item-content">
+          <div class="item-icon">🎵</div>
+          <div class="item-info">
+            <h5>${artist.name}</h5>
+            <p>${artist.description}</p>
+            <div class="item-location">🎪 ${artist.stage} • 🕐 ${artist.time}</div>
+            <div class="item-genre">🎶 ${artist.genre}</div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Populate float trucks
+  const floatTrucksList = document.getElementById('float-trucks-list');
+  if (floatTrucksList && floatTrucksData.length > 0) {
+    floatTrucksList.innerHTML = floatTrucksData.map(truck => `
+      <div class="content-item">
+        <div class="item-image">
+          <img src="${truck.image_url}" alt="${truck.name}">
+        </div>
+        <div class="item-content">
+          <div class="item-icon">🚛</div>
+          <div class="item-info">
+            <h5>${truck.name}</h5>
+            <p>${truck.description}</p>
+            <div class="item-location">📍 ${truck.route}</div>
+            <div class="item-theme">🎨 ${truck.theme}</div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  console.log('✅ Pull-up panel populated with festival data!');
 }
 
 // Set up real-time listeners
@@ -230,17 +419,17 @@ function setupRealtimeListeners(RealtimeService) {
   }
 }
 
-// Data loading functions - now empty for custom schema implementation
+// Data loading functions - now using sample data for testing
 function getHardcodedFoodStalls() {
-  return [];
+  return getSampleFoodStalls();
 }
 
 function getHardcodedArtists() {
-  return [];
+  return getSampleArtists();
 }
 
 function getHardcodedFloatTrucks() {
-  return [];
+  return getSampleFloatTrucks();
 }
 
 // Initialize the map
