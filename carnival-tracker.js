@@ -68,6 +68,20 @@ class CarnivalTracker {
       notes: ""
     };
 
+    // Premium features
+    this.isPremium = false;
+    this.maxFreeMembers = 5;
+    this.premiumFeatures = {
+      unlimitedMembers: true,
+      realTimeGPS: true,
+      locationHistory: true,
+      customThemes: true,
+      voiceMessages: true,
+      emergencyAlerts: true,
+      analytics: true,
+      prioritySupport: true
+    };
+
     // Notting Hill Carnival specific areas
     this.carnivalAreas = [
       "Ladbroke Grove Station", "Westbourne Park", "Portobello Road",
@@ -201,6 +215,12 @@ class CarnivalTracker {
 
   addPerson() {
     if (this.newPerson.name && this.newPerson.phone && this.newPerson.relationship) {
+      // Check if user can add more people
+      if (!this.isPremium && this.people.length >= this.maxFreeMembers) {
+        this.showPremiumUpgrade();
+        return;
+      }
+
       const avatar = this.generateAvatar(this.newPerson.name);
       this.people.push({
         ...this.newPerson,
@@ -215,6 +235,113 @@ class CarnivalTracker {
       this.render();
       this.updateToolbarCount();
     }
+  }
+
+  showPremiumUpgrade() {
+    const modal = document.createElement('div');
+    modal.className = 'premium-upgrade-modal';
+    modal.innerHTML = `
+      <div class="premium-upgrade-overlay">
+        <div class="premium-upgrade-content">
+          <div class="premium-upgrade-header">
+            <div class="premium-badge">💎</div>
+            <h2>Upgrade to Premium</h2>
+            <p>Unlock unlimited squad members and advanced features</p>
+          </div>
+          
+          <div class="premium-features">
+            <div class="feature-item">
+              <i class="fas fa-users"></i>
+              <span>Unlimited squad members</span>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Real-time GPS tracking</span>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-history"></i>
+              <span>30-day location history</span>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-palette"></i>
+              <span>Custom themes & badges</span>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-microphone"></i>
+              <span>Voice messages</span>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>Emergency alerts</span>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-chart-line"></i>
+              <span>Advanced analytics</span>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-headset"></i>
+              <span>Priority support</span>
+            </div>
+          </div>
+          
+          <div class="premium-pricing">
+            <div class="price">£9.99</div>
+            <div class="period">per month</div>
+            <div class="trial">7-day free trial • Cancel anytime</div>
+          </div>
+          
+          <div class="premium-actions">
+            <button class="upgrade-btn" onclick="window.carnivalTracker.upgradeToPremium()">
+              <i class="fas fa-crown"></i>
+              Start Free Trial
+            </button>
+            <button class="close-premium-btn" onclick="this.closest('.premium-upgrade-modal').remove()">
+              Maybe Later
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+  }
+
+  upgradeToPremium() {
+    // Here you would integrate with your payment processor (Stripe, PayPal, etc.)
+    console.log('💎 Upgrading to Premium...');
+    
+    // For demo purposes, we'll simulate the upgrade
+    this.isPremium = true;
+    
+    // Remove the modal
+    const modal = document.querySelector('.premium-upgrade-modal');
+    if (modal) {
+      modal.remove();
+    }
+    
+    // Show success message
+    this.showPremiumSuccess();
+    
+    // Re-render with premium features
+    this.render();
+  }
+
+  showPremiumSuccess() {
+    const successDiv = document.createElement('div');
+    successDiv.className = 'premium-success';
+    successDiv.innerHTML = `
+      <div class="success-content">
+        <i class="fas fa-crown"></i>
+        <h3>Welcome to Premium!</h3>
+        <p>All premium features are now unlocked</p>
+      </div>
+    `;
+    
+    document.body.appendChild(successDiv);
+    
+    setTimeout(() => {
+      successDiv.remove();
+    }, 3000);
   }
 
   requestLocationSharing(personId) {
