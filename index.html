@@ -319,6 +319,22 @@
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Supabase SDK -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Initialize Supabase Client -->
+    <script src="supabase-config-secret.js"></script>
+    <script>
+      // Initialize Supabase client globally
+      if (window.supabase && window.supabaseConfig) {
+        window.supabaseClient = window.supabase.createClient(
+          window.supabaseConfig.supabaseUrl,
+          window.supabaseConfig.supabaseAnonKey
+        );
+        console.log('✅ Supabase client initialized globally');
+      } else {
+        console.warn('⚠️ Supabase config not available, will use fallback auth');
+      }
+    </script>
     <script src="avatar-system.js"></script>
     <script src="script.js"></script>
 

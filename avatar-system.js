@@ -192,13 +192,18 @@ class AvatarSystem {
           return null;
         }
       },
-      signIn: async (email, password) => {
-        console.log('AUTH DEBUG: Fallback signIn called with:', email);
-        try {
-          const { data, error } = await window.supabaseClient.auth.signInWithPassword({
-            email,
-            password
-          });
+              signIn: async (email, password) => {
+          console.log('AUTH DEBUG: Fallback signIn called with:', email);
+          try {
+            if (!window.supabaseClient) {
+              console.error('AUTH DEBUG: Supabase client not available');
+              return { success: false, error: 'Authentication service not available. Please refresh the page.' };
+            }
+            
+            const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+              email,
+              password
+            });
 
           console.log('AUTH DEBUG: Supabase signIn response:', { data, error });
 
@@ -217,13 +222,18 @@ class AvatarSystem {
           return { success: false, error: error.message };
         }
       },
-      signUp: async (email, password) => {
-        console.log('AUTH DEBUG: Fallback signUp called with:', email);
-        try {
-          const { data, error } = await window.supabaseClient.auth.signUp({
-            email,
-            password
-          });
+              signUp: async (email, password) => {
+          console.log('AUTH DEBUG: Fallback signUp called with:', email);
+          try {
+            if (!window.supabaseClient) {
+              console.error('AUTH DEBUG: Supabase client not available');
+              return { success: false, error: 'Authentication service not available. Please refresh the page.' };
+            }
+            
+            const { data, error } = await window.supabaseClient.auth.signUp({
+              email,
+              password
+            });
 
           console.log('AUTH DEBUG: Supabase signUp response:', { data, error });
 
@@ -237,10 +247,15 @@ class AvatarSystem {
           return { success: false, error: error.message };
         }
       },
-      signOut: async () => {
-        console.log('AUTH DEBUG: Fallback signOut called');
-        try {
-          const { error } = await window.supabaseClient.auth.signOut();
+              signOut: async () => {
+          console.log('AUTH DEBUG: Fallback signOut called');
+          try {
+            if (!window.supabaseClient) {
+              console.error('AUTH DEBUG: Supabase client not available');
+              return { success: false, error: 'Authentication service not available. Please refresh the page.' };
+            }
+            
+            const { error } = await window.supabaseClient.auth.signOut();
           if (error) {
             console.error('AUTH DEBUG: SignOut error:', error);
           }
