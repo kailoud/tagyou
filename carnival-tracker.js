@@ -55,7 +55,7 @@ class CarnivalTracker {
   async checkPremiumStatus() {
     try {
       // Get current user email
-      const currentUser = window.authService?.getCurrentUser();
+      const currentUser = window.avatarSystem?.user;
       const email = currentUser?.email || '';
       
       if (!email) {
@@ -158,7 +158,7 @@ class CarnivalTracker {
       }
       
       // Update current user tier if email matches
-      const currentUser = window.authService?.getCurrentUser();
+      const currentUser = window.avatarSystem?.user;
       if (currentUser?.email === email) {
         this.setUserTier(isPremium ? 'Premium' : 'Basic');
       }
@@ -451,12 +451,12 @@ class CarnivalTracker {
       // Show loading state
       this.showPaymentLoading();
 
-      // Get current user info from auth service with debugging
-      console.log('🔍 Debug: window.authService exists?', !!window.authService);
-      console.log('🔍 Debug: window.authService.getCurrentUser exists?', !!window.authService?.getCurrentUser);
+      // Get current user info from avatar system with debugging
+      console.log('🔍 Debug: window.avatarSystem exists?', !!window.avatarSystem);
+      console.log('🔍 Debug: window.avatarSystem.user exists?', !!window.avatarSystem?.user);
       
-      const currentUser = window.authService?.getCurrentUser();
-      console.log('🔍 Debug: currentUser from auth service:', currentUser);
+      const currentUser = window.avatarSystem?.user;
+      console.log('🔍 Debug: currentUser from avatar system:', currentUser);
       
       // Try multiple ways to get user email
       let email = '';
@@ -465,14 +465,10 @@ class CarnivalTracker {
       if (currentUser?.email) {
         email = currentUser.email;
         userId = currentUser.id || 'anonymous';
-        console.log('✅ Got email from auth service:', email);
-      } else if (window.currentUser?.email) {
-        email = window.currentUser.email;
-        userId = window.currentUser.id || 'anonymous';
-        console.log('✅ Got email from window.currentUser:', email);
-      } else if (window.supabase?.auth?.getSession) {
+        console.log('✅ Got email from avatar system:', email);
+      } else if (window.supabaseClient?.auth?.getSession) {
         try {
-          const { data: { session } } = await window.supabase.auth.getSession();
+          const { data: { session } } = await window.supabaseClient.auth.getSession();
           if (session?.user?.email) {
             email = session.user.email;
             userId = session.user.id || 'anonymous';
@@ -483,12 +479,12 @@ class CarnivalTracker {
         }
       } else {
         // Try to get from localStorage or sessionStorage
-        const storedUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+        const storedUser = localStorage.getItem('tagyou_remembered_user') || sessionStorage.getItem('supabase_user');
         if (storedUser) {
           try {
             const parsedUser = JSON.parse(storedUser);
-            email = parsedUser.email || '';
-            userId = parsedUser.id || 'anonymous';
+            email = parsedUser.user?.email || parsedUser.email || '';
+            userId = parsedUser.user?.id || parsedUser.id || 'anonymous';
             console.log('✅ Got email from storage:', email);
           } catch (e) {
             console.log('❌ Failed to parse stored user:', e);
@@ -684,8 +680,8 @@ class CarnivalTracker {
   }
 
   getCurrentUserId() {
-    // Get current user ID from auth service
-    const currentUser = window.authService?.getCurrentUser();
+    // Get current user ID from avatar system
+    const currentUser = window.avatarSystem?.user;
     return currentUser?.id || 'anonymous';
   }
 
@@ -756,7 +752,7 @@ class CarnivalTracker {
       this.showPaymentLoading();
 
       // Get current user ID
-      const currentUser = window.authService?.getCurrentUser();
+      const currentUser = window.avatarSystem?.user;
       const userId = currentUser?.id || 'anonymous';
 
       // Create checkout session via API
