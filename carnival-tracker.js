@@ -285,15 +285,18 @@ class CarnivalTracker {
           </div>
           
           <div class="premium-pricing">
+            <div class="promotional-badge">🎉 LIMITED TIME OFFER</div>
+            <div class="original-price">~~£29.97~~</div>
             <div class="price">£9.99</div>
-            <div class="period">per month</div>
-            <div class="trial">7-day free trial • Cancel anytime</div>
+            <div class="period">for 3 months</div>
+            <div class="then-price">Then £9.99/month</div>
+            <div class="savings">Save £19.98 • Cancel anytime</div>
           </div>
           
           <div class="premium-actions">
             <button class="upgrade-btn" onclick="window.carnivalTracker.upgradeToPremium()">
               <i class="fas fa-crown"></i>
-              Start Free Trial
+              Get 3-Month Deal
             </button>
             <button class="close-premium-btn" onclick="this.closest('.premium-upgrade-modal').remove()">
               Maybe Later
@@ -309,7 +312,7 @@ class CarnivalTracker {
   upgradeToPremium() {
     // For static site deployment, use Stripe Checkout directly
     console.log('💎 Upgrading to Premium...');
-    
+
     // Create Stripe checkout session using Stripe's hosted checkout
     this.createStripeCheckoutSession();
   }
@@ -322,7 +325,7 @@ class CarnivalTracker {
       // For static sites, we'll use a simple redirect to Stripe
       // In production, you'd need a backend API endpoint
       const checkoutUrl = this.getStripeCheckoutUrl();
-      
+
       if (checkoutUrl) {
         // Redirect to Stripe Checkout
         window.location.href = checkoutUrl;
@@ -339,13 +342,13 @@ class CarnivalTracker {
     // For demo purposes, show a message about setting up Stripe
     // In production, this would be a real Stripe checkout URL
     const stripePublishableKey = 'pk_test_your_stripe_publishable_key_here';
-    
+
     if (stripePublishableKey === 'pk_test_your_stripe_publishable_key_here') {
       // Show demo message
       this.showDemoPaymentMessage();
       return null;
     }
-    
+
     // Real Stripe checkout URL would be generated here
     return `https://checkout.stripe.com/pay/cs_test_...`;
   }

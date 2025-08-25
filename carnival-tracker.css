@@ -860,6 +860,30 @@
   padding: 20px;
   background: linear-gradient(135deg, #fef3c7, #fde68a);
   border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.promotional-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  transform: rotate(15deg);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.original-price {
+  font-size: 20px;
+  color: #92400e;
+  text-decoration: line-through;
+  opacity: 0.7;
+  margin-bottom: 8px;
 }
 
 .price {
@@ -875,10 +899,22 @@
   margin: 4px 0 8px 0;
 }
 
-.trial {
-  font-size: 14px;
+.then-price {
+  font-size: 16px;
   color: #92400e;
   opacity: 0.8;
+  margin-bottom: 8px;
+}
+
+.savings {
+  font-size: 14px;
+  color: #92400e;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-top: 8px;
 }
 
 .premium-actions {
