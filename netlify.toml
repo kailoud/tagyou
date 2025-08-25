@@ -12,6 +12,7 @@
 # Stripe environment variables should be set in Netlify dashboard
 # Go to Site settings > Environment variables
 # Add: STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET
+# Make sure to use LIVE keys (sk_live_, pk_live_, whsec_) for production
 
 [[redirects]]
   from = "/*"
