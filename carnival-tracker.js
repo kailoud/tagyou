@@ -322,15 +322,56 @@ class CarnivalTracker {
       // Show loading state
       this.showPaymentLoading();
 
-      // Get current user info from auth service
+      // Get current user info from auth service with debugging
+      console.log('🔍 Debug: window.authService exists?', !!window.authService);
+      console.log('🔍 Debug: window.authService.getCurrentUser exists?', !!window.authService?.getCurrentUser);
+      
       const currentUser = window.authService?.getCurrentUser();
-      const userId = currentUser?.id || 'anonymous';
-      const email = currentUser?.email || '';
+      console.log('🔍 Debug: currentUser from auth service:', currentUser);
+      
+      // Try multiple ways to get user email
+      let email = '';
+      let userId = 'anonymous';
+      
+      if (currentUser?.email) {
+        email = currentUser.email;
+        userId = currentUser.id || 'anonymous';
+        console.log('✅ Got email from auth service:', email);
+      } else if (window.currentUser?.email) {
+        email = window.currentUser.email;
+        userId = window.currentUser.id || 'anonymous';
+        console.log('✅ Got email from window.currentUser:', email);
+      } else if (window.supabase?.auth?.session()?.user?.email) {
+        email = window.supabase.auth.session().user.email;
+        userId = window.supabase.auth.session().user.id || 'anonymous';
+        console.log('✅ Got email from Supabase session:', email);
+      } else {
+        // Try to get from localStorage or sessionStorage
+        const storedUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+        if (storedUser) {
+          try {
+            const parsedUser = JSON.parse(storedUser);
+            email = parsedUser.email || '';
+            userId = parsedUser.id || 'anonymous';
+            console.log('✅ Got email from storage:', email);
+          } catch (e) {
+            console.log('❌ Failed to parse stored user:', e);
+          }
+        }
+      }
 
       // Validate email before proceeding
       if (!email || !email.includes('@')) {
-        console.error('No valid email found for user');
-        this.showPaymentError('Please sign in with a valid email address to upgrade to premium.');
+        console.error('❌ No valid email found for user after all attempts');
+        console.log('🔍 Debug: Available auth data:', {
+          authService: !!window.authService,
+          currentUser: !!window.currentUser,
+          supabase: !!window.supabase,
+          localStorage: !!localStorage.getItem('currentUser'),
+          sessionStorage: !!sessionStorage.getItem('currentUser')
+        });
+        // Show a modal asking for email manually
+        this.showEmailInputModal();
         return;
       }
 
@@ -510,6 +551,106 @@ class CarnivalTracker {
     // Get current user ID from auth service
     const currentUser = window.authService?.getCurrentUser();
     return currentUser?.id || 'anonymous';
+  }
+
+  showEmailInputModal() {
+    // Remove any existing modals
+    const modal = document.querySelector('.premium-upgrade-modal');
+    if (modal) {
+      modal.remove();
+    }
+
+    // Show email input modal
+    const emailModal = document.createElement('div');
+    emailModal.className = 'premium-upgrade-modal';
+    emailModal.innerHTML = `
+      <div class="premium-upgrade-overlay">
+        <div class="premium-upgrade-content">
+          <div class="premium-upgrade-header">
+            <h3>📧 Enter Your Email</h3>
+            <div class="close-premium-upgrade">×</div>
+          </div>
+          <div class="premium-upgrade-body">
+            <div class="email-input-section">
+              <p>We need your email address to process the payment.</p>
+              <div class="email-input-group">
+                <input type="email" id="paymentEmailInput" placeholder="Enter your email address" class="email-input">
+                <button id="continuePaymentBtn" class="continue-payment-btn">💳 Continue to Payment</button>
+              </div>
+              <p class="email-note">This email will be used for payment confirmation and account updates.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(emailModal);
+
+    // Add event listeners
+    emailModal.querySelector('.close-premium-upgrade').addEventListener('click', () => {
+      emailModal.remove();
+    });
+
+    emailModal.querySelector('#continuePaymentBtn').addEventListener('click', () => {
+      const email = emailModal.querySelector('#paymentEmailInput').value.trim();
+      if (email && email.includes('@')) {
+        emailModal.remove();
+        this.createStripeCheckoutSessionWithEmail(email);
+      } else {
+        alert('Please enter a valid email address.');
+      }
+    });
+
+    // Allow Enter key to submit
+    emailModal.querySelector('#paymentEmailInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        emailModal.querySelector('#continuePaymentBtn').click();
+      }
+    });
+
+    // Focus on input
+    setTimeout(() => {
+      emailModal.querySelector('#paymentEmailInput').focus();
+    }, 100);
+  }
+
+  async createStripeCheckoutSessionWithEmail(email) {
+    try {
+      // Show loading state
+      this.showPaymentLoading();
+
+      // Get current user ID
+      const currentUser = window.authService?.getCurrentUser();
+      const userId = currentUser?.id || 'anonymous';
+
+      // Create checkout session via API
+      const response = await fetch('/.netlify/functions/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userId,
+          email: email,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
+      }
+
+      const { url } = await response.json();
+
+      if (url) {
+        // Redirect to Stripe Checkout
+        window.location.href = url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      this.showPaymentError();
+    }
   }
 
   showPremiumSuccess() {
