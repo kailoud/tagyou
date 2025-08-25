@@ -69,14 +69,9 @@ class Compass {
 
   // Start compass updates
   startCompassUpdates() {
-    if ('DeviceOrientationEvent' in window) {
-      window.addEventListener('deviceorientation', (event) => {
-        this.updateCompass(event.alpha);
-      });
-    } else {
-      console.log('🧭 Device orientation not supported, using mock compass');
-      this.startMockCompass();
-    }
+    // Fixed scale compass - no device orientation updates
+    console.log('🧭 Using fixed scale compass');
+    this.resetToNorth();
   }
 
   // Update compass rotation
@@ -95,16 +90,8 @@ class Compass {
     }
   }
 
-  // Mock compass for testing (when device orientation not available)
-  startMockCompass() {
-    let mockRotation = 0;
-    setInterval(() => {
-      mockRotation += 1;
-      if (mockRotation >= 360) mockRotation = 0;
-      this.rotation = mockRotation;
-      this.rotateCompass();
-    }, 100);
-  }
+  // Fixed scale compass - no rotation updates
+  // The compass maintains a fixed north orientation
 
   // Toggle compass visibility
   toggleCompass() {
@@ -112,6 +99,11 @@ class Compass {
     const compassContainer = document.querySelector('.compass-container');
     if (compassContainer) {
       compassContainer.style.display = this.isVisible ? 'block' : 'none';
+
+      // Reset to north when opening
+      if (this.isVisible) {
+        this.resetToNorth();
+      }
     }
     console.log('🧭 Compass visibility:', this.isVisible ? 'visible' : 'hidden');
   }
@@ -122,6 +114,8 @@ class Compass {
     const compassContainer = document.querySelector('.compass-container');
     if (compassContainer) {
       compassContainer.style.display = 'block';
+      // Reset to north when showing
+      this.resetToNorth();
     }
   }
 
@@ -137,6 +131,13 @@ class Compass {
   // Get current rotation
   getRotation() {
     return this.rotation;
+  }
+
+  // Reset compass to point north (fixed scale)
+  resetToNorth() {
+    this.rotation = 0;
+    this.rotateCompass();
+    console.log('🧭 Fixed scale compass pointing north (0°)');
   }
 
   // Get cardinal direction

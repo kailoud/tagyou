@@ -3,8 +3,9 @@
 /* Compass Container */
 .compass-container {
   position: fixed;
-  top: 50px;
-  right: 100px;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1000;
   cursor: pointer;
   animation: slideInCompass 0.3s ease-out;
@@ -42,8 +43,10 @@
   justify-content: center;
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
   border: 3px solid rgba(255, 255, 255, 0.5);
-  transition: transform 0.1s ease-out;
+  transition: none;
+  transform: scale(1);
   backdrop-filter: blur(5px);
+  color: #fff;
 }
 
 .compass-rose:hover {
@@ -215,32 +218,34 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .compass-container {
-    top: 50px;
-    right: 80px;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   .compass-rose {
-    width: 24px;
-    height: 24px;
+    width: 38px;
+    height: 38px;
+    transform: scale(1);
   }
 
   .needle-north {
-    border-left: 2px solid transparent;
-    border-right: 2px solid transparent;
-    border-bottom: 8px solid #ef4444;
+    border-left: 3px solid transparent;
+    border-right: 3px solid transparent;
+    border-bottom: 13px solid #ef4444;
   }
 
   .needle-south {
-    border-left: 2px solid transparent;
-    border-right: 2px solid transparent;
-    border-top: 8px solid #6b7280;
+    border-left: 3px solid transparent;
+    border-right: 3px solid transparent;
+    border-top: 13px solid #6b7280;
   }
 
   .marking-north,
   .marking-east,
   .marking-south,
   .marking-west {
-    font-size: 6px;
+    font-size: 10px;
   }
 
   .compass-label {
