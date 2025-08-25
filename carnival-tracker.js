@@ -327,7 +327,7 @@ class CarnivalTracker {
       const email = window.currentUser?.email || '';
 
       // Create checkout session via API
-      const response = await fetch('http://localhost:3000/api/create-checkout-session', {
+      const response = await fetch('/.netlify/functions/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -6,6 +6,13 @@
   VITE_SUPABASE_URL = "https://rpsbibwmbsllnvfithjw.supabase.co"
   VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc2JpYndtYnNsbG52Zml0aGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzA5NjQsImV4cCI6MjA3MTYwNjk2NH0.MdZz53RGQUIuCORdUtnFT-Uo0rFEK1a6chnMtS4Jjss"
 
+[functions]
+  directory = "netlify/functions"
+
+# Stripe environment variables should be set in Netlify dashboard
+# Go to Site settings > Environment variables
+# Add: STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
