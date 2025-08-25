@@ -43,9 +43,9 @@ class ProfileService {
 
       const { data, error } = await this.supabase
         .from('profiles')
-        .upsert(profileData, { 
+        .upsert(profileData, {
           onConflict: 'id',
-          ignoreDuplicates: false 
+          ignoreDuplicates: false
         })
         .select()
         .single();
@@ -99,30 +99,29 @@ class ProfileService {
         return { success: false, error: 'Supabase client not available' };
       }
 
-      // Check if storage bucket exists and is accessible
-      try {
-        const { data: buckets, error: bucketError } = await this.supabase.storage.listBuckets();
-        if (bucketError || !buckets.find(b => b.name === 'user-avatars')) {
-          console.warn('ProfileService: Storage bucket not available, using localStorage fallback');
-          return { success: false, error: 'Storage bucket not available' };
-        }
-      } catch (error) {
-        console.warn('ProfileService: Storage not accessible, using localStorage fallback');
-        return { success: false, error: 'Storage not accessible' };
-      }
-
+      // Skip bucket check for faster upload (assume bucket exists)
       // Generate unique filename
       const fileExt = file.name.split('.').pop();
       const fileName = `${userId}-${Date.now()}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
 
-      // Upload file to Supabase Storage
-      const { data: uploadData, error: uploadError } = await this.supabase.storage
+      // Upload file to Supabase Storage with timeout
+      const uploadPromise = this.supabase.storage
         .from('user-avatars')
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false
         });
+
+      // Add 10-second timeout
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Upload timeout')), 10000);
+      });
+
+      const { data: uploadData, error: uploadError } = await Promise.race([
+        uploadPromise,
+        timeoutPromise
+      ]);
 
       if (uploadError) {
         console.error('ProfileService: Error uploading avatar:', uploadError);
@@ -134,10 +133,10 @@ class ProfileService {
         .from('user-avatars')
         .getPublicUrl(filePath);
 
-      return { 
-        success: true, 
+      return {
+        success: true,
         url: urlData.publicUrl,
-        path: filePath 
+        path: filePath
       };
     } catch (error) {
       console.error('ProfileService: Error in uploadAvatar:', error);

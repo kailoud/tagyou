@@ -1663,6 +1663,54 @@ class AvatarSystem {
     });
   }
 
+  // Compress image for faster upload
+  async compressImage(file) {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+
+      img.onload = () => {
+        // Set maximum dimensions for avatar
+        const maxWidth = 300;
+        const maxHeight = 300;
+
+        // Calculate new dimensions
+        let { width, height } = img;
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+
+        // Set canvas dimensions
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw and compress image
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert to blob with quality 0.8 (80% quality)
+        canvas.toBlob((blob) => {
+          // Create new file with compressed data
+          const compressedFile = new File([blob], file.name, {
+            type: 'image/jpeg',
+            lastModified: Date.now()
+          });
+          resolve(compressedFile);
+        }, 'image/jpeg', 0.8);
+      };
+
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
   async saveProfileChanges(modal) {
     const nameInput = modal.querySelector('#profileName');
     const fileInput = modal.querySelector('#avatarUpload');
@@ -1680,7 +1728,22 @@ class AvatarSystem {
 
       // Handle avatar upload if file is selected
       if (newAvatarFile) {
-        // Create data URL for the avatar
+        // Validate file size (max 5MB)
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (newAvatarFile.size > maxSize) {
+          alert('Image file is too large. Please select an image smaller than 5MB.');
+          saveBtn.textContent = originalText;
+          saveBtn.disabled = false;
+          return;
+        }
+
+        // Compress and optimize image
+        const optimizedFile = await this.compressImage(newAvatarFile);
+
+        // Update loading text
+        saveBtn.textContent = 'Processing image...';
+
+        // Create data URL for the avatar (fast local storage)
         avatarUrl = await new Promise((resolve) => {
           const reader = new FileReader();
           reader.onload = (e) => {
@@ -1688,18 +1751,26 @@ class AvatarSystem {
             localStorage.setItem(`avatar_${this.user.email}`, dataUrl);
             resolve(dataUrl);
           };
-          reader.readAsDataURL(newAvatarFile);
+          reader.readAsDataURL(optimizedFile);
         });
 
-        // Try to upload to Supabase Storage (optional)
+        // Update loading text
+        saveBtn.textContent = 'Uploading to cloud...';
+
+        // Try to upload to Supabase Storage (optional, non-blocking)
         if (window.profileService) {
-          const uploadResult = await window.profileService.uploadAvatar(this.user.id, newAvatarFile);
-          if (uploadResult.success) {
-            avatarUrl = uploadResult.url; // Use cloud URL if available
-            localStorage.setItem(`avatar_${this.user.email}`, avatarUrl);
-          } else {
-            console.log('Storage upload failed, using data URL:', uploadResult.error);
-            // avatarUrl remains as data URL
+          try {
+            const uploadResult = await window.profileService.uploadAvatar(this.user.id, optimizedFile);
+            if (uploadResult.success) {
+              avatarUrl = uploadResult.url; // Use cloud URL if available
+              localStorage.setItem(`avatar_${this.user.email}`, avatarUrl);
+            } else {
+              console.log('Storage upload failed, using data URL:', uploadResult.error);
+              // avatarUrl remains as data URL
+            }
+          } catch (uploadError) {
+            console.log('Storage upload error, using data URL:', uploadError);
+            // Continue with data URL
           }
         }
       }
