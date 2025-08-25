@@ -1,0 +1,8 @@
+// Supabase Configuration
+// Replace 'your-service-role-key-here' with your actual service role key from Supabase Dashboard
+
+window.supabaseConfig = {
+  supabaseUrl: "https://rpsbibwmbsllnvfithjw.supabase.co",
+  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc2JpYndtYnNsbG52Zml0aGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzA5NjQsImV4cCI6MjA3MTYwNjk2NH0.MdZz53RGQUIuCORdUtnFT-Uo0rFEK1a6chnMtS4Jjss",
+  supabaseServiceKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc2JpYndtYnNsbG52Zml0aGp3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjAzMDk2NCwiZXhwIjoyMDcxNjA2OTY0fQ.2JHufjpMyL78LAoMzlA51aach0NGBpWgCgQetDTVnVI",
+};

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Admin - Site Identification</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .site-info {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px 0;
+      font-family: monospace;
+      font-size: 14px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin: 30px 0;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+      border: none;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+    }
+
+    .user-list {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .user-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      margin: 10px 0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .user-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .user-details h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .user-details p {
+      margin: 5px 0 0 0;
+      opacity: 0.8;
+      font-size: 14px;
+    }
+
+    .sites-section {
+      margin-top: 15px;
+    }
+
+    .site-item {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 10px;
+      margin: 5px 0;
+      font-size: 12px;
+    }
+
+    .site-name {
+      font-weight: bold;
+      color: #4ecdc4;
+    }
+
+    .site-data {
+      margin-top: 5px;
+      opacity: 0.8;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 18px;
+    }
+
+    .error {
+      background: rgba(255, 82, 82, 0.2);
+      border: 1px solid rgba(255, 82, 82, 0.3);
+      color: #ffcccc;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+  </style>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+  <!-- Auth Service -->
+  <script type="module" src="auth-service.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🔍 User Admin - Site Identification</h1>
+
+    <div class="site-info">
+      <strong>Current Site ID:</strong> <span id="currentSiteId">Loading...</span><br>
+      <strong>Domain:</strong> <span id="currentDomain">Loading...</span><br>
+      <strong>Port:</strong> <span id="currentPort">Loading...</span><br>
+      <strong>Path:</strong> <span id="currentPath">Loading...</span>
+    </div>
+
+    <div class="controls">
+      <button class="btn" onclick="loadAllUsers()">👥 Load All Users</button>
+      <button class="btn" onclick="showCurrentUser()">👤 Show Current User</button>
+      <button class="btn" onclick="testSignIn()">🔐 Test Sign In</button>
+      <button class="btn" onclick="testMobileSignUp()">📱 Test Mobile Sign Up</button>
+      <button class="btn" onclick="testMobileElements()">📱 Show Mobile Elements</button>
+      <button class="btn" onclick="testDropdownClose()">📱 Test Dropdown Close</button>
+      <button class="btn" onclick="testAuthServiceConnection()">🔗 Test Auth Service</button>
+      <button class="btn" onclick="clearData()">🗑️ Clear Data</button>
+    </div>
+
+    <div class="user-list" id="userList">
+      <div class="loading">Click "Load All Users" to see user data across sites</div>
+    </div>
+  </div>
+
+  <script>
+    let authService;
+
+    // Wait for auth service to be ready
+    async function initAdmin() {
+      let attempts = 0;
+      while (attempts < 50) {
+        if (window.authService) {
+          authService = window.authService;
+          break;
+        }
+        attempts++;
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      if (!authService) {
+        console.error('Auth service not available');
+        return;
+      }
+
+      // Update current site info
+      const siteInfo = authService.getSiteInfo();
+      document.getElementById('currentSiteId').textContent = siteInfo.siteId;
+      document.getElementById('currentDomain').textContent = siteInfo.domain;
+      document.getElementById('currentPort').textContent = window.location.port || '80';
+      document.getElementById('currentPath').textContent = siteInfo.path;
+    }
+
+    async function loadAllUsers() {
+      const userList = document.getElementById('userList');
+      userList.innerHTML = '<div class="loading">Loading users from Firebase...</div>';
+
+      try {
+        const db = firebase.firestore();
+        const usersSnapshot = await db.collection('users').get();
+
+        if (usersSnapshot.empty) {
+          userList.innerHTML = '<div class="error">No users found in the database</div>';
+          return;
+        }
+
+        let usersHTML = '';
+        usersSnapshot.forEach(doc => {
+          const userData = doc.data();
+          usersHTML += createUserCard(userData);
+        });
+
+        userList.innerHTML = usersHTML;
+      } catch (error) {
+        userList.innerHTML = `<div class="error">Error loading users: ${error.message}</div>`;
+      }
+    }
+
+    function createUserCard(userData) {
+      const initials = getUserInitials(userData.displayName || userData.email);
+      const sites = userData.sites || {};
+      const siteKeys = Object.keys(sites);
+
+      let sitesHTML = '';
+      siteKeys.forEach(siteId => {
+        const siteData = sites[siteId];
+        sitesHTML += `
+          <div class="site-item">
+            <div class="site-name">${siteId}</div>
+            <div class="site-data">
+              First Login: ${siteData.firstLogin ? new Date(siteData.firstLogin.toDate()).toLocaleString() : 'N/A'}<br>
+              Last Login: ${siteData.lastLogin ? new Date(siteData.lastLogin.toDate()).toLocaleString() : 'N/A'}<br>
+              Login Count: ${siteData.loginCount || 0}<br>
+              Notifications: ${siteData.preferences?.notifications ? 'Yes' : 'No'}
+            </div>
+          </div>
+        `;
+      });
+
+      return `
+        <div class="user-card">
+          <div class="user-header">
+            <div class="user-avatar">${initials}</div>
+            <div class="user-details">
+              <h3>${userData.displayName || 'No Name'}</h3>
+              <p>${userData.email}</p>
+              <p>UID: ${userData.uid}</p>
+            </div>
+          </div>
+          <div class="sites-section">
+            <strong>Sites Active On (${siteKeys.length}):</strong>
+            ${sitesHTML}
+          </div>
+        </div>
+      `;
+    }
+
+    function getUserInitials(name) {
+      if (!name) return 'U';
+
+      const words = name.trim().split(/\s+/);
+      if (words.length === 1) {
+        return words[0].substring(0, 2).toUpperCase();
+      } else {
+        return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
+      }
+    }
+
+    async function showCurrentUser() {
+      const userList = document.getElementById('userList');
+
+      if (!authService.getCurrentUser()) {
+        userList.innerHTML = '<div class="error">No user currently signed in</div>';
+        return;
+      }
+
+      const user = authService.getCurrentUser();
+      const userData = await authService.getUserDocument(user.uid);
+
+      if (userData) {
+        userList.innerHTML = createUserCard(userData);
+      } else {
+        userList.innerHTML = '<div class="error">Could not load user data</div>';
+      }
+    }
+
+    async function testSignIn() {
+      try {
+        const result = await authService.signIn('your-email@gmail.com', 'your-password');
+        if (result.success) {
+          alert('✅ Test sign in successful!');
+          showCurrentUser();
+        } else {
+          alert(`❌ Test sign in failed: ${result.error}`);
+        }
+      } catch (error) {
+        alert(`❌ Error: ${error.message}`);
+      }
+    }
+
+    function clearData() {
+      if (confirm('Are you sure you want to clear all user data? This cannot be undone.')) {
+        const userList = document.getElementById('userList');
+        userList.innerHTML = '<div class="loading">Click "Load All Users" to see user data across sites</div>';
+      }
+    }
+
+    function testMobileSignUp() {
+      console.log('🧪 Testing mobile sign up...');
+      if (window.mobileAuth && typeof window.mobileAuth.testMobileSignUp === 'function') {
+        window.mobileAuth.testMobileSignUp();
+      } else {
+        alert('Mobile auth module not available. Please check the console for errors.');
+      }
+    }
+
+    function testMobileElements() {
+      console.log('🧪 Testing mobile elements visibility...');
+      if (window.mobileAuth && typeof window.mobileAuth.showMobileElements === 'function') {
+        window.mobileAuth.showMobileElements();
+      } else {
+        alert('Mobile auth module not available. Please check the console for errors.');
+      }
+    }
+
+    function testDropdownClose() {
+      console.log('🧪 Testing dropdown close functionality...');
+      if (window.mobileAuth && typeof window.mobileAuth.testDropdownClose === 'function') {
+        window.mobileAuth.testDropdownClose();
+      } else {
+        alert('Mobile auth module not available. Please check the console for errors.');
+      }
+    }
+
+    function testAuthServiceConnection() {
+      console.log('🧪 Testing auth service connection...');
+      if (window.mobileAuth && typeof window.mobileAuth.testAuthServiceConnection === 'function') {
+        window.mobileAuth.testAuthServiceConnection();
+      } else {
+        alert('Mobile auth module not available. Please check the console for errors.');
+      }
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', initAdmin);
+  </script>
+</body>
+
+</html>

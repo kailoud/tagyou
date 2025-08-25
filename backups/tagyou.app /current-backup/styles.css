@@ -847,7 +847,7 @@ body {
   background-size: 300% 300%;
   border-radius: 25px 25px 0 0;
   box-shadow: 0 -10px 40px rgba(102, 126, 234, 0.4);
-  z-index: 10002;
+  z-index: 999;
   transform: translateY(calc(100% - 60px));
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(20px);
