@@ -38,21 +38,40 @@ exports.handler = async (event, context) => {
         const customerEmail = session.customer_email;
         const userId = session.metadata?.userId || 'anonymous';
         const offerType = session.metadata?.offerType || 'unknown';
+        const paymentAmount = session.metadata?.price || session.amount_total;
+        const paymentCurrency = session.metadata?.currency || session.currency;
         
         console.log('📧 Customer email:', customerEmail);
         console.log('👤 User ID:', userId);
         console.log('🎁 Offer type:', offerType);
+        console.log('💰 Payment amount:', paymentAmount);
+        console.log('💱 Payment currency:', paymentCurrency);
         
-        // Here you would typically:
-        // 1. Update your database to mark user as premium
-        // 2. Send confirmation email
-        // 3. Update user's subscription status
+        // Calculate expiration date based on offer type
+        let expiresAt = null;
+        if (offerType === '3-month-promo') {
+          expiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(); // 90 days
+        } else if (offerType === 'monthly-subscription') {
+          expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days
+        } else if (offerType === 'yearly-subscription') {
+          expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(); // 365 days
+        }
         
-        // For now, we'll log the success
+        // Prepare payment data for database
+        const paymentData = {
+          amount: paymentAmount,
+          currency: paymentCurrency,
+          sessionId: session.id,
+          offerType: offerType,
+          expiresAt: expiresAt
+        };
+        
         console.log('✅ Premium access granted for:', customerEmail);
+        console.log('📅 Expires at:', expiresAt);
         
+        // TODO: Add Supabase integration here
         // You can add database update logic here:
-        // await updateUserPremiumStatus(customerEmail, true);
+        // await updateUserPremiumStatus(customerEmail, true, paymentData);
         // await sendWelcomeEmail(customerEmail);
         
         break;

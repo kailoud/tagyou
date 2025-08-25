@@ -11,6 +11,167 @@ function checkSupabaseConnection() {
   }
 }
 
+// Premium Users Service
+export class PremiumUsersService {
+  static async getPremiumUser(email) {
+    try {
+      checkSupabaseConnection();
+
+      const { data, error } = await supabase
+        .from('premium_users')
+        .select('*')
+        .eq('email', email.toLowerCase())
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+        console.error('❌ Error fetching premium user:', error);
+        throw error;
+      }
+
+      console.log('✅ Premium user check for:', email, data ? 'Found' : 'Not found');
+      return data;
+    } catch (error) {
+      console.error('❌ PremiumUsersService.getPremiumUser error:', error);
+      return null;
+    }
+  }
+
+  static async addPremiumUser(email, paymentData = {}) {
+    try {
+      checkSupabaseConnection();
+
+      const premiumUser = {
+        email: email.toLowerCase(),
+        is_premium: true,
+        payment_date: new Date().toISOString(),
+        payment_amount: paymentData.amount || null,
+        payment_currency: paymentData.currency || 'gbp',
+        stripe_session_id: paymentData.sessionId || null,
+        offer_type: paymentData.offerType || '3-month-promo',
+        expires_at: paymentData.expiresAt || null,
+        created_at: new Date().toISOString()
+      };
+
+      const { data, error } = await supabase
+        .from('premium_users')
+        .upsert([premiumUser], { 
+          onConflict: 'email',
+          ignoreDuplicates: false 
+        })
+        .select();
+
+      if (error) {
+        console.error('❌ Error adding premium user:', error);
+        throw error;
+      }
+
+      console.log('✅ Premium user added/updated:', data[0]);
+      return data[0];
+    } catch (error) {
+      console.error('❌ PremiumUsersService.addPremiumUser error:', error);
+      throw error;
+    }
+  }
+
+  static async updatePremiumUser(email, updates) {
+    try {
+      checkSupabaseConnection();
+
+      const { data, error } = await supabase
+        .from('premium_users')
+        .update(updates)
+        .eq('email', email.toLowerCase())
+        .select();
+
+      if (error) {
+        console.error('❌ Error updating premium user:', error);
+        throw error;
+      }
+
+      console.log('✅ Premium user updated:', data[0]);
+      return data[0];
+    } catch (error) {
+      console.error('❌ PremiumUsersService.updatePremiumUser error:', error);
+      throw error;
+    }
+  }
+
+  static async removePremiumUser(email) {
+    try {
+      checkSupabaseConnection();
+
+      const { error } = await supabase
+        .from('premium_users')
+        .delete()
+        .eq('email', email.toLowerCase());
+
+      if (error) {
+        console.error('❌ Error removing premium user:', error);
+        throw error;
+      }
+
+      console.log('✅ Premium user removed:', email);
+      return true;
+    } catch (error) {
+      console.error('❌ PremiumUsersService.removePremiumUser error:', error);
+      throw error;
+    }
+  }
+
+  static async getAllPremiumUsers() {
+    try {
+      checkSupabaseConnection();
+
+      const { data, error } = await supabase
+        .from('premium_users')
+        .select('*')
+        .eq('is_premium', true)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('❌ Error fetching premium users:', error);
+        throw error;
+      }
+
+      console.log('✅ Loaded premium users:', data.length);
+      return data || [];
+    } catch (error) {
+      console.error('❌ PremiumUsersService.getAllPremiumUsers error:', error);
+      return [];
+    }
+  }
+
+  static async isPremiumUser(email) {
+    try {
+      const premiumUser = await this.getPremiumUser(email);
+      return premiumUser && premiumUser.is_premium;
+    } catch (error) {
+      console.error('❌ PremiumUsersService.isPremiumUser error:', error);
+      return false;
+    }
+  }
+
+  static async getPremiumUserDetails(email) {
+    try {
+      const premiumUser = await this.getPremiumUser(email);
+      if (!premiumUser) return null;
+
+      return {
+        email: premiumUser.email,
+        isPremium: premiumUser.is_premium,
+        paymentDate: premiumUser.payment_date,
+        expiresAt: premiumUser.expires_at,
+        offerType: premiumUser.offer_type,
+        paymentAmount: premiumUser.payment_amount,
+        paymentCurrency: premiumUser.payment_currency
+      };
+    } catch (error) {
+      console.error('❌ PremiumUsersService.getPremiumUserDetails error:', error);
+      return null;
+    }
+  }
+}
+
 // Food Stalls Service
 export class FoodStallsService {
   static async getAllFoodStalls() {

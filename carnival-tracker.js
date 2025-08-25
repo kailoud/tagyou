@@ -72,8 +72,23 @@ class CarnivalTracker {
         return;
       }
 
-      // Check if user has premium status (you can implement this with your database)
-      // For now, let's check against a list of premium emails or use a simple logic
+      // Check Supabase for premium status
+      if (window.PremiumUsersService) {
+        try {
+          const isPremium = await window.PremiumUsersService.isPremiumUser(email);
+          if (isPremium) {
+            console.log('💎 Premium user detected from Supabase:', email);
+            this.setUserTier('Premium');
+            // Cache in localStorage for faster future checks
+            localStorage.setItem(`premium_${email}`, 'true');
+            return;
+          }
+        } catch (error) {
+          console.log('⚠️ Supabase check failed, falling back to local list:', error);
+        }
+      }
+
+      // Fallback to local premium emails list
       const premiumEmails = [
         'kaycheckmate@gmail.com',
         'truesliks@gmail.com',
@@ -84,7 +99,7 @@ class CarnivalTracker {
       ];
 
       if (premiumEmails.includes(email.toLowerCase())) {
-        console.log('💎 Premium user detected:', email);
+        console.log('💎 Premium user detected from local list:', email);
         this.setUserTier('Premium');
         // Store in localStorage for future checks
         localStorage.setItem(`premium_${email}`, 'true');
@@ -98,10 +113,26 @@ class CarnivalTracker {
     }
   }
 
-  setPremiumStatus(email, isPremium) {
+  async setPremiumStatus(email, isPremium, paymentData = {}) {
     if (email) {
+      // Update localStorage for immediate UI updates
       localStorage.setItem(`premium_${email}`, isPremium ? 'true' : 'false');
       console.log(`💎 Premium status set for ${email}: ${isPremium ? 'Premium' : 'Basic'}`);
+      
+      // Update Supabase if service is available
+      if (window.PremiumUsersService) {
+        try {
+          if (isPremium) {
+            await window.PremiumUsersService.addPremiumUser(email, paymentData);
+            console.log('✅ Premium user added to Supabase:', email);
+          } else {
+            await window.PremiumUsersService.removePremiumUser(email);
+            console.log('✅ Premium user removed from Supabase:', email);
+          }
+        } catch (error) {
+          console.error('❌ Error updating Supabase:', error);
+        }
+      }
       
       // Update current user tier if email matches
       const currentUser = window.authService?.getCurrentUser();
