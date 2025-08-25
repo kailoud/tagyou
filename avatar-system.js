@@ -162,6 +162,7 @@ class AvatarSystem {
               sessionStorage.removeItem('supabase_user');
             }
             this.renderDropdown();
+            this.updateStatusIndicator();
           });
         }
 
@@ -442,6 +443,9 @@ class AvatarSystem {
       
       // Check premium status after user is loaded
       await this.checkPremiumStatus();
+      
+      // Update status indicator after user state is determined
+      this.updateStatusIndicator();
     } catch (error) {
       console.error('AUTH DEBUG: Error checking user:', error);
     } finally {
@@ -1150,6 +1154,7 @@ class AvatarSystem {
       // Update UI
       this.createAvatarElement(); // Recreate avatar with guest styling
       this.renderDropdown();
+      this.updateStatusIndicator();
 
       console.log('AUTH DEBUG: Sign out completed');
     } catch (error) {
@@ -1691,6 +1696,17 @@ class AvatarSystem {
     const dropdownAvatar = document.querySelector('.dropdown-header .current-avatar');
     if (dropdownAvatar) {
       dropdownAvatar.innerHTML = `<img src="${avatarUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+    }
+  }
+
+  updateStatusIndicator() {
+    const statusIndicator = document.querySelector('.status-indicator');
+    if (statusIndicator) {
+      if (this.user) {
+        statusIndicator.style.backgroundColor = '#4ade80'; // Green for logged in
+      } else {
+        statusIndicator.style.backgroundColor = '#fb923c'; // Orange for no user
+      }
     }
   }
 }
