@@ -3,7 +3,8 @@
 
 const supabaseConfig = {
   supabaseUrl: "https://your-project-id.supabase.co",
-  supabaseAnonKey: "your-anon-key-here"
+  supabaseAnonKey: "your-anon-key-here",
+  supabaseServiceKey: "your-service-role-key-here" // For admin operations (bypasses RLS)
 };
 
 export default supabaseConfig;

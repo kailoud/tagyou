@@ -29,13 +29,14 @@ async function initializeSupabase() {
     }
 
     // Try to load configuration
-    let supabaseUrl, supabaseAnonKey;
+    let supabaseUrl, supabaseKey;
     
     try {
       // Try to load from secret configuration file
       const secretConfig = await import('./supabase-config-secret.js');
       supabaseUrl = secretConfig.default.supabaseUrl;
-      supabaseAnonKey = secretConfig.default.supabaseAnonKey;
+      // Use service role key for admin operations, fallback to anon key
+      supabaseKey = secretConfig.default.supabaseServiceKey || secretConfig.default.supabaseAnonKey;
       console.log('✅ Supabase configuration loaded from secret file');
     } catch (error) {
       // Fallback to environment variables or default config
@@ -43,11 +44,13 @@ async function initializeSupabase() {
       
       // Use the same config as other files
       supabaseUrl = 'https://rpsbibwmbsllnvfithjw.supabase.co';
-      supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc2JpYndtYnNsbG52Zml0aGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5NzI5NzQsImV4cCI6MjA1MDU0ODk3NH0.Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8';
+      // For admin operations, we need the service role key
+      // This will be provided via environment variables in production
+      supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc2JpYndtYnNsbG52Zml0aGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5NzI5NzQsImV4cCI6MjA1MDU0ODk3NH0.Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8';
     }
 
     // Create Supabase client
-    supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+    supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
     
     console.log('✅ Supabase client initialized successfully');
     return supabase;
