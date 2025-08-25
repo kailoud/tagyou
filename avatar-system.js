@@ -497,7 +497,7 @@ class AvatarSystem {
         savedAvatar = localStorage.getItem(`avatar_${this.user.email}`);
       }
     }
-    
+
     if (savedAvatar) {
       userIcon.innerHTML = `<img src="${savedAvatar}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
     } else {
@@ -1667,29 +1667,27 @@ class AvatarSystem {
 
       // Handle avatar upload if file is selected
       if (newAvatarFile) {
-        if (window.profileService) {
-          // Upload to Supabase Storage
-          const uploadResult = await window.profileService.uploadAvatar(this.user.id, newAvatarFile);
-          if (uploadResult.success) {
-            avatarUrl = uploadResult.url;
-          } else {
-            console.log('Storage upload failed, using data URL:', uploadResult.error);
-            // Fallback to data URL stored in database
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              avatarUrl = e.target.result;
-              localStorage.setItem(`avatar_${this.user.email}`, avatarUrl);
-            };
-            reader.readAsDataURL(newAvatarFile);
-          }
-        } else {
-          // Fallback to localStorage
+        // Create data URL for the avatar
+        avatarUrl = await new Promise((resolve) => {
           const reader = new FileReader();
           reader.onload = (e) => {
-            avatarUrl = e.target.result;
-            localStorage.setItem(`avatar_${this.user.email}`, avatarUrl);
+            const dataUrl = e.target.result;
+            localStorage.setItem(`avatar_${this.user.email}`, dataUrl);
+            resolve(dataUrl);
           };
           reader.readAsDataURL(newAvatarFile);
+        });
+
+        // Try to upload to Supabase Storage (optional)
+        if (window.profileService) {
+          const uploadResult = await window.profileService.uploadAvatar(this.user.id, newAvatarFile);
+          if (uploadResult.success) {
+            avatarUrl = uploadResult.url; // Use cloud URL if available
+            localStorage.setItem(`avatar_${this.user.email}`, avatarUrl);
+          } else {
+            console.log('Storage upload failed, using data URL:', uploadResult.error);
+            // avatarUrl remains as data URL
+          }
         }
       }
 
@@ -1817,7 +1815,7 @@ class AvatarSystem {
         if (!savedAvatar) {
           savedAvatar = localStorage.getItem(`avatar_${this.user.email}`);
         }
-        
+
         if (savedAvatar) {
           userIcon.innerHTML = `<img src="${savedAvatar}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
         } else {
