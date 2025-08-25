@@ -12,21 +12,26 @@ let supabaseInitialized = false;
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function () {
   console.log('🚀 Initializing TagYou2 London Map...');
-  
+
   // Initialize map immediately
   initMap();
-  
+
   // Initialize other components with minimal delays
   setTimeout(() => {
     initMapToolbar();
     console.log('✅ Toolbar initialized');
   }, 100); // Reduced from 1000ms to 100ms
-  
+
   setTimeout(() => {
     initSearch();
     console.log('✅ Search initialized');
   }, 200);
-  
+
+  setTimeout(() => {
+    initPullUpPanel();
+    console.log('✅ Pull-up panel initialized');
+  }, 300);
+
   console.log('🎭 Carnival tracker will initialize automatically');
 });
 
@@ -182,12 +187,12 @@ async function loadInitialData(FoodStallsService, ArtistsService, FloatTrucksSer
       console.log('📝 Loading sample food stalls data...');
       foodStallsData = getSampleFoodStalls();
     }
-    
+
     if (artistsData.length === 0) {
       console.log('📝 Loading sample artists data...');
       artistsData = getSampleArtists();
     }
-    
+
     if (floatTrucksData.length === 0) {
       console.log('📝 Loading sample float trucks data...');
       floatTrucksData = getSampleFloatTrucks();
@@ -214,7 +219,7 @@ async function loadInitialData(FoodStallsService, ArtistsService, FloatTrucksSer
     foodStallsData = getSampleFoodStalls();
     artistsData = getSampleArtists();
     floatTrucksData = getSampleFloatTrucks();
-    
+
     // Populate the pull-up panel with sample data
     populatePullUpPanel();
   }
@@ -320,7 +325,7 @@ function getSampleFloatTrucks() {
 // Populate the pull-up panel with data
 function populatePullUpPanel() {
   console.log('🎭 Populating pull-up panel with festival data...');
-  
+
   // Populate food stalls
   const foodStallsList = document.getElementById('food-stalls-list');
   if (foodStallsList && foodStallsData.length > 0) {
@@ -1099,9 +1104,23 @@ function toggleButtonActive(button) {
 
 // Initialize pull-up panel functionality
 function initPullUpPanel() {
+  console.log('🔧 Initializing pull-up panel...');
+
   const pullUpPanel = document.getElementById('pullUpPanel');
   const panelHandle = document.querySelector('.panel-handle');
   const closePanel = document.getElementById('closePanel');
+
+  console.log('🔧 Pull-up panel elements found:', {
+    pullUpPanel: !!pullUpPanel,
+    panelHandle: !!panelHandle,
+    closePanel: !!closePanel
+  });
+
+  if (!pullUpPanel || !panelHandle || !closePanel) {
+    console.error('❌ Pull-up panel elements not found!');
+    return;
+  }
+
   let isExpanded = false;
   let startY = 0;
   let currentY = 0;
@@ -1110,14 +1129,14 @@ function initPullUpPanel() {
   // Handle click to expand/collapse
   panelHandle.addEventListener('click', function (e) {
     e.stopPropagation();
-    console.log('Panel handle clicked - current state:', isExpanded);
+    console.log('🎯 Panel handle clicked - current state:', isExpanded);
     togglePanel();
   });
 
   // Close button functionality
   closePanel.addEventListener('click', function (e) {
     e.stopPropagation();
-    console.log('Close button clicked');
+    console.log('🎯 Close button clicked');
     collapsePanel();
   });
 
@@ -1183,15 +1202,17 @@ function initPullUpPanel() {
   }
 
   function expandPanel() {
+    console.log('📈 Expanding panel...');
     pullUpPanel.classList.add('expanded');
     isExpanded = true;
-    console.log('Panel expanded - class added:', pullUpPanel.classList.contains('expanded'));
+    console.log('✅ Panel expanded - class added:', pullUpPanel.classList.contains('expanded'));
   }
 
   function collapsePanel() {
+    console.log('📉 Collapsing panel...');
     pullUpPanel.classList.remove('expanded');
     isExpanded = false;
-    console.log('Panel collapsed - class removed:', !pullUpPanel.classList.contains('expanded'));
+    console.log('✅ Panel collapsed - class removed:', !pullUpPanel.classList.contains('expanded'));
   }
 
   // Tab functionality

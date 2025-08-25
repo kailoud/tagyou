@@ -4,7 +4,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 1001;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -735,9 +735,7 @@
 }
 
 /* Ensure carnival tracker appears above other elements but below modals */
-.carnival-tracker {
-  z-index: 1000;
-}
+/* z-index is already set to 1001 in the main .carnival-tracker rule above */
 
 .add-person-modal {
   z-index: 2000;
@@ -1075,6 +1073,7 @@
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -1098,8 +1097,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .payment-loading p {
