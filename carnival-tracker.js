@@ -69,7 +69,7 @@ class CarnivalTracker {
     };
 
     // Premium features
-    this.isPremium = false;
+    this.isPremium = false; // Back to free mode
     this.maxFreeMembers = 5;
     this.premiumFeatures = {
       unlimitedMembers: true,
@@ -309,21 +309,138 @@ class CarnivalTracker {
   upgradeToPremium() {
     // Here you would integrate with your payment processor (Stripe, PayPal, etc.)
     console.log('💎 Upgrading to Premium...');
-    
-    // For demo purposes, we'll simulate the upgrade
-    this.isPremium = true;
-    
-    // Remove the modal
+
+    // Create Stripe checkout session
+    this.createStripeCheckoutSession();
+  }
+
+  async createStripeCheckoutSession() {
+    try {
+      // Show loading state
+      this.showPaymentLoading();
+
+      // Create checkout session with your backend
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          priceId: 'price_premium_monthly', // Your Stripe price ID
+          successUrl: window.location.origin + '/success',
+          cancelUrl: window.location.origin + '/cancel',
+          metadata: {
+            userId: this.getCurrentUserId(),
+            feature: 'carnival-tracker-premium'
+          }
+        })
+      });
+
+      const session = await response.json();
+
+      if (session.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = session.url;
+      } else {
+        throw new Error('Failed to create checkout session');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      this.showPaymentError();
+    }
+  }
+
+  showPaymentLoading() {
+    // Remove existing modal
     const modal = document.querySelector('.premium-upgrade-modal');
     if (modal) {
       modal.remove();
     }
-    
-    // Show success message
-    this.showPremiumSuccess();
-    
-    // Re-render with premium features
-    this.render();
+
+    // Show loading modal
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'premium-upgrade-modal';
+    loadingDiv.innerHTML = `
+      <div class="premium-upgrade-overlay">
+        <div class="premium-upgrade-content">
+          <div class="premium-upgrade-header">
+            <h3>💳 Processing Payment</h3>
+            <div class="close-premium-upgrade">×</div>
+          </div>
+          <div class="premium-upgrade-body">
+            <div class="payment-loading">
+              <div class="spinner"></div>
+              <p>Redirecting to secure payment...</p>
+              <p class="payment-note">You'll be redirected to Stripe for secure payment processing</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(loadingDiv);
+
+    // Auto-close after 3 seconds if something goes wrong
+    setTimeout(() => {
+      if (document.querySelector('.premium-upgrade-modal')) {
+        loadingDiv.remove();
+        this.showPaymentError();
+      }
+    }, 3000);
+  }
+
+  showPaymentError() {
+    // Remove loading modal
+    const modal = document.querySelector('.premium-upgrade-modal');
+    if (modal) {
+      modal.remove();
+    }
+
+    // Show error modal
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'premium-upgrade-modal';
+    errorDiv.innerHTML = `
+      <div class="premium-upgrade-overlay">
+        <div class="premium-upgrade-content">
+          <div class="premium-upgrade-header">
+            <h3>❌ Payment Error</h3>
+            <div class="close-premium-upgrade">×</div>
+          </div>
+          <div class="premium-upgrade-body">
+            <div class="payment-error">
+              <p>Sorry, we couldn't process your payment right now.</p>
+              <p>Please try again or contact support.</p>
+              <div class="payment-error-actions">
+                <button class="retry-payment-btn">🔄 Try Again</button>
+                <button class="contact-support-btn">📧 Contact Support</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(errorDiv);
+
+    // Add event listeners
+    errorDiv.querySelector('.close-premium-upgrade').addEventListener('click', () => {
+      errorDiv.remove();
+    });
+
+    errorDiv.querySelector('.retry-payment-btn').addEventListener('click', () => {
+      errorDiv.remove();
+      this.upgradeToPremium();
+    });
+
+    errorDiv.querySelector('.contact-support-btn').addEventListener('click', () => {
+      window.open('mailto:support@tagyou.app?subject=Premium Payment Issue', '_blank');
+      errorDiv.remove();
+    });
+  }
+
+  getCurrentUserId() {
+    // Get current user ID from your auth system
+    return window.currentUser?.id || 'anonymous';
   }
 
   showPremiumSuccess() {
@@ -336,9 +453,9 @@ class CarnivalTracker {
         <p>All premium features are now unlocked</p>
       </div>
     `;
-    
+
     document.body.appendChild(successDiv);
-    
+
     setTimeout(() => {
       successDiv.remove();
     }, 3000);
@@ -441,9 +558,9 @@ class CarnivalTracker {
 
         <!-- Content -->
         <div class="tracker-content">
-          ${this.activeTab === 'tracker' ? this.renderTrackerTab(filteredPeople) : 
-            this.activeTab === 'notifications' ? this.renderNotificationsTab() :
-            this.activeTab === 'analytics' ? this.renderAnalyticsTab() : ''}
+          ${this.activeTab === 'tracker' ? this.renderTrackerTab(filteredPeople) :
+        this.activeTab === 'notifications' ? this.renderNotificationsTab() :
+          this.activeTab === 'analytics' ? this.renderAnalyticsTab() : ''}
         </div>
       </div>
     `;
@@ -553,7 +670,7 @@ class CarnivalTracker {
     const activeMembers = this.people.filter(p => p.isSharing).length;
     const avgResponseTime = "2.3 min";
     const popularArea = "Ladbroke Grove Station";
-    
+
     return `
       <div class="analytics-tab-content">
         <div class="analytics-header">
@@ -769,14 +886,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Small delay to ensure other components are loaded
   setTimeout(() => {
     window.carnivalTracker = new CarnivalTracker();
-    
+
     // Make it globally accessible
     window.toggleCarnivalTracker = () => {
       if (window.carnivalTracker) {
         window.carnivalTracker.toggle();
       }
     };
-    
+
     console.log('🎭 Carnival tracker initialized');
   }, 50); // Reduced delay for faster loading
 });

@@ -1,38 +1,20 @@
 {
-  "name": "tagyou2-london-map",
+  "name": "tagyou-carnival-tracker",
   "version": "1.0.0",
-  "description": "Interactive London map focused on Notting Hill Carnival with festival features",
-  "main": "index.html",
+  "description": "Carnival tracking app with premium features",
+  "main": "server.js",
   "scripts": {
-    "start": "live-server --port=5501 --open=/index.html",
-    "dev": "live-server --port=5501 --open=/index.html",
-    "build": "echo 'Build process for London map'",
-    "test": "echo 'No tests specified'",
-    "lint": "echo 'No linter configured'",
-    "format": "echo 'No formatter configured'"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
-  "keywords": [
-    "london",
-    "map",
-    "notting-hill-carnival",
-    "festival",
-    "leaflet",
-    "interactive"
-  ],
-  "author": "TagYou2 Team",
-  "license": "MIT",
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0"
+    "express": "^4.18.2",
+    "stripe": "^14.0.0"
   },
   "devDependencies": {
-    "live-server": "^1.2.2"
+    "nodemon": "^3.0.1"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/tagyou2-london-map.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yourusername/tagyou2-london-map/issues"
-  },
-  "homepage": "https://github.com/yourusername/tagyou2-london-map#readme"
+  "keywords": ["carnival", "tracker", "premium", "stripe"],
+  "author": "TagYou Team",
+  "license": "MIT"
 }
