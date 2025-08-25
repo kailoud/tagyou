@@ -33,7 +33,7 @@ const PRICING_CONFIG = {
 
     premium_monthly: {
       name: 'Premium Monthly',
-      price: 499, // £4.99 in pence
+      price: 999, // £9.99 in pence
       currency: 'gbp',
       duration: '1 month',
       recurring: true,
@@ -50,11 +50,11 @@ const PRICING_CONFIG = {
 
     premium_yearly: {
       name: 'Premium Yearly',
-      price: 4999, // £49.99 in pence
+      price: 9999, // £99.99 in pence
       currency: 'gbp',
       duration: '12 months',
       recurring: true,
-      savings: '58% off monthly',
+      savings: '17% off monthly',
       features: [
         'Unlimited squad members',
         'Real-time GPS tracking',
@@ -72,11 +72,11 @@ const PRICING_CONFIG = {
     '3-month-promo': {
       name: 'TagYou Premium - 3 Month Deal',
       description: 'Premium carnival tracking with unlimited squad members and advanced features',
-      price: 100, // £9.99
+      price: 999, // £9.99
       currency: 'gbp',
       duration: '3 months',
-      originalPrice: 1497, // £14.97 (3 x £4.99)
-      savings: '33% off',
+      originalPrice: 2997, // £29.97 (3 x £9.99)
+      savings: '67% off',
       popular: true,
       image: 'https://tagyou.app/logo.png'
     },
@@ -84,7 +84,7 @@ const PRICING_CONFIG = {
     'monthly-subscription': {
       name: 'TagYou Premium - Monthly',
       description: 'Premium carnival tracking with unlimited squad members and advanced features',
-      price: 499, // £4.99
+      price: 999, // £9.99
       currency: 'gbp',
       duration: '1 month',
       recurring: true,
@@ -94,11 +94,11 @@ const PRICING_CONFIG = {
     'yearly-subscription': {
       name: 'TagYou Premium - Yearly',
       description: 'Premium carnival tracking with unlimited squad members and advanced features',
-      price: 4999, // £49.99
+      price: 9999, // £99.99
       currency: 'gbp',
       duration: '12 months',
       recurring: true,
-      originalPrice: 5988, // £59.88 (12 x £4.99)
+      originalPrice: 11988, // £119.88 (12 x £9.99)
       savings: '17% off',
       image: 'https://tagyou.app/logo.png'
     }
