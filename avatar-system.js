@@ -75,6 +75,11 @@ class AvatarSystem {
 
     // Initialize authentication in background
     this.init();
+    
+    // Check if avatar was created successfully after a short delay
+    setTimeout(() => {
+      this.recreateAvatarIfMissing();
+    }, 1000);
   }
 
   async initializeSupabase() {
@@ -417,16 +422,36 @@ class AvatarSystem {
     await this.checkPremiumStatus();
   }
 
+  // Force recreate avatar if missing
+  recreateAvatarIfMissing() {
+    const existingAvatar = document.querySelector('.avatar-container');
+    if (!existingAvatar) {
+      console.log('UI DEBUG: Avatar missing, recreating...');
+      this.createAvatarElement();
+    } else {
+      console.log('UI DEBUG: Avatar exists:', existingAvatar);
+    }
+  }
+
   createAvatarElement() {
-    console.log('UI DEBUG: Creating avatar element...');
-    const avatarContainer = document.createElement('div');
-    avatarContainer.className = 'avatar-container';
-    avatarContainer.style.cssText = `
-      position: fixed;
-      top: 40px;
-      right: 40px;
-      z-index: 9999;
-    `;
+    try {
+      console.log('UI DEBUG: Creating avatar element...');
+      
+      // Remove any existing avatar first
+      const existingAvatar = document.querySelector('.avatar-container');
+      if (existingAvatar) {
+        existingAvatar.remove();
+        console.log('UI DEBUG: Removed existing avatar');
+      }
+      
+      const avatarContainer = document.createElement('div');
+      avatarContainer.className = 'avatar-container';
+      avatarContainer.style.cssText = `
+        position: fixed;
+        top: 40px;
+        right: 40px;
+        z-index: 9999;
+      `;
 
     const avatarButton = document.createElement('button');
     avatarButton.className = 'avatar-button';
@@ -480,6 +505,14 @@ class AvatarSystem {
     avatarContainer.appendChild(avatarButton);
     this.dropdownRef = avatarContainer;
     document.body.appendChild(avatarContainer);
+    
+    console.log('UI DEBUG: Avatar element created and added to DOM');
+    console.log('UI DEBUG: Avatar container:', avatarContainer);
+    console.log('UI DEBUG: Avatar button:', avatarButton);
+    
+    } catch (error) {
+      console.error('UI DEBUG: Error creating avatar element:', error);
+    }
   }
 
   // Method to update status indicator without recreating avatar
