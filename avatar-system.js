@@ -18,6 +18,8 @@ class AvatarSystem {
     this.dropdownRef = null;
     this.authService = null;
     this.rememberMe = false; // Remember Me functionality
+    this.userTier = 'Basic'; // 'Basic' or 'Premium'
+    this.isPremium = false;
 
     // UK Carnival data
     this.ukCarnivals = [
@@ -220,6 +222,9 @@ class AvatarSystem {
 
     // Try to connect to the global auth service
     this.connectToGlobalAuthService();
+    
+    // Check user premium status
+    await this.checkPremiumStatus();
   }
 
   async connectToGlobalAuthService() {
@@ -233,13 +238,14 @@ class AvatarSystem {
           console.log('AUTH DEBUG: Connected to global auth service');
           this.authService = window.authService;
 
-          // Set up auth state listener
-          this.authService.onAuthStateChanged((user) => {
-            console.log('AUTH DEBUG: Global auth state changed:', user?.email || 'no user');
-            this.user = user;
-            this.updateStatusIndicator();
-            this.renderDropdown();
-          });
+                // Set up auth state listener
+      this.authService.onAuthStateChanged((user) => {
+        console.log('AUTH DEBUG: Global auth state changed:', user?.email || 'no user');
+        this.user = user;
+        this.updateStatusIndicator();
+        this.checkPremiumStatus(); // Check premium status when user changes
+        this.renderDropdown();
+      });
 
           return;
         }
@@ -297,6 +303,44 @@ class AvatarSystem {
       console.error('AUTH DEBUG: Error checking user:', error);
     } finally {
       this.loading = false;
+    }
+  }
+
+  async checkPremiumStatus() {
+    try {
+      if (!this.user || !this.user.email) {
+        this.setUserTier('Basic');
+        return;
+      }
+
+      // Check if user has premium status (same logic as carnival tracker)
+      const premiumEmails = [
+        'kaycheckmate@gmail.com',
+        'truesliks@gmail.com',
+        // Add more premium emails here
+      ];
+
+      if (premiumEmails.includes(this.user.email.toLowerCase())) {
+        console.log('💎 Premium user detected in avatar system:', this.user.email);
+        this.setUserTier('Premium');
+      } else {
+        console.log('📱 Basic user detected in avatar system:', this.user.email);
+        this.setUserTier('Basic');
+      }
+    } catch (error) {
+      console.error('❌ Error checking premium status:', error);
+      this.setUserTier('Basic');
+    }
+  }
+
+  setUserTier(tier) {
+    this.userTier = tier;
+    this.isPremium = tier === 'Premium';
+    console.log(`🎯 Avatar system user tier set to: ${tier}`);
+    
+    // Update dropdown if it's currently open
+    if (this.isDropdownOpen) {
+      this.renderDropdown();
     }
   }
 
@@ -432,8 +476,13 @@ class AvatarSystem {
             <h3 style="font-weight: bold; font-size: 18px; margin: 0;">${this.user.user_metadata?.full_name || 'User'}</h3>
             <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin: 4px 0;">${this.user.email}</p>
             <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
-              <i class="fas fa-star" style="color: #fbbf24;"></i>
-              <span style="font-size: 14px; color: rgba(255,255,255,0.9);">Premium User</span>
+              ${this.isPremium ? `
+                <i class="fas fa-star" style="color: #fbbf24;"></i>
+                <span style="font-size: 14px; color: rgba(255,255,255,0.9);">Premium User</span>
+              ` : `
+                <i class="fas fa-user" style="color: #9ca3af;"></i>
+                <span style="font-size: 14px; color: rgba(255,255,255,0.9);">Basic User</span>
+              `}
             </div>
           </div>
         </div>
@@ -475,11 +524,17 @@ class AvatarSystem {
       <div style="background: #f9fafb; padding: 16px; border-top: 1px solid #f3f4f6;">
         <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #6b7280; margin-bottom: 12px;">
           <span>Joined Today</span>
-          <span>Free Plan</span>
+          <span>${this.isPremium ? 'Premium Plan' : 'Free Plan'}</span>
         </div>
-        <button class="avatar-upgrade-btn" style="width: 100%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; padding: 8px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s;">
-          Upgrade 💎
-        </button>
+        ${this.isPremium ? `
+          <button class="avatar-premium-btn" style="width: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; padding: 8px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: default; transition: all 0.3s;">
+            Premium 💎
+          </button>
+        ` : `
+          <button class="avatar-upgrade-btn" style="width: 100%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; padding: 8px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s;">
+            Upgrade 💎
+          </button>
+        `}
       </div>
     `;
   }
