@@ -322,35 +322,38 @@ class CarnivalTracker {
       // Show loading state
       this.showPaymentLoading();
 
-      // For static sites, we'll use a simple redirect to Stripe
-      // In production, you'd need a backend API endpoint
-      const checkoutUrl = this.getStripeCheckoutUrl();
+      // Get current user info
+      const userId = this.getCurrentUserId();
+      const email = window.currentUser?.email || '';
 
-      if (checkoutUrl) {
+      // Create checkout session via API
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userId,
+          email: email,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
+      }
+
+      const { url } = await response.json();
+
+      if (url) {
         // Redirect to Stripe Checkout
-        window.location.href = checkoutUrl;
+        window.location.href = url;
       } else {
-        throw new Error('Stripe checkout URL not configured');
+        throw new Error('No checkout URL received');
       }
     } catch (error) {
       console.error('Payment error:', error);
       this.showPaymentError();
     }
-  }
-
-  getStripeCheckoutUrl() {
-    // For demo purposes, show a message about setting up Stripe
-    // In production, this would be a real Stripe checkout URL
-    const stripePublishableKey = 'pk_test_your_stripe_publishable_key_here';
-
-    if (stripePublishableKey === 'pk_test_your_stripe_publishable_key_here') {
-      // Show demo message
-      this.showDemoPaymentMessage();
-      return null;
-    }
-
-    // Real Stripe checkout URL would be generated here
-    return `https://checkout.stripe.com/pay/cs_test_...`;
   }
 
   showDemoPaymentMessage() {
