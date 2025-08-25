@@ -312,7 +312,7 @@ class CarnivalTracker {
           </div>
           
           <div class="premium-actions">
-            <button class="upgrade-btn" onclick="window.carnivalTracker.handleUpgradeClick()">
+            <button class="upgrade-btn" onclick="window.carnivalTracker.upgradeToPremium()">
               <i class="fas fa-crown"></i>
               Get 3-Month Deal
             </button>
