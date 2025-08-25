@@ -4,8 +4,64 @@
 // Use global Supabase instance
 let supabase = null;
 
+// Initialize Supabase client
+async function initializeSupabase() {
+  if (supabase) {
+    return supabase; // Already initialized
+  }
+
+  try {
+    // Wait for Supabase SDK to be available
+    let attempts = 0;
+    const maxAttempts = 30;
+
+    while (attempts < maxAttempts) {
+      if (typeof window !== 'undefined' && window.supabase && window.supabase.createClient) {
+        console.log('✅ Supabase SDK available, proceeding with initialization...');
+        break;
+      }
+      attempts++;
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    if (attempts >= maxAttempts) {
+      throw new Error('Supabase SDK not available after 3 seconds');
+    }
+
+    // Try to load configuration
+    let supabaseUrl, supabaseAnonKey;
+    
+    try {
+      // Try to load from secret configuration file
+      const secretConfig = await import('./supabase-config-secret.js');
+      supabaseUrl = secretConfig.default.supabaseUrl;
+      supabaseAnonKey = secretConfig.default.supabaseAnonKey;
+      console.log('✅ Supabase configuration loaded from secret file');
+    } catch (error) {
+      // Fallback to environment variables or default config
+      console.warn('⚠️ Secret config not found, using fallback configuration');
+      
+      // Use the same config as other files
+      supabaseUrl = 'https://rpsbibwmbsllnvfithjw.supabase.co';
+      supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc2JpYndtYnNsbG52Zml0aGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5NzI5NzQsImV4cCI6MjA1MDU0ODk3NH0.Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8';
+    }
+
+    // Create Supabase client
+    supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+    
+    console.log('✅ Supabase client initialized successfully');
+    return supabase;
+  } catch (error) {
+    console.error('❌ Supabase initialization error:', error);
+    throw error;
+  }
+}
+
 // Check if Supabase is properly initialized
-function checkSupabaseConnection() {
+async function checkSupabaseConnection() {
+  if (!supabase) {
+    await initializeSupabase();
+  }
   if (!supabase) {
     throw new Error('Supabase not initialized. Please check your configuration.');
   }
@@ -15,7 +71,7 @@ function checkSupabaseConnection() {
 export class PremiumUsersService {
   static async getPremiumUser(email) {
     try {
-      checkSupabaseConnection();
+      await await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('premium_users')
@@ -38,7 +94,7 @@ export class PremiumUsersService {
 
   static async addPremiumUser(email, paymentData = {}) {
     try {
-      checkSupabaseConnection();
+      await await checkSupabaseConnection();
 
       const premiumUser = {
         email: email.toLowerCase(),
@@ -75,7 +131,7 @@ export class PremiumUsersService {
 
   static async updatePremiumUser(email, updates) {
     try {
-      checkSupabaseConnection();
+      await await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('premium_users')
@@ -98,7 +154,7 @@ export class PremiumUsersService {
 
   static async removePremiumUser(email) {
     try {
-      checkSupabaseConnection();
+      await await checkSupabaseConnection();
 
       const { error } = await supabase
         .from('premium_users')
@@ -120,7 +176,7 @@ export class PremiumUsersService {
 
   static async getAllPremiumUsers() {
     try {
-      checkSupabaseConnection();
+      await await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('premium_users')
@@ -176,7 +232,7 @@ export class PremiumUsersService {
 export class FoodStallsService {
   static async getAllFoodStalls() {
     try {
-      checkSupabaseConnection();
+      await await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('food_stalls')
@@ -198,7 +254,7 @@ export class FoodStallsService {
 
   static async addFoodStall(foodStall) {
     try {
-      checkSupabaseConnection();
+      await await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('food_stalls')
@@ -220,7 +276,7 @@ export class FoodStallsService {
 
   static async updateFoodStall(id, updates) {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('food_stalls')
@@ -243,7 +299,7 @@ export class FoodStallsService {
 
   static async deleteFoodStall(id) {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { error } = await supabase
         .from('food_stalls')
@@ -268,7 +324,7 @@ export class FoodStallsService {
 export class ArtistsService {
   static async getAllArtists() {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('artists')
@@ -290,7 +346,7 @@ export class ArtistsService {
 
   static async addArtist(artist) {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('artists')
@@ -312,7 +368,7 @@ export class ArtistsService {
 
   static async updateArtist(id, updates) {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('artists')
@@ -335,7 +391,7 @@ export class ArtistsService {
 
   static async deleteArtist(id) {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { error } = await supabase
         .from('artists')
@@ -360,7 +416,7 @@ export class ArtistsService {
 export class FloatTrucksService {
   static async getAllFloatTrucks() {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('float_trucks')
@@ -382,7 +438,7 @@ export class FloatTrucksService {
 
   static async addFloatTruck(floatTruck) {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('float_trucks')
@@ -404,7 +460,7 @@ export class FloatTrucksService {
 
   static async updateFloatTruck(id, updates) {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('float_trucks')
@@ -427,7 +483,7 @@ export class FloatTrucksService {
 
   static async deleteFloatTruck(id) {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { error } = await supabase
         .from('float_trucks')
@@ -452,7 +508,7 @@ export class FloatTrucksService {
 export class UserFavoritesService {
   static async getUserFavorites(userId) {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('user_favorites')
@@ -473,7 +529,7 @@ export class UserFavoritesService {
 
   static async addFavorite(userId, itemId, itemType) {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('user_favorites')
@@ -500,7 +556,7 @@ export class UserFavoritesService {
 
   static async removeFavorite(userId, itemId, itemType) {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { error } = await supabase
         .from('user_favorites')
@@ -524,7 +580,7 @@ export class UserFavoritesService {
 
   static async isFavorite(userId, itemId, itemType) {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const { data, error } = await supabase
         .from('user_favorites')
@@ -551,7 +607,7 @@ export class UserFavoritesService {
 export class RealtimeService {
   static subscribeToFoodStalls(callback) {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const subscription = supabase
         .channel('food_stalls_changes')
@@ -571,7 +627,7 @@ export class RealtimeService {
 
   static subscribeToArtists(callback) {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const subscription = supabase
         .channel('artists_changes')
@@ -591,7 +647,7 @@ export class RealtimeService {
 
   static subscribeToFloatTrucks(callback) {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const subscription = supabase
         .channel('float_trucks_changes')
@@ -611,7 +667,7 @@ export class RealtimeService {
 
   static subscribeToUserFavorites(userId, callback) {
     try {
-      checkSupabaseConnection();
+      await checkSupabaseConnection();
 
       const subscription = supabase
         .channel(`user_favorites_${userId}`)
@@ -633,7 +689,7 @@ export class RealtimeService {
 // Initialize default data - now empty for custom schema
 export async function initializeDefaultData() {
   try {
-    checkSupabaseConnection();
+    await checkSupabaseConnection();
 
     console.log('🚀 Data initialization ready for custom schema...');
     console.log('ℹ️ No demo data will be inserted - implement your own schema');
