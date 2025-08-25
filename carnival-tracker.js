@@ -235,7 +235,7 @@ class CarnivalTracker {
     if (this.newPerson.name && this.newPerson.phone && this.newPerson.relationship) {
       // Check if user can add more people
       if (!this.canAddPerson()) {
-        this.showPremiumUpgrade(`You've reached the limit of ${this.maxFreeMembers} person for Basic users. Upgrade to Premium for unlimited squad members!`);
+        this.showPremiumUpgrade(`You've reached the limit of ${this.maxFreeMembers} person for Basic users. Upgrade to Pro for unlimited squad members!`);
         return;
       }
 
@@ -263,7 +263,7 @@ class CarnivalTracker {
         <div class="premium-upgrade-content">
           <div class="premium-upgrade-header">
             <div class="premium-badge">💎</div>
-            <h2>Upgrade to Premium</h2>
+            <h2>Upgrade to Pro</h2>
             <p>${customMessage || 'Unlock unlimited squad members and advanced features'}</p>
           </div>
           
@@ -312,7 +312,7 @@ class CarnivalTracker {
           </div>
           
           <div class="premium-actions">
-            <button class="upgrade-btn" onclick="window.carnivalTracker.upgradeToPremium()">
+            <button class="upgrade-btn" onclick="window.carnivalTracker.handleUpgradeClick()">
               <i class="fas fa-crown"></i>
               Get 3-Month Deal
             </button>
@@ -327,9 +327,20 @@ class CarnivalTracker {
     document.body.appendChild(modal);
   }
 
+  handleUpgradeClick() {
+    // Close any existing modals first
+    const existingModal = document.querySelector('.premium-upgrade-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+    
+    // Show the premium upgrade modal
+    this.showPremiumUpgrade();
+  }
+
   upgradeToPremium() {
     // For static site deployment, use Stripe Checkout directly
-    console.log('💎 Upgrading to Premium...');
+    console.log('💎 Upgrading to Pro...');
 
     // Create Stripe checkout session using Stripe's hosted checkout
     this.createStripeCheckoutSession();
@@ -766,9 +777,9 @@ class CarnivalTracker {
           
           <div class="tracker-actions">
             ${!this.isPremium ? `
-              <button class="premium-upgrade-btn" title="Upgrade to Premium" onclick="window.carnivalTracker.showPremiumUpgrade()">
-                <i class="fas fa-crown"></i>
-              </button>
+                          <button class="premium-upgrade-btn" title="Upgrade to Pro" onclick="window.carnivalTracker.handleUpgradeClick()">
+              <i class="fas fa-crown"></i>
+            </button>
             ` : ''}
             <button class="add-person-btn" title="Add Person">
               <i class="fas fa-plus"></i>
@@ -874,7 +885,7 @@ class CarnivalTracker {
               <i class="fas fa-phone"></i>
             </button>
           ` : `
-            <button class="action-btn phone-btn disabled" title="Calling requires Premium" onclick="window.carnivalTracker.showPremiumUpgrade('Calling and messaging are Premium features. Upgrade to connect with your squad!')">
+            <button class="action-btn phone-btn disabled" title="Calling requires Pro" onclick="window.carnivalTracker.showPremiumUpgrade('Calling and messaging are Pro features. Upgrade to connect with your squad!')">
               <i class="fas fa-phone"></i>
             </button>
           `}
@@ -884,7 +895,7 @@ class CarnivalTracker {
               <i class="fab fa-whatsapp"></i>
             </button>
           ` : `
-            <button class="action-btn whatsapp-btn disabled" title="Messaging requires Premium" onclick="window.carnivalTracker.showPremiumUpgrade('Calling and messaging are Premium features. Upgrade to connect with your squad!')">
+            <button class="action-btn whatsapp-btn disabled" title="Messaging requires Pro" onclick="window.carnivalTracker.showPremiumUpgrade('Calling and messaging are Pro features. Upgrade to connect with your squad!')">
               <i class="fab fa-whatsapp"></i>
             </button>
           `}
