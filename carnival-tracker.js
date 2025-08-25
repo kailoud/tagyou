@@ -1269,6 +1269,104 @@ class CarnivalTracker {
     }
   }
 
+  // Update user location in carnival tracker
+  updateUserLocation(position) {
+    console.log('🎭 Updating user location in carnival tracker:', position);
+
+    // Find current user in people list or add them
+    const currentUser = window.avatarSystem?.user;
+    if (!currentUser) {
+      console.log('⚠️ No current user found');
+      return;
+    }
+
+    let userPerson = this.people.find(p => p.email === currentUser.email);
+
+    if (!userPerson) {
+      // Add current user to people list
+      userPerson = {
+        id: Date.now(),
+        name: currentUser.user_metadata?.full_name || currentUser.email.split('@')[0],
+        email: currentUser.email,
+        phone: currentUser.phone || '',
+        relationship: 'You',
+        isSharing: true,
+        location: {
+          latitude: position.latitude,
+          longitude: position.longitude,
+          area: this.getAreaFromCoordinates(position.latitude, position.longitude),
+          accuracy: position.accuracy
+        },
+        lastUpdate: new Date(position.timestamp),
+        avatar: this.generateAvatar(currentUser.user_metadata?.full_name || currentUser.email.split('@')[0])
+      };
+
+      this.people.push(userPerson);
+      console.log('✅ Added current user to carnival tracker');
+    } else {
+      // Update existing user location
+      userPerson.isSharing = true;
+      userPerson.location = {
+        latitude: position.latitude,
+        longitude: position.longitude,
+        area: this.getAreaFromCoordinates(position.latitude, position.longitude),
+        accuracy: position.accuracy
+      };
+      userPerson.lastUpdate = new Date(position.timestamp);
+      console.log('✅ Updated current user location in carnival tracker');
+    }
+
+    // Re-render if visible
+    if (this.isVisible) {
+      this.render();
+    }
+  }
+
+  // Remove user location from carnival tracker
+  removeUserLocation() {
+    console.log('🎭 Removing user location from carnival tracker');
+
+    const currentUser = window.avatarSystem?.user;
+    if (!currentUser) {
+      console.log('⚠️ No current user found');
+      return;
+    }
+
+    const userPerson = this.people.find(p => p.email === currentUser.email);
+    if (userPerson) {
+      userPerson.isSharing = false;
+      userPerson.location = null;
+      console.log('✅ Removed current user location from carnival tracker');
+
+      // Re-render if visible
+      if (this.isVisible) {
+        this.render();
+      }
+    }
+  }
+
+  // Get area name from coordinates (simplified)
+  getAreaFromCoordinates(lat, lng) {
+    // This is a simplified version - in a real app you'd use a geocoding service
+    const areas = [
+      { name: 'Ladbroke Grove', lat: 51.5194, lng: -0.2107, radius: 0.01 },
+      { name: 'Portobello Road', lat: 51.5189, lng: -0.2047, radius: 0.01 },
+      { name: 'Westbourne Park', lat: 51.5219, lng: -0.2019, radius: 0.01 },
+      { name: 'Notting Hill', lat: 51.5167, lng: -0.2000, radius: 0.01 },
+      { name: 'Kensal Rise', lat: 51.5269, lng: -0.2219, radius: 0.01 }
+    ];
+
+    for (const area of areas) {
+      const distance = Math.sqrt(
+        Math.pow(lat - area.lat, 2) + Math.pow(lng - area.lng, 2)
+      );
+      if (distance <= area.radius) {
+        return area.name;
+      }
+    }
+
+    return 'Nearby Area';
+  }
 }
 
 // Initialize the carnival tracker when the page loads
