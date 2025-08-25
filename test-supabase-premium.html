@@ -62,7 +62,22 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        // Import the PremiumUsersService
+        let PremiumUsersService = null;
+        
+        async function loadPremiumService() {
+            try {
+                const { PremiumUsersService: Service } = await import('./supabase-service.js');
+                PremiumUsersService = Service;
+                console.log('✅ PremiumUsersService loaded successfully');
+                return true;
+            } catch (error) {
+                console.error('❌ Error loading PremiumUsersService:', error);
+                return false;
+            }
+        }
+
         // Test premium user check
         async function testPremiumCheck() {
             const email = document.getElementById('testEmail').value.trim();
@@ -74,26 +89,31 @@
             }
 
             try {
-                resultDiv.innerHTML = '<div class="info">Checking premium status...</div>';
+                resultDiv.innerHTML = '<div class="info">Loading service and checking premium status...</div>';
                 
-                if (window.PremiumUsersService) {
-                    const isPremium = await window.PremiumUsersService.isPremiumUser(email);
-                    const details = await window.PremiumUsersService.getPremiumUserDetails(email);
-                    
-                    resultDiv.innerHTML = `
-                        <div class="${isPremium ? 'success' : 'error'}">
-                            <h4>Premium Status: ${isPremium ? '✅ Premium' : '❌ Basic'}</h4>
-                            <p><strong>Email:</strong> ${email}</p>
-                            ${details ? `
-                                <p><strong>Payment Date:</strong> ${details.paymentDate}</p>
-                                <p><strong>Offer Type:</strong> ${details.offerType}</p>
-                                <p><strong>Expires At:</strong> ${details.expiresAt || 'No expiration'}</p>
-                            ` : '<p>No premium details found</p>'}
-                        </div>
-                    `;
-                } else {
-                    resultDiv.innerHTML = '<div class="error">PremiumUsersService not available. Check if supabase-service.js is loaded.</div>';
+                // Load service if not already loaded
+                if (!PremiumUsersService) {
+                    const loaded = await loadPremiumService();
+                    if (!loaded) {
+                        resultDiv.innerHTML = '<div class="error">Failed to load PremiumUsersService. Check console for errors.</div>';
+                        return;
+                    }
                 }
+                
+                const isPremium = await PremiumUsersService.isPremiumUser(email);
+                const details = await PremiumUsersService.getPremiumUserDetails(email);
+                
+                resultDiv.innerHTML = `
+                    <div class="${isPremium ? 'success' : 'error'}">
+                        <h4>Premium Status: ${isPremium ? '✅ Premium' : '❌ Basic'}</h4>
+                        <p><strong>Email:</strong> ${email}</p>
+                        ${details ? `
+                            <p><strong>Payment Date:</strong> ${details.paymentDate}</p>
+                            <p><strong>Offer Type:</strong> ${details.offerType}</p>
+                            <p><strong>Expires At:</strong> ${details.expiresAt || 'No expiration'}</p>
+                        ` : '<p>No premium details found</p>'}
+                    </div>
+                `;
             } catch (error) {
                 resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
             }
@@ -110,30 +130,35 @@
             }
 
             try {
-                resultDiv.innerHTML = '<div class="info">Adding premium user...</div>';
+                resultDiv.innerHTML = '<div class="info">Loading service and adding premium user...</div>';
                 
-                if (window.PremiumUsersService) {
-                    const paymentData = {
-                        amount: 999,
-                        currency: 'gbp',
-                        sessionId: 'test-session-' + Date.now(),
-                        offerType: '3-month-promo',
-                        expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
-                    };
-                    
-                    const result = await window.PremiumUsersService.addPremiumUser(email, paymentData);
-                    
-                    resultDiv.innerHTML = `
-                        <div class="success">
-                            <h4>✅ Premium User Added Successfully</h4>
-                            <p><strong>Email:</strong> ${result.email}</p>
-                            <p><strong>Premium Status:</strong> ${result.is_premium ? 'Active' : 'Inactive'}</p>
-                            <p><strong>Payment Date:</strong> ${result.payment_date}</p>
-                        </div>
-                    `;
-                } else {
-                    resultDiv.innerHTML = '<div class="error">PremiumUsersService not available.</div>';
+                // Load service if not already loaded
+                if (!PremiumUsersService) {
+                    const loaded = await loadPremiumService();
+                    if (!loaded) {
+                        resultDiv.innerHTML = '<div class="error">Failed to load PremiumUsersService. Check console for errors.</div>';
+                        return;
+                    }
                 }
+                
+                const paymentData = {
+                    amount: 999,
+                    currency: 'gbp',
+                    sessionId: 'test-session-' + Date.now(),
+                    offerType: '3-month-promo',
+                    expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+                };
+                
+                const result = await PremiumUsersService.addPremiumUser(email, paymentData);
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Premium User Added Successfully</h4>
+                        <p><strong>Email:</strong> ${result.email}</p>
+                        <p><strong>Premium Status:</strong> ${result.is_premium ? 'Active' : 'Inactive'}</p>
+                        <p><strong>Payment Date:</strong> ${result.payment_date}</p>
+                    </div>
+                `;
             } catch (error) {
                 resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
             }
@@ -144,26 +169,31 @@
             const resultDiv = document.getElementById('getAllPremiumResult');
             
             try {
-                resultDiv.innerHTML = '<div class="info">Fetching all premium users...</div>';
+                resultDiv.innerHTML = '<div class="info">Loading service and fetching all premium users...</div>';
                 
-                if (window.PremiumUsersService) {
-                    const users = await window.PremiumUsersService.getAllPremiumUsers();
-                    
-                    resultDiv.innerHTML = `
-                        <div class="success">
-                            <h4>📊 Premium Users (${users.length})</h4>
-                            ${users.length > 0 ? `
-                                <ul>
-                                    ${users.map(user => `
-                                        <li><strong>${user.email}</strong> - ${user.offer_type} (${user.payment_date})</li>
-                                    `).join('')}
-                                </ul>
-                            ` : '<p>No premium users found</p>'}
-                        </div>
-                    `;
-                } else {
-                    resultDiv.innerHTML = '<div class="error">PremiumUsersService not available.</div>';
+                // Load service if not already loaded
+                if (!PremiumUsersService) {
+                    const loaded = await loadPremiumService();
+                    if (!loaded) {
+                        resultDiv.innerHTML = '<div class="error">Failed to load PremiumUsersService. Check console for errors.</div>';
+                        return;
+                    }
                 }
+                
+                const users = await PremiumUsersService.getAllPremiumUsers();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>📊 Premium Users (${users.length})</h4>
+                        ${users.length > 0 ? `
+                            <ul>
+                                ${users.map(user => `
+                                    <li><strong>${user.email}</strong> - ${user.offer_type} (${user.payment_date})</li>
+                                `).join('')}
+                            </ul>
+                        ` : '<p>No premium users found</p>'}
+                    </div>
+                `;
             } catch (error) {
                 resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
             }
@@ -180,49 +210,73 @@
             }
 
             try {
-                resultDiv.innerHTML = '<div class="info">Removing premium user...</div>';
+                resultDiv.innerHTML = '<div class="info">Loading service and removing premium user...</div>';
                 
-                if (window.PremiumUsersService) {
-                    await window.PremiumUsersService.removePremiumUser(email);
-                    
-                    resultDiv.innerHTML = `
-                        <div class="success">
-                            <h4>✅ Premium User Removed Successfully</h4>
-                            <p><strong>Email:</strong> ${email}</p>
-                        </div>
-                    `;
-                } else {
-                    resultDiv.innerHTML = '<div class="error">PremiumUsersService not available.</div>';
+                // Load service if not already loaded
+                if (!PremiumUsersService) {
+                    const loaded = await loadPremiumService();
+                    if (!loaded) {
+                        resultDiv.innerHTML = '<div class="error">Failed to load PremiumUsersService. Check console for errors.</div>';
+                        return;
+                    }
                 }
+                
+                await PremiumUsersService.removePremiumUser(email);
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Premium User Removed Successfully</h4>
+                        <p><strong>Email:</strong> ${email}</p>
+                    </div>
+                `;
             } catch (error) {
                 resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
             }
         }
 
         // Check environment
-        function checkEnvironment() {
+        async function checkEnvironment() {
             const resultDiv = document.getElementById('environmentResult');
             
-            const checks = {
-                'Supabase URL': window.supabase ? '✅ Available' : '❌ Not available',
-                'PremiumUsersService': window.PremiumUsersService ? '✅ Available' : '❌ Not available',
-                'Supabase Client': window.supabase ? '✅ Connected' : '❌ Not connected'
-            };
-            
-            resultDiv.innerHTML = `
-                <div class="info">
-                    <h4>🔧 Environment Check</h4>
-                    <ul>
-                        ${Object.entries(checks).map(([key, value]) => `<li><strong>${key}:</strong> ${value}</li>`).join('')}
-                    </ul>
-                </div>
-            `;
+            try {
+                // Try to load the service
+                const serviceLoaded = await loadPremiumService();
+                
+                const checks = {
+                    'Supabase URL': window.supabase ? '✅ Available' : '❌ Not available',
+                    'PremiumUsersService': serviceLoaded ? '✅ Available' : '❌ Not available',
+                    'Supabase Client': window.supabase ? '✅ Connected' : '❌ Not connected'
+                };
+                
+                resultDiv.innerHTML = `
+                    <div class="info">
+                        <h4>🔧 Environment Check</h4>
+                        <ul>
+                            ${Object.entries(checks).map(([key, value]) => `<li><strong>${key}:</strong> ${value}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>🔧 Environment Check Failed</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
         }
 
         // Check environment on page load
         window.addEventListener('load', function() {
             checkEnvironment();
         });
+
+        // Make functions globally available
+        window.testPremiumCheck = testPremiumCheck;
+        window.testAddPremium = testAddPremium;
+        window.testGetAllPremium = testGetAllPremium;
+        window.testRemovePremium = testRemovePremium;
+        window.checkEnvironment = checkEnvironment;
     </script>
 </body>
 </html>
