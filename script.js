@@ -1157,26 +1157,8 @@ function initMapToolbar() {
     }
   });
 
-  // Profile button for authentication
-  const profileBtn = document.getElementById('profileBtn');
-  if (profileBtn) {
-    profileBtn.addEventListener('click', function () {
-      console.log('👤 Profile button clicked');
-
-      // Check if user is authenticated
-      if (window.authService && window.authService.isAuthenticated()) {
-        // Show profile menu or sign out option
-        showProfileMenu();
-      } else {
-        // Show sign in modal
-        if (window.authService && window.authService.showSignInModal) {
-          window.authService.showSignInModal();
-        } else {
-          console.log('❌ Auth service not available');
-        }
-      }
-    });
-  }
+  // Profile button removed - using avatar system instead
+  // The avatar system handles all profile functionality
 
   console.log('🎭 Carnival tracker button event listener added (replaces Groups button)');
 }
@@ -1192,58 +1174,8 @@ function toggleButtonActive(button) {
   }
 }
 
-// Show profile menu for authenticated users
-function showProfileMenu() {
-  const user = window.authService.getCurrentUser();
-
-  // Remove any existing profile menu
-  const existingMenu = document.querySelector('.profile-menu-modal');
-  if (existingMenu) {
-    existingMenu.remove();
-  }
-
-  const menu = document.createElement('div');
-  menu.className = 'profile-menu-modal';
-  menu.innerHTML = `
-    <div class="profile-menu-overlay">
-      <div class="profile-menu-content">
-        <div class="profile-menu-header">
-          <div class="profile-avatar">
-            <i class="fas fa-user"></i>
-          </div>
-          <div class="profile-info">
-            <h4>${user.email}</h4>
-            <p>Signed in</p>
-          </div>
-        </div>
-        
-        <div class="profile-menu-items">
-          <button class="profile-menu-item" onclick="window.authService.showSignUpModal()">
-            <i class="fas fa-user-edit"></i>
-            Edit Profile
-          </button>
-          <button class="profile-menu-item" onclick="window.authService.signOut()">
-            <i class="fas fa-sign-out-alt"></i>
-            Sign Out
-          </button>
-        </div>
-        
-        <button class="profile-menu-close" onclick="this.closest('.profile-menu-modal').remove()">
-          Close
-        </button>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(menu);
-
-  // Close menu when clicking overlay
-  menu.addEventListener('click', (e) => {
-    if (e.target === menu) {
-      menu.remove();
-    }
-  });
-}
+// Profile menu functionality moved to avatar system
+// The avatar system handles all profile and authentication UI
 
 // Initialize pull-up panel functionality
 function initPullUpPanel() {
