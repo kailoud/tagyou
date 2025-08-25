@@ -392,11 +392,11 @@ class CarnivalTracker {
           <div class="premium-features">
             <div class="feature-item">
               <i class="fas fa-users"></i>
-              <span>Unlimited squad members (vs 1 for Basic)</span>
+              <span>Unlimited squad members</span>
             </div>
             <div class="feature-item">
               <i class="fas fa-phone"></i>
-              <span>Phone calling & WhatsApp messaging</span>
+              <span>Phone calling & messaging</span>
             </div>
             <div class="feature-item">
               <i class="fas fa-map-marker-alt"></i>
@@ -407,20 +407,8 @@ class CarnivalTracker {
               <span>30-day location history</span>
             </div>
             <div class="feature-item">
-              <i class="fas fa-palette"></i>
-              <span>Custom themes & badges</span>
-            </div>
-            <div class="feature-item">
-              <i class="fas fa-microphone"></i>
-              <span>Voice messages</span>
-            </div>
-            <div class="feature-item">
               <i class="fas fa-exclamation-triangle"></i>
               <span>Emergency alerts</span>
-            </div>
-            <div class="feature-item">
-              <i class="fas fa-chart-line"></i>
-              <span>Advanced analytics</span>
             </div>
             <div class="feature-item">
               <i class="fas fa-headset"></i>

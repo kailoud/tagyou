@@ -853,70 +853,70 @@
 .premium-upgrade-content {
   background: white;
   border-radius: 20px;
-  padding: 32px;
+  padding: 24px;
   position: relative;
   z-index: 1;
-  max-width: 500px;
+  max-width: 400px;
   width: 90%;
-  max-height: 90vh;
+  max-height: 85vh;
   overflow-y: auto;
   animation: slideUpModal 0.3s ease-out;
 }
 
 .premium-upgrade-header {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .premium-badge {
-  font-size: 48px;
-  margin-bottom: 16px;
+  font-size: 40px;
+  margin-bottom: 12px;
 }
 
 .premium-upgrade-header h2 {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: bold;
   color: #111827;
-  margin: 0 0 8px 0;
+  margin: 0 0 6px 0;
 }
 
 .premium-upgrade-header p {
-  font-size: 16px;
+  font-size: 14px;
   color: #6b7280;
   margin: 0;
 }
 
 .premium-features {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 24px;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-bottom: 20px;
 }
 
 .feature-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
+  gap: 10px;
+  padding: 8px 12px;
   background: #f9fafb;
-  border-radius: 12px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 13px;
   color: #374151;
 }
 
 .feature-item i {
   color: #8b5cf6;
-  font-size: 16px;
-  width: 20px;
+  font-size: 14px;
+  width: 16px;
   text-align: center;
 }
 
 .premium-pricing {
   text-align: center;
-  margin-bottom: 24px;
-  padding: 20px;
+  margin-bottom: 20px;
+  padding: 16px;
   background: linear-gradient(135deg, #fef3c7, #fde68a);
-  border-radius: 16px;
+  border-radius: 12px;
   position: relative;
   overflow: hidden;
 }
@@ -936,57 +936,57 @@
 }
 
 .original-price {
-  font-size: 20px;
+  font-size: 18px;
   color: #92400e;
   text-decoration: line-through;
   opacity: 0.7;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .price {
-  font-size: 48px;
+  font-size: 40px;
   font-weight: bold;
   color: #92400e;
   margin: 0;
 }
 
 .period {
-  font-size: 18px;
+  font-size: 16px;
   color: #92400e;
-  margin: 4px 0 8px 0;
+  margin: 3px 0 6px 0;
 }
 
 .then-price {
-  font-size: 16px;
+  font-size: 14px;
   color: #92400e;
   opacity: 0.8;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .savings {
-  font-size: 14px;
+  font-size: 12px;
   color: #92400e;
   font-weight: 600;
   background: rgba(255, 255, 255, 0.8);
-  padding: 8px 16px;
-  border-radius: 20px;
+  padding: 6px 12px;
+  border-radius: 16px;
   display: inline-block;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .premium-actions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .upgrade-btn {
   background: linear-gradient(135deg, #fbbf24, #f59e0b);
   color: white;
   border: none;
-  padding: 16px;
-  border-radius: 12px;
-  font-size: 18px;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -1006,9 +1006,9 @@
   background: none;
   border: 2px solid #e5e7eb;
   color: #6b7280;
-  padding: 12px;
-  border-radius: 12px;
-  font-size: 16px;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -1017,6 +1017,69 @@
 .close-premium-btn:hover {
   border-color: #d1d5db;
   background: #f9fafb;
+}
+
+/* Mobile optimizations for premium upgrade modal */
+@media (max-width: 480px) {
+  .premium-upgrade-content {
+    padding: 20px;
+    max-width: 95%;
+    max-height: 80vh;
+  }
+  
+  .premium-badge {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+  
+  .premium-upgrade-header h2 {
+    font-size: 22px;
+  }
+  
+  .premium-upgrade-header p {
+    font-size: 13px;
+  }
+  
+  .feature-item {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  
+  .feature-item i {
+    font-size: 12px;
+    width: 14px;
+  }
+  
+  .price {
+    font-size: 36px;
+  }
+  
+  .original-price {
+    font-size: 16px;
+  }
+  
+  .period {
+    font-size: 14px;
+  }
+  
+  .then-price {
+    font-size: 12px;
+  }
+  
+  .savings {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+  
+  .upgrade-btn {
+    padding: 12px;
+    font-size: 15px;
+  }
+  
+  .close-premium-btn {
+    padding: 8px;
+    font-size: 13px;
+  }
 }
 
 /* Premium Success Message */
