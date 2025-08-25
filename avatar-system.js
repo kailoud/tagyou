@@ -1383,9 +1383,9 @@ class AvatarSystem {
         }
         window.carnivalRouteActive = false;
 
-        const starButton = document.getElementById('festivalBtn');
-        if (starButton) {
-          starButton.classList.remove('active');
+        const compassButton = document.getElementById('compassBtn');
+        if (compassButton) {
+          compassButton.classList.remove('active');
         }
 
         console.log('🎭 Carnival route hidden');
@@ -1399,9 +1399,9 @@ class AvatarSystem {
         window.showJudgingZone();
         window.showStartFlag();
 
-        const starButton = document.getElementById('festivalBtn');
-        if (starButton) {
-          starButton.classList.add('active');
+        const compassButton = document.getElementById('compassBtn');
+        if (compassButton) {
+          compassButton.classList.add('active');
         }
 
         console.log('🎭 Carnival route activated');

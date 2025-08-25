@@ -999,7 +999,7 @@ function initMapToolbar() {
   const foodStallBtn = document.getElementById('foodStallBtn');
   const floatTruckBtn = document.getElementById('floatTruckBtn');
   const artistBandBtn = document.getElementById('artistBandBtn');
-  const festivalBtn = document.getElementById('festivalBtn');
+  const compassBtn = document.getElementById('compassBtn');
   const locationCenterBtn = document.getElementById('locationCenterBtn');
   const carnivalTrackerBtn = document.getElementById('carnivalTrackerBtn');
 
@@ -1034,63 +1034,16 @@ function initMapToolbar() {
     }
   });
 
-  // Festival button - Simple ON/OFF switch for carnival route
-  festivalBtn.addEventListener('click', function () {
-    console.log('Festival button clicked');
-    console.log('Current carnival route state:', window.carnivalRouteActive);
-    console.log('Global functions available:', {
-      showCarnivalRoute: typeof window.showCarnivalRoute,
-      showJudgingZone: typeof window.showJudgingZone,
-      showStartFlag: typeof window.showStartFlag
-    });
+  // Compass button - Toggle compass visibility
+  compassBtn.addEventListener('click', function () {
+    console.log('Compass button clicked');
 
-    // Toggle carnival route visibility
-    // Check if route is actually visible on the map
-    const isRouteVisible = window.carnivalRouteActive || (window.carnivalRoute && window.map.hasLayer(window.carnivalRoute));
-    console.log('Route visibility check:', {
-      carnivalRouteActive: window.carnivalRouteActive,
-      carnivalRouteExists: !!window.carnivalRoute,
-      hasLayer: window.carnivalRoute ? window.map.hasLayer(window.carnivalRoute) : false,
-      isRouteVisible: isRouteVisible
-    });
-
-    if (isRouteVisible) {
-      // Route is visible, hide it
-      console.log('Attempting to hide carnival route...');
-
-      if (window.carnivalRoute && window.map) {
-        console.log('Removing carnival route from map');
-        window.map.removeLayer(window.carnivalRoute);
-        window.carnivalRoute = null;
-      }
-      if (window.startFlag && window.map) {
-        console.log('Removing start flag from map');
-        window.map.removeLayer(window.startFlag);
-        window.startFlag = null;
-      }
-      // Remove judging zone
-      const judgingZone = document.querySelector('.judging-zone-label');
-      if (judgingZone) {
-        console.log('Removing judging zone');
-        judgingZone.remove();
-      }
-      // Update global state
-      window.carnivalRouteActive = false;
-      this.classList.remove('active');
-      console.log('🎭 Carnival route hidden via star button');
-      console.log('Updated carnival route state:', window.carnivalRouteActive);
+    if (window.compass) {
+      window.compass.toggleCompass();
+      this.classList.toggle('active');
+      console.log('🧭 Compass toggled via toolbar button');
     } else {
-      // Route is hidden, show it
-      if (typeof window.showCarnivalRoute === 'function' &&
-        typeof window.showJudgingZone === 'function' &&
-        typeof window.showStartFlag === 'function') {
-        window.showCarnivalRoute();
-        window.showJudgingZone();
-        window.showStartFlag();
-        this.classList.add('active');
-        console.log('🎭 Carnival route activated via star button');
-        console.log('Updated carnival route state:', window.carnivalRouteActive);
-      }
+      console.log('🧭 Compass component not available');
     }
   });
 
