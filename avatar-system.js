@@ -158,6 +158,10 @@ class AvatarSystem {
             this.user = user;
             if (user) {
               sessionStorage.setItem('supabase_user', JSON.stringify(user));
+              // Load profile and refresh avatar when user signs in
+              this.loadUserProfile().then(() => {
+                this.refreshMainAvatar();
+              });
             } else {
               sessionStorage.removeItem('supabase_user');
             }
@@ -486,7 +490,7 @@ class AvatarSystem {
       avatarButton.style.background = 'linear-gradient(135deg, #9ca3af, #6b7280)';
     }
 
-    const userIcon = document.createElement('div');
+        const userIcon = document.createElement('div');
     // Check for saved avatar from multiple sources
     let savedAvatar = null;
     if (this.user) {
@@ -496,8 +500,20 @@ class AvatarSystem {
       if (!savedAvatar) {
         savedAvatar = localStorage.getItem(`avatar_${this.user.email}`);
       }
+      // Then check profile data
+      if (!savedAvatar) {
+        const storedProfile = localStorage.getItem(`profile_${this.user.email}`);
+        if (storedProfile) {
+          try {
+            const profile = JSON.parse(storedProfile);
+            savedAvatar = profile.avatar_url;
+          } catch (error) {
+            console.error('Error parsing stored profile:', error);
+          }
+        }
+      }
     }
-
+    
     if (savedAvatar) {
       userIcon.innerHTML = `<img src="${savedAvatar}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
     } else {
@@ -1852,6 +1868,8 @@ class AvatarSystem {
         return;
       }
 
+      let avatarFound = false;
+
       // First try to load from Supabase
       if (window.profileService) {
         const profile = await window.profileService.getUserProfile(this.user.id);
@@ -1863,6 +1881,7 @@ class AvatarSystem {
             localStorage.setItem(`avatar_${this.user.email}`, profile.avatar_url);
             // Refresh main avatar button
             this.refreshMainAvatar();
+            avatarFound = true;
           }
 
           // Update user metadata if profile has name
@@ -1874,31 +1893,41 @@ class AvatarSystem {
           }
 
           console.log('Profile loaded from Supabase:', profile);
-          return;
         }
       }
 
-      // Fallback to localStorage
-      const storedProfile = localStorage.getItem(`profile_${this.user.email}`);
-      if (storedProfile) {
-        try {
-          const profile = JSON.parse(storedProfile);
-          if (profile.avatar_url) {
-            this.updateAvatarDisplay(profile.avatar_url);
-            localStorage.setItem(`avatar_${this.user.email}`, profile.avatar_url);
-            // Refresh main avatar button
-            this.refreshMainAvatar();
+      // If no avatar found in Supabase, check localStorage
+      if (!avatarFound) {
+        const storedProfile = localStorage.getItem(`profile_${this.user.email}`);
+        if (storedProfile) {
+          try {
+            const profile = JSON.parse(storedProfile);
+            if (profile.avatar_url) {
+              this.updateAvatarDisplay(profile.avatar_url);
+              localStorage.setItem(`avatar_${this.user.email}`, profile.avatar_url);
+              // Refresh main avatar button
+              this.refreshMainAvatar();
+              avatarFound = true;
+            }
+            if (profile.full_name) {
+              this.user.user_metadata = {
+                ...this.user.user_metadata,
+                full_name: profile.full_name
+              };
+            }
+            console.log('Profile loaded from localStorage:', profile);
+          } catch (error) {
+            console.error('Error parsing stored profile:', error);
           }
-          if (profile.full_name) {
-            this.user.user_metadata = {
-              ...this.user.user_metadata,
-              full_name: profile.full_name
-            };
-          }
-          console.log('Profile loaded from localStorage:', profile);
-        } catch (error) {
-          console.error('Error parsing stored profile:', error);
         }
+      }
+
+      // If still no avatar, check user metadata
+      if (!avatarFound && this.user.user_metadata?.avatar_url) {
+        this.updateAvatarDisplay(this.user.user_metadata.avatar_url);
+        localStorage.setItem(`avatar_${this.user.email}`, this.user.user_metadata.avatar_url);
+        this.refreshMainAvatar();
+        console.log('Avatar loaded from user metadata');
       }
 
       // Try to create profile in Supabase if service is available
