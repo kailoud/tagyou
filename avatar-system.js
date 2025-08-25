@@ -500,8 +500,8 @@ class AvatarSystem {
           <span>Joined Today</span>
           <span>Free Plan</span>
         </div>
-        <button style="width: 100%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; padding: 8px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s;">
-          Upgrade to Pro
+        <button class="avatar-upgrade-btn" style="width: 100%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; padding: 8px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s;">
+          Upgrade 💎
         </button>
       </div>
     `;
@@ -586,6 +586,8 @@ class AvatarSystem {
         this.renderAuthModal();
       } else if (e.target.closest('.signout-button')) {
         this.handleSignOut();
+      } else if (e.target.closest('.avatar-upgrade-btn')) {
+        this.handleUpgradeClick();
       } else if (e.target.closest('.carnival-button')) {
         this.toggleCarnivalDropdown();
       } else if (e.target.closest('.auth-modal') && !e.target.closest('.auth-modal > div')) {
@@ -1225,6 +1227,82 @@ class AvatarSystem {
     } else {
       console.warn('🎭 Carnival route functions not found. Make sure the main script is loaded.');
     }
+  }
+
+  handleUpgradeClick() {
+    console.log('UI DEBUG: Avatar upgrade button clicked');
+    
+    // Close dropdown
+    this.isDropdownOpen = false;
+    this.renderDropdown();
+    
+    // Use carnival tracker's upgrade handler if available
+    if (window.carnivalTracker && window.carnivalTracker.handleUpgradeClick) {
+      console.log('UI DEBUG: Using carnival tracker upgrade handler');
+      window.carnivalTracker.handleUpgradeClick();
+    } else {
+      console.log('UI DEBUG: Carnival tracker not available, showing fallback upgrade modal');
+      this.showFallbackUpgradeModal();
+    }
+  }
+
+  showFallbackUpgradeModal() {
+    // Create a simple upgrade modal if carnival tracker is not available
+    const modal = document.createElement('div');
+    modal.className = 'fallback-upgrade-modal';
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10001;
+      padding: 16px;
+    `;
+
+    modal.innerHTML = `
+      <div style="background: white; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-width: 448px; width: 100%; padding: 24px; text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 16px;">💎</div>
+        <h2 style="font-size: 24px; font-weight: bold; margin: 0 0 16px 0; color: #374151;">Upgrade to Premium</h2>
+        <p style="color: #6b7280; margin: 0 0 24px 0; line-height: 1.6;">
+          Unlock unlimited squad members and advanced features for your carnival tracking experience.
+        </p>
+        <button class="fallback-upgrade-btn" style="width: 100%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+          Get 3-Month Deal
+        </button>
+        <button class="fallback-close-btn" style="width: 100%; background: #f3f4f6; color: #374151; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 500; cursor: pointer; margin-top: 12px; transition: all 0.3s;">
+          Maybe Later
+        </button>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Add event listeners
+    modal.querySelector('.fallback-upgrade-btn').addEventListener('click', () => {
+      modal.remove();
+      // Try to use carnival tracker's upgrade method
+      if (window.carnivalTracker && window.carnivalTracker.upgradeToPremium) {
+        window.carnivalTracker.upgradeToPremium();
+      } else {
+        alert('Upgrade functionality not available. Please try again later.');
+      }
+    });
+
+    modal.querySelector('.fallback-close-btn').addEventListener('click', () => {
+      modal.remove();
+    });
+
+    // Close on background click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
   }
 }
 
