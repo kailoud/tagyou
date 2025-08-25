@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Auth Test</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .info {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🔐 Simple Auth Test</h1>
+    <div id="status"></div>
+
+    <h2>Test 1: Supabase SDK</h2>
+    <button onclick="testSupabaseSDK()">Test Supabase SDK</button>
+
+    <h2>Test 2: Direct Connection</h2>
+    <button onclick="testDirectConnection()">Test Direct Connection</button>
+
+    <h2>Test 3: Sign In</h2>
+    <input type="email" id="email" placeholder="Email" value="kaycheckmate@gmail.com">
+    <input type="password" id="password" placeholder="Password" value="">
+    <button onclick="testSignIn()">Test Sign In</button>
+    
+    <h2>Test 4: Sign Up</h2>
+    <input type="email" id="signupEmail" placeholder="Email for signup" value="">
+    <input type="password" id="signupPassword" placeholder="Password for signup" value="">
+    <button onclick="testSignUp()">Test Sign Up</button>
+    
+    <h2>Test 5: Check Current User</h2>
+    <button onclick="checkCurrentUser()">Check Current User</button>
+
+    <div id="results"></div>
+  </div>
+
+  <script>
+    let supabase = null;
+
+    function updateStatus(message, type = 'info') {
+      const statusDiv = document.getElementById('status');
+      statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+      console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+
+    function addResult(message, type = 'info') {
+      const resultsDiv = document.getElementById('results');
+      const div = document.createElement('div');
+      div.className = `status ${type}`;
+      div.textContent = message;
+      resultsDiv.appendChild(div);
+    }
+
+    function testSupabaseSDK() {
+      try {
+        if (typeof window.supabase === 'undefined') {
+          addResult('❌ Supabase SDK not loaded', 'error');
+          return;
+        }
+
+        if (typeof window.supabase.createClient !== 'function') {
+          addResult('❌ Supabase createClient not available', 'error');
+          return;
+        }
+
+        addResult('✅ Supabase SDK is loaded and available', 'success');
+        updateStatus('Supabase SDK test passed', 'success');
+      } catch (error) {
+        addResult('❌ Error testing Supabase SDK: ' + error.message, 'error');
+      }
+    }
+
+    function testDirectConnection() {
+      try {
+        // Hardcoded config for testing
+        const supabaseUrl = "https://rpsbibwmbsllnvfithjw.supabase.co";
+                 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc2JpYndtYnNsbG52Zml0aGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzA5NjQsImV4cCI6MjA3MTYwNjk2NH0.MdZz53RGQUIuCORdUtnFT-Uo0rFEK1a6chnMtS4Jjss";
+
+        supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        addResult('✅ Supabase client created successfully', 'success');
+        updateStatus('Direct connection test passed', 'success');
+      } catch (error) {
+        addResult('❌ Error creating Supabase client: ' + error.message, 'error');
+      }
+    }
+
+    async function testSignIn() {
+      if (!supabase) {
+        addResult('❌ Supabase client not initialized', 'error');
+        return;
+      }
+
+      try {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        addResult(`🔐 Attempting sign in with: ${email}`, 'info');
+
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+        if (error) {
+          addResult('❌ Sign in failed: ' + error.message, 'error');
+        } else {
+          addResult('✅ Sign in successful!', 'success');
+          addResult(`User: ${data.user.email}`, 'success');
+        }
+      } catch (error) {
+        addResult('❌ Sign in error: ' + error.message, 'error');
+      }
+    }
+
+    async function testSignUp() {
+      if (!supabase) {
+        addResult('❌ Supabase client not initialized', 'error');
+        return;
+      }
+
+      try {
+        const email = document.getElementById('signupEmail').value;
+        const password = document.getElementById('signupPassword').value;
+
+        addResult(`🔐 Attempting sign up with: ${email}`, 'info');
+
+        const { data, error } = await supabase.auth.signUp({
+          email: email,
+          password: password
+        });
+
+        if (error) {
+          addResult('❌ Sign up failed: ' + error.message, 'error');
+        } else {
+          addResult('✅ Sign up successful!', 'success');
+          addResult(`User: ${data.user.email}`, 'success');
+        }
+      } catch (error) {
+        addResult('❌ Sign up error: ' + error.message, 'error');
+      }
+    }
+
+    async function checkCurrentUser() {
+      if (!supabase) {
+        addResult('❌ Supabase client not initialized', 'error');
+        return;
+      }
+
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+
+        if (error) {
+          addResult('❌ Error getting user: ' + error.message, 'error');
+        } else if (user) {
+          addResult('✅ User is signed in: ' + user.email, 'success');
+        } else {
+          addResult('👤 No user signed in', 'info');
+        }
+      } catch (error) {
+        addResult('❌ Error checking user: ' + error.message, 'error');
+      }
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function () {
+      updateStatus('🚀 Simple auth test loaded', 'info');
+      testSupabaseSDK();
+    });
+  </script>
+</body>
+
+</html>

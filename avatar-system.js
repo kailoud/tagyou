@@ -124,7 +124,13 @@ class AvatarSystem {
       signIn: async (email, password) => {
         console.log('AUTH DEBUG: Fallback signIn called with:', email);
         try {
-          const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+          // Check if Supabase is available
+          if (!window.supabase) {
+            console.error('AUTH DEBUG: Supabase not available');
+            return { success: false, error: 'Supabase not initialized. Please refresh the page.' };
+          }
+
+          const { data, error } = await window.supabase.auth.signInWithPassword({
             email,
             password
           });
@@ -149,7 +155,13 @@ class AvatarSystem {
       signUp: async (email, password) => {
         console.log('AUTH DEBUG: Fallback signUp called with:', email);
         try {
-          const { data, error } = await window.supabaseClient.auth.signUp({
+          // Check if Supabase is available
+          if (!window.supabase) {
+            console.error('AUTH DEBUG: Supabase not available');
+            return { success: false, error: 'Supabase not initialized. Please refresh the page.' };
+          }
+
+          const { data, error } = await window.supabase.auth.signUp({
             email,
             password
           });
@@ -169,7 +181,13 @@ class AvatarSystem {
       signOut: async () => {
         console.log('AUTH DEBUG: Fallback signOut called');
         try {
-          const { error } = await window.supabaseClient.auth.signOut();
+          // Check if Supabase is available
+          if (!window.supabase) {
+            console.error('AUTH DEBUG: Supabase not available');
+            return { success: false, error: 'Supabase not initialized. Please refresh the page.' };
+          }
+
+          const { error } = await window.supabase.auth.signOut();
           if (error) {
             console.error('AUTH DEBUG: SignOut error:', error);
           }
@@ -181,8 +199,8 @@ class AvatarSystem {
         }
       },
       onAuthStateChanged: (callback) => {
-        if (window.supabaseClient && window.supabaseClient.auth) {
-          return window.supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (window.supabase && window.supabase.auth) {
+          return window.supabase.auth.onAuthStateChange((event, session) => {
             console.log('AUTH DEBUG: Auth state change event:', event, session?.user?.email);
             callback(session?.user || null);
           });

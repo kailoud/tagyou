@@ -32,11 +32,17 @@ document.addEventListener('DOMContentLoaded', async function () {
     console.log('✅ Pull-up panel initialized');
   }, 300);
 
+  // Initialize Supabase first
+  setTimeout(async () => {
+    await initializeSupabase();
+    console.log('✅ Supabase initialized');
+  }, 400);
+
   // Initialize authentication service
   setTimeout(async () => {
     await initializeAuthService();
     console.log('✅ Authentication service initialized');
-  }, 400);
+  }, 500);
 
   console.log('🎭 Carnival tracker will initialize automatically');
 });
@@ -52,12 +58,21 @@ async function initializeSupabase() {
 
     // Import and initialize Supabase config first
     console.log('🔐 Loading Supabase configuration...');
-    const supabaseModule = await import('./supabase-config.js');
-    const { initializeSupabase: initSupabase, supabase: supabaseClient } = supabaseModule;
 
-    // Initialize Supabase using the exported function
-    console.log('🔐 Initializing Supabase client...');
-    const success = await initSupabase();
+    // Import the secret config directly
+    const supabaseConfig = await import('./supabase-config-secret.js');
+
+    // Create Supabase client directly
+    console.log('🔐 Creating Supabase client...');
+    const supabaseClient = window.supabase.createClient(
+      supabaseConfig.default.supabaseUrl,
+      supabaseConfig.default.supabaseAnonKey
+    );
+
+    // Make it globally available
+    window.supabase = supabaseClient;
+
+    const success = true;
 
     if (success) {
       console.log('✅ Supabase core initialized successfully');
@@ -77,6 +92,9 @@ async function initializeSupabase() {
 
       // Set the global Supabase instance
       setSupabaseInstance(supabaseClient);
+
+      // Also set it for the auth service
+      window.supabase = supabaseClient;
 
       // Avatar System V2 creates its own Supabase client, so no need to set it here
 

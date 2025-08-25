@@ -52,6 +52,9 @@ async function initializeSupabase() {
         supabaseConfig.supabaseAnonKey
       );
 
+      // Set the global supabase instance
+      window.supabase = supabase;
+
       console.log('✅ Supabase initialized successfully');
       console.log('🌐 Project URL:', supabaseConfig.supabaseUrl);
       return true;
