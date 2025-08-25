@@ -14,7 +14,7 @@
 /* Avatar System Styles */
 .avatar-container {
   position: fixed !important;
-  top: 40px !important;
+  top: 50px !important;
   right: 40px !important;
   z-index: 9999 !important;
 }
@@ -73,6 +73,21 @@
   overflow: hidden !important;
 }
 
+
+
+/* Simple Header */
+.simple-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  height: 30px;
+  background-color: #6b7280;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 /* Reset and base styles */
 * {
   margin: 0;
@@ -102,7 +117,7 @@ body {
 /* Centered Controls Container */
 .controls-container {
   position: fixed;
-  top: 20px;
+  top: 50px;
   left: 0;
   right: 0;
   z-index: 1000;

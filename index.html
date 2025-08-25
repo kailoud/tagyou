@@ -21,7 +21,7 @@
   <!-- Supabase Service -->
   <script type="module">
     // Load PremiumUsersService for premium status checks
-    window.loadPremiumService = async function() {
+    window.loadPremiumService = async function () {
       try {
         const { PremiumUsersService } = await import('./supabase-service.js');
         window.PremiumUsersService = PremiumUsersService;
@@ -32,9 +32,9 @@
         return false;
       }
     };
-    
+
     // Load the service when the page loads
-    window.addEventListener('load', function() {
+    window.addEventListener('load', function () {
       window.loadPremiumService();
     });
   </script>
@@ -48,6 +48,9 @@
 
 <body>
 
+  <!-- Header Section -->
+  <header class="simple-header">
+  </header>
 
   <!-- Centered Controls Container -->
   <div class="controls-container">
@@ -97,6 +100,8 @@
         </div>
       </div>
     </div>
+
+
 
 
 
