@@ -263,7 +263,7 @@ class CarnivalTracker {
         <div class="premium-upgrade-content">
           <div class="premium-upgrade-header">
             <div class="premium-badge">💎</div>
-            <h2>Upgrade 💎</h2>
+            <h2>Upgrade to Premium</h2>
             <p>${customMessage || 'Unlock unlimited squad members and advanced features'}</p>
           </div>
           
