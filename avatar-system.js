@@ -308,16 +308,6 @@ class AvatarSystem {
 
   async checkPremiumStatus() {
     try {
-      // First check for test premium status (no auth required)
-      const testPremium = localStorage.getItem('tagyou_test_premium');
-      const testEmail = localStorage.getItem('tagyou_test_email');
-      
-      if (testPremium === 'true' && testEmail) {
-        console.log('🎯 Test premium user detected in avatar system:', testEmail);
-        this.setUserTier('Premium');
-        return;
-      }
-
       if (!this.user || !this.user.email) {
         this.setUserTier('Basic');
         return;
@@ -335,8 +325,6 @@ class AvatarSystem {
       const premiumEmails = [
         'kaycheckmate@gmail.com',
         'truesliks@gmail.com',
-        'test@tagyou.app', // Sample test user
-        'demo@tagyou.app', // Demo premium user
         // Add more premium emails here
       ];
 
