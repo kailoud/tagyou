@@ -130,14 +130,30 @@
             // Set premium status
             localStorage.setItem(`premium_${email}`, 'true');
             
-            // Update carnival tracker if available
-            if (window.carnivalTracker && window.carnivalTracker.setPremiumStatus) {
-                window.carnivalTracker.setPremiumStatus(email, true);
+            // Force update carnival tracker
+            if (window.carnivalTracker) {
+                if (window.carnivalTracker.setPremiumStatus) {
+                    window.carnivalTracker.setPremiumStatus(email, true);
+                }
+                if (window.carnivalTracker.checkPremiumStatus) {
+                    window.carnivalTracker.checkPremiumStatus();
+                }
+                if (window.carnivalTracker.render) {
+                    window.carnivalTracker.render();
+                }
             }
             
-            // Update avatar system if available
-            if (window.avatarSystem && window.avatarSystem.setPremiumStatus) {
-                window.avatarSystem.setPremiumStatus(email, true);
+            // Force update avatar system
+            if (window.avatarSystem) {
+                if (window.avatarSystem.setPremiumStatus) {
+                    window.avatarSystem.setPremiumStatus(email, true);
+                }
+                if (window.avatarSystem.checkPremiumStatus) {
+                    window.avatarSystem.checkPremiumStatus();
+                }
+                if (window.avatarSystem.renderAuthenticatedDropdown) {
+                    window.avatarSystem.renderAuthenticatedDropdown();
+                }
             }
             
             alert(`✅ ${email} has been set as Premium!\n\nPlease refresh the main page to see the changes.`);

@@ -325,6 +325,9 @@ class AvatarSystem {
       const premiumEmails = [
         'kaycheckmate@gmail.com',
         'truesliks@gmail.com',
+        // Add payment emails here - these users have paid for premium
+        // Add your payment email below:
+        // 'your-payment-email@example.com',
         // Add more premium emails here
       ];
 
