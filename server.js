@@ -31,10 +31,17 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Import pricing configuration
+const { PRICING_CONFIG, PricingHelpers } = require('./pricing-config.js');
+
 // Create Stripe checkout session for premium upgrade
 app.post('/api/create-checkout-session', async (req, res) => {
   try {
-    const { userId, email } = req.body;
+    const { userId, email, offerId = '3-month-promo' } = req.body;
+
+    // Get the offer configuration
+    const offer = PricingHelpers.getOffer(offerId);
+    const currency = offer.currency || PRICING_CONFIG.defaults.currency;
 
     // Create the checkout session
     const session = await stripeClient.checkout.sessions.create({
@@ -42,24 +49,27 @@ app.post('/api/create-checkout-session', async (req, res) => {
       line_items: [
         {
           price_data: {
-            currency: 'gbp',
+            currency: currency,
             product_data: {
-              name: 'TagYou Premium - 3 Month Deal',
-              description: 'Premium carnival tracking with unlimited squad members and advanced features',
-              images: ['https://tagyou.app/logo.png'], // Add your logo URL
+              name: offer.name,
+              description: offer.description,
+              images: [offer.image],
             },
-            unit_amount: 999, // £9.99 in pence
+            unit_amount: offer.price,
           },
           quantity: 1,
         },
       ],
-      mode: 'payment', // One-time payment for the 3-month deal
+      mode: offer.recurring ? 'subscription' : 'payment',
       success_url: `${req.protocol}://${req.get('host')}/success.html?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.protocol}://${req.get('host')}/cancel.html`,
       customer_email: email,
       metadata: {
         userId: userId || 'anonymous',
-        offerType: '3-month-promo',
+        offerType: offerId,
+        price: offer.price,
+        currency: currency,
+        duration: offer.duration
       },
     });
 
