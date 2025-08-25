@@ -1663,7 +1663,7 @@ class AvatarSystem {
     });
   }
 
-  // Compress image for faster upload
+  // Compress image for faster upload (mobile optimized)
   async compressImage(file) {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
@@ -1671,9 +1671,12 @@ class AvatarSystem {
       const img = new Image();
 
       img.onload = () => {
-        // Set maximum dimensions for avatar
-        const maxWidth = 300;
-        const maxHeight = 300;
+        // Check if device is mobile for different compression settings
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        // Set maximum dimensions for avatar (smaller for mobile)
+        const maxWidth = isMobile ? 200 : 300;
+        const maxHeight = isMobile ? 200 : 300;
 
         // Calculate new dimensions
         let { width, height } = img;
@@ -1696,7 +1699,10 @@ class AvatarSystem {
         // Draw and compress image
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Convert to blob with quality 0.8 (80% quality)
+        // Use higher compression for mobile (70% quality vs 80% for desktop)
+        const quality = isMobile ? 0.7 : 0.8;
+
+        // Convert to blob with optimized quality
         canvas.toBlob((blob) => {
           // Create new file with compressed data
           const compressedFile = new File([blob], file.name, {
@@ -1704,7 +1710,7 @@ class AvatarSystem {
             lastModified: Date.now()
           });
           resolve(compressedFile);
-        }, 'image/jpeg', 0.8);
+        }, 'image/jpeg', quality);
       };
 
       img.src = URL.createObjectURL(file);
@@ -1863,19 +1869,48 @@ class AvatarSystem {
   }
 
   updateAvatarDisplay(avatarUrl) {
-    // Update the main avatar button
+    // Preload image for better mobile performance
+    const preloadImage = new Image();
+    preloadImage.onload = () => {
+      // Update the main avatar button
+      const avatarButton = document.querySelector('.avatar-button');
+      if (avatarButton) {
+        const userIcon = avatarButton.querySelector('div');
+        if (userIcon) {
+          userIcon.innerHTML = `<img src="${avatarUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
+      }
+
+      // Update the dropdown header avatar
+      const dropdownAvatar = document.querySelector('.dropdown-header .current-avatar');
+      if (dropdownAvatar) {
+        dropdownAvatar.innerHTML = `<img src="${avatarUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+      }
+    };
+
+    preloadImage.onerror = () => {
+      console.warn('Failed to load avatar image:', avatarUrl);
+      // Fallback to default icon
+      this.showDefaultAvatar();
+    };
+
+    // Start loading the image
+    preloadImage.src = avatarUrl;
+  }
+
+  showDefaultAvatar() {
+    // Show default user icon if image fails to load
     const avatarButton = document.querySelector('.avatar-button');
     if (avatarButton) {
       const userIcon = avatarButton.querySelector('div');
       if (userIcon) {
-        userIcon.innerHTML = `<img src="${avatarUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        userIcon.innerHTML = '<i class="fas fa-user" style="font-size: 24px; color: white;"></i>';
       }
     }
 
-    // Update the dropdown header avatar
     const dropdownAvatar = document.querySelector('.dropdown-header .current-avatar');
     if (dropdownAvatar) {
-      dropdownAvatar.innerHTML = `<img src="${avatarUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+      dropdownAvatar.innerHTML = '<i class="fas fa-user" style="font-size: 24px; color: white;"></i>';
     }
   }
 
@@ -1902,7 +1937,15 @@ class AvatarSystem {
         }
 
         if (savedAvatar) {
-          userIcon.innerHTML = `<img src="${savedAvatar}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+          // Use preloaded image for better mobile performance
+          const preloadImage = new Image();
+          preloadImage.onload = () => {
+            userIcon.innerHTML = `<img src="${savedAvatar}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+          };
+          preloadImage.onerror = () => {
+            userIcon.innerHTML = '<i class="fas fa-user" style="font-size: 24px; color: white;"></i>';
+          };
+          preloadImage.src = savedAvatar;
         } else {
           userIcon.innerHTML = '<i class="fas fa-user" style="font-size: 24px; color: white;"></i>';
         }
@@ -1938,34 +1981,11 @@ class AvatarSystem {
 
       let avatarFound = false;
 
-      // First try to load from Supabase
-      if (window.profileService) {
-        const profile = await window.profileService.getUserProfile(this.user.id);
-        if (profile) {
-          // Update avatar if profile has one
-          if (profile.avatar_url) {
-            this.updateAvatarDisplay(profile.avatar_url);
-            // Also store in localStorage for fallback
-            localStorage.setItem(`avatar_${this.user.email}`, profile.avatar_url);
-            // Refresh main avatar button
-            this.refreshMainAvatar();
-            avatarFound = true;
-          }
+      // For mobile devices, prioritize localStorage for faster loading
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-          // Update user metadata if profile has name
-          if (profile.display_name && (!this.user.user_metadata?.full_name || this.user.user_metadata.full_name !== profile.display_name)) {
-            this.user.user_metadata = {
-              ...this.user.user_metadata,
-              full_name: profile.display_name
-            };
-          }
-
-          console.log('Profile loaded from Supabase:', profile);
-        }
-      }
-
-      // If no avatar found in Supabase, check localStorage
-      if (!avatarFound) {
+      if (isMobile) {
+        // On mobile, check localStorage first for instant loading
         const storedProfile = localStorage.getItem(`profile_${this.user.email}`);
         if (storedProfile) {
           try {
@@ -1973,7 +1993,6 @@ class AvatarSystem {
             if (profile.avatar_url) {
               this.updateAvatarDisplay(profile.avatar_url);
               localStorage.setItem(`avatar_${this.user.email}`, profile.avatar_url);
-              // Refresh main avatar button
               this.refreshMainAvatar();
               avatarFound = true;
             }
@@ -1983,7 +2002,60 @@ class AvatarSystem {
                 full_name: profile.full_name
               };
             }
-            console.log('Profile loaded from localStorage:', profile);
+            console.log('Profile loaded from localStorage (mobile):', profile);
+          } catch (error) {
+            console.error('Error parsing stored profile:', error);
+          }
+        }
+      }
+
+      // Then try to load from Supabase (background sync)
+      if (window.profileService) {
+        try {
+          const profile = await window.profileService.getUserProfile(this.user.id);
+          if (profile) {
+            // Update avatar if profile has one and we don't have one yet
+            if (profile.avatar_url && !avatarFound) {
+              this.updateAvatarDisplay(profile.avatar_url);
+              localStorage.setItem(`avatar_${this.user.email}`, profile.avatar_url);
+              this.refreshMainAvatar();
+              avatarFound = true;
+            }
+
+            // Update user metadata if profile has name
+            if (profile.display_name && (!this.user.user_metadata?.full_name || this.user.user_metadata.full_name !== profile.display_name)) {
+              this.user.user_metadata = {
+                ...this.user.user_metadata,
+                full_name: profile.display_name
+              };
+            }
+
+            console.log('Profile loaded from Supabase:', profile);
+          }
+        } catch (error) {
+          console.error('Error loading profile from Supabase:', error);
+        }
+      }
+
+      // If still no avatar found and not mobile, check localStorage as fallback
+      if (!avatarFound && !isMobile) {
+        const storedProfile = localStorage.getItem(`profile_${this.user.email}`);
+        if (storedProfile) {
+          try {
+            const profile = JSON.parse(storedProfile);
+            if (profile.avatar_url) {
+              this.updateAvatarDisplay(profile.avatar_url);
+              localStorage.setItem(`avatar_${this.user.email}`, profile.avatar_url);
+              this.refreshMainAvatar();
+              avatarFound = true;
+            }
+            if (profile.full_name) {
+              this.user.user_metadata = {
+                ...this.user.user_metadata,
+                full_name: profile.full_name
+              };
+            }
+            console.log('Profile loaded from localStorage (fallback):', profile);
           } catch (error) {
             console.error('Error parsing stored profile:', error);
           }
