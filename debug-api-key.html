@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug API Key Configuration</title>
+    <!-- Supabase SDK -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .section { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .success { color: #059669; background: #d1fae5; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .error { color: #dc2626; background: #fee2e2; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .info { color: #1d4ed8; background: #dbeafe; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        button { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #2563eb; }
+        .key-display { font-family: monospace; background: #f3f4f6; padding: 10px; border-radius: 4px; margin: 10px 0; word-break: break-all; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Debug API Key Configuration</h1>
+        
+        <div class="section">
+            <h2>📋 Current Configuration</h2>
+            <button onclick="checkConfig()">Check Current Config</button>
+            <div id="configResult"></div>
+        </div>
+
+        <div class="section">
+            <h2>🔑 Test Supabase Connection</h2>
+            <button onclick="testConnection()">Test Connection</button>
+            <div id="connectionResult"></div>
+        </div>
+
+        <div class="section">
+            <h2>📝 Instructions</h2>
+            <div class="info">
+                <h3>To fix the "Invalid API key" error:</h3>
+                <ol>
+                    <li><strong>Get your service role key:</strong>
+                        <ul>
+                            <li>Go to <a href="https://supabase.com/dashboard" target="_blank">Supabase Dashboard</a></li>
+                            <li>Select your project: <code>rpsbibwmbsllnvfithjw.supabase.co</code></li>
+                            <li>Click "Settings" → "API"</li>
+                            <li>Copy the "service_role" key (starts with <code>eyJ...</code>)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Update the config file:</strong>
+                        <ul>
+                            <li>Open <code>supabase-config-secret.js</code></li>
+                            <li>Replace <code>"your-service-role-key-here"</code> with your actual key</li>
+                            <li>Save the file</li>
+                        </ul>
+                    </li>
+                    <li><strong>Test again:</strong>
+                        <ul>
+                            <li>Refresh this page</li>
+                            <li>Click "Check Current Config" and "Test Connection"</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        let supabaseConfig = null;
+
+        async function loadConfig() {
+            try {
+                const config = await import('./supabase-config-secret.js');
+                supabaseConfig = config.default;
+                return true;
+            } catch (error) {
+                console.error('Error loading config:', error);
+                return false;
+            }
+        }
+
+        window.checkConfig = async function() {
+            const resultDiv = document.getElementById('configResult');
+            resultDiv.innerHTML = '<div class="info">Loading configuration...</div>';
+
+            const loaded = await loadConfig();
+            if (!loaded) {
+                resultDiv.innerHTML = '<div class="error">❌ Failed to load configuration file</div>';
+                return;
+            }
+
+            const isServiceKeyPlaceholder = supabaseConfig.supabaseServiceKey === 'your-service-role-key-here';
+            const isAnonKeyValid = supabaseConfig.supabaseAnonKey && supabaseConfig.supabaseAnonKey.length > 50;
+
+            resultDiv.innerHTML = `
+                <div class="info">
+                    <h4>Configuration Status:</h4>
+                    <p><strong>URL:</strong> ${supabaseConfig.supabaseUrl}</p>
+                    <p><strong>Anon Key:</strong> <span class="key-display">${supabaseConfig.supabaseAnonKey.substring(0, 20)}...</span></p>
+                    <p><strong>Service Key:</strong> <span class="key-display">${supabaseConfig.supabaseServiceKey}</span></p>
+                </div>
+                ${isServiceKeyPlaceholder ? 
+                    '<div class="error">❌ Service role key is still the placeholder! Please replace it with your actual key.</div>' : 
+                    '<div class="success">✅ Service role key appears to be set</div>'
+                }
+                ${isAnonKeyValid ? 
+                    '<div class="success">✅ Anon key appears valid</div>' : 
+                    '<div class="error">❌ Anon key appears invalid</div>'
+                }
+            `;
+        };
+
+        window.testConnection = async function() {
+            const resultDiv = document.getElementById('connectionResult');
+            resultDiv.innerHTML = '<div class="info">Testing connection...</div>';
+
+            try {
+                // Wait for Supabase SDK
+                let attempts = 0;
+                while (attempts < 20 && !window.supabase) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+
+                if (!window.supabase) {
+                    resultDiv.innerHTML = '<div class="error">❌ Supabase SDK not available</div>';
+                    return;
+                }
+
+                // Test with anon key first
+                const anonClient = window.supabase.createClient(
+                    supabaseConfig.supabaseUrl,
+                    supabaseConfig.supabaseAnonKey
+                );
+
+                const { data: anonData, error: anonError } = await anonClient
+                    .from('premium_users')
+                    .select('count')
+                    .limit(1);
+
+                if (anonError) {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            ❌ Anon key test failed: ${anonError.message}
+                            <br>This is expected due to RLS policies.
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ Anon key works (but limited by RLS)
+                        </div>
+                    `;
+                }
+
+                // Test with service key
+                const serviceClient = window.supabase.createClient(
+                    supabaseConfig.supabaseUrl,
+                    supabaseConfig.supabaseServiceKey
+                );
+
+                const { data: serviceData, error: serviceError } = await serviceClient
+                    .from('premium_users')
+                    .select('count')
+                    .limit(1);
+
+                if (serviceError) {
+                    resultDiv.innerHTML += `
+                        <div class="error">
+                            ❌ Service key test failed: ${serviceError.message}
+                            <br>This indicates the service role key is invalid or not set correctly.
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML += `
+                        <div class="success">
+                            ✅ Service key works! Can bypass RLS policies.
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Connection test failed: ${error.message}</div>`;
+            }
+        };
+
+        // Auto-load config on page load
+        window.addEventListener('load', function() {
+            loadConfig();
+        });
+    </script>
+</body>
+</html>
