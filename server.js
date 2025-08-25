@@ -48,13 +48,6 @@ app.post('/api/create-checkout-session', async (req, res) => {
         userId: userId || 'anonymous',
         offerType: '3-month-promo',
       },
-      // Add subscription setup for recurring billing after 3 months
-      subscription_data: {
-        trial_period_days: 90, // 3 months trial
-        metadata: {
-          userId: userId || 'anonymous',
-        },
-      },
     });
 
     res.json({ sessionId: session.id, url: session.url });
