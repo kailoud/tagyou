@@ -1806,7 +1806,7 @@ class AvatarSystem {
     }
   }
 
-    refreshMainAvatar() {
+  refreshMainAvatar() {
     const avatarButton = document.querySelector('.avatar-button');
     if (avatarButton && this.user) {
       const userIcon = avatarButton.querySelector('div');
@@ -1816,7 +1816,7 @@ class AvatarSystem {
         if (!savedAvatar) {
           savedAvatar = localStorage.getItem(`avatar_${this.user.email}`);
         }
-        
+
         if (savedAvatar) {
           userIcon.innerHTML = `<img src="${savedAvatar}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
         } else {
@@ -1828,7 +1828,7 @@ class AvatarSystem {
 
   getDisplayName() {
     if (!this.user) return 'User';
-    
+
     // Check multiple sources for the best name
     let name = this.user.user_metadata?.full_name;
     if (!name) {
@@ -1842,7 +1842,7 @@ class AvatarSystem {
         }
       }
     }
-    
+
     return name || 'User';
   }
 
