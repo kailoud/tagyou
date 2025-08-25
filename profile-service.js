@@ -15,9 +15,9 @@ class ProfileService {
       }
 
       const { data, error } = await this.supabase
-        .from('user_profiles')
+        .from('profiles')
         .select('*')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .single();
 
       if (error) {
@@ -42,9 +42,9 @@ class ProfileService {
       }
 
       const { data, error } = await this.supabase
-        .from('user_profiles')
+        .from('profiles')
         .upsert(profileData, { 
-          onConflict: 'user_id',
+          onConflict: 'id',
           ignoreDuplicates: false 
         })
         .select()
@@ -71,10 +71,9 @@ class ProfileService {
       }
 
       const { data, error } = await this.supabase
-        .from('user_profiles')
+        .from('profiles')
         .update(updates)
-        .eq('user_id', userId)
-        .select()
+        .eq('id', userId)
         .single();
 
       if (error) {
@@ -177,9 +176,9 @@ class ProfileService {
       }
 
       const { data, error } = await this.supabase
-        .from('user_profiles')
+        .from('profiles')
         .select('*')
-        .eq('email', email)
+        .eq('id', email) // Using email as id for now
         .single();
 
       if (error) {
@@ -198,11 +197,11 @@ class ProfileService {
   async initializeProfile(userId, email, fullName = '') {
     try {
       const profileData = {
-        user_id: userId,
-        email: email,
-        full_name: fullName,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        id: userId,
+        avatar_url: null,
+        bio: null,
+        location: null,
+        website: null
       };
 
       return await this.upsertUserProfile(profileData);

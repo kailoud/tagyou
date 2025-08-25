@@ -195,18 +195,18 @@ class AvatarSystem {
           return null;
         }
       },
-              signIn: async (email, password) => {
-          console.log('AUTH DEBUG: Fallback signIn called with:', email);
-          try {
-            if (!window.supabaseClient) {
-              console.error('AUTH DEBUG: Supabase client not available');
-              return { success: false, error: 'Authentication service not available. Please refresh the page.' };
-            }
-            
-            const { data, error } = await window.supabaseClient.auth.signInWithPassword({
-              email,
-              password
-            });
+      signIn: async (email, password) => {
+        console.log('AUTH DEBUG: Fallback signIn called with:', email);
+        try {
+          if (!window.supabaseClient) {
+            console.error('AUTH DEBUG: Supabase client not available');
+            return { success: false, error: 'Authentication service not available. Please refresh the page.' };
+          }
+
+          const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+            email,
+            password
+          });
 
           console.log('AUTH DEBUG: Supabase signIn response:', { data, error });
 
@@ -225,18 +225,18 @@ class AvatarSystem {
           return { success: false, error: error.message };
         }
       },
-              signUp: async (email, password) => {
-          console.log('AUTH DEBUG: Fallback signUp called with:', email);
-          try {
-            if (!window.supabaseClient) {
-              console.error('AUTH DEBUG: Supabase client not available');
-              return { success: false, error: 'Authentication service not available. Please refresh the page.' };
-            }
-            
-            const { data, error } = await window.supabaseClient.auth.signUp({
-              email,
-              password
-            });
+      signUp: async (email, password) => {
+        console.log('AUTH DEBUG: Fallback signUp called with:', email);
+        try {
+          if (!window.supabaseClient) {
+            console.error('AUTH DEBUG: Supabase client not available');
+            return { success: false, error: 'Authentication service not available. Please refresh the page.' };
+          }
+
+          const { data, error } = await window.supabaseClient.auth.signUp({
+            email,
+            password
+          });
 
           console.log('AUTH DEBUG: Supabase signUp response:', { data, error });
 
@@ -250,15 +250,15 @@ class AvatarSystem {
           return { success: false, error: error.message };
         }
       },
-              signOut: async () => {
-          console.log('AUTH DEBUG: Fallback signOut called');
-          try {
-            if (!window.supabaseClient) {
-              console.error('AUTH DEBUG: Supabase client not available');
-              return { success: false, error: 'Authentication service not available. Please refresh the page.' };
-            }
-            
-            const { error } = await window.supabaseClient.auth.signOut();
+      signOut: async () => {
+        console.log('AUTH DEBUG: Fallback signOut called');
+        try {
+          if (!window.supabaseClient) {
+            console.error('AUTH DEBUG: Supabase client not available');
+            return { success: false, error: 'Authentication service not available. Please refresh the page.' };
+          }
+
+          const { error } = await window.supabaseClient.auth.signOut();
           if (error) {
             console.error('AUTH DEBUG: SignOut error:', error);
           }
@@ -288,7 +288,7 @@ class AvatarSystem {
     }).catch(error => {
       console.warn('AUTH DEBUG: Background initialization failed:', error);
     });
-    
+
     // Check premium status after user is loaded
     this.checkPremiumStatus();
   }
@@ -331,7 +331,7 @@ class AvatarSystem {
           await new Promise(resolve => setTimeout(resolve, 100));
           attempts++;
         }
-        
+
         if (window.PremiumUsersService) {
           try {
             const isPremium = await window.PremiumUsersService.isPremiumUser(this.user.email);
@@ -376,7 +376,7 @@ class AvatarSystem {
     if (email) {
       localStorage.setItem(`premium_${email}`, isPremium ? 'true' : 'false');
       console.log(`💎 Avatar system premium status set for ${email}: ${isPremium ? 'Premium' : 'Basic'}`);
-      
+
       // Update current user tier if email matches
       if (this.user?.email === email) {
         this.setUserTier(isPremium ? 'Premium' : 'Basic');
@@ -388,7 +388,7 @@ class AvatarSystem {
     this.userTier = tier;
     this.isPremium = tier === 'Premium';
     console.log(`🎯 Avatar system user tier set to: ${tier}`);
-    
+
     // Update dropdown if it's currently open
     if (this.isDropdownOpen) {
       this.renderDropdown();
@@ -440,10 +440,10 @@ class AvatarSystem {
           console.log('AUTH DEBUG: Current user from session storage:', this.user?.email || 'none');
         }
       }
-      
+
       // Check premium status after user is loaded
       await this.checkPremiumStatus();
-      
+
       // Update status indicator after user state is determined
       this.updateStatusIndicator();
     } catch (error) {
@@ -530,14 +530,14 @@ class AvatarSystem {
   toggleDropdown() {
     console.log('UI DEBUG: Toggle dropdown called, current state:', this.isDropdownOpen);
     this.isDropdownOpen = !this.isDropdownOpen;
-    
+
     // Force check premium status when dropdown opens (non-blocking)
     if (this.isDropdownOpen && this.user) {
       this.refreshPremiumStatus().catch(error => {
         console.error('Error refreshing premium status:', error);
       });
     }
-    
+
     this.renderDropdown();
   }
 
@@ -1394,11 +1394,11 @@ class AvatarSystem {
 
   handleUpgradeClick() {
     console.log('UI DEBUG: Avatar upgrade button clicked');
-    
+
     // Close dropdown
     this.isDropdownOpen = false;
     this.renderDropdown();
-    
+
     // Use carnival tracker's upgrade handler if available
     if (window.carnivalTracker && window.carnivalTracker.handleUpgradeClick) {
       console.log('UI DEBUG: Using carnival tracker upgrade handler');
@@ -1657,12 +1657,8 @@ class AvatarSystem {
       // Update profile in Supabase (with fallback to localStorage)
       if (window.profileService && this.user) {
         const profileUpdates = {
-          full_name: newName
+          avatar_url: avatarUrl || null
         };
-
-        if (avatarUrl) {
-          profileUpdates.avatar_url = avatarUrl;
-        }
 
         const updateResult = await window.profileService.updateProfile(this.user.id, profileUpdates);
         if (updateResult.success) {
@@ -1719,7 +1715,7 @@ class AvatarSystem {
       // Show success message
       saveBtn.textContent = 'Saved!';
       saveBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-      
+
       setTimeout(() => {
         modal.remove();
         // Refresh the dropdown to show updated info
@@ -1731,7 +1727,7 @@ class AvatarSystem {
       const saveBtn = modal.querySelector('.save-profile-btn');
       saveBtn.textContent = 'Error - Try Again';
       saveBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-      
+
       setTimeout(() => {
         saveBtn.textContent = 'Save Changes';
         saveBtn.style.background = 'linear-gradient(135deg, #8b5cf6, #3b82f6)';
