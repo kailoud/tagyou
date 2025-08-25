@@ -1654,7 +1654,7 @@ class AvatarSystem {
         }
       }
 
-      // Update profile in Supabase
+      // Update profile in Supabase (with fallback to localStorage)
       if (window.profileService && this.user) {
         const profileUpdates = {
           full_name: newName
@@ -1668,8 +1668,21 @@ class AvatarSystem {
         if (updateResult.success) {
           console.log('Profile updated successfully in Supabase');
         } else {
-          console.error('Error updating profile in Supabase:', updateResult.error);
+          console.log('Supabase update failed, using localStorage fallback:', updateResult.error);
+          // Store in localStorage as fallback
+          localStorage.setItem(`profile_${this.user.email}`, JSON.stringify({
+            full_name: newName,
+            avatar_url: avatarUrl,
+            updated_at: new Date().toISOString()
+          }));
         }
+      } else {
+        // No profile service available, use localStorage
+        localStorage.setItem(`profile_${this.user.email}`, JSON.stringify({
+          full_name: newName,
+          avatar_url: avatarUrl,
+          updated_at: new Date().toISOString()
+        }));
       }
 
       // Update user metadata in Supabase Auth
@@ -1757,39 +1770,64 @@ class AvatarSystem {
 
   async loadUserProfile() {
     try {
-      if (!this.user || !window.profileService) {
+      if (!this.user) {
         return;
       }
 
-      const profile = await window.profileService.getUserProfile(this.user.id);
-      if (profile) {
-        // Update avatar if profile has one
-        if (profile.avatar_url) {
-          this.updateAvatarDisplay(profile.avatar_url);
-          // Also store in localStorage for fallback
-          localStorage.setItem(`avatar_${this.user.email}`, profile.avatar_url);
-        }
-
-        // Update user metadata if profile has name
-        if (profile.full_name && (!this.user.user_metadata?.full_name || this.user.user_metadata.full_name !== profile.full_name)) {
-          this.user.user_metadata = {
-            ...this.user.user_metadata,
-            full_name: profile.full_name
-          };
-        }
-
-        console.log('Profile loaded from Supabase:', profile);
-      } else {
-        // Create profile if it doesn't exist
-        if (this.user.id && this.user.email) {
-          const initResult = await window.profileService.initializeProfile(
-            this.user.id,
-            this.user.email,
-            this.user.user_metadata?.full_name || ''
-          );
-          if (initResult.success) {
-            console.log('Profile initialized in Supabase');
+      // First try to load from Supabase
+      if (window.profileService) {
+        const profile = await window.profileService.getUserProfile(this.user.id);
+        if (profile) {
+          // Update avatar if profile has one
+          if (profile.avatar_url) {
+            this.updateAvatarDisplay(profile.avatar_url);
+            // Also store in localStorage for fallback
+            localStorage.setItem(`avatar_${this.user.email}`, profile.avatar_url);
           }
+
+          // Update user metadata if profile has name
+          if (profile.full_name && (!this.user.user_metadata?.full_name || this.user.user_metadata.full_name !== profile.full_name)) {
+            this.user.user_metadata = {
+              ...this.user.user_metadata,
+              full_name: profile.full_name
+            };
+          }
+
+          console.log('Profile loaded from Supabase:', profile);
+          return;
+        }
+      }
+
+      // Fallback to localStorage
+      const storedProfile = localStorage.getItem(`profile_${this.user.email}`);
+      if (storedProfile) {
+        try {
+          const profile = JSON.parse(storedProfile);
+          if (profile.avatar_url) {
+            this.updateAvatarDisplay(profile.avatar_url);
+            localStorage.setItem(`avatar_${this.user.email}`, profile.avatar_url);
+          }
+          if (profile.full_name) {
+            this.user.user_metadata = {
+              ...this.user.user_metadata,
+              full_name: profile.full_name
+            };
+          }
+          console.log('Profile loaded from localStorage:', profile);
+        } catch (error) {
+          console.error('Error parsing stored profile:', error);
+        }
+      }
+
+      // Try to create profile in Supabase if service is available
+      if (window.profileService && this.user.id && this.user.email) {
+        const initResult = await window.profileService.initializeProfile(
+          this.user.id,
+          this.user.email,
+          this.user.user_metadata?.full_name || ''
+        );
+        if (initResult.success) {
+          console.log('Profile initialized in Supabase');
         }
       }
     } catch (error) {

@@ -22,6 +22,7 @@ class ProfileService {
 
       if (error) {
         console.error('ProfileService: Error fetching profile:', error);
+        // Return null to trigger localStorage fallback
         return null;
       }
 
@@ -78,6 +79,7 @@ class ProfileService {
 
       if (error) {
         console.error('ProfileService: Error updating profile:', error);
+        // Return success false to trigger localStorage fallback
         return { success: false, error: error.message };
       }
 
@@ -94,6 +96,18 @@ class ProfileService {
       if (!this.supabase) {
         console.error('ProfileService: Supabase client not available');
         return { success: false, error: 'Supabase client not available' };
+      }
+
+      // Check if storage bucket exists and is accessible
+      try {
+        const { data: buckets, error: bucketError } = await this.supabase.storage.listBuckets();
+        if (bucketError || !buckets.find(b => b.name === 'user-avatars')) {
+          console.warn('ProfileService: Storage bucket not available, using localStorage fallback');
+          return { success: false, error: 'Storage bucket not available' };
+        }
+      } catch (error) {
+        console.warn('ProfileService: Storage not accessible, using localStorage fallback');
+        return { success: false, error: 'Storage not accessible' };
       }
 
       // Generate unique filename
