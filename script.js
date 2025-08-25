@@ -999,7 +999,6 @@ function initMapToolbar() {
   const foodStallBtn = document.getElementById('foodStallBtn');
   const floatTruckBtn = document.getElementById('floatTruckBtn');
   const artistBandBtn = document.getElementById('artistBandBtn');
-  const compassBtn = document.getElementById('compassBtn');
   const locationCenterBtn = document.getElementById('locationCenterBtn');
   const carnivalTrackerBtn = document.getElementById('carnivalTrackerBtn');
 
@@ -1034,18 +1033,7 @@ function initMapToolbar() {
     }
   });
 
-  // Compass button - Toggle compass visibility
-  compassBtn.addEventListener('click', function () {
-    console.log('Compass button clicked');
 
-    if (window.compass) {
-      window.compass.toggleCompass();
-      this.classList.toggle('active');
-      console.log('🧭 Compass toggled via toolbar button');
-    } else {
-      console.log('🧭 Compass component not available');
-    }
-  });
 
   // Medical locations data
   let medicalMarkers = [];

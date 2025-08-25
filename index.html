@@ -11,7 +11,6 @@
   <link rel="stylesheet" href="carnival-tracker.css">
   <link rel="stylesheet" href="invite-styles.css">
   <link rel="stylesheet" href="toggle_switch_css.css">
-  <link rel="stylesheet" href="compass.css">
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Supabase SDK -->
@@ -25,8 +24,6 @@
   <script src="invite-system.js"></script>
   <!-- Location Sharing Toggle -->
   <script src="location-sharing-toggle.js"></script>
-  <!-- Compass -->
-  <script src="compass.js"></script>
   <!-- Supabase Service -->
   <script type="module">
     // Load PremiumUsersService for premium status checks
@@ -134,275 +131,270 @@
           <i class="fas fa-crosshairs"></i>
         </button>
       </div>
+    </div>
+  </div>
 
-      <div class="toolbar-section">
-        <button class="toolbar-btn" id="compassBtn" title="Compass">
-          <i class="fas fa-compass"></i>
+  <!-- Pull Up Panel -->
+  <div class="pull-up-panel" id="pullUpPanel">
+    <div class="panel-handle">
+      <div class="handle-bar"></div>
+      <span class="handle-text">Pull up for more</span>
+    </div>
+    <div class="panel-content">
+      <div class="panel-header">
+        <h3>Festival Information</h3>
+        <button class="close-panel" id="closePanel">
+          <i class="fas fa-times"></i>
         </button>
       </div>
-    </div>
 
-    <!-- Pull Up Panel -->
-    <div class="pull-up-panel" id="pullUpPanel">
-      <div class="panel-handle">
-        <div class="handle-bar"></div>
-        <span class="handle-text">Pull up for more</span>
+      <!-- Tab Navigation -->
+      <div class="tab-navigation">
+        <button class="tab-btn active" data-tab="foodstall">
+          <i class="fas fa-utensils"></i>
+          <span>Food Stalls</span>
+        </button>
+        <button class="tab-btn" data-tab="floattrucks">
+          <i class="fas fa-truck"></i>
+          <span>Float Trucks</span>
+        </button>
+        <button class="tab-btn" data-tab="artist">
+          <i class="fas fa-music"></i>
+          <span>Artists</span>
+        </button>
+        <button class="tab-btn" data-tab="groups">
+          <i class="fas fa-users"></i>
+          <span>Groups</span>
+        </button>
+        <button class="tab-btn" data-tab="settings">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </button>
       </div>
-      <div class="panel-content">
-        <div class="panel-header">
-          <h3>Festival Information</h3>
-          <button class="close-panel" id="closePanel">
-            <i class="fas fa-times"></i>
-          </button>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Food Stalls Tab -->
+        <div class="tab-pane active" id="foodstall">
+          <div class="tab-header">
+            <h4>🍽️ Food Stalls</h4>
+            <p>Discover delicious festival food and refreshments</p>
+          </div>
+          <div class="content-list" id="food-stalls-list">
+            <!-- Food stalls will be populated by JavaScript -->
+            <div class="empty-state">
+              <p>No food stalls available yet. Please set up your database.</p>
+            </div>
+          </div>
         </div>
 
-        <!-- Tab Navigation -->
-        <div class="tab-navigation">
-          <button class="tab-btn active" data-tab="foodstall">
-            <i class="fas fa-utensils"></i>
-            <span>Food Stalls</span>
-          </button>
-          <button class="tab-btn" data-tab="floattrucks">
-            <i class="fas fa-truck"></i>
-            <span>Float Trucks</span>
-          </button>
-          <button class="tab-btn" data-tab="artist">
-            <i class="fas fa-music"></i>
-            <span>Artists</span>
-          </button>
-          <button class="tab-btn" data-tab="groups">
-            <i class="fas fa-users"></i>
-            <span>Groups</span>
-          </button>
-          <button class="tab-btn" data-tab="settings">
-            <i class="fas fa-cog"></i>
-            <span>Settings</span>
-          </button>
+        <!-- Float Trucks Tab -->
+        <div class="tab-pane" id="floattrucks">
+          <div class="tab-header">
+            <h4>🚛 Float Trucks</h4>
+            <p>Amazing parade floats and mobile attractions</p>
+          </div>
+          <div class="content-list" id="float-trucks-list">
+            <!-- Float trucks will be populated by JavaScript -->
+            <div class="empty-state">
+              <p>No float trucks available yet. Please set up your database.</p>
+            </div>
+          </div>
         </div>
 
-        <!-- Tab Content -->
-        <div class="tab-content">
-          <!-- Food Stalls Tab -->
-          <div class="tab-pane active" id="foodstall">
-            <div class="tab-header">
-              <h4>🍽️ Food Stalls</h4>
-              <p>Discover delicious festival food and refreshments</p>
-            </div>
-            <div class="content-list" id="food-stalls-list">
-              <!-- Food stalls will be populated by JavaScript -->
-              <div class="empty-state">
-                <p>No food stalls available yet. Please set up your database.</p>
-              </div>
+        <!-- Artists Tab -->
+        <div class="tab-pane" id="artist">
+          <div class="tab-header">
+            <h4>🎵 Artists & Bands</h4>
+            <p>Live performances and musical entertainment</p>
+          </div>
+          <div class="content-list" id="artists-list">
+            <!-- Artists will be populated by JavaScript -->
+            <div class="empty-state">
+              <p>No artists available yet. Please set up your database.</p>
             </div>
           </div>
+        </div>
 
-          <!-- Float Trucks Tab -->
-          <div class="tab-pane" id="floattrucks">
-            <div class="tab-header">
-              <h4>🚛 Float Trucks</h4>
-              <p>Amazing parade floats and mobile attractions</p>
-            </div>
-            <div class="content-list" id="float-trucks-list">
-              <!-- Float trucks will be populated by JavaScript -->
-              <div class="empty-state">
-                <p>No float trucks available yet. Please set up your database.</p>
-              </div>
-            </div>
+        <!-- Groups Tab -->
+        <div class="tab-pane" id="groups">
+          <div class="tab-header">
+            <h4>👥 Groups & Communities</h4>
+            <p>Connect with festival communities and groups</p>
           </div>
-
-          <!-- Artists Tab -->
-          <div class="tab-pane" id="artist">
-            <div class="tab-header">
-              <h4>🎵 Artists & Bands</h4>
-              <p>Live performances and musical entertainment</p>
-            </div>
-            <div class="content-list" id="artists-list">
-              <!-- Artists will be populated by JavaScript -->
-              <div class="empty-state">
-                <p>No artists available yet. Please set up your database.</p>
+          <div class="content-list">
+            <div class="content-item">
+              <div class="item-image">
+                <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=150&h=100&fit=crop"
+                  alt="LGBTQ+ Community">
+              </div>
+              <div class="item-content">
+                <div class="item-icon">🏳️‍🌈</div>
+                <div class="item-info">
+                  <h5>LGBTQ+ Community</h5>
+                  <p>Inclusive space for LGBTQ+ festival-goers</p>
+                  <span class="item-location">📍 Community Hub, All Day</span>
+                </div>
               </div>
             </div>
-          </div>
-
-          <!-- Groups Tab -->
-          <div class="tab-pane" id="groups">
-            <div class="tab-header">
-              <h4>👥 Groups & Communities</h4>
-              <p>Connect with festival communities and groups</p>
+            <div class="content-item">
+              <div class="item-image">
+                <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=150&h=100&fit=crop"
+                  alt="International Visitors">
+              </div>
+              <div class="item-content">
+                <div class="item-icon">🌍</div>
+                <div class="item-info">
+                  <h5>International Visitors</h5>
+                  <p>Group for international festival attendees</p>
+                  <span class="item-location">📍 Welcome Center, 10:00 AM</span>
+                </div>
+              </div>
             </div>
-            <div class="content-list">
-              <div class="content-item">
-                <div class="item-image">
-                  <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=150&h=100&fit=crop"
-                    alt="LGBTQ+ Community">
-                </div>
-                <div class="item-content">
-                  <div class="item-icon">🏳️‍🌈</div>
-                  <div class="item-info">
-                    <h5>LGBTQ+ Community</h5>
-                    <p>Inclusive space for LGBTQ+ festival-goers</p>
-                    <span class="item-location">📍 Community Hub, All Day</span>
-                  </div>
-                </div>
+            <div class="content-item">
+              <div class="item-image">
+                <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=150&h=100&fit=crop"
+                  alt="Art & Culture Group">
               </div>
-              <div class="content-item">
-                <div class="item-image">
-                  <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=150&h=100&fit=crop"
-                    alt="International Visitors">
-                </div>
-                <div class="item-content">
-                  <div class="item-icon">🌍</div>
-                  <div class="item-info">
-                    <h5>International Visitors</h5>
-                    <p>Group for international festival attendees</p>
-                    <span class="item-location">📍 Welcome Center, 10:00 AM</span>
-                  </div>
-                </div>
-              </div>
-              <div class="content-item">
-                <div class="item-image">
-                  <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=150&h=100&fit=crop"
-                    alt="Art & Culture Group">
-                </div>
-                <div class="item-content">
-                  <div class="item-icon">🎨</div>
-                  <div class="item-info">
-                    <h5>Art & Culture Group</h5>
-                    <p>Creative community for art enthusiasts</p>
-                    <span class="item-location">📍 Art Gallery, 2:00 PM</span>
-                  </div>
+              <div class="item-content">
+                <div class="item-icon">🎨</div>
+                <div class="item-info">
+                  <h5>Art & Culture Group</h5>
+                  <p>Creative community for art enthusiasts</p>
+                  <span class="item-location">📍 Art Gallery, 2:00 PM</span>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Settings Tab -->
-          <div class="tab-pane" id="settings">
-            <div class="tab-header">
-              <h4>⚙️ Settings</h4>
-              <p>Customize your festival experience</p>
+        <!-- Settings Tab -->
+        <div class="tab-pane" id="settings">
+          <div class="tab-header">
+            <h4>⚙️ Settings</h4>
+            <p>Customize your festival experience</p>
+          </div>
+          <div class="settings-list">
+            <div class="setting-item">
+              <div class="setting-info">
+                <h5>Push Notifications</h5>
+                <p>Get alerts about events and updates</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider"></span>
+              </label>
             </div>
-            <div class="settings-list">
-              <div class="setting-item">
-                <div class="setting-info">
-                  <h5>Push Notifications</h5>
-                  <p>Get alerts about events and updates</p>
-                </div>
-                <label class="switch">
-                  <input type="checkbox" checked>
-                  <span class="slider"></span>
-                </label>
+            <div class="setting-item">
+              <div class="setting-info">
+                <h5>Location Services</h5>
+                <p>Share your location for better recommendations</p>
               </div>
-              <div class="setting-item">
-                <div class="setting-info">
-                  <h5>Location Services</h5>
-                  <p>Share your location for better recommendations</p>
-                </div>
-                <label class="switch">
-                  <input type="checkbox">
-                  <span class="slider"></span>
-                </label>
+              <label class="switch">
+                <input type="checkbox">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <h5>Dark Mode</h5>
+                <p>Switch to dark theme for better visibility</p>
               </div>
-              <div class="setting-item">
-                <div class="setting-info">
-                  <h5>Dark Mode</h5>
-                  <p>Switch to dark theme for better visibility</p>
-                </div>
-                <label class="switch">
-                  <input type="checkbox">
-                  <span class="slider"></span>
-                </label>
+              <label class="switch">
+                <input type="checkbox">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <h5>Auto-Save Favorites</h5>
+                <p>Automatically save your favorite items</p>
               </div>
-              <div class="setting-item">
-                <div class="setting-info">
-                  <h5>Auto-Save Favorites</h5>
-                  <p>Automatically save your favorite items</p>
-                </div>
-                <label class="switch">
-                  <input type="checkbox" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider"></span>
+              </label>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Full Scale Map Container -->
-    <div id="map"></div>
+  <!-- Full Scale Map Container -->
+  <div id="map"></div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Supabase SDK -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <!-- Initialize Supabase Client -->
-    <script src="supabase-config-secret.js"></script>
-    <script>
-      // Initialize Supabase client globally
-      if (window.supabase && window.supabaseConfig) {
-        window.supabaseClient = window.supabase.createClient(
-          window.supabaseConfig.supabaseUrl,
-          window.supabaseConfig.supabaseAnonKey
-        );
-        console.log('✅ Supabase client initialized globally');
-      } else {
-        console.warn('⚠️ Supabase config not available, will use fallback auth');
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Initialize Supabase Client -->
+  <script src="supabase-config-secret.js"></script>
+  <script>
+    // Initialize Supabase client globally
+    if (window.supabase && window.supabaseConfig) {
+      window.supabaseClient = window.supabase.createClient(
+        window.supabaseConfig.supabaseUrl,
+        window.supabaseConfig.supabaseAnonKey
+      );
+      console.log('✅ Supabase client initialized globally');
+    } else {
+      console.warn('⚠️ Supabase config not available, will use fallback auth');
+    }
+  </script>
+  <script src="profile-service.js"></script>
+  <script src="avatar-system.js"></script>
+  <script src="script.js"></script>
+
+  <!-- Script verification removed -->
+
+
+
+
+  <script>
+
+
+    // Force show mobile elements (only for testing)
+    function forceShowMobileElements() {
+      console.log('🔧 Force showing mobile elements for testing...');
+
+      // Only show mobile elements if we're in test mode or on mobile
+      const isMobile = window.innerWidth <= 480;
+      const isTestMode = document.body.classList.contains('mobile-test-mode');
+
+      if (!isMobile && !isTestMode) {
+        console.log('📱 Not mobile and not in test mode, skipping force show');
+        return;
       }
-    </script>
-    <script src="profile-service.js"></script>
-    <script src="avatar-system.js"></script>
-    <script src="script.js"></script>
 
-    <!-- Script verification removed -->
+      // Old mobile profile elements removed - using modern profile system
+    }
 
 
 
+    // Auto-test mobile auth on page load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        console.log('🚀 Page loaded, checking mobile auth...');
 
-    <script>
-
-
-      // Force show mobile elements (only for testing)
-      function forceShowMobileElements() {
-        console.log('🔧 Force showing mobile elements for testing...');
-
-        // Only show mobile elements if we're in test mode or on mobile
-        const isMobile = window.innerWidth <= 480;
-        const isTestMode = document.body.classList.contains('mobile-test-mode');
-
-        if (!isMobile && !isTestMode) {
-          console.log('📱 Not mobile and not in test mode, skipping force show');
-          return;
+        // Force show mobile elements only on mobile
+        if (window.innerWidth <= 480) {
+          forceShowMobileElements();
         }
 
-        // Old mobile profile elements removed - using modern profile system
-      }
+        // Old mobileAuth references removed - using modern profile system
+      }, 3000);
+    });
+
+    // Side-by-side comparison function for live testing
+    window.enableSignInComparison = function () {
+      console.log('🔍 Enabling sign in comparison monitoring...');
+
+      // Performance optimization - minimal initialization
+      console.log('🚀 TagYou2 loading optimized for speed');
+    };
 
 
-
-      // Auto-test mobile auth on page load
-      window.addEventListener('load', () => {
-        setTimeout(() => {
-          console.log('🚀 Page loaded, checking mobile auth...');
-
-          // Force show mobile elements only on mobile
-          if (window.innerWidth <= 480) {
-            forceShowMobileElements();
-          }
-
-          // Old mobileAuth references removed - using modern profile system
-        }, 3000);
-      });
-
-      // Side-by-side comparison function for live testing
-      window.enableSignInComparison = function () {
-        console.log('🔍 Enabling sign in comparison monitoring...');
-
-        // Performance optimization - minimal initialization
-        console.log('🚀 TagYou2 loading optimized for speed');
-      };
-
-
-    </script>
+  </script>
 </body>
 
 </html>
