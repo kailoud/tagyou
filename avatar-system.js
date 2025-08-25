@@ -87,11 +87,6 @@ class AvatarSystem {
     }, 1000);
   }
 
-// Create global instance when script loads
-console.log('🚀 AvatarSystem script loaded, creating global instance...');
-window.avatarSystem = new AvatarSystem();
-console.log('🚀 AvatarSystem global instance created:', window.avatarSystem);
-
   async initializeSupabase() {
     try {
       console.log('🔧 Initializing Supabase connection...');
