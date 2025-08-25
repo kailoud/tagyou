@@ -321,7 +321,23 @@ class AvatarSystem {
         return;
       }
 
-      // Check if user has premium status (same logic as carnival tracker)
+      // Check Supabase for premium status
+      if (window.PremiumUsersService) {
+        try {
+          const isPremium = await window.PremiumUsersService.isPremiumUser(this.user.email);
+          if (isPremium) {
+            console.log('💎 Premium user detected in avatar system from Supabase:', this.user.email);
+            this.setUserTier('Premium');
+            // Cache in localStorage for faster future checks
+            localStorage.setItem(`premium_${this.user.email}`, 'true');
+            return;
+          }
+        } catch (error) {
+          console.log('⚠️ Supabase check failed in avatar system, falling back to local list:', error);
+        }
+      }
+
+      // Fallback to local premium emails list
       const premiumEmails = [
         'kaycheckmate@gmail.com',
         'truesliks@gmail.com',
@@ -332,7 +348,7 @@ class AvatarSystem {
       ];
 
       if (premiumEmails.includes(this.user.email.toLowerCase())) {
-        console.log('💎 Premium user detected in avatar system:', this.user.email);
+        console.log('💎 Premium user detected in avatar system from local list:', this.user.email);
         this.setUserTier('Premium');
         // Store in localStorage for future checks
         localStorage.setItem(`premium_${this.user.email}`, 'true');

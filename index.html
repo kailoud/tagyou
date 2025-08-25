@@ -18,6 +18,26 @@
   <script src="avatar-system.js"></script>
   <!-- Carnival Tracker -->
   <script src="carnival-tracker.js"></script>
+  <!-- Supabase Service -->
+  <script type="module">
+    // Load PremiumUsersService for premium status checks
+    window.loadPremiumService = async function() {
+      try {
+        const { PremiumUsersService } = await import('./supabase-service.js');
+        window.PremiumUsersService = PremiumUsersService;
+        console.log('✅ PremiumUsersService loaded for main app');
+        return true;
+      } catch (error) {
+        console.error('❌ Error loading PremiumUsersService:', error);
+        return false;
+      }
+    };
+    
+    // Load the service when the page loads
+    window.addEventListener('load', function() {
+      window.loadPremiumService();
+    });
+  </script>
 
 
 

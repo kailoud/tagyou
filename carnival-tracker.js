@@ -86,6 +86,29 @@ class CarnivalTracker {
         } catch (error) {
           console.log('⚠️ Supabase check failed, falling back to local list:', error);
         }
+      } else {
+        // Wait for PremiumUsersService to be loaded
+        console.log('⏳ PremiumUsersService not loaded yet, waiting...');
+        let attempts = 0;
+        const maxAttempts = 10;
+        while (attempts < maxAttempts && !window.PremiumUsersService) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+        
+        if (window.PremiumUsersService) {
+          try {
+            const isPremium = await window.PremiumUsersService.isPremiumUser(email);
+            if (isPremium) {
+              console.log('💎 Premium user detected from Supabase (after waiting):', email);
+              this.setUserTier('Premium');
+              localStorage.setItem(`premium_${email}`, 'true');
+              return;
+            }
+          } catch (error) {
+            console.log('⚠️ Supabase check failed after waiting, falling back to local list:', error);
+          }
+        }
       }
 
       // Fallback to local premium emails list
