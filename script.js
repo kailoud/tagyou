@@ -32,6 +32,12 @@ document.addEventListener('DOMContentLoaded', async function () {
     console.log('✅ Pull-up panel initialized');
   }, 300);
 
+  // Initialize authentication service
+  setTimeout(async () => {
+    await initializeAuthService();
+    console.log('✅ Authentication service initialized');
+  }, 400);
+
   console.log('🎭 Carnival tracker will initialize automatically');
 });
 
@@ -112,7 +118,52 @@ async function initializeSupabase() {
   }
 }
 
-// Old authentication service removed - using modern profile system instead
+// Authentication service initialization
+async function initializeAuthService() {
+  console.log('🔐 Initializing Authentication Service...');
+
+  try {
+    // Check if Supabase is available
+    if (!window.supabase) {
+      console.error('❌ Supabase not available for auth service');
+      return false;
+    }
+
+    console.log('✅ Supabase ready, loading auth service...');
+
+    // Import and initialize auth service
+    const { supabaseAuthService, setSupabaseInstance } = await import('./supabase-auth-service.js');
+
+    // Set the global supabase instance
+    setSupabaseInstance(window.supabase);
+
+    // Make auth service globally accessible
+    window.authService = supabaseAuthService;
+
+    // Initialize the auth service
+    const success = await supabaseAuthService.initialize();
+
+    if (success) {
+      // Set up auth state listener
+      supabaseAuthService.onAuthStateChanged((user) => {
+        console.log('🔐 Auth state changed:', user ? `User: ${user.email}` : 'No user');
+        currentUser = user;
+
+        // Update UI based on auth state
+        updateAuthenticatedUI(user);
+      });
+
+      console.log('✅ Authentication service initialized');
+      return true;
+    } else {
+      console.error('❌ Authentication service initialization failed');
+      return false;
+    }
+  } catch (error) {
+    console.error('❌ Authentication service initialization failed:', error);
+    return false;
+  }
+}
 
 // Initialize Modern Profile Service
 
@@ -1088,6 +1139,27 @@ function initMapToolbar() {
     }
   });
 
+  // Profile button for authentication
+  const profileBtn = document.getElementById('profileBtn');
+  if (profileBtn) {
+    profileBtn.addEventListener('click', function () {
+      console.log('👤 Profile button clicked');
+
+      // Check if user is authenticated
+      if (window.authService && window.authService.isAuthenticated()) {
+        // Show profile menu or sign out option
+        showProfileMenu();
+      } else {
+        // Show sign in modal
+        if (window.authService && window.authService.showSignInModal) {
+          window.authService.showSignInModal();
+        } else {
+          console.log('❌ Auth service not available');
+        }
+      }
+    });
+  }
+
   console.log('🎭 Carnival tracker button event listener added (replaces Groups button)');
 }
 
@@ -1100,6 +1172,59 @@ function toggleButtonActive(button) {
   } else {
     button.classList.add('active');
   }
+}
+
+// Show profile menu for authenticated users
+function showProfileMenu() {
+  const user = window.authService.getCurrentUser();
+
+  // Remove any existing profile menu
+  const existingMenu = document.querySelector('.profile-menu-modal');
+  if (existingMenu) {
+    existingMenu.remove();
+  }
+
+  const menu = document.createElement('div');
+  menu.className = 'profile-menu-modal';
+  menu.innerHTML = `
+    <div class="profile-menu-overlay">
+      <div class="profile-menu-content">
+        <div class="profile-menu-header">
+          <div class="profile-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="profile-info">
+            <h4>${user.email}</h4>
+            <p>Signed in</p>
+          </div>
+        </div>
+        
+        <div class="profile-menu-items">
+          <button class="profile-menu-item" onclick="window.authService.showSignUpModal()">
+            <i class="fas fa-user-edit"></i>
+            Edit Profile
+          </button>
+          <button class="profile-menu-item" onclick="window.authService.signOut()">
+            <i class="fas fa-sign-out-alt"></i>
+            Sign Out
+          </button>
+        </div>
+        
+        <button class="profile-menu-close" onclick="this.closest('.profile-menu-modal').remove()">
+          Close
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(menu);
+
+  // Close menu when clicking overlay
+  menu.addEventListener('click', (e) => {
+    if (e.target === menu) {
+      menu.remove();
+    }
+  });
 }
 
 // Initialize pull-up panel functionality

@@ -455,6 +455,135 @@ export class SupabaseAuthService {
       throw error;
     }
   }
+
+  // Show sign in modal
+  showSignInModal() {
+    console.log('🔐 Showing sign in modal...');
+    this.createAuthModal('signin');
+  }
+
+  // Show sign up modal
+  showSignUpModal() {
+    console.log('🔐 Showing sign up modal...');
+    this.createAuthModal('signup');
+  }
+
+  // Create authentication modal
+  createAuthModal(type) {
+    // Remove any existing modal
+    const existingModal = document.querySelector('.auth-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    const modal = document.createElement('div');
+    modal.className = 'auth-modal';
+    modal.innerHTML = `
+      <div class="auth-modal-overlay">
+        <div class="auth-modal-content">
+          <div class="auth-modal-header">
+            <h2>${type === 'signup' ? 'Create Account' : 'Sign In'}</h2>
+            <button class="auth-modal-close" onclick="this.closest('.auth-modal').remove()">×</button>
+          </div>
+          
+          <div class="auth-modal-body">
+            <form class="auth-form" id="authForm">
+              <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+              </div>
+              
+              ${type === 'signup' ? `
+                <div class="form-group">
+                  <label for="confirmPassword">Confirm Password</label>
+                  <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+              ` : ''}
+              
+              <div class="auth-error" id="authError" style="display: none;"></div>
+              
+              <button type="submit" class="auth-submit-btn">
+                ${type === 'signup' ? 'Create Account' : 'Sign In'}
+              </button>
+            </form>
+            
+            <div class="auth-divider">
+              <span>or</span>
+            </div>
+            
+            <div class="oauth-buttons">
+              <button class="oauth-btn google-btn" onclick="window.authService.signInWithGoogle()">
+                <i class="fab fa-google"></i>
+                Sign in with Google
+              </button>
+              <button class="oauth-btn facebook-btn" onclick="window.authService.signInWithFacebook()">
+                <i class="fab fa-facebook"></i>
+                Sign in with Facebook
+              </button>
+            </div>
+            
+            <div class="auth-footer">
+              ${type === 'signup' ?
+        '<p>Already have an account? <a href="#" onclick="window.authService.showSignInModal()">Sign in</a></p>' :
+        '<p>Don\'t have an account? <a href="#" onclick="window.authService.showSignUpModal()">Create one</a></p>'
+      }
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Show the modal with animation
+    setTimeout(() => {
+      modal.classList.add('show');
+    }, 10);
+
+    // Handle form submission
+    const form = modal.querySelector('#authForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = form.email.value;
+      const password = form.password.value;
+      const confirmPassword = form.confirmPassword?.value;
+      const errorDiv = modal.querySelector('#authError');
+
+      // Clear previous errors
+      errorDiv.style.display = 'none';
+      errorDiv.textContent = '';
+
+      try {
+        if (type === 'signup') {
+          if (password !== confirmPassword) {
+            throw new Error('Passwords do not match');
+          }
+          await this.signUp(email, password);
+        } else {
+          await this.signIn(email, password);
+        }
+
+        // Close modal on success
+        modal.remove();
+      } catch (error) {
+        errorDiv.textContent = error.message;
+        errorDiv.style.display = 'block';
+      }
+    });
+
+    // Close modal when clicking overlay
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
+  }
 }
 
 // Create and export a singleton instance
