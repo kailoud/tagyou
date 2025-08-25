@@ -487,8 +487,17 @@ class AvatarSystem {
     }
 
     const userIcon = document.createElement('div');
-    // Check for saved avatar (will be updated after profile load)
-    const savedAvatar = this.user ? localStorage.getItem(`avatar_${this.user.email}`) : null;
+    // Check for saved avatar from multiple sources
+    let savedAvatar = null;
+    if (this.user) {
+      // Check user metadata first
+      savedAvatar = this.user.user_metadata?.avatar_url;
+      // Then check localStorage
+      if (!savedAvatar) {
+        savedAvatar = localStorage.getItem(`avatar_${this.user.email}`);
+      }
+    }
+    
     if (savedAvatar) {
       userIcon.innerHTML = `<img src="${savedAvatar}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
     } else {
@@ -1752,6 +1761,8 @@ class AvatarSystem {
         modal.remove();
         // Refresh the dropdown to show updated info
         this.renderDropdown();
+        // Also refresh the main avatar button
+        this.refreshMainAvatar();
       }, 1000);
 
     } catch (error) {
@@ -1796,6 +1807,26 @@ class AvatarSystem {
     }
   }
 
+  refreshMainAvatar() {
+    const avatarButton = document.querySelector('.avatar-button');
+    if (avatarButton && this.user) {
+      const userIcon = avatarButton.querySelector('div');
+      if (userIcon) {
+        // Check for saved avatar from multiple sources
+        let savedAvatar = this.user.user_metadata?.avatar_url;
+        if (!savedAvatar) {
+          savedAvatar = localStorage.getItem(`avatar_${this.user.email}`);
+        }
+        
+        if (savedAvatar) {
+          userIcon.innerHTML = `<img src="${savedAvatar}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        } else {
+          userIcon.innerHTML = '<i class="fas fa-user" style="font-size: 24px; color: white;"></i>';
+        }
+      }
+    }
+  }
+
   async loadUserProfile() {
     try {
       if (!this.user) {
@@ -1811,6 +1842,8 @@ class AvatarSystem {
             this.updateAvatarDisplay(profile.avatar_url);
             // Also store in localStorage for fallback
             localStorage.setItem(`avatar_${this.user.email}`, profile.avatar_url);
+            // Refresh main avatar button
+            this.refreshMainAvatar();
           }
 
           // Update user metadata if profile has name
@@ -1834,6 +1867,8 @@ class AvatarSystem {
           if (profile.avatar_url) {
             this.updateAvatarDisplay(profile.avatar_url);
             localStorage.setItem(`avatar_${this.user.email}`, profile.avatar_url);
+            // Refresh main avatar button
+            this.refreshMainAvatar();
           }
           if (profile.full_name) {
             this.user.user_metadata = {
