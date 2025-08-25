@@ -1,64 +1,12 @@
 class CarnivalTracker {
   constructor() {
-    this.people = [
-      {
-        id: 1,
-        name: "Sarah Johnson",
-        phone: "(020) 7123-4567",
-        relationship: "Friend",
-        attending: true,
-        location: { area: "Ladbroke Grove Station", street: "Ladbroke Grove", postcodeArea: "W10" },
-        lastUpdate: new Date(Date.now() - 120000),
-        isSharing: true,
-        notes: "Near sound system truck",
-        avatar: {
-          bgColor: "bg-pink-500",
-          initials: "SJ",
-          imageUrl: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=80&h=80&fit=crop&crop=face"
-        }
-      },
-      {
-        id: 2,
-        name: "Mike Davis",
-        phone: "(020) 8987-6543",
-        relationship: "Family",
-        attending: true,
-        location: { area: "Westbourne Park", street: "Westbourne Park Road", postcodeArea: "W2" },
-        lastUpdate: new Date(Date.now() - 300000),
-        isSharing: true,
-        notes: "Food stalls area",
-        avatar: {
-          bgColor: "bg-blue-500",
-          initials: "MD",
-          imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face"
-        }
-      },
-      {
-        id: 3,
-        name: "Emma Wilson",
-        phone: "(020) 7456-7890",
-        relationship: "Family",
-        attending: true,
-        location: { area: "Portobello Road", street: "Portobello Road", postcodeArea: "W11" },
-        lastUpdate: new Date(Date.now() - 60000),
-        isSharing: true,
-        notes: "Main parade route",
-        avatar: {
-          bgColor: "bg-purple-500",
-          initials: "EW",
-          imageUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face"
-        }
-      }
-    ];
+    this.people = [];
 
     this.isVisible = false;
     this.activeTab = "tracker";
     this.searchTerm = "";
     this.showAddForm = false;
-    this.notifications = [
-      { id: 1, text: "Sarah is near Ladbroke Grove Station", time: "2 min ago", type: "location" },
-      { id: 2, text: "Mike shared their location", time: "5 min ago", type: "sharing" }
-    ];
+    this.notifications = [];
 
     this.newPerson = {
       name: "",
