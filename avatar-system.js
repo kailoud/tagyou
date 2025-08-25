@@ -490,7 +490,7 @@ class AvatarSystem {
       avatarButton.style.background = 'linear-gradient(135deg, #9ca3af, #6b7280)';
     }
 
-        const userIcon = document.createElement('div');
+    const userIcon = document.createElement('div');
     // Check for saved avatar from multiple sources
     let savedAvatar = null;
     if (this.user) {
@@ -513,7 +513,7 @@ class AvatarSystem {
         }
       }
     }
-    
+
     if (savedAvatar) {
       userIcon.innerHTML = `<img src="${savedAvatar}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
     } else {
