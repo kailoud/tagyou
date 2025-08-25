@@ -1,7 +1,6 @@
 // Avatar System - Fixed version with authentication debugging
 class AvatarSystem {
   constructor() {
-    console.log('🚀 AvatarSystem constructor called');
     this.user = null;
     this.loading = true;
     this.authMode = 'signin';
@@ -19,8 +18,6 @@ class AvatarSystem {
     this.dropdownRef = null;
     this.authService = null;
     this.rememberMe = false; // Remember Me functionality
-    this.userTier = 'Basic'; // 'Basic' or 'Premium'
-    this.isPremium = false;
 
     // UK Carnival data
     this.ukCarnivals = [
@@ -71,46 +68,108 @@ class AvatarSystem {
     ];
 
     // Create avatar immediately without waiting for async operations
-    console.log('🚀 Creating avatar element...');
     this.createAvatarElement();
-    console.log('🚀 Setting up event listeners...');
     this.setupEventListeners();
 
     // Initialize authentication in background
-    console.log('🚀 Initializing authentication...');
     this.init();
-    
-    // Check if avatar was created successfully after a short delay
-    setTimeout(() => {
-      console.log('🚀 Checking if avatar was created...');
-      this.recreateAvatarIfMissing();
-    }, 1000);
   }
 
   async initializeSupabase() {
     try {
-      console.log('🔧 Initializing Supabase connection...');
+      console.log('AUTH DEBUG: Initializing Supabase...');
 
-      // Reduced max attempts and timeout
-      const maxAttempts = 10; // Reduced from 50
+      // Wait for Supabase to be available (reduced timeout)
       let attempts = 0;
+      const maxAttempts = 50; // Reduced from 300 to 50 (5 seconds max)
 
-      while (attempts < maxAttempts) {
-        if (window.supabase) {
-          console.log('✅ Supabase connection established');
-          this.supabase = window.supabase;
-          return true;
-        }
-
+      while (!window.supabase && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 100));
         attempts++;
-        await new Promise(resolve => setTimeout(resolve, 50)); // Reduced from 100ms to 50ms
       }
 
-      console.log('⚠️ Supabase not available, using fallback mode');
-      return false;
+      if (!window.supabase) {
+        console.warn('AUTH DEBUG: Supabase not available, will continue without it');
+        this.authService = this.createFallbackAuthService();
+        return;
+      }
+
+      // Wait for Supabase client to be fully initialized (reduced timeout)
+      attempts = 0;
+      while (!window.supabaseClient && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+
+      if (!window.supabaseClient) {
+        console.warn('AUTH DEBUG: Supabase client not available, will try to create one');
+      }
+
+      console.log('AUTH DEBUG: Supabase is ready, proceeding with initialization...');
+
+      // Try to import the auth service - handle missing file gracefully
+      let authModule;
+      try {
+        authModule = await import('./supabase-auth-service.js');
+        this.authService = authModule.supabaseAuthService;
+      } catch (importError) {
+        console.warn('AUTH DEBUG: Failed to import auth service, creating fallback');
+        this.authService = this.createFallbackAuthService();
+      }
+
+      // Set the global supabase instance for the auth service
+      if (window.supabaseClient) {
+        if (authModule && authModule.setSupabaseInstance) {
+          authModule.setSupabaseInstance(window.supabaseClient);
+        }
+      } else {
+        // Create our own Supabase client if none exists
+        try {
+          const config = await import('./supabase-config-secret.js');
+          const supabaseClient = window.supabase.createClient(
+            config.default.supabaseUrl,
+            config.default.supabaseAnonKey
+          );
+          window.supabaseClient = supabaseClient;
+          if (authModule && authModule.setSupabaseInstance) {
+            authModule.setSupabaseInstance(supabaseClient);
+          }
+        } catch (error) {
+          console.warn('AUTH DEBUG: Failed to create Supabase client, using fallback');
+          this.authService = this.createFallbackAuthService();
+          return;
+        }
+      }
+
+      // Skip connection test for faster loading
+      console.log('AUTH DEBUG: Supabase client ready');
+
+      // Initialize the auth service (simplified)
+      try {
+        if (this.authService.initialize) {
+          await this.authService.initialize();
+        }
+
+        // Set up auth state listener
+        if (this.authService.onAuthStateChanged) {
+          this.authService.onAuthStateChanged((user) => {
+            this.user = user;
+            if (user) {
+              sessionStorage.setItem('supabase_user', JSON.stringify(user));
+            } else {
+              sessionStorage.removeItem('supabase_user');
+            }
+            this.renderDropdown();
+          });
+        }
+
+        console.log('AUTH DEBUG: Supabase Auth Service initialized');
+      } catch (error) {
+        console.warn('AUTH DEBUG: Auth service initialization failed, using fallback');
+        this.authService = this.createFallbackAuthService();
+      }
     } catch (error) {
-      console.error('❌ Supabase initialization error:', error);
-      return false;
+      console.error('AUTH DEBUG: Error initializing Supabase Auth Service:', error);
     }
   }
 
@@ -136,13 +195,7 @@ class AvatarSystem {
       signIn: async (email, password) => {
         console.log('AUTH DEBUG: Fallback signIn called with:', email);
         try {
-          // Check if Supabase is available
-          if (!window.supabase) {
-            console.error('AUTH DEBUG: Supabase not available');
-            return { success: false, error: 'Supabase not initialized. Please refresh the page.' };
-          }
-
-          const { data, error } = await window.supabase.auth.signInWithPassword({
+          const { data, error } = await window.supabaseClient.auth.signInWithPassword({
             email,
             password
           });
@@ -167,13 +220,7 @@ class AvatarSystem {
       signUp: async (email, password) => {
         console.log('AUTH DEBUG: Fallback signUp called with:', email);
         try {
-          // Check if Supabase is available
-          if (!window.supabase) {
-            console.error('AUTH DEBUG: Supabase not available');
-            return { success: false, error: 'Supabase not initialized. Please refresh the page.' };
-          }
-
-          const { data, error } = await window.supabase.auth.signUp({
+          const { data, error } = await window.supabaseClient.auth.signUp({
             email,
             password
           });
@@ -193,13 +240,7 @@ class AvatarSystem {
       signOut: async () => {
         console.log('AUTH DEBUG: Fallback signOut called');
         try {
-          // Check if Supabase is available
-          if (!window.supabase) {
-            console.error('AUTH DEBUG: Supabase not available');
-            return { success: false, error: 'Supabase not initialized. Please refresh the page.' };
-          }
-
-          const { error } = await window.supabase.auth.signOut();
+          const { error } = await window.supabaseClient.auth.signOut();
           if (error) {
             console.error('AUTH DEBUG: SignOut error:', error);
           }
@@ -211,8 +252,8 @@ class AvatarSystem {
         }
       },
       onAuthStateChanged: (callback) => {
-        if (window.supabase && window.supabase.auth) {
-          return window.supabase.auth.onAuthStateChange((event, session) => {
+        if (window.supabaseClient && window.supabaseClient.auth) {
+          return window.supabaseClient.auth.onAuthStateChange((event, session) => {
             console.log('AUTH DEBUG: Auth state change event:', event, session?.user?.email);
             callback(session?.user || null);
           });
@@ -229,47 +270,6 @@ class AvatarSystem {
     }).catch(error => {
       console.warn('AUTH DEBUG: Background initialization failed:', error);
     });
-
-    // Try to connect to the global auth service
-    this.connectToGlobalAuthService();
-    
-    // Check user premium status
-    await this.checkPremiumStatus();
-  }
-
-  async connectToGlobalAuthService() {
-    try {
-      // Wait for the global auth service to be available
-      let attempts = 0;
-      const maxAttempts = 50;
-
-      while (attempts < maxAttempts) {
-        if (window.authService) {
-          console.log('AUTH DEBUG: Connected to global auth service');
-          this.authService = window.authService;
-
-                // Set up auth state listener
-      this.authService.onAuthStateChanged((user) => {
-        console.log('AUTH DEBUG: Global auth state changed:', user?.email || 'no user');
-        this.user = user;
-        this.updateStatusIndicator();
-        this.checkPremiumStatus(); // Check premium status when user changes
-        this.renderDropdown();
-      });
-
-          return;
-        }
-
-        attempts++;
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-
-      console.log('AUTH DEBUG: Global auth service not available, using fallback');
-      this.authService = this.createFallbackAuthService();
-    } catch (error) {
-      console.error('AUTH DEBUG: Error connecting to global auth service:', error);
-      this.authService = this.createFallbackAuthService();
-    }
   }
 
   async checkUser() {
@@ -316,147 +316,16 @@ class AvatarSystem {
     }
   }
 
-  async checkPremiumStatus() {
-    try {
-      if (!this.user || !this.user.email) {
-        this.setUserTier('Basic');
-        return;
-      }
-
-      // First check localStorage for premium status (for immediate updates after payment)
-      const premiumStatus = localStorage.getItem(`premium_${this.user.email}`);
-      if (premiumStatus === 'true') {
-        console.log('💎 Premium user detected in avatar system from localStorage:', this.user.email);
-        this.setUserTier('Premium');
-        return;
-      }
-
-      // Check Supabase for premium status
-      if (window.PremiumUsersService) {
-        try {
-          const isPremium = await window.PremiumUsersService.isPremiumUser(this.user.email);
-          if (isPremium) {
-            console.log('💎 Premium user detected in avatar system from Supabase:', this.user.email);
-            this.setUserTier('Premium');
-            // Cache in localStorage for faster future checks
-            localStorage.setItem(`premium_${this.user.email}`, 'true');
-            return;
-          }
-        } catch (error) {
-          console.log('⚠️ Supabase check failed in avatar system, falling back to local list:', error);
-        }
-      } else {
-        // Wait for PremiumUsersService to be loaded
-        console.log('⏳ PremiumUsersService not loaded yet, waiting...');
-        let attempts = 0;
-        const maxAttempts = 10;
-        while (attempts < maxAttempts && !window.PremiumUsersService) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-          attempts++;
-        }
-        
-        if (window.PremiumUsersService) {
-          try {
-            const isPremium = await window.PremiumUsersService.isPremiumUser(this.user.email);
-            if (isPremium) {
-              console.log('💎 Premium user detected in avatar system from Supabase (after waiting):', this.user.email);
-              this.setUserTier('Premium');
-              localStorage.setItem(`premium_${this.user.email}`, 'true');
-              return;
-            }
-          } catch (error) {
-            console.log('⚠️ Supabase check failed after waiting, falling back to local list:', error);
-          }
-        }
-      }
-
-      // Fallback to local premium emails list
-      const premiumEmails = [
-        'kaycheckmate@gmail.com',
-        'truesliks@gmail.com',
-        // Add payment emails here - these users have paid for premium
-        // Add your payment email below:
-        // 'your-payment-email@example.com',
-        // Add more premium emails here
-      ];
-
-      if (premiumEmails.includes(this.user.email.toLowerCase())) {
-        console.log('💎 Premium user detected in avatar system from local list:', this.user.email);
-        this.setUserTier('Premium');
-        // Store in localStorage for future checks
-        localStorage.setItem(`premium_${this.user.email}`, 'true');
-      } else {
-        console.log('📱 Basic user detected in avatar system:', this.user.email);
-        this.setUserTier('Basic');
-      }
-    } catch (error) {
-      console.error('❌ Error checking premium status:', error);
-      this.setUserTier('Basic');
-    }
-  }
-
-  setPremiumStatus(email, isPremium) {
-    if (email) {
-      localStorage.setItem(`premium_${email}`, isPremium ? 'true' : 'false');
-      console.log(`💎 Avatar system premium status set for ${email}: ${isPremium ? 'Premium' : 'Basic'}`);
-      
-      // Update current user tier if email matches
-      if (this.user?.email === email) {
-        this.setUserTier(isPremium ? 'Premium' : 'Basic');
-      }
-    }
-  }
-
-  setUserTier(tier) {
-    this.userTier = tier;
-    this.isPremium = tier === 'Premium';
-    console.log(`🎯 Avatar system user tier set to: ${tier}`);
-    
-    // Update dropdown if it's currently open
-    if (this.isDropdownOpen) {
-      this.renderDropdown();
-    }
-    
-    // Force re-render the dropdown to update the UI
-    this.renderDropdown();
-  }
-
-  // Force refresh premium status from Supabase
-  async refreshPremiumStatus() {
-    console.log('🔄 Forcing premium status refresh...');
-    await this.checkPremiumStatus();
-  }
-
-  // Force recreate avatar if missing
-  recreateAvatarIfMissing() {
-    const existingAvatar = document.querySelector('.avatar-container');
-    if (!existingAvatar) {
-      console.log('UI DEBUG: Avatar missing, recreating...');
-      this.createAvatarElement();
-    } else {
-      console.log('UI DEBUG: Avatar exists:', existingAvatar);
-    }
-  }
-
   createAvatarElement() {
-    try {
-      console.log('UI DEBUG: Creating avatar element...');
-      
-      // Remove any existing avatar first
-      const existingAvatar = document.querySelector('.avatar-container');
-      if (existingAvatar) {
-        existingAvatar.remove();
-        console.log('UI DEBUG: Removed existing avatar');
-      }
-      
-      const avatarContainer = document.createElement('div');
-      avatarContainer.className = 'avatar-container';
-      avatarContainer.style.cssText = `
-        position: fixed;
-        top: 40px;
-        right: 40px;
-        z-index: 9999;
-      `;
+    console.log('UI DEBUG: Creating avatar element...');
+    const avatarContainer = document.createElement('div');
+    avatarContainer.className = 'avatar-container';
+    avatarContainer.style.cssText = `
+      position: fixed;
+      top: 40px;
+      right: 40px;
+      z-index: 9999;
+    `;
 
     const avatarButton = document.createElement('button');
     avatarButton.className = 'avatar-button';
@@ -486,7 +355,6 @@ class AvatarSystem {
 
     const statusIndicator = document.createElement('div');
     statusIndicator.className = 'status-indicator';
-    statusIndicator.id = 'avatar-status-indicator'; // Add ID for easy access
     statusIndicator.style.cssText = `
       position: absolute;
       top: -4px;
@@ -495,13 +363,12 @@ class AvatarSystem {
       height: 16px;
       border-radius: 50%;
       border: 2px solid white;
-      transition: background-color 0.3s ease;
     `;
 
     if (this.user) {
-      statusIndicator.style.backgroundColor = '#10b981'; // Green when logged in
+      statusIndicator.style.backgroundColor = '#4ade80';
     } else {
-      statusIndicator.style.backgroundColor = '#f97316'; // Orange when signed out
+      statusIndicator.style.backgroundColor = '#fb923c';
     }
 
     avatarButton.appendChild(statusIndicator);
@@ -510,39 +377,11 @@ class AvatarSystem {
     avatarContainer.appendChild(avatarButton);
     this.dropdownRef = avatarContainer;
     document.body.appendChild(avatarContainer);
-    
-    console.log('UI DEBUG: Avatar element created and added to DOM');
-    console.log('UI DEBUG: Avatar container:', avatarContainer);
-    console.log('UI DEBUG: Avatar button:', avatarButton);
-    
-    } catch (error) {
-      console.error('UI DEBUG: Error creating avatar element:', error);
-    }
-  }
-
-  // Method to update status indicator without recreating avatar
-  updateStatusIndicator() {
-    const statusIndicator = document.getElementById('avatar-status-indicator');
-    if (statusIndicator) {
-      if (this.user) {
-        statusIndicator.style.backgroundColor = '#10b981'; // Green when logged in
-      } else {
-        statusIndicator.style.backgroundColor = '#f97316'; // Orange when signed out
-      }
-    }
   }
 
   toggleDropdown() {
     console.log('UI DEBUG: Toggle dropdown called, current state:', this.isDropdownOpen);
     this.isDropdownOpen = !this.isDropdownOpen;
-    
-    // Force check premium status when dropdown opens (non-blocking)
-    if (this.isDropdownOpen && this.user) {
-      this.refreshPremiumStatus().catch(error => {
-        console.error('Error refreshing premium status:', error);
-      });
-    }
-    
     this.renderDropdown();
   }
 
@@ -595,13 +434,8 @@ class AvatarSystem {
             <h3 style="font-weight: bold; font-size: 18px; margin: 0;">${this.user.user_metadata?.full_name || 'User'}</h3>
             <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin: 4px 0;">${this.user.email}</p>
             <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
-              ${this.isPremium ? `
-                <i class="fas fa-star" style="color: #fbbf24;"></i>
-                <span style="font-size: 14px; color: rgba(255,255,255,0.9);">Premium User</span>
-              ` : `
-                <i class="fas fa-user" style="color: #9ca3af;"></i>
-                <span style="font-size: 14px; color: rgba(255,255,255,0.9);">Basic User</span>
-              `}
+              <i class="fas fa-star" style="color: #fbbf24;"></i>
+              <span style="font-size: 14px; color: rgba(255,255,255,0.9);">Premium User</span>
             </div>
           </div>
         </div>
@@ -618,7 +452,13 @@ class AvatarSystem {
           </button>
         </div>
         
-
+        <button class="menu-button" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 12px; border: none; background: none; cursor: pointer; border-radius: 8px; transition: background 0.2s;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <i class="fas fa-bell" style="color: #8b5cf6; font-size: 20px;"></i>
+            <span style="font-size: 14px; font-weight: 500; color: #374151;">Notifications</span>
+          </div>
+          <span style="background: #ef4444; color: white; font-size: 12px; padding: 2px 8px; border-radius: 12px;">3</span>
+        </button>
       </div>
 
       <div style="border-top: 1px solid #f3f4f6; margin: 8px 0;"></div>
@@ -643,20 +483,11 @@ class AvatarSystem {
       <div style="background: #f9fafb; padding: 16px; border-top: 1px solid #f3f4f6;">
         <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #6b7280; margin-bottom: 12px;">
           <span>Joined Today</span>
-          <span>${this.isPremium ? 'Premium Plan' : 'Free Plan'}</span>
+          <span>Free Plan</span>
         </div>
-        ${this.isPremium ? `
-          <button class="avatar-premium-btn" style="width: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; padding: 8px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: default; transition: all 0.3s;">
-            Premium 💎
-          </button>
-        ` : `
-          <button class="avatar-upgrade-btn" style="width: 100%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; padding: 8px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s;">
-            Upgrade 💎
-          </button>
-          <button class="refresh-premium-btn" style="width: 100%; background: #f3f4f6; color: #6b7280; padding: 4px 8px; border: none; border-radius: 4px; font-size: 12px; margin-top: 8px; cursor: pointer; transition: all 0.3s;">
-            🔄 Refresh Premium Status
-          </button>
-        `}
+        <button style="width: 100%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; padding: 8px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s;">
+          Upgrade to Pro
+        </button>
       </div>
     `;
   }
@@ -693,7 +524,7 @@ class AvatarSystem {
 
         <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f3f4f6;">
           <p style="font-size: 14px; color: #6b7280; text-align: center; margin: 0;">
-            Sign in to access carnival tracking and personalized features.
+            Sign in to access carnival tracking, notifications, and personalized features.
           </p>
         </div>
 
@@ -704,7 +535,10 @@ class AvatarSystem {
               <i class="fas fa-map-marker-alt" style="color: #8b5cf6; font-size: 16px;"></i>
               <span>Track UK carnival events</span>
             </li>
-
+            <li style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #6b7280;">
+              <i class="fas fa-bell" style="color: #8b5cf6; font-size: 16px;"></i>
+              <span>Get event notifications</span>
+            </li>
             <li style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #6b7280;">
               <i class="fas fa-edit" style="color: #8b5cf6; font-size: 16px;"></i>
               <span>Add personal notes</span>
@@ -723,47 +557,20 @@ class AvatarSystem {
     document.addEventListener('click', (e) => {
       if (e.target.closest('.signin-button')) {
         console.log('UI DEBUG: Sign in button clicked');
-
-        // Use global auth service if available
-        if (window.authService && window.authService.showSignInModal) {
-          console.log('UI DEBUG: Using global auth service for sign in');
-          window.authService.showSignInModal();
-        } else {
-          console.log('UI DEBUG: Using local auth modal for sign in');
-          this.showAuthModal = true;
-          this.authMode = 'signin';
-          this.isDropdownOpen = false;
-          this.formData = { email: '', password: '', confirmPassword: '' }; // Reset form data
-          this.renderAuthModal();
-        }
+        this.showAuthModal = true;
+        this.authMode = 'signin';
+        this.isDropdownOpen = false;
+        this.formData = { email: '', password: '', confirmPassword: '' }; // Reset form data
+        this.renderAuthModal();
       } else if (e.target.closest('.signup-button')) {
         console.log('UI DEBUG: Sign up button clicked');
-
-        // Use global auth service if available
-        if (window.authService && window.authService.showSignUpModal) {
-          console.log('UI DEBUG: Using global auth service for sign up');
-          window.authService.showSignUpModal();
-        } else {
-          console.log('UI DEBUG: Using local auth modal for sign up');
-          this.showAuthModal = true;
-          this.authMode = 'signup';
-      } else if (e.target.closest('.refresh-premium-btn')) {
-        console.log('UI DEBUG: Refresh premium status button clicked');
-        this.refreshPremiumStatus();
-      } else if (e.target.closest('.avatar-upgrade-btn')) {
-        console.log('UI DEBUG: Upgrade button clicked');
-        // Trigger premium upgrade modal
-        if (window.carnivalTracker && window.carnivalTracker.showUpgradeModal) {
-          window.carnivalTracker.showUpgradeModal();
-        }
-          this.isDropdownOpen = false;
-          this.formData = { email: '', password: '', confirmPassword: '' }; // Reset form data
-          this.renderAuthModal();
-        }
+        this.showAuthModal = true;
+        this.authMode = 'signup';
+        this.isDropdownOpen = false;
+        this.formData = { email: '', password: '', confirmPassword: '' }; // Reset form data
+        this.renderAuthModal();
       } else if (e.target.closest('.signout-button')) {
         this.handleSignOut();
-      } else if (e.target.closest('.avatar-upgrade-btn')) {
-        this.handleAvatarUpgradeClick();
       } else if (e.target.closest('.carnival-button')) {
         this.toggleCarnivalDropdown();
       } else if (e.target.closest('.auth-modal') && !e.target.closest('.auth-modal > div')) {
@@ -1009,19 +816,6 @@ class AvatarSystem {
     console.log('AUTH DEBUG: Auth service available:', !!this.authService);
     console.log('AUTH DEBUG: Auth service initialized:', this.authService?.isInitialized);
 
-    if (!this.authService) {
-      this.authError = 'Authentication service not available. Please refresh the page and try again.';
-      console.log('AUTH DEBUG: No auth service available');
-      return;
-    }
-
-    // Check if the auth service has the required methods
-    if (!this.authService.signIn || !this.authService.signUp) {
-      this.authError = 'Authentication service is not properly initialized. Please refresh the page and try again.';
-      console.log('AUTH DEBUG: Auth service missing required methods');
-      return;
-    }
-
     this.authLoading = true;
     this.authError = '';
     this.authSuccess = '';
@@ -1148,7 +942,6 @@ class AvatarSystem {
           // Close modal immediately and refresh UI
           setTimeout(() => {
             this.closeAuthModal();
-            this.updateStatusIndicator(); // Update status indicator color
             this.renderDropdown();
           }, 800);
         } else {
@@ -1194,82 +987,6 @@ class AvatarSystem {
     } finally {
       this.authLoading = false;
     }
-  }
-
-  handleAvatarUpgradeClick() {
-    console.log('UI DEBUG: Avatar upgrade button clicked');
-    
-    // Close dropdown
-    this.isDropdownOpen = false;
-    this.renderDropdown();
-    
-    // Use carnival tracker's upgrade handler if available
-    if (window.carnivalTracker && window.carnivalTracker.handleUpgradeClick) {
-      console.log('UI DEBUG: Using carnival tracker upgrade handler');
-      window.carnivalTracker.handleUpgradeClick();
-    } else {
-      console.log('UI DEBUG: Carnival tracker not available, showing fallback upgrade modal');
-      this.showFallbackUpgradeModal();
-    }
-  }
-
-  showFallbackUpgradeModal() {
-    // Create a simple upgrade modal if carnival tracker is not available
-    const modal = document.createElement('div');
-    modal.className = 'fallback-upgrade-modal';
-    modal.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10001;
-      padding: 16px;
-    `;
-
-    modal.innerHTML = `
-      <div style="background: white; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-width: 448px; width: 100%; padding: 24px; text-align: center;">
-        <div style="font-size: 48px; margin-bottom: 16px;">💎</div>
-        <h2 style="font-size: 24px; font-weight: bold; margin: 0 0 16px 0; color: #374151;">Upgrade to Premium</h2>
-        <p style="color: #6b7280; margin: 0 0 24px 0; line-height: 1.6;">
-          Unlock unlimited squad members and advanced features for your carnival tracking experience.
-        </p>
-        <button class="fallback-upgrade-btn" style="width: 100%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-          Get 3-Month Deal
-        </button>
-        <button class="fallback-close-btn" style="width: 100%; background: #f3f4f6; color: #374151; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 500; cursor: pointer; margin-top: 12px; transition: all 0.3s;">
-          Maybe Later
-        </button>
-      </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    // Add event listeners
-    modal.querySelector('.fallback-upgrade-btn').addEventListener('click', () => {
-      modal.remove();
-      // Try to use carnival tracker's upgrade method
-      if (window.carnivalTracker && window.carnivalTracker.upgradeToPremium) {
-        window.carnivalTracker.upgradeToPremium();
-      } else {
-        alert('Upgrade functionality not available. Please try again later.');
-      }
-    });
-
-    modal.querySelector('.fallback-close-btn').addEventListener('click', () => {
-      modal.remove();
-    });
-
-    // Close on background click
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.remove();
-      }
-    });
   }
 
   closeAuthModal() {
