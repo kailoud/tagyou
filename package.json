@@ -4,8 +4,8 @@
   "description": "Carnival tracking app with premium features",
   "main": "index.html",
   "scripts": {
-    "start": "live-server --port=3000 --open=/index.html",
-    "dev": "live-server --port=3000 --open=/index.html",
+    "start": "npx live-server --port=3000 --open=/index.html",
+    "dev": "npx live-server --port=3000 --open=/index.html",
     "build": "echo 'Static site - no build required'",
     "test": "echo 'No tests specified'"
   },
