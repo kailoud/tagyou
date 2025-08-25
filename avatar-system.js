@@ -1,6 +1,7 @@
 // Avatar System - Fixed version with authentication debugging
 class AvatarSystem {
   constructor() {
+    console.log('🚀 AvatarSystem constructor called');
     this.user = null;
     this.loading = true;
     this.authMode = 'signin';
@@ -70,17 +71,26 @@ class AvatarSystem {
     ];
 
     // Create avatar immediately without waiting for async operations
+    console.log('🚀 Creating avatar element...');
     this.createAvatarElement();
+    console.log('🚀 Setting up event listeners...');
     this.setupEventListeners();
 
     // Initialize authentication in background
+    console.log('🚀 Initializing authentication...');
     this.init();
     
     // Check if avatar was created successfully after a short delay
     setTimeout(() => {
+      console.log('🚀 Checking if avatar was created...');
       this.recreateAvatarIfMissing();
     }, 1000);
   }
+
+// Create global instance when script loads
+console.log('🚀 AvatarSystem script loaded, creating global instance...');
+window.avatarSystem = new AvatarSystem();
+console.log('🚀 AvatarSystem global instance created:', window.avatarSystem);
 
   async initializeSupabase() {
     try {
