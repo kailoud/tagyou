@@ -199,6 +199,36 @@
         </div>
 
         <div class="test-section">
+            <h3>🚀 Quick Test (No Password Required)</h3>
+            <p style="color: #666; margin-bottom: 15px;">
+                Test premium features immediately without signing in:
+            </p>
+            
+            <div style="margin-bottom: 15px;">
+                <button class="test-button success" onclick="quickTestPremium()">
+                    🎯 Quick Premium Test
+                </button>
+                <button class="test-button" onclick="quickTestBasic()">
+                    📱 Quick Basic Test
+                </button>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <strong>How it works:</strong>
+                <ol style="margin: 10px 0; padding-left: 20px;">
+                    <li>Click "Quick Premium Test"</li>
+                    <li>Go to main app (tagyou.app)</li>
+                    <li>See premium features immediately</li>
+                    <li>No sign-in required!</li>
+                </ol>
+            </div>
+            
+            <button class="test-button" onclick="goToMainApp()">
+                🏠 Go to Main App
+            </button>
+        </div>
+
+        <div class="test-section">
             <h3>✨ Premium Features</h3>
             <ul class="feature-list">
                 <li>Unlimited squad members (vs 1 for Basic)</li>
@@ -288,6 +318,53 @@
 
         function refreshPage() {
             window.location.reload();
+        }
+
+        function quickTestPremium() {
+            console.log('🚀 Quick Premium Test Triggered');
+            simulateUser('quick_test@tagyou.app', true); // Simulate a user directly
+            alert('✅ Quick Premium Test complete. Go to the main app to see premium features.');
+        }
+
+        function quickTestBasic() {
+            console.log('🚀 Quick Basic Test Triggered');
+            simulateUser('quick_test@tagyou.app', false); // Simulate a user directly
+            alert('✅ Quick Basic Test complete. Go to the main app to see basic features.');
+        }
+
+        function goToMainApp() {
+            console.log('🏠 Redirecting to main app...');
+            window.location.href = '/'; // Go to main app
+        }
+
+        // Function to set premium status for any email (no auth required)
+        function setPremiumForEmail(email, isPremium = true) {
+            console.log(`🎯 Setting premium status for ${email}: ${isPremium ? 'Premium' : 'Basic'}`);
+            
+            // Set in localStorage (this works without authentication)
+            localStorage.setItem(`premium_${email}`, isPremium ? 'true' : 'false');
+            
+            // Also set a global flag for immediate testing
+            localStorage.setItem('tagyou_test_premium', isPremium ? 'true' : 'false');
+            localStorage.setItem('tagyou_test_email', email);
+            
+            console.log(`✅ Premium status set for ${email}: ${isPremium ? 'Premium' : 'Basic'}`);
+            console.log('💡 Now go to the main app to see the changes!');
+            
+            return true;
+        }
+
+        // Quick test functions that work without authentication
+        function quickTestPremium() {
+            console.log('🚀 Quick Premium Test Triggered');
+            setPremiumForEmail('quick_test@tagyou.app', true);
+            alert('✅ Quick Premium Test complete!\n\nGo to the main app to see premium features.\n\nNo sign-in required!');
+        }
+
+        function quickTestBasic() {
+            console.log('🚀 Quick Basic Test Triggered');
+            setPremiumForEmail('quick_test@tagyou.app', false);
+            alert('✅ Quick Basic Test complete!\n\nGo to the main app to see basic features.\n\nNo sign-in required!');
         }
 
         // Show current premium users on load

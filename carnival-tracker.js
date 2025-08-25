@@ -54,6 +54,16 @@ class CarnivalTracker {
 
   async checkPremiumStatus() {
     try {
+      // First check for test premium status (no auth required)
+      const testPremium = localStorage.getItem('tagyou_test_premium');
+      const testEmail = localStorage.getItem('tagyou_test_email');
+      
+      if (testPremium === 'true' && testEmail) {
+        console.log('🎯 Test premium user detected:', testEmail);
+        this.setUserTier('Premium');
+        return;
+      }
+
       // Get current user email
       const currentUser = window.authService?.getCurrentUser();
       const email = currentUser?.email || '';
