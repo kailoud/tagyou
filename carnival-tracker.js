@@ -68,9 +68,10 @@ class CarnivalTracker {
       notes: ""
     };
 
-    // Premium features
-    this.isPremium = false; // Back to free mode
-    this.maxFreeMembers = 5;
+    // Premium features and user tiers
+    this.isPremium = false;
+    this.maxFreeMembers = 1; // Reduced to 1 for non-premium
+    this.userTier = 'Basic'; // 'Basic' or 'Premium'
     this.premiumFeatures = {
       unlimitedMembers: true,
       realTimeGPS: true,
@@ -79,7 +80,9 @@ class CarnivalTracker {
       voiceMessages: true,
       emergencyAlerts: true,
       analytics: true,
-      prioritySupport: true
+      prioritySupport: true,
+      messaging: true,
+      calling: true
     };
 
     // Notting Hill Carnival specific areas
@@ -98,6 +101,73 @@ class CarnivalTracker {
     this.createTrackerElement();
     this.setupEventListeners();
     this.updateToolbarCount();
+    this.checkPremiumStatus();
+  }
+
+  async checkPremiumStatus() {
+    try {
+      // Get current user email
+      const currentUser = window.authService?.getCurrentUser();
+      const email = currentUser?.email || '';
+      
+      if (!email) {
+        console.log('🔍 No user email found, defaulting to Basic tier');
+        this.setUserTier('Basic');
+        return;
+      }
+
+      // Check if user has premium status (you can implement this with your database)
+      // For now, let's check against a list of premium emails or use a simple logic
+      const premiumEmails = [
+        'kaycheckmate@gmail.com',
+        'truesliks@gmail.com',
+        // Add more premium emails here
+      ];
+
+      if (premiumEmails.includes(email.toLowerCase())) {
+        console.log('💎 Premium user detected:', email);
+        this.setUserTier('Premium');
+      } else {
+        console.log('📱 Basic user detected:', email);
+        this.setUserTier('Basic');
+      }
+    } catch (error) {
+      console.error('❌ Error checking premium status:', error);
+      this.setUserTier('Basic');
+    }
+  }
+
+  setUserTier(tier) {
+    this.userTier = tier;
+    this.isPremium = tier === 'Premium';
+    
+    // Update UI to reflect tier
+    this.updateTierDisplay();
+    this.render();
+    
+    console.log(`🎯 User tier set to: ${tier}`);
+  }
+
+  updateTierDisplay() {
+    // Update any tier indicators in the UI
+    const tierIndicator = document.querySelector('.user-tier-indicator');
+    if (tierIndicator) {
+      tierIndicator.textContent = this.userTier;
+      tierIndicator.className = `user-tier-indicator ${this.userTier.toLowerCase()}-tier`;
+    }
+  }
+
+  canAddPerson() {
+    if (this.isPremium) return true;
+    return this.people.length < this.maxFreeMembers;
+  }
+
+  canUseMessaging() {
+    return this.isPremium;
+  }
+
+  canUseCalling() {
+    return this.isPremium;
   }
 
   createTrackerElement() {
@@ -216,8 +286,8 @@ class CarnivalTracker {
   addPerson() {
     if (this.newPerson.name && this.newPerson.phone && this.newPerson.relationship) {
       // Check if user can add more people
-      if (!this.isPremium && this.people.length >= this.maxFreeMembers) {
-        this.showPremiumUpgrade();
+      if (!this.canAddPerson()) {
+        this.showPremiumUpgrade(`You've reached the limit of ${this.maxFreeMembers} person for Basic users. Upgrade to Premium for unlimited squad members!`);
         return;
       }
 
@@ -237,7 +307,7 @@ class CarnivalTracker {
     }
   }
 
-  showPremiumUpgrade() {
+  showPremiumUpgrade(customMessage = null) {
     const modal = document.createElement('div');
     modal.className = 'premium-upgrade-modal';
     modal.innerHTML = `
@@ -246,7 +316,7 @@ class CarnivalTracker {
           <div class="premium-upgrade-header">
             <div class="premium-badge">💎</div>
             <h2>Upgrade to Premium</h2>
-            <p>Unlock unlimited squad members and advanced features</p>
+            <p>${customMessage || 'Unlock unlimited squad members and advanced features'}</p>
           </div>
           
           <div class="premium-features">
@@ -739,6 +809,10 @@ class CarnivalTracker {
             <div>
               <h3>Carnival Squad ${this.isPremium ? '<span class="premium-indicator">💎</span>' : ''}</h3>
               <p>${this.people.filter(p => p.isSharing).length} sharing location ${!this.isPremium ? `(${this.people.length}/${this.maxFreeMembers})` : ''}</p>
+              <div class="user-tier-badge ${this.userTier.toLowerCase()}-tier">
+                <span class="tier-icon">${this.isPremium ? '💎' : '📱'}</span>
+                <span class="tier-text">${this.userTier}</span>
+              </div>
             </div>
           </div>
           
@@ -847,13 +921,25 @@ class CarnivalTracker {
             <div class="location-status ${locationStatus.bgColor} ${locationStatus.status === 'live' ? 'pulse' : ''}"></div>
           `}
           
-          <button class="action-btn phone-btn" title="Call or WhatsApp" data-phone="${person.phone}" data-name="${person.name}">
-            <i class="fas fa-phone"></i>
-          </button>
+          ${this.canUseCalling() ? `
+            <button class="action-btn phone-btn" title="Call or WhatsApp" data-phone="${person.phone}" data-name="${person.name}">
+              <i class="fas fa-phone"></i>
+            </button>
+          ` : `
+            <button class="action-btn phone-btn disabled" title="Calling requires Premium" onclick="window.carnivalTracker.showPremiumUpgrade('Calling and messaging are Premium features. Upgrade to connect with your squad!')">
+              <i class="fas fa-phone"></i>
+            </button>
+          `}
           
-          <button class="action-btn whatsapp-btn" title="Message on WhatsApp" data-phone="${person.phone}" data-name="${person.name}">
-            <i class="fab fa-whatsapp"></i>
-          </button>
+          ${this.canUseMessaging() ? `
+            <button class="action-btn whatsapp-btn" title="Message on WhatsApp" data-phone="${person.phone}" data-name="${person.name}">
+              <i class="fab fa-whatsapp"></i>
+            </button>
+          ` : `
+            <button class="action-btn whatsapp-btn disabled" title="Messaging requires Premium" onclick="window.carnivalTracker.showPremiumUpgrade('Calling and messaging are Premium features. Upgrade to connect with your squad!')">
+              <i class="fab fa-whatsapp"></i>
+            </button>
+          `}
         </div>
       </div>
     `;
