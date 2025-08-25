@@ -651,10 +651,7 @@ class AvatarSystem {
           <span style="font-size: 14px; font-weight: 500; color: #374151;">Edit Profile</span>
         </button>
         
-        <button class="menu-button" style="width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px; border: none; background: none; cursor: pointer; border-radius: 8px; transition: background 0.2s;">
-          <i class="fas fa-cog" style="color: #6b7280; font-size: 20px;"></i>
-          <span style="font-size: 14px; font-weight: 500; color: #374151;">Settings</span>
-        </button>
+
         
         <button class="menu-button" style="width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px; border: none; background: none; cursor: pointer; border-radius: 8px; transition: background 0.2s;">
           <i class="fas fa-question-circle" style="color: #6b7280; font-size: 20px;"></i>
