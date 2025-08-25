@@ -403,12 +403,17 @@ class CarnivalTracker {
           <div class="tracker-title">
             <i class="fas fa-users"></i>
             <div>
-              <h3>Carnival Squad</h3>
-              <p>${this.people.filter(p => p.isSharing).length} sharing location</p>
+              <h3>Carnival Squad ${this.isPremium ? '<span class="premium-indicator">💎</span>' : ''}</h3>
+              <p>${this.people.filter(p => p.isSharing).length} sharing location ${!this.isPremium ? `(${this.people.length}/${this.maxFreeMembers})` : ''}</p>
             </div>
           </div>
           
           <div class="tracker-actions">
+            ${!this.isPremium ? `
+              <button class="premium-upgrade-btn" title="Upgrade to Premium" onclick="window.carnivalTracker.showPremiumUpgrade()">
+                <i class="fas fa-crown"></i>
+              </button>
+            ` : ''}
             <button class="add-person-btn" title="Add Person">
               <i class="fas fa-plus"></i>
             </button>
@@ -421,17 +426,24 @@ class CarnivalTracker {
         <!-- Tab Navigation -->
         <div class="tracker-tabs">
           <button class="tab-btn ${this.activeTab === 'tracker' ? 'active' : ''}" data-tab="tracker">
-            Track (${this.people.length})
+            Track (${this.people.length})${!this.isPremium ? `/${this.maxFreeMembers}` : ''}
           </button>
           <button class="tab-btn ${this.activeTab === 'notifications' ? 'active' : ''}" data-tab="notifications">
             Updates
             ${this.notifications.length > 0 ? `<span class="notification-badge">${this.notifications.length}</span>` : ''}
           </button>
+          ${this.isPremium ? `
+            <button class="tab-btn ${this.activeTab === 'analytics' ? 'active' : ''}" data-tab="analytics">
+              <i class="fas fa-chart-line"></i> Analytics
+            </button>
+          ` : ''}
         </div>
 
         <!-- Content -->
         <div class="tracker-content">
-          ${this.activeTab === 'tracker' ? this.renderTrackerTab(filteredPeople) : this.renderNotificationsTab()}
+          ${this.activeTab === 'tracker' ? this.renderTrackerTab(filteredPeople) : 
+            this.activeTab === 'notifications' ? this.renderNotificationsTab() :
+            this.activeTab === 'analytics' ? this.renderAnalyticsTab() : ''}
         </div>
       </div>
     `;
