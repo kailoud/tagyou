@@ -307,10 +307,10 @@ class CarnivalTracker {
   }
 
   upgradeToPremium() {
-    // Here you would integrate with your payment processor (Stripe, PayPal, etc.)
+    // For static site deployment, use Stripe Checkout directly
     console.log('💎 Upgrading to Premium...');
-
-    // Create Stripe checkout session
+    
+    // Create Stripe checkout session using Stripe's hosted checkout
     this.createStripeCheckoutSession();
   }
 
@@ -319,35 +319,89 @@ class CarnivalTracker {
       // Show loading state
       this.showPaymentLoading();
 
-      // Create checkout session with your backend
-      const response = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          priceId: 'price_premium_monthly', // Your Stripe price ID
-          successUrl: window.location.origin + '/success',
-          cancelUrl: window.location.origin + '/cancel',
-          metadata: {
-            userId: this.getCurrentUserId(),
-            feature: 'carnival-tracker-premium'
-          }
-        })
-      });
-
-      const session = await response.json();
-
-      if (session.url) {
+      // For static sites, we'll use a simple redirect to Stripe
+      // In production, you'd need a backend API endpoint
+      const checkoutUrl = this.getStripeCheckoutUrl();
+      
+      if (checkoutUrl) {
         // Redirect to Stripe Checkout
-        window.location.href = session.url;
+        window.location.href = checkoutUrl;
       } else {
-        throw new Error('Failed to create checkout session');
+        throw new Error('Stripe checkout URL not configured');
       }
     } catch (error) {
       console.error('Payment error:', error);
       this.showPaymentError();
     }
+  }
+
+  getStripeCheckoutUrl() {
+    // For demo purposes, show a message about setting up Stripe
+    // In production, this would be a real Stripe checkout URL
+    const stripePublishableKey = 'pk_test_your_stripe_publishable_key_here';
+    
+    if (stripePublishableKey === 'pk_test_your_stripe_publishable_key_here') {
+      // Show demo message
+      this.showDemoPaymentMessage();
+      return null;
+    }
+    
+    // Real Stripe checkout URL would be generated here
+    return `https://checkout.stripe.com/pay/cs_test_...`;
+  }
+
+  showDemoPaymentMessage() {
+    // Remove existing modal
+    const modal = document.querySelector('.premium-upgrade-modal');
+    if (modal) {
+      modal.remove();
+    }
+
+    // Show demo message
+    const demoDiv = document.createElement('div');
+    demoDiv.className = 'premium-upgrade-modal';
+    demoDiv.innerHTML = `
+      <div class="premium-upgrade-overlay">
+        <div class="premium-upgrade-content">
+          <div class="premium-upgrade-header">
+            <h3>💳 Payment Demo</h3>
+            <div class="close-premium-upgrade">×</div>
+          </div>
+          <div class="premium-upgrade-body">
+            <div class="payment-demo">
+              <p>🎉 <strong>Premium feature demo!</strong></p>
+              <p>This is a demonstration of the premium upgrade flow.</p>
+              <p>In production, this would redirect to Stripe for secure payment processing.</p>
+              <div class="demo-features">
+                <h4>Premium Features:</h4>
+                <ul>
+                  <li>✅ Unlimited squad members</li>
+                  <li>✅ Advanced analytics</li>
+                  <li>✅ Priority support</li>
+                  <li>✅ Custom themes</li>
+                </ul>
+              </div>
+              <button class="demo-activate-btn">🎭 Activate Premium Demo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(demoDiv);
+
+    // Add event listeners
+    demoDiv.querySelector('.close-premium-upgrade').addEventListener('click', () => {
+      demoDiv.remove();
+    });
+
+    demoDiv.querySelector('.demo-activate-btn').addEventListener('click', () => {
+      // Simulate premium activation
+      this.isPremium = true;
+      demoDiv.remove();
+      this.showPremiumSuccess();
+      this.render();
+    });
   }
 
   showPaymentLoading() {

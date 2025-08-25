@@ -1161,3 +1161,60 @@
   background: #e5e7eb;
   transform: translateY(-2px);
 }
+
+/* Demo Payment Styles */
+.payment-demo {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.payment-demo p {
+  margin: 0.5rem 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.payment-demo strong {
+  color: #374151;
+}
+
+.demo-features {
+  text-align: left;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+}
+
+.demo-features h4 {
+  margin: 0 0 0.5rem 0;
+  color: #374151;
+  font-size: 1rem;
+}
+
+.demo-features ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.demo-features li {
+  margin: 0.25rem 0;
+  color: #6b7280;
+}
+
+.demo-activate-btn {
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 1rem;
+}
+
+.demo-activate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
