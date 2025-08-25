@@ -13,7 +13,7 @@ async function initializeSupabase() {
   try {
     // Wait for Supabase SDK to be available
     let attempts = 0;
-    const maxAttempts = 30;
+    const maxAttempts = 50; // Increased from 30 to 50
 
     while (attempts < maxAttempts) {
       if (typeof window !== 'undefined' && window.supabase && window.supabase.createClient) {
@@ -25,7 +25,7 @@ async function initializeSupabase() {
     }
 
     if (attempts >= maxAttempts) {
-      throw new Error('Supabase SDK not available after 3 seconds');
+      throw new Error('Supabase SDK not available after 5 seconds');
     }
 
     // Try to load configuration
