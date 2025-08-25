@@ -548,6 +548,77 @@ class CarnivalTracker {
     `;
   }
 
+  renderAnalyticsTab() {
+    const totalMembers = this.people.length;
+    const activeMembers = this.people.filter(p => p.isSharing).length;
+    const avgResponseTime = "2.3 min";
+    const popularArea = "Ladbroke Grove Station";
+    
+    return `
+      <div class="analytics-tab-content">
+        <div class="analytics-header">
+          <h3>Squad Analytics</h3>
+          <p>Premium insights for your carnival squad</p>
+        </div>
+        
+        <div class="analytics-grid">
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="analytics-content">
+              <div class="analytics-value">${totalMembers}</div>
+              <div class="analytics-label">Total Members</div>
+            </div>
+          </div>
+          
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="analytics-content">
+              <div class="analytics-value">${activeMembers}</div>
+              <div class="analytics-label">Active Now</div>
+            </div>
+          </div>
+          
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="analytics-content">
+              <div class="analytics-value">${avgResponseTime}</div>
+              <div class="analytics-label">Avg Response</div>
+            </div>
+          </div>
+          
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="analytics-content">
+              <div class="analytics-value">${popularArea}</div>
+              <div class="analytics-label">Popular Area</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="analytics-chart">
+          <h4>Activity Timeline</h4>
+          <div class="timeline-chart">
+            <div class="timeline-bar" style="width: 75%; background: linear-gradient(90deg, #8b5cf6, #ec4899);"></div>
+            <div class="timeline-labels">
+              <span>9 AM</span>
+              <span>12 PM</span>
+              <span>3 PM</span>
+              <span>6 PM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   renderAddForm() {
     const modal = document.createElement('div');
     modal.className = 'add-person-modal';
