@@ -151,6 +151,13 @@ class Compass {
     const compassRose = document.getElementById('compassRose');
     if (compassRose) {
       console.log('🧭 Compass rotation applied:', compassRose.style.transform);
+
+      // Mobile-specific debugging
+      if (window.innerWidth <= 768) {
+        console.log('🧭 Mobile device detected');
+        console.log('🧭 Compass container transform:', document.querySelector('.compass-container')?.style.transform);
+        console.log('🧭 Compass rose transform:', compassRose.style.transform);
+      }
     }
   }
 
