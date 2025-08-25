@@ -133,6 +133,31 @@
   gap: 8px;
 }
 
+.tracker-actions .invite-friends-btn {
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+}
+
+.tracker-actions .invite-friends-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+}
+
+.tracker-actions .invite-friends-btn i {
+  font-size: 14px;
+}
+
 .tracker-actions button {
   background: rgba(255, 255, 255, 0.2);
   border: none;
@@ -403,6 +428,16 @@
 .whatsapp-btn:hover {
   background: #dcfce7;
   color: #16a34a;
+}
+
+.invite-btn {
+  background: #8b5cf6;
+  color: white;
+}
+
+.invite-btn:hover {
+  background: #7c3aed;
+  transform: scale(1.05);
 }
 
 /* Phone Options Modal */
@@ -1026,56 +1061,56 @@
     max-width: 95%;
     max-height: 80vh;
   }
-  
+
   .premium-badge {
     font-size: 36px;
     margin-bottom: 10px;
   }
-  
+
   .premium-upgrade-header h2 {
     font-size: 22px;
   }
-  
+
   .premium-upgrade-header p {
     font-size: 13px;
   }
-  
+
   .feature-item {
     padding: 6px 10px;
     font-size: 12px;
   }
-  
+
   .feature-item i {
     font-size: 12px;
     width: 14px;
   }
-  
+
   .price {
     font-size: 36px;
   }
-  
+
   .original-price {
     font-size: 16px;
   }
-  
+
   .period {
     font-size: 14px;
   }
-  
+
   .then-price {
     font-size: 12px;
   }
-  
+
   .savings {
     font-size: 11px;
     padding: 4px 10px;
   }
-  
+
   .upgrade-btn {
     padding: 12px;
     font-size: 15px;
   }
-  
+
   .close-premium-btn {
     padding: 8px;
     font-size: 13px;

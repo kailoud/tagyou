@@ -57,7 +57,7 @@ class CarnivalTracker {
       // Get current user email
       const currentUser = window.avatarSystem?.user;
       const email = currentUser?.email || '';
-      
+
       if (!email) {
         console.log('🔍 No user email found, defaulting to Basic tier');
         this.setUserTier('Basic');
@@ -95,7 +95,7 @@ class CarnivalTracker {
           await new Promise(resolve => setTimeout(resolve, 100));
           attempts++;
         }
-        
+
         if (window.PremiumUsersService) {
           try {
             const isPremium = await window.PremiumUsersService.isPremiumUser(email);
@@ -141,7 +141,7 @@ class CarnivalTracker {
       // Update localStorage for immediate UI updates
       localStorage.setItem(`premium_${email}`, isPremium ? 'true' : 'false');
       console.log(`💎 Premium status set for ${email}: ${isPremium ? 'Premium' : 'Basic'}`);
-      
+
       // Update Supabase if service is available
       if (window.PremiumUsersService) {
         try {
@@ -156,7 +156,7 @@ class CarnivalTracker {
           console.error('❌ Error updating Supabase:', error);
         }
       }
-      
+
       // Update current user tier if email matches
       const currentUser = window.avatarSystem?.user;
       if (currentUser?.email === email) {
@@ -168,31 +168,31 @@ class CarnivalTracker {
   // Global method to manually set premium status (for testing)
   static setUserPremium(email, isPremium = true) {
     console.log(`🎯 Manually setting premium status for ${email}: ${isPremium ? 'Premium' : 'Basic'}`);
-    
+
     // Set in localStorage
     localStorage.setItem(`premium_${email}`, isPremium ? 'true' : 'false');
-    
+
     // Update carnival tracker if available
     if (window.carnivalTracker) {
       window.carnivalTracker.setPremiumStatus(email, isPremium);
     }
-    
+
     // Update avatar system if available
     if (window.avatarSystem) {
       window.avatarSystem.setPremiumStatus(email, isPremium);
     }
-    
+
     console.log('✅ Premium status updated manually');
   }
 
   setUserTier(tier) {
     this.userTier = tier;
     this.isPremium = tier === 'Premium';
-    
+
     // Update UI to reflect tier
     this.updateTierDisplay();
     this.render();
-    
+
     console.log(`🎯 Carnival tracker user tier set to: ${tier}`);
     console.log(`🎯 Phone/Messaging enabled: ${this.isPremium}`);
   }
@@ -202,7 +202,7 @@ class CarnivalTracker {
     if (window.avatarSystem && window.avatarSystem.user) {
       const avatarTier = window.avatarSystem.userTier;
       const avatarIsPremium = window.avatarSystem.isPremium;
-      
+
       if (avatarTier !== this.userTier || avatarIsPremium !== this.isPremium) {
         console.log(`🔄 Syncing carnival tracker with avatar system: ${avatarTier} (${avatarIsPremium})`);
         this.setUserTier(avatarTier);
@@ -447,7 +447,7 @@ class CarnivalTracker {
     if (existingModal) {
       existingModal.remove();
     }
-    
+
     // Show the premium upgrade modal
     this.showPremiumUpgrade();
   }
@@ -468,14 +468,14 @@ class CarnivalTracker {
       // Get current user info from avatar system with debugging
       console.log('🔍 Debug: window.avatarSystem exists?', !!window.avatarSystem);
       console.log('🔍 Debug: window.avatarSystem.user exists?', !!window.avatarSystem?.user);
-      
+
       const currentUser = window.avatarSystem?.user;
       console.log('🔍 Debug: currentUser from avatar system:', currentUser);
-      
+
       // Try multiple ways to get user email
       let email = '';
       let userId = 'anonymous';
-      
+
       if (currentUser?.email) {
         email = currentUser.email;
         userId = currentUser.id || 'anonymous';
@@ -896,6 +896,9 @@ class CarnivalTracker {
           </div>
           
           <div class="tracker-actions">
+            <button class="invite-friends-btn" title="Invite Friends" onclick="window.inviteSystem.showInviteModal()">
+              <i class="fas fa-user-plus"></i>
+            </button>
             ${!this.isPremium ? `
                           <button class="premium-upgrade-btn" title="Upgrade to Pro" onclick="window.carnivalTracker.handleUpgradeClick()">
               <i class="fas fa-crown"></i>
@@ -1019,6 +1022,10 @@ class CarnivalTracker {
               <i class="fab fa-whatsapp"></i>
             </button>
           `}
+          
+          <button class="action-btn invite-btn" title="Invite ${person.name}" onclick="window.inviteSystem.showInviteModal()">
+            <i class="fas fa-user-plus"></i>
+          </button>
         </div>
       </div>
     `;
@@ -1261,6 +1268,7 @@ class CarnivalTracker {
       this.show();
     }
   }
+
 }
 
 // Initialize the carnival tracker when the page loads
