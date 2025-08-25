@@ -483,7 +483,13 @@ class AvatarSystem {
     }
 
     const userIcon = document.createElement('div');
-    userIcon.innerHTML = '<i class="fas fa-user" style="font-size: 24px; color: white;"></i>';
+    // Check for saved avatar
+    const savedAvatar = this.user ? localStorage.getItem(`avatar_${this.user.email}`) : null;
+    if (savedAvatar) {
+      userIcon.innerHTML = `<img src="${savedAvatar}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+    } else {
+      userIcon.innerHTML = '<i class="fas fa-user" style="font-size: 24px; color: white;"></i>';
+    }
     avatarButton.appendChild(userIcon);
 
     const statusIndicator = document.createElement('div');
@@ -568,8 +574,12 @@ class AvatarSystem {
     return `
       <div class="dropdown-header" style="background: linear-gradient(135deg, #8b5cf6, #3b82f6, #14b8a6); padding: 24px; color: white;">
         <div style="display: flex; align-items: center; gap: 16px;">
-          <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
-            <i class="fas fa-user" style="font-size: 32px; color: white;"></i>
+          <div class="current-avatar" style="width: 64px; height: 64px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); overflow: hidden;">
+            ${this.user && localStorage.getItem(`avatar_${this.user.email}`) ? `
+              <img src="${localStorage.getItem(`avatar_${this.user.email}`)}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+            ` : `
+              <i class="fas fa-user" style="font-size: 32px; color: white;"></i>
+            `}
           </div>
           <div style="flex: 1;">
             <h3 style="font-weight: bold; font-size: 18px; margin: 0;">${this.user.user_metadata?.full_name || 'User'}</h3>
@@ -602,6 +612,11 @@ class AvatarSystem {
       <div style="border-top: 1px solid #f3f4f6; margin: 8px 0;"></div>
 
       <div style="padding: 8px;">
+        <button class="menu-button profile-edit-btn" style="width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px; border: none; background: none; cursor: pointer; border-radius: 8px; transition: background 0.2s;">
+          <i class="fas fa-user-edit" style="color: #6b7280; font-size: 20px;"></i>
+          <span style="font-size: 14px; font-weight: 500; color: #374151;">Edit Profile</span>
+        </button>
+        
         <button class="menu-button" style="width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px; border: none; background: none; cursor: pointer; border-radius: 8px; transition: background 0.2s;">
           <i class="fas fa-cog" style="color: #6b7280; font-size: 20px;"></i>
           <span style="font-size: 14px; font-weight: 500; color: #374151;">Settings</span>
@@ -723,6 +738,9 @@ class AvatarSystem {
       } else if (e.target.closest('.refresh-premium-btn')) {
         console.log('UI DEBUG: Refresh premium status button clicked');
         this.refreshPremiumStatus();
+      } else if (e.target.closest('.profile-edit-btn')) {
+        console.log('UI DEBUG: Profile edit button clicked');
+        this.showProfileEditModal();
       } else if (e.target.closest('.carnival-button')) {
         this.toggleCarnivalDropdown();
       } else if (e.target.closest('.auth-modal') && !e.target.closest('.auth-modal > div')) {
@@ -1438,6 +1456,242 @@ class AvatarSystem {
         modal.remove();
       }
     });
+  }
+
+  showProfileEditModal() {
+    // Remove any existing modals
+    const existingModal = document.querySelector('.profile-edit-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // Get current user data
+    const currentName = this.user?.user_metadata?.full_name || '';
+    const currentEmail = this.user?.email || '';
+    const currentAvatar = this.user?.user_metadata?.avatar_url || '';
+
+    const modal = document.createElement('div');
+    modal.className = 'profile-edit-modal';
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10001;
+      padding: 16px;
+    `;
+
+    modal.innerHTML = `
+      <div style="background: white; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-width: 480px; width: 100%; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #8b5cf6, #3b82f6); padding: 24px; color: white;">
+          <h2 style="font-size: 24px; font-weight: bold; margin: 0;">Edit Profile</h2>
+          <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin: 8px 0 0 0;">Update your profile information and avatar</p>
+        </div>
+
+        <div style="padding: 24px;">
+          <form class="profile-edit-form">
+            <!-- Avatar Upload Section -->
+            <div style="margin-bottom: 24px;">
+              <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">Profile Picture</label>
+              <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="current-avatar" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); display: flex; align-items: center; justify-content: center; border: 3px solid #e5e7eb; overflow: hidden;">
+                  ${currentAvatar ? `
+                    <img src="${currentAvatar}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                  ` : `
+                    <i class="fas fa-user" style="font-size: 32px; color: white;"></i>
+                  `}
+                </div>
+                <div style="flex: 1;">
+                  <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+                  <button type="button" class="upload-avatar-btn" style="background: #f3f4f6; color: #374151; border: 2px dashed #d1d5db; padding: 12px 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s; width: 100%; font-size: 14px;">
+                    <i class="fas fa-camera" style="margin-right: 8px;"></i>
+                    Upload New Photo
+                  </button>
+                  <p style="font-size: 12px; color: #6b7280; margin: 4px 0 0 0;">JPG, PNG or GIF. Max 5MB.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Name Field -->
+            <div style="margin-bottom: 20px;">
+              <label for="profileName" style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">Full Name</label>
+              <input type="text" id="profileName" value="${currentName}" placeholder="Enter your full name" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: border-color 0.2s;">
+            </div>
+
+            <!-- Email Field (Read-only) -->
+            <div style="margin-bottom: 24px;">
+              <label for="profileEmail" style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">Email Address</label>
+              <input type="email" id="profileEmail" value="${currentEmail}" readonly style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; background: #f9fafb; color: #6b7280;">
+              <p style="font-size: 12px; color: #6b7280; margin: 4px 0 0 0;">Email cannot be changed</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 12px;">
+              <button type="submit" class="save-profile-btn" style="flex: 1; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                Save Changes
+              </button>
+              <button type="button" class="cancel-profile-btn" style="flex: 1; background: #f3f4f6; color: #374151; padding: 12px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Add event listeners
+    const uploadBtn = modal.querySelector('.upload-avatar-btn');
+    const fileInput = modal.querySelector('#avatarUpload');
+    const currentAvatarDiv = modal.querySelector('.current-avatar');
+    const form = modal.querySelector('.profile-edit-form');
+    const cancelBtn = modal.querySelector('.cancel-profile-btn');
+
+    // Handle avatar upload
+    uploadBtn.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        // Validate file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+          alert('File size must be less than 5MB');
+          return;
+        }
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          alert('Please select an image file');
+          return;
+        }
+
+        // Create preview
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          currentAvatarDiv.innerHTML = `<img src="${e.target.result}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Handle form submission
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.saveProfileChanges(modal);
+    });
+
+    // Handle cancel
+    cancelBtn.addEventListener('click', () => {
+      modal.remove();
+    });
+
+    // Close on background click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
+  }
+
+  async saveProfileChanges(modal) {
+    const nameInput = modal.querySelector('#profileName');
+    const fileInput = modal.querySelector('#avatarUpload');
+    const newName = nameInput.value.trim();
+    const newAvatarFile = fileInput.files[0];
+
+    try {
+      // Show loading state
+      const saveBtn = modal.querySelector('.save-profile-btn');
+      const originalText = saveBtn.textContent;
+      saveBtn.textContent = 'Saving...';
+      saveBtn.disabled = true;
+
+      // Update user metadata
+      const updates = {
+        user_metadata: {
+          full_name: newName
+        }
+      };
+
+      // Handle avatar upload if file is selected
+      if (newAvatarFile) {
+        // For now, we'll store the avatar as a data URL in localStorage
+        // In a real app, you'd upload to a server/CDN
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const avatarDataUrl = e.target.result;
+          localStorage.setItem(`avatar_${this.user.email}`, avatarDataUrl);
+          updates.user_metadata.avatar_url = avatarDataUrl;
+          
+          // Update the avatar in the UI
+          this.updateAvatarDisplay(avatarDataUrl);
+        };
+        reader.readAsDataURL(newAvatarFile);
+      }
+
+      // Update user profile in Supabase (if available)
+      if (window.supabaseClient && this.user) {
+        try {
+          const { error } = await window.supabaseClient.auth.updateUser(updates);
+          if (error) {
+            console.error('Error updating profile:', error);
+          } else {
+            console.log('Profile updated successfully');
+            // Update local user object
+            this.user = { ...this.user, ...updates };
+          }
+        } catch (error) {
+          console.error('Error updating profile:', error);
+        }
+      }
+
+      // Show success message
+      saveBtn.textContent = 'Saved!';
+      saveBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+      
+      setTimeout(() => {
+        modal.remove();
+        // Refresh the dropdown to show updated info
+        this.renderDropdown();
+      }, 1000);
+
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      const saveBtn = modal.querySelector('.save-profile-btn');
+      saveBtn.textContent = 'Error - Try Again';
+      saveBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+      
+      setTimeout(() => {
+        saveBtn.textContent = 'Save Changes';
+        saveBtn.style.background = 'linear-gradient(135deg, #8b5cf6, #3b82f6)';
+        saveBtn.disabled = false;
+      }, 2000);
+    }
+  }
+
+  updateAvatarDisplay(avatarUrl) {
+    // Update the main avatar button
+    const avatarButton = document.querySelector('.avatar-button');
+    if (avatarButton) {
+      const userIcon = avatarButton.querySelector('div');
+      if (userIcon) {
+        userIcon.innerHTML = `<img src="${avatarUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+      }
+    }
+
+    // Update the dropdown header avatar
+    const dropdownAvatar = document.querySelector('.dropdown-header .current-avatar');
+    if (dropdownAvatar) {
+      dropdownAvatar.innerHTML = `<img src="${avatarUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+    }
   }
 }
 
