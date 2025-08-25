@@ -322,9 +322,10 @@ class CarnivalTracker {
       // Show loading state
       this.showPaymentLoading();
 
-      // Get current user info
-      const userId = this.getCurrentUserId();
-      const email = window.currentUser?.email || '';
+      // Get current user info from auth service
+      const currentUser = window.authService?.getCurrentUser();
+      const userId = currentUser?.id || 'anonymous';
+      const email = currentUser?.email || '';
 
       // Validate email before proceeding
       if (!email || !email.includes('@')) {
@@ -506,8 +507,9 @@ class CarnivalTracker {
   }
 
   getCurrentUserId() {
-    // Get current user ID from your auth system
-    return window.currentUser?.id || 'anonymous';
+    // Get current user ID from auth service
+    const currentUser = window.authService?.getCurrentUser();
+    return currentUser?.id || 'anonymous';
   }
 
   showPremiumSuccess() {
