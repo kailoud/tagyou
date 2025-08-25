@@ -326,6 +326,13 @@ class CarnivalTracker {
       const userId = this.getCurrentUserId();
       const email = window.currentUser?.email || '';
 
+      // Validate email before proceeding
+      if (!email || !email.includes('@')) {
+        console.error('No valid email found for user');
+        this.showPaymentError('Please sign in with a valid email address to upgrade to premium.');
+        return;
+      }
+
       // Create checkout session via API
       const response = await fetch('/.netlify/functions/create-checkout-session', {
         method: 'POST',
@@ -449,7 +456,7 @@ class CarnivalTracker {
     }, 3000);
   }
 
-  showPaymentError() {
+  showPaymentError(customMessage = null) {
     // Remove loading modal
     const modal = document.querySelector('.premium-upgrade-modal');
     if (modal) {
@@ -468,8 +475,8 @@ class CarnivalTracker {
           </div>
           <div class="premium-upgrade-body">
             <div class="payment-error">
-              <p>Sorry, we couldn't process your payment right now.</p>
-              <p>Please try again or contact support.</p>
+              <p>${customMessage || 'Sorry, we couldn\'t process your payment right now.'}</p>
+              <p>${customMessage ? 'Please try again or contact support.' : 'Please try again or contact support.'}</p>
               <div class="payment-error-actions">
                 <button class="retry-payment-btn">🔄 Try Again</button>
                 <button class="contact-support-btn">📧 Contact Support</button>

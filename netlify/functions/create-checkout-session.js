@@ -13,6 +13,20 @@ exports.handler = async (event, context) => {
     // Parse the request body
     const { userId, email } = JSON.parse(event.body);
 
+    // Validate email
+    if (!email || !email.includes('@')) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS'
+        },
+        body: JSON.stringify({ error: 'Valid email is required' })
+      };
+    }
+
     // Initialize Stripe with your secret key
     const stripeClient = stripe(process.env.STRIPE_SECRET_KEY);
 
