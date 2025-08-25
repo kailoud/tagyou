@@ -78,22 +78,22 @@ class AvatarSystem {
   async initializeSupabase() {
     try {
       console.log('🔧 Initializing Supabase connection...');
-      
+
       // Reduced max attempts and timeout
       const maxAttempts = 10; // Reduced from 50
       let attempts = 0;
-      
+
       while (attempts < maxAttempts) {
         if (window.supabase) {
           console.log('✅ Supabase connection established');
           this.supabase = window.supabase;
           return true;
         }
-        
+
         attempts++;
         await new Promise(resolve => setTimeout(resolve, 50)); // Reduced from 100ms to 50ms
       }
-      
+
       console.log('⚠️ Supabase not available, using fallback mode');
       return false;
     } catch (error) {
@@ -199,6 +199,43 @@ class AvatarSystem {
     }).catch(error => {
       console.warn('AUTH DEBUG: Background initialization failed:', error);
     });
+
+    // Try to connect to the global auth service
+    this.connectToGlobalAuthService();
+  }
+
+  async connectToGlobalAuthService() {
+    try {
+      // Wait for the global auth service to be available
+      let attempts = 0;
+      const maxAttempts = 50;
+
+      while (attempts < maxAttempts) {
+        if (window.authService) {
+          console.log('AUTH DEBUG: Connected to global auth service');
+          this.authService = window.authService;
+
+          // Set up auth state listener
+          this.authService.onAuthStateChanged((user) => {
+            console.log('AUTH DEBUG: Global auth state changed:', user?.email || 'no user');
+            this.user = user;
+            this.updateStatusIndicator();
+            this.renderDropdown();
+          });
+
+          return;
+        }
+
+        attempts++;
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      console.log('AUTH DEBUG: Global auth service not available, using fallback');
+      this.authService = this.createFallbackAuthService();
+    } catch (error) {
+      console.error('AUTH DEBUG: Error connecting to global auth service:', error);
+      this.authService = this.createFallbackAuthService();
+    }
   }
 
   async checkUser() {
@@ -491,18 +528,34 @@ class AvatarSystem {
     document.addEventListener('click', (e) => {
       if (e.target.closest('.signin-button')) {
         console.log('UI DEBUG: Sign in button clicked');
-        this.showAuthModal = true;
-        this.authMode = 'signin';
-        this.isDropdownOpen = false;
-        this.formData = { email: '', password: '', confirmPassword: '' }; // Reset form data
-        this.renderAuthModal();
+
+        // Use global auth service if available
+        if (window.authService && window.authService.showSignInModal) {
+          console.log('UI DEBUG: Using global auth service for sign in');
+          window.authService.showSignInModal();
+        } else {
+          console.log('UI DEBUG: Using local auth modal for sign in');
+          this.showAuthModal = true;
+          this.authMode = 'signin';
+          this.isDropdownOpen = false;
+          this.formData = { email: '', password: '', confirmPassword: '' }; // Reset form data
+          this.renderAuthModal();
+        }
       } else if (e.target.closest('.signup-button')) {
         console.log('UI DEBUG: Sign up button clicked');
-        this.showAuthModal = true;
-        this.authMode = 'signup';
-        this.isDropdownOpen = false;
-        this.formData = { email: '', password: '', confirmPassword: '' }; // Reset form data
-        this.renderAuthModal();
+
+        // Use global auth service if available
+        if (window.authService && window.authService.showSignUpModal) {
+          console.log('UI DEBUG: Using global auth service for sign up');
+          window.authService.showSignUpModal();
+        } else {
+          console.log('UI DEBUG: Using local auth modal for sign up');
+          this.showAuthModal = true;
+          this.authMode = 'signup';
+          this.isDropdownOpen = false;
+          this.formData = { email: '', password: '', confirmPassword: '' }; // Reset form data
+          this.renderAuthModal();
+        }
       } else if (e.target.closest('.signout-button')) {
         this.handleSignOut();
       } else if (e.target.closest('.carnival-button')) {
@@ -749,6 +802,19 @@ class AvatarSystem {
     });
     console.log('AUTH DEBUG: Auth service available:', !!this.authService);
     console.log('AUTH DEBUG: Auth service initialized:', this.authService?.isInitialized);
+
+    if (!this.authService) {
+      this.authError = 'Authentication service not available. Please refresh the page and try again.';
+      console.log('AUTH DEBUG: No auth service available');
+      return;
+    }
+
+    // Check if the auth service has the required methods
+    if (!this.authService.signIn || !this.authService.signUp) {
+      this.authError = 'Authentication service is not properly initialized. Please refresh the page and try again.';
+      console.log('AUTH DEBUG: Auth service missing required methods');
+      return;
+    }
 
     this.authLoading = true;
     this.authError = '';
