@@ -64,6 +64,14 @@ class CarnivalTracker {
         return;
       }
 
+      // First check localStorage for premium status (for immediate updates after payment)
+      const premiumStatus = localStorage.getItem(`premium_${email}`);
+      if (premiumStatus === 'true') {
+        console.log('💎 Premium user detected from localStorage:', email);
+        this.setUserTier('Premium');
+        return;
+      }
+
       // Check if user has premium status (you can implement this with your database)
       // For now, let's check against a list of premium emails or use a simple logic
       const premiumEmails = [
@@ -75,6 +83,8 @@ class CarnivalTracker {
       if (premiumEmails.includes(email.toLowerCase())) {
         console.log('💎 Premium user detected:', email);
         this.setUserTier('Premium');
+        // Store in localStorage for future checks
+        localStorage.setItem(`premium_${email}`, 'true');
       } else {
         console.log('📱 Basic user detected:', email);
         this.setUserTier('Basic');
@@ -83,6 +93,39 @@ class CarnivalTracker {
       console.error('❌ Error checking premium status:', error);
       this.setUserTier('Basic');
     }
+  }
+
+  setPremiumStatus(email, isPremium) {
+    if (email) {
+      localStorage.setItem(`premium_${email}`, isPremium ? 'true' : 'false');
+      console.log(`💎 Premium status set for ${email}: ${isPremium ? 'Premium' : 'Basic'}`);
+      
+      // Update current user tier if email matches
+      const currentUser = window.authService?.getCurrentUser();
+      if (currentUser?.email === email) {
+        this.setUserTier(isPremium ? 'Premium' : 'Basic');
+      }
+    }
+  }
+
+  // Global method to manually set premium status (for testing)
+  static setUserPremium(email, isPremium = true) {
+    console.log(`🎯 Manually setting premium status for ${email}: ${isPremium ? 'Premium' : 'Basic'}`);
+    
+    // Set in localStorage
+    localStorage.setItem(`premium_${email}`, isPremium ? 'true' : 'false');
+    
+    // Update carnival tracker if available
+    if (window.carnivalTracker) {
+      window.carnivalTracker.setPremiumStatus(email, isPremium);
+    }
+    
+    // Update avatar system if available
+    if (window.avatarSystem) {
+      window.avatarSystem.setPremiumStatus(email, isPremium);
+    }
+    
+    console.log('✅ Premium status updated manually');
   }
 
   setUserTier(tier) {

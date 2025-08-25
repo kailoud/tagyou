@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Payment Successful - TagYou Premium</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .success-container {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      max-width: 500px;
+    }
+    .success-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+    .success-title {
+      font-size: 28px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .success-message {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+    .premium-features {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+    .premium-features h3 {
+      color: #333;
+      margin-bottom: 15px;
+    }
+    .feature-list {
+      list-style: none;
+      padding: 0;
+    }
+    .feature-list li {
+      padding: 8px 0;
+      color: #666;
+    }
+    .feature-list li:before {
+      content: "✅ ";
+      color: #28a745;
+      font-weight: bold;
+    }
+    .back-button {
+      background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+    }
+    .loading {
+      display: none;
+      margin-top: 20px;
+    }
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #8b5cf6;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="success-container">
+    <div class="success-icon">🎉</div>
+    <h1 class="success-title">Welcome to Premium!</h1>
+    <p class="success-message">
+      Your payment was successful! You now have access to all premium features.
+    </p>
+    
+    <div class="premium-features">
+      <h3>Your Premium Features:</h3>
+      <ul class="feature-list">
+        <li>Unlimited squad members</li>
+        <li>Real-time GPS tracking</li>
+        <li>Voice messages & calling</li>
+        <li>Emergency alerts</li>
+        <li>Advanced analytics</li>
+        <li>Priority support</li>
+        <li>Custom themes</li>
+      </ul>
+    </div>
+
+    <button class="back-button" onclick="goBackToApp()">
+      Continue to App
+    </button>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Updating your account...</p>
+    </div>
+  </div>
+
+  <script>
+    // Get session ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    
+    console.log('🎉 Payment success page loaded with session ID:', sessionId);
+
+    // Update premium status immediately
+    function updatePremiumStatus() {
+      const loading = document.getElementById('loading');
+      loading.style.display = 'block';
+
+      // Get current user email from various sources
+      let userEmail = '';
+      
+      // Try to get from auth service
+      if (window.authService && window.authService.getCurrentUser) {
+        const currentUser = window.authService.getCurrentUser();
+        userEmail = currentUser?.email || '';
+      }
+      
+      // Try to get from localStorage
+      if (!userEmail) {
+        const storedUser = localStorage.getItem('tagyou_remembered_user');
+        if (storedUser) {
+          try {
+            const userData = JSON.parse(storedUser);
+            userEmail = userData.user?.email || '';
+          } catch (e) {
+            console.log('Failed to parse stored user:', e);
+          }
+        }
+      }
+
+      // Try to get from sessionStorage
+      if (!userEmail) {
+        const storedUser = sessionStorage.getItem('supabase_user');
+        if (storedUser) {
+          try {
+            const userData = JSON.parse(storedUser);
+            userEmail = userData.email || '';
+          } catch (e) {
+            console.log('Failed to parse session user:', e);
+          }
+        }
+      }
+
+      if (userEmail) {
+        console.log('💎 Setting premium status for:', userEmail);
+        
+        // Set premium status in localStorage
+        localStorage.setItem(`premium_${userEmail}`, 'true');
+        
+        // Update carnival tracker if available
+        if (window.carnivalTracker && window.carnivalTracker.setPremiumStatus) {
+          window.carnivalTracker.setPremiumStatus(userEmail, true);
+        }
+        
+        // Update avatar system if available
+        if (window.avatarSystem && window.avatarSystem.setPremiumStatus) {
+          window.avatarSystem.setPremiumStatus(userEmail, true);
+        }
+        
+        console.log('✅ Premium status updated successfully');
+      } else {
+        console.log('⚠️ No user email found, premium status will be set when user signs in');
+      }
+
+      // Hide loading after a short delay
+      setTimeout(() => {
+        loading.style.display = 'none';
+      }, 2000);
+    }
+
+    function goBackToApp() {
+      // Update premium status before going back
+      updatePremiumStatus();
+      
+      // Redirect back to the main app
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 500);
+    }
+
+    // Update premium status immediately when page loads
+    updatePremiumStatus();
+  </script>
+</body>
+</html>

@@ -313,6 +313,14 @@ class AvatarSystem {
         return;
       }
 
+      // First check localStorage for premium status (for immediate updates after payment)
+      const premiumStatus = localStorage.getItem(`premium_${this.user.email}`);
+      if (premiumStatus === 'true') {
+        console.log('💎 Premium user detected in avatar system from localStorage:', this.user.email);
+        this.setUserTier('Premium');
+        return;
+      }
+
       // Check if user has premium status (same logic as carnival tracker)
       const premiumEmails = [
         'kaycheckmate@gmail.com',
@@ -323,6 +331,8 @@ class AvatarSystem {
       if (premiumEmails.includes(this.user.email.toLowerCase())) {
         console.log('💎 Premium user detected in avatar system:', this.user.email);
         this.setUserTier('Premium');
+        // Store in localStorage for future checks
+        localStorage.setItem(`premium_${this.user.email}`, 'true');
       } else {
         console.log('📱 Basic user detected in avatar system:', this.user.email);
         this.setUserTier('Basic');
@@ -330,6 +340,18 @@ class AvatarSystem {
     } catch (error) {
       console.error('❌ Error checking premium status:', error);
       this.setUserTier('Basic');
+    }
+  }
+
+  setPremiumStatus(email, isPremium) {
+    if (email) {
+      localStorage.setItem(`premium_${email}`, isPremium ? 'true' : 'false');
+      console.log(`💎 Avatar system premium status set for ${email}: ${isPremium ? 'Premium' : 'Basic'}`);
+      
+      // Update current user tier if email matches
+      if (this.user?.email === email) {
+        this.setUserTier(isPremium ? 'Premium' : 'Basic');
+      }
     }
   }
 
