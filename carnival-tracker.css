@@ -70,6 +70,63 @@
   margin: 0;
 }
 
+.squad-limits {
+  margin-top: 4px;
+}
+
+.limit-text {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.limit-text.basic {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.limit-text.premium {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: white;
+  font-weight: 600;
+}
+
+.user-tier-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-top: 4px;
+}
+
+.user-tier-badge.basic-tier {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.user-tier-badge.premium-tier {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: white;
+  font-weight: 600;
+}
+
+.tier-icon {
+  font-size: 10px;
+}
+
+.tier-text {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .tracker-actions {
   display: flex;
   align-items: center;
@@ -1359,11 +1416,29 @@
 
 /* Disabled Button Styles */
 .action-btn.disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
   background: #f3f4f6 !important;
   color: #9ca3af !important;
   border: 1px solid #e5e7eb !important;
+  position: relative;
+}
+
+.action-btn.disabled::after {
+  content: "🔒";
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  font-size: 8px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .action-btn.disabled:hover {

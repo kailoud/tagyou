@@ -193,7 +193,29 @@ class CarnivalTracker {
     this.updateTierDisplay();
     this.render();
     
-    console.log(`🎯 User tier set to: ${tier}`);
+    console.log(`🎯 Carnival tracker user tier set to: ${tier}`);
+    console.log(`🎯 Phone/Messaging enabled: ${this.isPremium}`);
+  }
+
+  // Sync premium status with avatar system
+  syncPremiumStatus() {
+    if (window.avatarSystem && window.avatarSystem.user) {
+      const avatarTier = window.avatarSystem.userTier;
+      const avatarIsPremium = window.avatarSystem.isPremium;
+      
+      if (avatarTier !== this.userTier || avatarIsPremium !== this.isPremium) {
+        console.log(`🔄 Syncing carnival tracker with avatar system: ${avatarTier} (${avatarIsPremium})`);
+        this.setUserTier(avatarTier);
+      }
+    }
+  }
+
+  // Force refresh premium status and update UI
+  async refreshPremiumStatus() {
+    console.log('🔄 Forcing carnival tracker premium status refresh...');
+    await this.checkPremiumStatus();
+    this.syncPremiumStatus();
+    this.render();
   }
 
   updateTierDisplay() {
@@ -264,16 +286,16 @@ class CarnivalTracker {
         this.requestLocationSharing(personId);
       }
 
-      // Phone button - show call/WhatsApp options
-      if (e.target.closest('.phone-btn')) {
+      // Phone button - show call/WhatsApp options (only for premium users)
+      if (e.target.closest('.phone-btn') && !e.target.closest('.phone-btn').classList.contains('disabled')) {
         const button = e.target.closest('.phone-btn');
         const phoneNumber = button.dataset.phone;
         const personName = button.dataset.name;
         this.showPhoneOptions(phoneNumber, personName);
       }
 
-      // WhatsApp button
-      if (e.target.closest('.whatsapp-btn')) {
+      // WhatsApp button (only for premium users)
+      if (e.target.closest('.whatsapp-btn') && !e.target.closest('.whatsapp-btn').classList.contains('disabled')) {
         const button = e.target.closest('.whatsapp-btn');
         const phoneNumber = button.dataset.phone;
         const personName = button.dataset.name;
@@ -370,7 +392,11 @@ class CarnivalTracker {
           <div class="premium-features">
             <div class="feature-item">
               <i class="fas fa-users"></i>
-              <span>Unlimited squad members</span>
+              <span>Unlimited squad members (vs 1 for Basic)</span>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-phone"></i>
+              <span>Phone calling & WhatsApp messaging</span>
             </div>
             <div class="feature-item">
               <i class="fas fa-map-marker-alt"></i>
@@ -844,6 +870,9 @@ class CarnivalTracker {
       return;
     }
 
+    // Sync premium status with avatar system when rendering
+    this.syncPremiumStatus();
+
     this.trackerElement.style.display = 'block';
     this.renderFull();
 
@@ -863,10 +892,17 @@ class CarnivalTracker {
             <i class="fas fa-users"></i>
             <div>
               <h3>Carnival Squad ${this.isPremium ? '<span class="premium-indicator">💎</span>' : ''}</h3>
-              <p>${this.people.filter(p => p.isSharing).length} sharing location ${!this.isPremium ? `(${this.people.length}/${this.maxFreeMembers})` : ''}</p>
+              <p>${this.people.filter(p => p.isSharing).length} sharing location</p>
+              <div class="squad-limits">
+                ${this.isPremium ? `
+                  <span class="limit-text premium">Unlimited Squad Members</span>
+                ` : `
+                  <span class="limit-text basic">Squad Sharing (${this.people.length}/${this.maxFreeMembers})</span>
+                `}
+              </div>
               <div class="user-tier-badge ${this.userTier.toLowerCase()}-tier">
                 <span class="tier-icon">${this.isPremium ? '💎' : '📱'}</span>
-                <span class="tier-text">${this.userTier}</span>
+                <span class="tier-text">${this.userTier} User</span>
               </div>
             </div>
           </div>
@@ -889,7 +925,7 @@ class CarnivalTracker {
         <!-- Tab Navigation -->
         <div class="tracker-tabs">
           <button class="tab-btn ${this.activeTab === 'tracker' ? 'active' : ''}" data-tab="tracker">
-            Track (${this.people.length})${!this.isPremium ? `/${this.maxFreeMembers}` : ''}
+            Track ${this.isPremium ? `(${this.people.length})` : `(${this.people.length}/${this.maxFreeMembers})`}
           </button>
           <button class="tab-btn ${this.activeTab === 'notifications' ? 'active' : ''}" data-tab="notifications">
             Updates
@@ -977,21 +1013,21 @@ class CarnivalTracker {
           `}
           
           ${this.canUseCalling() ? `
-            <button class="action-btn phone-btn" title="Call or WhatsApp" data-phone="${person.phone}" data-name="${person.name}">
+            <button class="action-btn phone-btn" title="Call ${person.name}" data-phone="${person.phone}" data-name="${person.name}">
               <i class="fas fa-phone"></i>
             </button>
           ` : `
-            <button class="action-btn phone-btn disabled" title="Calling requires Pro" onclick="window.carnivalTracker.showPremiumUpgrade('Calling and messaging are Pro features. Upgrade to connect with your squad!')">
+            <button class="action-btn phone-btn disabled" title="Calling requires Premium" onclick="window.carnivalTracker.showPremiumUpgrade('Phone calling is a Premium feature. Upgrade to connect with your squad!')">
               <i class="fas fa-phone"></i>
             </button>
           `}
           
           ${this.canUseMessaging() ? `
-            <button class="action-btn whatsapp-btn" title="Message on WhatsApp" data-phone="${person.phone}" data-name="${person.name}">
+            <button class="action-btn whatsapp-btn" title="Message ${person.name} on WhatsApp" data-phone="${person.phone}" data-name="${person.name}">
               <i class="fab fa-whatsapp"></i>
             </button>
           ` : `
-            <button class="action-btn whatsapp-btn disabled" title="Messaging requires Pro" onclick="window.carnivalTracker.showPremiumUpgrade('Calling and messaging are Pro features. Upgrade to connect with your squad!')">
+            <button class="action-btn whatsapp-btn disabled" title="Messaging requires Premium" onclick="window.carnivalTracker.showPremiumUpgrade('WhatsApp messaging is a Premium feature. Upgrade to connect with your squad!')">
               <i class="fab fa-whatsapp"></i>
             </button>
           `}
