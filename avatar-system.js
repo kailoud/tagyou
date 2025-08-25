@@ -466,14 +466,6 @@ class AvatarSystem {
             <i class="fas fa-chevron-right" style="color: #9ca3af; font-size: 16px;"></i>
           </button>
         </div>
-        
-        <button class="menu-button" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 12px; border: none; background: none; cursor: pointer; border-radius: 8px; transition: background 0.2s;">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <i class="fas fa-bell" style="color: #8b5cf6; font-size: 20px;"></i>
-            <span style="font-size: 14px; font-weight: 500; color: #374151;">Notifications</span>
-          </div>
-          <span style="background: #ef4444; color: white; font-size: 12px; padding: 2px 8px; border-radius: 12px;">3</span>
-        </button>
       </div>
 
       <div style="border-top: 1px solid #f3f4f6; margin: 8px 0;"></div>
