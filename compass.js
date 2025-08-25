@@ -93,6 +93,11 @@ class Compass {
       compassRose.style.transform = '';
       compassRose.style.transform = `rotate(${this.rotation}deg)`;
       console.log('🧭 Rotating compass to:', this.rotation + '°');
+
+      // Mobile-specific transform handling
+      if (window.innerWidth <= 768) {
+        console.log('🧭 Mobile: Applied rotation transform:', compassRose.style.transform);
+      }
     } else {
       console.log('🧭 Warning: Compass rose element not found');
     }
