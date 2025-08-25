@@ -487,7 +487,7 @@ class AvatarSystem {
     }
 
     const userIcon = document.createElement('div');
-    // Check for saved avatar
+    // Check for saved avatar (will be updated after profile load)
     const savedAvatar = this.user ? localStorage.getItem(`avatar_${this.user.email}`) : null;
     if (savedAvatar) {
       userIcon.innerHTML = `<img src="${savedAvatar}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
@@ -495,6 +495,11 @@ class AvatarSystem {
       userIcon.innerHTML = '<i class="fas fa-user" style="font-size: 24px; color: white;"></i>';
     }
     avatarButton.appendChild(userIcon);
+
+    // Load profile from Supabase if user is logged in
+    if (this.user && window.profileService) {
+      this.loadUserProfile();
+    }
 
     const statusIndicator = document.createElement('div');
     statusIndicator.className = 'status-indicator';
@@ -579,8 +584,8 @@ class AvatarSystem {
       <div class="dropdown-header" style="background: linear-gradient(135deg, #8b5cf6, #3b82f6, #14b8a6); padding: 24px; color: white;">
         <div style="display: flex; align-items: center; gap: 16px;">
           <div class="current-avatar" style="width: 64px; height: 64px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); overflow: hidden;">
-            ${this.user && localStorage.getItem(`avatar_${this.user.email}`) ? `
-              <img src="${localStorage.getItem(`avatar_${this.user.email}`)}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+            ${this.user && (this.user.user_metadata?.avatar_url || localStorage.getItem(`avatar_${this.user.email}`)) ? `
+              <img src="${this.user.user_metadata?.avatar_url || localStorage.getItem(`avatar_${this.user.email}`)}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
             ` : `
               <i class="fas fa-user" style="font-size: 32px; color: white;"></i>
             `}
@@ -1619,43 +1624,83 @@ class AvatarSystem {
       saveBtn.textContent = 'Saving...';
       saveBtn.disabled = true;
 
-      // Update user metadata
+      let avatarUrl = null;
+
+      // Handle avatar upload if file is selected
+      if (newAvatarFile) {
+        if (window.profileService) {
+          // Upload to Supabase Storage
+          const uploadResult = await window.profileService.uploadAvatar(this.user.id, newAvatarFile);
+          if (uploadResult.success) {
+            avatarUrl = uploadResult.url;
+          } else {
+            console.error('Error uploading avatar:', uploadResult.error);
+            // Fallback to localStorage
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              avatarUrl = e.target.result;
+              localStorage.setItem(`avatar_${this.user.email}`, avatarUrl);
+            };
+            reader.readAsDataURL(newAvatarFile);
+          }
+        } else {
+          // Fallback to localStorage
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            avatarUrl = e.target.result;
+            localStorage.setItem(`avatar_${this.user.email}`, avatarUrl);
+          };
+          reader.readAsDataURL(newAvatarFile);
+        }
+      }
+
+      // Update profile in Supabase
+      if (window.profileService && this.user) {
+        const profileUpdates = {
+          full_name: newName
+        };
+
+        if (avatarUrl) {
+          profileUpdates.avatar_url = avatarUrl;
+        }
+
+        const updateResult = await window.profileService.updateProfile(this.user.id, profileUpdates);
+        if (updateResult.success) {
+          console.log('Profile updated successfully in Supabase');
+        } else {
+          console.error('Error updating profile in Supabase:', updateResult.error);
+        }
+      }
+
+      // Update user metadata in Supabase Auth
       const updates = {
         user_metadata: {
           full_name: newName
         }
       };
 
-      // Handle avatar upload if file is selected
-      if (newAvatarFile) {
-        // For now, we'll store the avatar as a data URL in localStorage
-        // In a real app, you'd upload to a server/CDN
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const avatarDataUrl = e.target.result;
-          localStorage.setItem(`avatar_${this.user.email}`, avatarDataUrl);
-          updates.user_metadata.avatar_url = avatarDataUrl;
-          
-          // Update the avatar in the UI
-          this.updateAvatarDisplay(avatarDataUrl);
-        };
-        reader.readAsDataURL(newAvatarFile);
+      if (avatarUrl) {
+        updates.user_metadata.avatar_url = avatarUrl;
       }
 
-      // Update user profile in Supabase (if available)
       if (window.supabaseClient && this.user) {
         try {
           const { error } = await window.supabaseClient.auth.updateUser(updates);
           if (error) {
-            console.error('Error updating profile:', error);
+            console.error('Error updating user metadata:', error);
           } else {
-            console.log('Profile updated successfully');
+            console.log('User metadata updated successfully');
             // Update local user object
             this.user = { ...this.user, ...updates };
           }
         } catch (error) {
-          console.error('Error updating profile:', error);
+          console.error('Error updating user metadata:', error);
         }
+      }
+
+      // Update the avatar in the UI
+      if (avatarUrl) {
+        this.updateAvatarDisplay(avatarUrl);
       }
 
       // Show success message
@@ -1707,6 +1752,48 @@ class AvatarSystem {
       } else {
         statusIndicator.style.backgroundColor = '#fb923c'; // Orange for no user
       }
+    }
+  }
+
+  async loadUserProfile() {
+    try {
+      if (!this.user || !window.profileService) {
+        return;
+      }
+
+      const profile = await window.profileService.getUserProfile(this.user.id);
+      if (profile) {
+        // Update avatar if profile has one
+        if (profile.avatar_url) {
+          this.updateAvatarDisplay(profile.avatar_url);
+          // Also store in localStorage for fallback
+          localStorage.setItem(`avatar_${this.user.email}`, profile.avatar_url);
+        }
+
+        // Update user metadata if profile has name
+        if (profile.full_name && (!this.user.user_metadata?.full_name || this.user.user_metadata.full_name !== profile.full_name)) {
+          this.user.user_metadata = {
+            ...this.user.user_metadata,
+            full_name: profile.full_name
+          };
+        }
+
+        console.log('Profile loaded from Supabase:', profile);
+      } else {
+        // Create profile if it doesn't exist
+        if (this.user.id && this.user.email) {
+          const initResult = await window.profileService.initializeProfile(
+            this.user.id,
+            this.user.email,
+            this.user.user_metadata?.full_name || ''
+          );
+          if (initResult.success) {
+            console.log('Profile initialized in Supabase');
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
     }
   }
 }
