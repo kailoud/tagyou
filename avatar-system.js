@@ -494,13 +494,15 @@ class AvatarSystem {
     }
   }
 
-  async toggleDropdown() {
+  toggleDropdown() {
     console.log('UI DEBUG: Toggle dropdown called, current state:', this.isDropdownOpen);
     this.isDropdownOpen = !this.isDropdownOpen;
     
-    // Force check premium status when dropdown opens
+    // Force check premium status when dropdown opens (non-blocking)
     if (this.isDropdownOpen && this.user) {
-      await this.refreshPremiumStatus();
+      this.refreshPremiumStatus().catch(error => {
+        console.error('Error refreshing premium status:', error);
+      });
     }
     
     this.renderDropdown();
