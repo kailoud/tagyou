@@ -600,7 +600,7 @@ class AvatarSystem {
             `}
           </div>
           <div style="flex: 1;">
-            <h3 style="font-weight: bold; font-size: 18px; margin: 0;">${this.user.user_metadata?.full_name || 'User'}</h3>
+            <h3 style="font-weight: bold; font-size: 18px; margin: 0;">${this.getDisplayName()}</h3>
             <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin: 4px 0;">${this.user.email}</p>
             <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
               ${this.isPremium ? `
@@ -1511,7 +1511,7 @@ class AvatarSystem {
           const profile = await window.profileService.getUserProfile(this.user.id);
           if (profile) {
             if (profile.avatar_url) currentAvatar = profile.avatar_url;
-            // Note: We don't have full_name in the profiles table, so we keep the one from metadata/localStorage
+            if (profile.display_name) currentName = profile.display_name;
           }
         } catch (error) {
           console.error('Error loading profile from Supabase:', error);
@@ -1694,7 +1694,8 @@ class AvatarSystem {
       // Update profile in Supabase (with fallback to localStorage)
       if (window.profileService && this.user) {
         const profileUpdates = {
-          avatar_url: avatarUrl || null
+          avatar_url: avatarUrl || null,
+          display_name: newName || null
         };
 
         console.log('Attempting to update profile in Supabase with:', profileUpdates);
@@ -1805,7 +1806,7 @@ class AvatarSystem {
     }
   }
 
-  refreshMainAvatar() {
+    refreshMainAvatar() {
     const avatarButton = document.querySelector('.avatar-button');
     if (avatarButton && this.user) {
       const userIcon = avatarButton.querySelector('div');
@@ -1815,7 +1816,7 @@ class AvatarSystem {
         if (!savedAvatar) {
           savedAvatar = localStorage.getItem(`avatar_${this.user.email}`);
         }
-
+        
         if (savedAvatar) {
           userIcon.innerHTML = `<img src="${savedAvatar}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
         } else {
@@ -1823,6 +1824,26 @@ class AvatarSystem {
         }
       }
     }
+  }
+
+  getDisplayName() {
+    if (!this.user) return 'User';
+    
+    // Check multiple sources for the best name
+    let name = this.user.user_metadata?.full_name;
+    if (!name) {
+      const storedProfile = localStorage.getItem(`profile_${this.user.email}`);
+      if (storedProfile) {
+        try {
+          const profile = JSON.parse(storedProfile);
+          name = profile.full_name;
+        } catch (error) {
+          console.error('Error parsing stored profile:', error);
+        }
+      }
+    }
+    
+    return name || 'User';
   }
 
   async loadUserProfile() {
@@ -1845,10 +1866,10 @@ class AvatarSystem {
           }
 
           // Update user metadata if profile has name
-          if (profile.full_name && (!this.user.user_metadata?.full_name || this.user.user_metadata.full_name !== profile.full_name)) {
+          if (profile.display_name && (!this.user.user_metadata?.full_name || this.user.user_metadata.full_name !== profile.display_name)) {
             this.user.user_metadata = {
               ...this.user.user_metadata,
-              full_name: profile.full_name
+              full_name: profile.display_name
             };
           }
 
