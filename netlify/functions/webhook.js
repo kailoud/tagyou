@@ -1,4 +1,14 @@
 const stripe = require('stripe');
+const { createClient } = require('@supabase/supabase-js');
+
+// Initialize Supabase client
+const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://rpsbibwmbsllnvfithjw.supabase.co';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+let supabase = null;
+if (supabaseUrl && supabaseServiceKey) {
+  supabase = createClient(supabaseUrl, supabaseServiceKey);
+}
 
 exports.handler = async (event, context) => {
   // Only allow POST requests
@@ -57,22 +67,40 @@ exports.handler = async (event, context) => {
           expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(); // 365 days
         }
         
-        // Prepare payment data for database
-        const paymentData = {
-          amount: paymentAmount,
-          currency: paymentCurrency,
-          sessionId: session.id,
-          offerType: offerType,
-          expiresAt: expiresAt
-        };
+        // Add user to Supabase premium_users table
+        if (supabase && customerEmail) {
+          try {
+            const { data, error } = await supabase
+              .from('premium_users')
+              .upsert([{
+                email: customerEmail.toLowerCase(),
+                is_premium: true,
+                payment_date: new Date().toISOString(),
+                payment_amount: paymentAmount,
+                payment_currency: paymentCurrency,
+                stripe_session_id: session.id,
+                offer_type: offerType,
+                expires_at: expiresAt,
+                created_at: new Date().toISOString()
+              }], {
+                onConflict: 'email',
+                ignoreDuplicates: false
+              });
+
+            if (error) {
+              console.error('❌ Error adding premium user to Supabase:', error);
+            } else {
+              console.log('✅ Premium user added to Supabase:', data[0]);
+            }
+          } catch (error) {
+            console.error('❌ Supabase error:', error);
+          }
+        } else {
+          console.log('⚠️ Supabase not configured or no customer email');
+        }
         
         console.log('✅ Premium access granted for:', customerEmail);
         console.log('📅 Expires at:', expiresAt);
-        
-        // TODO: Add Supabase integration here
-        // You can add database update logic here:
-        // await updateUserPremiumStatus(customerEmail, true, paymentData);
-        // await sendWelcomeEmail(customerEmail);
         
         break;
 
