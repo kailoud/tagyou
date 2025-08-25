@@ -321,6 +321,26 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="avatar-system.js"></script>
     <script src="script.js"></script>
+    <!-- Supabase Service -->
+    <script type="module">
+      // Load PremiumUsersService for premium status checks
+      window.loadPremiumService = async function() {
+        try {
+          const { PremiumUsersService } = await import('./supabase-service.js');
+          window.PremiumUsersService = PremiumUsersService;
+          console.log('✅ PremiumUsersService loaded for main app');
+          return true;
+        } catch (error) {
+          console.error('❌ Error loading PremiumUsersService:', error);
+          return false;
+        }
+      };
+      
+      // Load the service when the page loads
+      window.addEventListener('load', function() {
+        window.loadPremiumService();
+      });
+    </script>
 
     <!-- Script verification removed -->
 
