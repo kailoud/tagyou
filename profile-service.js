@@ -70,18 +70,20 @@ class ProfileService {
         return { success: false, error: 'Supabase client not available' };
       }
 
+      console.log('ProfileService: Updating profile for user:', userId, 'with updates:', updates);
+
       const { data, error } = await this.supabase
         .from('profiles')
         .update(updates)
         .eq('id', userId)
-        .single();
+        .select();
 
       if (error) {
         console.error('ProfileService: Error updating profile:', error);
-        // Return success false to trigger localStorage fallback
         return { success: false, error: error.message };
       }
 
+      console.log('ProfileService: Profile updated successfully:', data);
       return { success: true, data };
     } catch (error) {
       console.error('ProfileService: Error in updateProfile:', error);

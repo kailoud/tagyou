@@ -1634,8 +1634,8 @@ class AvatarSystem {
           if (uploadResult.success) {
             avatarUrl = uploadResult.url;
           } else {
-            console.error('Error uploading avatar:', uploadResult.error);
-            // Fallback to localStorage
+            console.log('Storage upload failed, using data URL:', uploadResult.error);
+            // Fallback to data URL stored in database
             const reader = new FileReader();
             reader.onload = (e) => {
               avatarUrl = e.target.result;
@@ -1660,9 +1660,11 @@ class AvatarSystem {
           avatar_url: avatarUrl || null
         };
 
+        console.log('Attempting to update profile in Supabase with:', profileUpdates);
+
         const updateResult = await window.profileService.updateProfile(this.user.id, profileUpdates);
         if (updateResult.success) {
-          console.log('Profile updated successfully in Supabase');
+          console.log('Profile updated successfully in Supabase:', updateResult.data);
         } else {
           console.log('Supabase update failed, using localStorage fallback:', updateResult.error);
           // Store in localStorage as fallback
