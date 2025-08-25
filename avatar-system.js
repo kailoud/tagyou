@@ -335,6 +335,29 @@ class AvatarSystem {
         } catch (error) {
           console.log('⚠️ Supabase check failed in avatar system, falling back to local list:', error);
         }
+      } else {
+        // Wait for PremiumUsersService to be loaded
+        console.log('⏳ PremiumUsersService not loaded yet, waiting...');
+        let attempts = 0;
+        const maxAttempts = 10;
+        while (attempts < maxAttempts && !window.PremiumUsersService) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+        
+        if (window.PremiumUsersService) {
+          try {
+            const isPremium = await window.PremiumUsersService.isPremiumUser(this.user.email);
+            if (isPremium) {
+              console.log('💎 Premium user detected in avatar system from Supabase (after waiting):', this.user.email);
+              this.setUserTier('Premium');
+              localStorage.setItem(`premium_${this.user.email}`, 'true');
+              return;
+            }
+          } catch (error) {
+            console.log('⚠️ Supabase check failed after waiting, falling back to local list:', error);
+          }
+        }
       }
 
       // Fallback to local premium emails list
@@ -383,6 +406,15 @@ class AvatarSystem {
     if (this.isDropdownOpen) {
       this.renderDropdown();
     }
+    
+    // Force re-render the dropdown to update the UI
+    this.renderDropdown();
+  }
+
+  // Force refresh premium status from Supabase
+  async refreshPremiumStatus() {
+    console.log('🔄 Forcing premium status refresh...');
+    await this.checkPremiumStatus();
   }
 
   createAvatarElement() {
@@ -462,9 +494,15 @@ class AvatarSystem {
     }
   }
 
-  toggleDropdown() {
+  async toggleDropdown() {
     console.log('UI DEBUG: Toggle dropdown called, current state:', this.isDropdownOpen);
     this.isDropdownOpen = !this.isDropdownOpen;
+    
+    // Force check premium status when dropdown opens
+    if (this.isDropdownOpen && this.user) {
+      await this.refreshPremiumStatus();
+    }
+    
     this.renderDropdown();
   }
 
@@ -575,6 +613,9 @@ class AvatarSystem {
           <button class="avatar-upgrade-btn" style="width: 100%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; padding: 8px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s;">
             Upgrade 💎
           </button>
+          <button class="refresh-premium-btn" style="width: 100%; background: #f3f4f6; color: #6b7280; padding: 4px 8px; border: none; border-radius: 4px; font-size: 12px; margin-top: 8px; cursor: pointer; transition: all 0.3s;">
+            🔄 Refresh Premium Status
+          </button>
         `}
       </div>
     `;
@@ -666,6 +707,15 @@ class AvatarSystem {
           console.log('UI DEBUG: Using local auth modal for sign up');
           this.showAuthModal = true;
           this.authMode = 'signup';
+      } else if (e.target.closest('.refresh-premium-btn')) {
+        console.log('UI DEBUG: Refresh premium status button clicked');
+        this.refreshPremiumStatus();
+      } else if (e.target.closest('.avatar-upgrade-btn')) {
+        console.log('UI DEBUG: Upgrade button clicked');
+        // Trigger premium upgrade modal
+        if (window.carnivalTracker && window.carnivalTracker.showUpgradeModal) {
+          window.carnivalTracker.showUpgradeModal();
+        }
           this.isDropdownOpen = false;
           this.formData = { email: '', password: '', confirmPassword: '' }; // Reset form data
           this.renderAuthModal();
