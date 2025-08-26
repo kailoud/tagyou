@@ -588,8 +588,3 @@ export class SupabaseAuthService {
 
 // Create and export a singleton instance
 export const supabaseAuthService = new SupabaseAuthService();
-
-// Set the global supabase instance
-export function setSupabaseInstance(supabaseInstance) {
-  supabase = supabaseInstance;
-}
