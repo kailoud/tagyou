@@ -1178,11 +1178,22 @@ body {
   flex-direction: column;
 }
 
-/* Force consistent rendering for all cards */
-.flip-card *,
-#food-stalls-list .flip-card *,
-#artists-list .flip-card *,
-#float-trucks-list .flip-card * {
+/* Force consistent rendering for all cards - but allow page turn animation */
+.flip-card-inner,
+#food-stalls-list .flip-card-inner,
+#artists-list .flip-card-inner,
+#float-trucks-list .flip-card-inner {
+  /* Allow transform for page turn animation */
+}
+
+.flip-card-front *,
+.flip-card-back *,
+#food-stalls-list .flip-card-front *,
+#food-stalls-list .flip-card-back *,
+#artists-list .flip-card-front *,
+#artists-list .flip-card-back *,
+#float-trucks-list .flip-card-front *,
+#float-trucks-list .flip-card-back * {
   transform: none !important;
 }
 
