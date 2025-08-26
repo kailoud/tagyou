@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Stalls Display</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .load-button {
+      display: block;
+      margin: 20px auto;
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .load-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .load-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status {
+      text-align: center;
+      color: white;
+      margin: 20px 0;
+      font-size: 1.1rem;
+    }
+
+    .food-stalls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .food-stall-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s ease;
+    }
+
+    .food-stall-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .food-stall-image {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      font-size: 0.9rem;
+    }
+
+    .food-stall-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .food-stall-content {
+      padding: 20px;
+    }
+
+    .food-stall-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .food-stall-cuisine {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+
+    .food-stall-description {
+      color: #555;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    .food-stall-details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .food-stall-location {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .food-stall-rating {
+      background: linear-gradient(45deg, #ffd700, #ffed4e);
+      color: #333;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .food-stall-price {
+      color: #28a745;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .error-message {
+      background: #ff6b6b;
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .loading {
+      text-align: center;
+      color: white;
+      font-size: 1.1rem;
+    }
+
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 3px solid white;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🍽️ Food Stalls Display</h1>
+      <p>Load and display food stalls data from Supabase</p>
+    </div>
+
+    <button id="loadButton" class="load-button">
+      🚀 Load Food Stalls from Supabase
+    </button>
+
+    <div id="status" class="status"></div>
+    <div id="foodStallsContainer" class="food-stalls-grid"></div>
+  </div>
+
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Supabase Config -->
+  <script src="supabase-config-secret.js"></script>
+
+  <script>
+    // Global variables
+    let supabaseClient = null;
+    let foodStallsData = [];
+
+    // Initialize Supabase
+    async function initializeSupabase() {
+      try {
+        if (!window.supabase || !window.supabaseConfig) {
+          throw new Error('Supabase SDK or config not available');
+        }
+
+        supabaseClient = window.supabase.createClient(
+          window.supabaseConfig.supabaseUrl,
+          window.supabaseConfig.supabaseAnonKey
+        );
+
+        console.log('✅ Supabase client initialized');
+        return true;
+      } catch (error) {
+        console.error('❌ Failed to initialize Supabase:', error);
+        return false;
+      }
+    }
+
+    // Load food stalls from Supabase
+    async function loadFoodStalls() {
+      try {
+        updateStatus('loading', '🔄 Loading food stalls from Supabase...');
+
+        const { data, error } = await supabaseClient
+          .from('food_stalls')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          throw error;
+        }
+
+        foodStallsData = data || [];
+        console.log('✅ Loaded food stalls:', foodStallsData.length);
+
+        updateStatus('success', `✅ Successfully loaded ${foodStallsData.length} food stalls!`);
+        displayFoodStalls();
+
+      } catch (error) {
+        console.error('❌ Error loading food stalls:', error);
+        updateStatus('error', `❌ Error loading food stalls: ${error.message}`);
+      }
+    }
+
+    // Display food stalls in the grid
+    function displayFoodStalls() {
+      const container = document.getElementById('foodStallsContainer');
+
+      if (foodStallsData.length === 0) {
+        container.innerHTML = `
+                    <div class="error-message">
+                        <h3>No Food Stalls Found</h3>
+                        <p>No food stalls data available in the database.</p>
+                    </div>
+                `;
+        return;
+      }
+
+      container.innerHTML = foodStallsData.map(stall => `
+                <div class="food-stall-card">
+                    <div class="food-stall-image">
+                        ${stall.image_url ?
+          `<img src="${stall.image_url}" alt="${stall.name}" onerror="this.parentElement.innerHTML='No Image Available'">` :
+          'No Image Available'
+        }
+                    </div>
+                    <div class="food-stall-content">
+                        <div class="food-stall-name">${stall.name || 'Unnamed Stall'}</div>
+                        <div class="food-stall-cuisine">${stall.cuisine || 'Cuisine not specified'}</div>
+                        <div class="food-stall-description">${stall.description || 'No description available'}</div>
+                        <div class="food-stall-details">
+                            <div class="food-stall-location">📍 ${stall.location || 'Location not specified'}</div>
+                            <div class="food-stall-rating">⭐ ${stall.rating || 'N/A'}</div>
+                        </div>
+                        <div class="food-stall-price">${stall.price_range || 'Price not specified'}</div>
+                    </div>
+                </div>
+            `).join('');
+    }
+
+    // Update status display
+    function updateStatus(type, message) {
+      const statusDiv = document.getElementById('status');
+      const button = document.getElementById('loadButton');
+
+      switch (type) {
+        case 'loading':
+          statusDiv.innerHTML = `
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            ${message}
+                        </div>
+                    `;
+          button.disabled = true;
+          button.textContent = '🔄 Loading...';
+          break;
+
+        case 'success':
+          statusDiv.innerHTML = `<div class="loading">${message}</div>`;
+          button.disabled = false;
+          button.textContent = '🔄 Reload Food Stalls';
+          break;
+
+        case 'error':
+          statusDiv.innerHTML = `<div class="error-message">${message}</div>`;
+          button.disabled = false;
+          button.textContent = '🔄 Try Again';
+          break;
+      }
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('🚀 Initializing Food Stalls Display...');
+
+      const initialized = await initializeSupabase();
+      if (!initialized) {
+        updateStatus('error', '❌ Failed to initialize Supabase. Please check your configuration.');
+        return;
+      }
+
+      updateStatus('success', '✅ Ready to load food stalls! Click the button above.');
+    });
+
+    // Load button click handler
+    document.getElementById('loadButton').addEventListener('click', loadFoodStalls);
+  </script>
+</body>
+
+</html>
