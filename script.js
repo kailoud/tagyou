@@ -250,52 +250,114 @@ async function loadInitialDataDirect() {
     console.log('🔍 Checking if window.supabaseClient exists:', !!window.supabaseClient);
     console.log('🔍 window.supabaseClient:', window.supabaseClient);
 
-    // Load food stalls with detailed logging (using admin site pattern)
+    // Load food stalls with detailed logging (using test form pattern)
     console.log('🍽️ Fetching food stalls from Supabase...');
     try {
       const supabase = window.supabase;
       if (!supabase) {
         throw new Error('Supabase not initialized');
       }
-      const { data, error } = await supabase.from('food_stalls').select('*');
-      if (error) throw error;
-      foodStallsData = data || [];
-      console.log('✅ Loaded food stalls from Supabase:', foodStallsData.length);
-      console.log('📊 Food stalls data:', foodStallsData);
+      const { data: foodStalls, error } = await supabase
+        .from('food_stalls')
+        .select(`
+          id,
+          name,
+          cuisine,
+          location,
+          description,
+          rating,
+          price_range,
+          image_url,
+          coordinates,
+          opening_hours,
+          special_dietary_options,
+          contact_info,
+          status,
+          carnivals(name)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('❌ Food stalls error:', error);
+        foodStallsData = [];
+      } else {
+        foodStallsData = foodStalls || [];
+        console.log('✅ Loaded food stalls from Supabase:', foodStallsData.length);
+        console.log('📊 Food stalls data:', foodStallsData);
+      }
     } catch (error) {
       console.error('❌ Food stalls error:', error);
       foodStallsData = [];
     }
 
-    // Load artists with detailed logging (using admin site pattern)
+    // Load artists with detailed logging (using specific fields)
     console.log('🎵 Fetching artists from Supabase...');
     try {
       const supabase = window.supabase;
       if (!supabase) {
         throw new Error('Supabase not initialized');
       }
-      const { data, error } = await supabase.from('artists').select('*');
-      if (error) throw error;
-      artistsData = data || [];
-      console.log('✅ Loaded artists from Supabase:', artistsData.length);
-      console.log('📊 Artists data:', artistsData);
+      const { data: artists, error } = await supabase
+        .from('artists')
+        .select(`
+          id,
+          name,
+          genre,
+          description,
+          image_url,
+          coordinates,
+          performance_time,
+          stage,
+          rating,
+          status,
+          carnivals(name)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('❌ Artists error:', error);
+        artistsData = [];
+      } else {
+        artistsData = artists || [];
+        console.log('✅ Loaded artists from Supabase:', artistsData.length);
+        console.log('📊 Artists data:', artistsData);
+      }
     } catch (error) {
       console.error('❌ Artists error:', error);
       artistsData = [];
     }
 
-    // Load float trucks with detailed logging (using admin site pattern)
+    // Load float trucks with detailed logging (using specific fields)
     console.log('🚛 Fetching float trucks from Supabase...');
     try {
       const supabase = window.supabase;
       if (!supabase) {
         throw new Error('Supabase not initialized');
       }
-      const { data, error } = await supabase.from('float_trucks').select('*');
-      if (error) throw error;
-      floatTrucksData = data || [];
-      console.log('✅ Loaded float trucks from Supabase:', floatTrucksData.length);
-      console.log('📊 Float trucks data:', floatTrucksData);
+      const { data: floatTrucks, error } = await supabase
+        .from('float_trucks')
+        .select(`
+          id,
+          name,
+          theme,
+          description,
+          image_url,
+          coordinates,
+          route,
+          rating,
+          status,
+          carnivals(name)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('❌ Float trucks error:', error);
+        floatTrucksData = [];
+      } else {
+        floatTrucksData = floatTrucks || [];
+        console.log('✅ Loaded float trucks from Supabase:', floatTrucksData.length);
+        console.log('📊 Float trucks data:', floatTrucksData);
+      }
     } catch (error) {
       console.error('❌ Float trucks error:', error);
       floatTrucksData = [];
