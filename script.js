@@ -103,6 +103,24 @@ function populatePullUpPanel() {
   populateFoodStalls();
   populateArtists();
   populateFloatTrucks();
+  setupFlipCardListeners();
+}
+
+function setupFlipCardListeners() {
+  // Add click listeners to flip cards
+  document.querySelectorAll('.flip-card').forEach(card => {
+    card.addEventListener('click', function (e) {
+      // Don't flip if clicking on the back button
+      if (e.target.classList.contains('flip-back-btn')) {
+        e.stopPropagation();
+        this.classList.remove('flipped');
+        return;
+      }
+
+      // Toggle flip state
+      this.classList.toggle('flipped');
+    });
+  });
 }
 
 function populateFoodStalls() {
@@ -114,26 +132,72 @@ function populateFoodStalls() {
     return;
   }
 
-  container.innerHTML = foodStallsData.map(stall => `
-    <div class="content-item">
-      <div class="item-image">
-        ${stall.image_url ?
-      `<img src="${stall.image_url}" alt="${stall.name}" onerror="this.parentElement.innerHTML='No Image'">` :
-      '<div class="no-image">No Image</div>'
+  container.innerHTML = foodStallsData.map((stall, index) => `
+      <div class="flip-card" data-index="${index}">
+        <div class="flip-card-inner">
+          <!-- Front Side (Basic Info) -->
+          <div class="flip-card-front">
+            <div class="item-image">
+              ${stall.image_url ?
+      `<img src="${stall.image_url}" alt="${stall.name}" onerror="this.parentElement.innerHTML='<div class=\\"no-image\\">🍽️</div>'">` :
+      '<div class="no-image">🍽️</div>'
     }
-      </div>
-      <div class="item-content">
-        <h5>${stall.name || 'Unnamed Stall'}</h5>
-        <p class="item-cuisine">${stall.cuisine || 'Cuisine not specified'}</p>
-        <p class="item-description">${stall.description || 'No description available'}</p>
-        <div class="item-details">
-          <span class="item-location">📍 ${stall.location || 'Location not specified'}</span>
-          <span class="item-rating">⭐ ${stall.rating || 'N/A'}</span>
+            </div>
+            <div class="item-content">
+              <div class="item-header">
+                <h5>${stall.name || 'Unnamed Stall'}</h5>
+                <div class="item-badge cuisine-badge">${stall.cuisine || 'Cuisine'}</div>
+              </div>
+              <p class="item-description">${stall.description || 'Delicious festival food and refreshments available at this stall.'}</p>
+              <div class="item-details">
+                <div class="detail-row">
+                  <span class="item-location">📍 ${stall.location || 'Festival Grounds'}</span>
+                  <span class="item-rating">⭐ ${stall.rating || '4.5'}</span>
+                </div>
+              </div>
+              <div class="flip-hint">Click for more info</div>
+            </div>
+          </div>
+          
+          <!-- Back Side (Detailed Info) -->
+          <div class="flip-card-back">
+            <div class="back-header">
+              <h5>${stall.name || 'Unnamed Stall'}</h5>
+              <div class="item-badge cuisine-badge">${stall.cuisine || 'Cuisine'}</div>
+            </div>
+            <div class="back-content">
+              <div class="info-section">
+                <h6>📍 Location</h6>
+                <p>${stall.location || 'Festival Grounds'}</p>
+              </div>
+              <div class="info-section">
+                <h6>🕐 Opening Hours</h6>
+                <p>${stall.opening_hours || 'All Day'}</p>
+              </div>
+              <div class="info-section">
+                <h6>💰 Price Range</h6>
+                <p>${stall.price_range || '£5-15'}</p>
+              </div>
+              <div class="info-section">
+                <h6>⭐ Rating</h6>
+                <p>${stall.rating || '4.5'} / 5.0</p>
+              </div>
+              <div class="info-section">
+                <h6>🍽️ Specialties</h6>
+                <p>${stall.specialties || 'Local Favorites'}</p>
+              </div>
+              <div class="info-section">
+                <h6>📝 Description</h6>
+                <p>${stall.description || 'Delicious festival food and refreshments available at this stall.'}</p>
+              </div>
+            </div>
+            <div class="back-footer">
+              <button class="flip-back-btn">← Back</button>
+            </div>
+          </div>
         </div>
-        <div class="item-price">${stall.price_range || 'Price not specified'}</div>
       </div>
-    </div>
-  `).join('');
+    `).join('');
 }
 
 function populateArtists() {
@@ -145,25 +209,72 @@ function populateArtists() {
     return;
   }
 
-  container.innerHTML = artistsData.map(artist => `
-    <div class="content-item">
-      <div class="item-image">
-        ${artist.image_url ?
-      `<img src="${artist.image_url}" alt="${artist.name}" onerror="this.parentElement.innerHTML='No Image'">` :
-      '<div class="no-image">No Image</div>'
+  container.innerHTML = artistsData.map((artist, index) => `
+      <div class="flip-card" data-index="${index}">
+        <div class="flip-card-inner">
+          <!-- Front Side (Basic Info) -->
+          <div class="flip-card-front">
+            <div class="item-image">
+              ${artist.image_url ?
+      `<img src="${artist.image_url}" alt="${artist.name}" onerror="this.parentElement.innerHTML='<div class=\\"no-image\\">🎵</div>'">` :
+      '<div class="no-image">🎵</div>'
     }
-      </div>
-      <div class="item-content">
-        <h5>${artist.name || 'Unnamed Artist'}</h5>
-        <p class="item-genre">${artist.genre || 'Genre not specified'}</p>
-        <p class="item-description">${artist.description || 'No description available'}</p>
-        <div class="item-details">
-          <span class="item-stage">🎤 ${artist.stage || 'Stage not specified'}</span>
-          <span class="item-time">🕐 ${artist.performance_time || 'Time not specified'}</span>
+            </div>
+            <div class="item-content">
+              <div class="item-header">
+                <h5>${artist.name || 'Unnamed Artist'}</h5>
+                <div class="item-badge genre-badge">${artist.genre || 'Music'}</div>
+              </div>
+              <p class="item-description">${artist.description || 'Amazing live performance and entertainment at the festival.'}</p>
+              <div class="item-details">
+                <div class="detail-row">
+                  <span class="item-stage">🎤 ${artist.stage || 'Main Stage'}</span>
+                  <span class="item-rating">⭐ ${artist.rating || '4.8'}</span>
+                </div>
+              </div>
+              <div class="flip-hint">Click for more info</div>
+            </div>
+          </div>
+          
+          <!-- Back Side (Detailed Info) -->
+          <div class="flip-card-back">
+            <div class="back-header">
+              <h5>${artist.name || 'Unnamed Artist'}</h5>
+              <div class="item-badge genre-badge">${artist.genre || 'Music'}</div>
+            </div>
+            <div class="back-content">
+              <div class="info-section">
+                <h6>🎤 Stage</h6>
+                <p>${artist.stage || 'Main Stage'}</p>
+              </div>
+              <div class="info-section">
+                <h6>🕐 Performance Time</h6>
+                <p>${artist.performance_time || 'TBA'}</p>
+              </div>
+              <div class="info-section">
+                <h6>⏱️ Duration</h6>
+                <p>${artist.duration || '60 min'}</p>
+              </div>
+              <div class="info-section">
+                <h6>⭐ Rating</h6>
+                <p>${artist.rating || '4.8'} / 5.0</p>
+              </div>
+              <div class="info-section">
+                <h6>🎵 Specialties</h6>
+                <p>${artist.specialties || 'Live Performance'}</p>
+              </div>
+              <div class="info-section">
+                <h6>📝 Description</h6>
+                <p>${artist.description || 'Amazing live performance and entertainment at the festival.'}</p>
+              </div>
+            </div>
+            <div class="back-footer">
+              <button class="flip-back-btn">← Back</button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    `).join('');
 }
 
 function populateFloatTrucks() {
@@ -175,25 +286,72 @@ function populateFloatTrucks() {
     return;
   }
 
-  container.innerHTML = floatTrucksData.map(truck => `
-    <div class="content-item">
-      <div class="item-image">
-        ${truck.image_url ?
-      `<img src="${truck.image_url}" alt="${truck.name}" onerror="this.parentElement.innerHTML='No Image'">` :
-      '<div class="no-image">No Image</div>'
+  container.innerHTML = floatTrucksData.map((truck, index) => `
+      <div class="flip-card" data-index="${index}">
+        <div class="flip-card-inner">
+          <!-- Front Side (Basic Info) -->
+          <div class="flip-card-front">
+            <div class="item-image">
+              ${truck.image_url ?
+      `<img src="${truck.image_url}" alt="${truck.name}" onerror="this.parentElement.innerHTML='<div class=\\"no-image\\">🚛</div>'">` :
+      '<div class="no-image">🚛</div>'
     }
-      </div>
-      <div class="item-content">
-        <h5>${truck.name || 'Unnamed Float'}</h5>
-        <p class="item-theme">${truck.theme || 'Theme not specified'}</p>
-        <p class="item-description">${truck.description || 'No description available'}</p>
-        <div class="item-details">
-          <span class="item-route">🛣️ ${truck.route || 'Route not specified'}</span>
-          <span class="item-time">🕐 ${truck.parade_time || 'Time not specified'}</span>
+            </div>
+            <div class="item-content">
+              <div class="item-header">
+                <h5>${truck.name || 'Unnamed Float'}</h5>
+                <div class="item-badge theme-badge">${truck.theme || 'Parade'}</div>
+              </div>
+              <p class="item-description">${truck.description || 'Spectacular parade float with amazing decorations and entertainment.'}</p>
+              <div class="item-details">
+                <div class="detail-row">
+                  <span class="item-route">🛣️ ${truck.route || 'Main Route'}</span>
+                  <span class="item-rating">⭐ ${truck.rating || '4.7'}</span>
+                </div>
+              </div>
+              <div class="flip-hint">Click for more info</div>
+            </div>
+          </div>
+          
+          <!-- Back Side (Detailed Info) -->
+          <div class="flip-card-back">
+            <div class="back-header">
+              <h5>${truck.name || 'Unnamed Float'}</h5>
+              <div class="item-badge theme-badge">${truck.theme || 'Parade'}</div>
+            </div>
+            <div class="back-content">
+              <div class="info-section">
+                <h6>🛣️ Route</h6>
+                <p>${truck.route || 'Main Route'}</p>
+              </div>
+              <div class="info-section">
+                <h6>🕐 Parade Time</h6>
+                <p>${truck.parade_time || 'TBA'}</p>
+              </div>
+              <div class="info-section">
+                <h6>⏱️ Duration</h6>
+                <p>${truck.duration || '30 min'}</p>
+              </div>
+              <div class="info-section">
+                <h6>⭐ Rating</h6>
+                <p>${truck.rating || '4.7'} / 5.0</p>
+              </div>
+              <div class="info-section">
+                <h6>🚛 Specialties</h6>
+                <p>${truck.specialties || 'Parade Float'}</p>
+              </div>
+              <div class="info-section">
+                <h6>📝 Description</h6>
+                <p>${truck.description || 'Spectacular parade float with amazing decorations and entertainment.'}</p>
+              </div>
+            </div>
+            <div class="back-footer">
+              <button class="flip-back-btn">← Back</button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    `).join('');
 }
 
 function initMap() {
