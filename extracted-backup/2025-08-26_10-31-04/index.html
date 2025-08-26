@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TagYou2 - London Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="auth-styles.css">
+  <link rel="stylesheet" href="carnival-tracker.css">
+  <link rel="stylesheet" href="invite-styles.css">
+  <link rel="stylesheet" href="toggle_switch_css.css">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <!-- Avatar System -->
+  <script src="avatar-system.js"></script>
+  <!-- Carnival Tracker -->
+  <script src="carnival-tracker.js"></script>
+  <!-- Invite System -->
+  <script src="invite-system.js"></script>
+  <!-- Location Sharing Toggle -->
+  <script src="location-sharing-toggle.js"></script>
+  <!-- Supabase Service -->
+  <script type="module">
+    // Load PremiumUsersService for premium status checks
+    window.loadPremiumService = async function () {
+      try {
+        const { PremiumUsersService } = await import('./supabase-service.js');
+        window.PremiumUsersService = PremiumUsersService;
+        console.log('✅ PremiumUsersService loaded for main app');
+        return true;
+      } catch (error) {
+        console.error('❌ Error loading PremiumUsersService:', error);
+        return false;
+      }
+    };
+
+    // Load the service when the page loads
+    window.addEventListener('load', function () {
+      window.loadPremiumService();
+    });
+  </script>
+
+
+
+
+
+
+</head>
+
+<body>
+
+  <!-- Header Section -->
+  <header class="simple-header">
+  </header>
+
+  <!-- Centered Controls Container -->
+  <div class="controls-container">
+
+
+
+
+
+    <!-- Interactive Map Toolbar -->
+    <div class="map-toolbar">
+      <div class="toolbar-section">
+        <button class="toolbar-btn" id="carnivalTrackerBtn" title="Carnival Squad Tracker">
+          <i class="fas fa-users"></i>
+          <span class="tracker-count" id="trackerCount">3</span>
+        </button>
+        <button class="toolbar-btn" id="foodStallBtn" title="Food Stalls">
+          <i class="fas fa-utensils"></i>
+        </button>
+        <button class="toolbar-btn" id="floatTruckBtn" title="Float Trucks">
+          <i class="fas fa-truck"></i>
+        </button>
+        <button class="toolbar-btn" id="artistBandBtn" title="Artists & Bands">
+          <i class="fas fa-music"></i>
+        </button>
+        <button class="toolbar-btn location-btn" id="locationCenterBtn" title="Center on Location">
+          <i class="fas fa-crosshairs"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pull Up Panel -->
+  <div class="pull-up-panel" id="pullUpPanel">
+    <div class="panel-handle">
+      <div class="handle-bar"></div>
+      <span class="handle-text">Pull up for more</span>
+    </div>
+    <div class="panel-content">
+      <div class="panel-header">
+        <h3>Festival Information</h3>
+        <button class="close-panel" id="closePanel">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tab-navigation">
+        <button class="tab-btn active" data-tab="foodstall">
+          <i class="fas fa-utensils"></i>
+          <span>Food Stalls</span>
+        </button>
+        <button class="tab-btn" data-tab="floattrucks">
+          <i class="fas fa-truck"></i>
+          <span>Float Trucks</span>
+        </button>
+        <button class="tab-btn" data-tab="artist">
+          <i class="fas fa-music"></i>
+          <span>Artists</span>
+        </button>
+        <button class="tab-btn" data-tab="settings">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Food Stalls Tab -->
+        <div class="tab-pane active" id="foodstall">
+          <div class="tab-header">
+            <h4>🍽️ Food Stalls</h4>
+            <p>Discover delicious festival food and refreshments</p>
+          </div>
+          <div class="content-list" id="food-stalls-list">
+            <!-- Food stalls will be populated by JavaScript -->
+            <div class="empty-state">
+              <p>No food stalls available yet. Please set up your database.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Float Trucks Tab -->
+        <div class="tab-pane" id="floattrucks">
+          <div class="tab-header">
+            <h4>🚛 Float Trucks</h4>
+            <p>Amazing parade floats and mobile attractions</p>
+          </div>
+          <div class="content-list" id="float-trucks-list">
+            <!-- Float trucks will be populated by JavaScript -->
+            <div class="empty-state">
+              <p>No float trucks available yet. Please set up your database.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Artists Tab -->
+        <div class="tab-pane" id="artist">
+          <div class="tab-header">
+            <h4>🎵 Artists & Bands</h4>
+            <p>Live performances and musical entertainment</p>
+          </div>
+          <div class="content-list" id="artists-list">
+            <!-- Artists will be populated by JavaScript -->
+            <div class="empty-state">
+              <p>No artists available yet. Please set up your database.</p>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- Settings Tab -->
+        <div class="tab-pane" id="settings">
+          <div class="tab-header">
+            <h4>⚙️ Settings</h4>
+            <p>Customize your festival experience</p>
+          </div>
+          <div class="settings-list">
+            <div class="setting-item">
+              <div class="setting-info">
+                <h5>Push Notifications</h5>
+                <p>Get alerts about events and updates</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <h5>Location Services</h5>
+                <p>Share your location for better recommendations</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <h5>Dark Mode</h5>
+                <p>Switch to dark theme for better visibility</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <h5>Auto-Save Favorites</h5>
+                <p>Automatically save your favorite items</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full Scale Map Container -->
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Initialize Supabase Client -->
+  <script src="supabase-config-secret.js"></script>
+  <script>
+    // Initialize Supabase client globally
+    if (window.supabase && window.supabaseConfig) {
+      window.supabaseClient = window.supabase.createClient(
+        window.supabaseConfig.supabaseUrl,
+        window.supabaseConfig.supabaseAnonKey
+      );
+      console.log('✅ Supabase client initialized globally');
+    } else {
+      console.warn('⚠️ Supabase config not available, will use fallback auth');
+    }
+  </script>
+  <script src="profile-service.js"></script>
+  <script src="avatar-system.js"></script>
+  <script src="script.js"></script>
+
+  <!-- Script verification removed -->
+
+
+
+
+  <script>
+
+
+    // Force show mobile elements (only for testing)
+    function forceShowMobileElements() {
+      console.log('🔧 Force showing mobile elements for testing...');
+
+      // Only show mobile elements if we're in test mode or on mobile
+      const isMobile = window.innerWidth <= 480;
+      const isTestMode = document.body.classList.contains('mobile-test-mode');
+
+      if (!isMobile && !isTestMode) {
+        console.log('📱 Not mobile and not in test mode, skipping force show');
+        return;
+      }
+
+      // Old mobile profile elements removed - using modern profile system
+    }
+
+
+
+    // Auto-test mobile auth on page load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        console.log('🚀 Page loaded, checking mobile auth...');
+
+        // Force show mobile elements only on mobile
+        if (window.innerWidth <= 480) {
+          forceShowMobileElements();
+        }
+
+        // Old mobileAuth references removed - using modern profile system
+      }, 3000);
+    });
+
+    // Side-by-side comparison function for live testing
+    window.enableSignInComparison = function () {
+      console.log('🔍 Enabling sign in comparison monitoring...');
+
+      // Performance optimization - minimal initialization
+      console.log('🚀 TagYou2 loading optimized for speed');
+    };
+
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,187 @@
+/* Toggle Switch CSS */
+.toggle-switch {
+  position: relative;
+  display: inline-flex;
+  height: 32px;
+  /* h-8 */
+  width: 56px;
+  /* w-14 */
+  align-items: center;
+  border-radius: 9999px;
+  /* rounded-full */
+  transition: background-color 300ms ease;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Focus styles */
+.toggle-switch:focus {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 1),
+    0 0 0 4px rgba(59, 130, 246, 0.5);
+  /* focus:ring-2 focus:ring-offset-2 */
+}
+
+/* Disabled state (gray) */
+.toggle-switch.disabled {
+  background-color: #d1d5db;
+  /* bg-gray-300 */
+}
+
+.toggle-switch.disabled:focus {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 1),
+    0 0 0 4px rgba(156, 163, 175, 0.5);
+  /* focus:ring-gray-400 */
+}
+
+/* Enabled state (green) */
+.toggle-switch.enabled {
+  background-color: #10b981;
+  /* bg-green-500 */
+}
+
+.toggle-switch.enabled:focus {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 1),
+    0 0 0 4px rgba(16, 185, 129, 0.5);
+  /* focus:ring-green-500 */
+}
+
+/* Toggle circle/thumb */
+.toggle-thumb {
+  display: inline-block;
+  height: 24px;
+  /* h-6 */
+  width: 24px;
+  /* w-6 */
+  border-radius: 50%;
+  background-color: #ffffff;
+  /* bg-white */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  /* shadow-lg */
+  transition: transform 300ms ease;
+}
+
+/* Thumb position when disabled */
+.toggle-switch.disabled .toggle-thumb {
+  transform: translateX(4px);
+  /* translate-x-1 */
+}
+
+/* Thumb position when enabled */
+.toggle-switch.enabled .toggle-thumb {
+  transform: translateX(28px);
+  /* translate-x-7 */
+}
+
+/* Location Sharing Toggle Container */
+.location-sharing-toggle {
+  position: fixed;
+  top: 110px;
+  right: 40px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideInToggle 0.3s ease-out;
+}
+
+@keyframes slideInToggle {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.location-sharing-info {
+  flex: 1;
+}
+
+.location-sharing-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.location-sharing-description {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.location-sharing-status {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.location-sharing-status.sharing {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.location-sharing-status.not-sharing {
+  background: rgba(156, 163, 175, 0.1);
+  color: #6b7280;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .location-sharing-toggle {
+    top: 100px;
+    right: 40px;
+  }
+}
+
+/* Success and Error Messages */
+.location-toggle-success,
+.location-toggle-error {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  z-index: 10002;
+  animation: slideInMessage 0.3s ease-out;
+}
+
+.location-toggle-success {
+  background: #10b981;
+  color: white;
+}
+
+.location-toggle-error {
+  background: #ef4444;
+  color: white;
+}
+
+.location-toggle-success i,
+.location-toggle-error i {
+  font-size: 16px;
+}
+
+@keyframes slideInMessage {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}

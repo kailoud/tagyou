@@ -1,0 +1,10 @@
+Backup created on Mon Aug 18 01:35:23 BST 2025
+TagYou2 London Map Project - Complete Backup
+Features included:
+- Interactive London Map with Leaflet.js
+- Notting Hill Carnival route with orange line
+- Judging zone label (red, 60° rotated)
+- Start flag (green) at Ladbroke Grove
+- Medical locations (red markers)
+- Interactive toolbar with festival star button
+- Responsive zoom scaling system
