@@ -71,6 +71,7 @@ async function initializeSupabase() {
 
     // Make it globally available
     window.supabase = supabaseClient;
+    window.supabaseClient = supabaseClient;
 
     const success = true;
 
@@ -78,17 +79,22 @@ async function initializeSupabase() {
       console.log('✅ Supabase core initialized successfully');
 
       // Now import and initialize Supabase services
-      const {
-        FoodStallsService,
-        ArtistsService,
-        FloatTrucksService,
-        UserFavoritesService,
-        RealtimeService,
-        initializeDefaultData,
-        setSupabaseInstance
-      } = await import('./supabase-service.js');
+      try {
+        const {
+          FoodStallsService,
+          ArtistsService,
+          FloatTrucksService,
+          UserFavoritesService,
+          RealtimeService,
+          initializeDefaultData,
+          setSupabaseInstance
+        } = await import('./supabase-service.js');
 
-      console.log('✅ Supabase modules loaded successfully');
+        console.log('✅ Supabase modules loaded successfully');
+      } catch (moduleError) {
+        console.warn('⚠️ Could not load Supabase service modules:', moduleError.message);
+        console.log('🔄 Continuing with direct client approach...');
+      }
 
       // Set the global Supabase instance
       setSupabaseInstance(supabaseClient);
@@ -241,6 +247,8 @@ function updateProtectedFeatures(isAuthenticated) {
 async function loadInitialDataDirect() {
   try {
     console.log('🚀 Loading data from Supabase...');
+    console.log('🔍 Checking if window.supabaseClient exists:', !!window.supabaseClient);
+    console.log('🔍 window.supabaseClient:', window.supabaseClient);
 
     // Load food stalls with detailed logging
     console.log('🍽️ Fetching food stalls from Supabase...');
@@ -430,22 +438,25 @@ function populatePullUpPanel() {
   // Populate food stalls
   const foodStallsList = document.getElementById('food-stalls-list');
   if (foodStallsList && foodStallsData.length > 0) {
+    console.log('🍽️ Populating food stalls list with', foodStallsData.length, 'items');
     foodStallsList.innerHTML = foodStallsData.map(stall => `
       <div class="content-item">
         <div class="item-image">
-          <img src="${stall.image_url}" alt="${stall.name}">
+          <img src="${stall.image_url || ''}" alt="${stall.name}" onerror="this.style.display='none'">
         </div>
         <div class="item-content">
           <div class="item-icon">🍽️</div>
           <div class="item-info">
-            <h5>${stall.name}</h5>
-            <p>${stall.description}</p>
-            <div class="item-location">📍 ${stall.location}</div>
-            <div class="item-rating">⭐ ${stall.rating} • ${stall.price_range}</div>
+            <h5>${stall.name || 'Unnamed Stall'}</h5>
+            <p>${stall.description || 'No description available'}</p>
+            <div class="item-location">📍 ${stall.location || 'Location not specified'}</div>
+            <div class="item-rating">⭐ ${stall.rating || 'N/A'} • ${stall.price_range || 'Price not specified'}</div>
           </div>
         </div>
       </div>
     `).join('');
+  } else {
+    console.log('🍽️ No food stalls data available, showing empty state');
   }
 
   // Populate artists
@@ -627,25 +638,32 @@ function showFoodStalls() {
 
   // Add markers for food stalls
   stallsToShow.forEach(stall => {
+    // Handle data structure from database
+    const imageUrl = stall.image_url || stall.image || '';
+    const coordinates = stall.coordinates || {};
+    const lat = coordinates.lat || stall.lat || 51.5074; // Default to London
+    const lng = coordinates.lng || stall.lng || -0.1278;
+    const hours = stall.opening_hours ? stall.opening_hours[0] || 'Hours not specified' : stall.hours || 'Hours not specified';
+
     const popupContent = `
       <div style="padding: 10px; max-width: 180px;">
         <div style="display: flex; align-items: center; margin-bottom: 8px;">
-          <img src="${stall.image}" alt="${stall.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 8px;">
+          <img src="${imageUrl}" alt="${stall.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 8px;" onerror="this.style.display='none'">
           <div>
             <h3 style="margin: 0; font-size: 14px; font-weight: 600;">🍽️ ${stall.name}</h3>
-            <span style="background: #10b981; color: white; padding: 1px 4px; border-radius: 3px; font-size: 9px;">⭐ ${stall.rating}</span>
+            <span style="background: #10b981; color: white; padding: 1px 4px; border-radius: 3px; font-size: 9px;">⭐ ${stall.rating || 'N/A'}</span>
           </div>
         </div>
-        <p style="margin: 0 0 6px 0; font-size: 11px; color: #666;">${stall.description}</p>
-        <p style="margin: 0 0 4px 0; font-size: 10px;">📍 ${stall.location}</p>
-        <p style="margin: 0; font-size: 10px;">🕒 ${stall.hours}</p>
+        <p style="margin: 0 0 6px 0; font-size: 11px; color: #666;">${stall.description || 'No description available'}</p>
+        <p style="margin: 0 0 4px 0; font-size: 10px;">📍 ${stall.location || 'Location not specified'}</p>
+        <p style="margin: 0; font-size: 10px;">🕒 ${hours}</p>
         <div style="margin-top: 8px; display: flex; gap: 4px;">
           <button onclick="addToFavorites('foodStalls', '${stall.id}')" style="background: #3b82f6; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">❤️ Add to Favorites</button>
         </div>
       </div>
     `;
 
-    const marker = L.marker([stall.lat, stall.lng], { icon: foodStallIcon })
+    const marker = L.marker([lat, lng], { icon: foodStallIcon })
       .addTo(map);
 
     // Bind popup once on creation
