@@ -249,18 +249,28 @@ async function loadInitialDataDirect() {
     console.log('🚀 Loading data from Supabase...');
 
     // Load data using separate functions (admin pattern)
+    console.log('🍽️ Loading food stalls...');
     const foodStalls = await getFoodStalls();
+
+    console.log('🎵 Loading artists...');
     const artists = await getArtists();
+
+    console.log('🚛 Loading float trucks...');
     const floatTrucks = await getFloatTrucks();
+
+    console.log('🎪 Loading carnivals...');
+    const carnivals = await getCarnivals();
 
     // Store data globally (admin pattern)
     foodStallsData = foodStalls;
     artistsData = artists;
     floatTrucksData = floatTrucks;
+    window.carnivalsData = carnivals; // Store carnivals globally for reference
 
     console.log('✅ Loaded food stalls from Supabase:', foodStalls.length);
     console.log('✅ Loaded artists from Supabase:', artists.length);
     console.log('✅ Loaded float trucks from Supabase:', floatTrucks.length);
+    console.log('✅ Loaded carnivals from Supabase:', carnivals.length);
 
     // Always use database data - no fallback to sample data
     console.log('🔍 Data source check:', {
@@ -321,12 +331,15 @@ async function loadInitialDataDirect() {
 // Data fetching functions (admin pattern)
 async function getFoodStalls() {
   try {
-    const supabase = window.supabase;
-    if (!supabase) {
-      throw new Error('Supabase not initialized');
+    const { data, error } = await window.supabase
+      .from('food_stalls')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching food stalls:', error);
+      return [];
     }
-    const { data, error } = await supabase.from('food_stalls').select('*');
-    if (error) throw error;
     return data || [];
   } catch (error) {
     console.error('Error fetching food stalls:', error);
@@ -336,12 +349,15 @@ async function getFoodStalls() {
 
 async function getArtists() {
   try {
-    const supabase = window.supabase;
-    if (!supabase) {
-      throw new Error('Supabase not initialized');
+    const { data, error } = await window.supabase
+      .from('artists')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching artists:', error);
+      return [];
     }
-    const { data, error } = await supabase.from('artists').select('*');
-    if (error) throw error;
     return data || [];
   } catch (error) {
     console.error('Error fetching artists:', error);
@@ -351,15 +367,36 @@ async function getArtists() {
 
 async function getFloatTrucks() {
   try {
-    const supabase = window.supabase;
-    if (!supabase) {
-      throw new Error('Supabase not initialized');
+    const { data, error } = await window.supabase
+      .from('float_trucks')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching float trucks:', error);
+      return [];
     }
-    const { data, error } = await supabase.from('float_trucks').select('*');
-    if (error) throw error;
     return data || [];
   } catch (error) {
     console.error('Error fetching float trucks:', error);
+    return [];
+  }
+}
+
+async function getCarnivals() {
+  try {
+    const { data: carnivals, error } = await window.supabase
+      .from('carnivals')
+      .select('id, name, external_id')
+      .order('name');
+
+    if (error) {
+      console.error('Error loading carnivals:', error);
+      return [];
+    }
+    return carnivals || [];
+  } catch (error) {
+    console.error('Error loading carnivals:', error);
     return [];
   }
 }
