@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Food Stalls Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .result {
+      background: #f5f5f5;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border-left: 4px solid #007cba;
+    }
+
+    .error {
+      border-left-color: #dc3232;
+      background: #ffe6e6;
+    }
+
+    .success {
+      border-left-color: #46b450;
+      background: #e6ffe6;
+    }
+
+    pre {
+      background: #fff;
+      padding: 10px;
+      border-radius: 3px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🍽️ Simple Food Stalls Test</h1>
+  <div id="results">Loading...</div>
+
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Initialize Supabase Client -->
+  <script src="supabase-config-secret.js"></script>
+
+  <script type="module">
+    import { FoodStallsService } from './supabase-service.js';
+
+    async function testFoodStalls() {
+      const resultsDiv = document.getElementById('results');
+
+      try {
+        resultsDiv.innerHTML = '<div class="result">🔄 Testing FoodStallsService...</div>';
+
+        // Test 1: Direct Supabase query
+        resultsDiv.innerHTML += '<div class="result"><h3>Test 1: Direct Supabase Query</h3>';
+
+        if (window.supabase && window.supabaseConfig) {
+          const supabaseClient = window.supabase.createClient(
+            window.supabaseConfig.supabaseUrl,
+            window.supabaseConfig.supabaseAnonKey
+          );
+
+          const { data: directData, error: directError } = await supabaseClient
+            .from('food_stalls')
+            .select('*')
+            .order('id');
+
+          if (directError) {
+            resultsDiv.innerHTML += `<p class="error">❌ Direct query error: ${directError.message}</p>`;
+          } else {
+            resultsDiv.innerHTML += `<p class="success">✅ Direct query success: ${directData.length} records</p>`;
+            resultsDiv.innerHTML += `<pre>${JSON.stringify(directData, null, 2)}</pre>`;
+          }
+        } else {
+          resultsDiv.innerHTML += '<p class="error">❌ Supabase config not available</p>';
+        }
+        resultsDiv.innerHTML += '</div>';
+
+        // Test 2: FoodStallsService
+        resultsDiv.innerHTML += '<div class="result"><h3>Test 2: FoodStallsService.getAllFoodStalls()</h3>';
+
+        try {
+          const serviceData = await FoodStallsService.getAllFoodStalls();
+          resultsDiv.innerHTML += `<p class="success">✅ Service returned: ${serviceData.length} records</p>`;
+          resultsDiv.innerHTML += `<pre>${JSON.stringify(serviceData, null, 2)}</pre>`;
+
+          // Check data structure
+          if (serviceData.length > 0) {
+            const firstRecord = serviceData[0];
+            resultsDiv.innerHTML += '<h4>Data Structure Analysis:</h4>';
+            resultsDiv.innerHTML += `<p>Has 'id' field: ${firstRecord.hasOwnProperty('id') ? '✅ Yes' : '❌ No'}</p>`;
+            resultsDiv.innerHTML += `<p>Has 'name' field: ${firstRecord.hasOwnProperty('name') ? '✅ Yes' : '❌ No'}</p>`;
+            resultsDiv.innerHTML += `<p>Has 'carnival_id' field: ${firstRecord.hasOwnProperty('carnival_id') ? '✅ Yes' : '❌ No'}</p>`;
+            resultsDiv.innerHTML += `<p>ID value: ${firstRecord.id || 'undefined'}</p>`;
+            resultsDiv.innerHTML += `<p>Name value: ${firstRecord.name || 'undefined'}</p>`;
+            resultsDiv.innerHTML += `<p>Carnival ID value: ${firstRecord.carnival_id || 'undefined'}</p>`;
+          }
+        } catch (error) {
+          resultsDiv.innerHTML += `<p class="error">❌ Service error: ${error.message}</p>`;
+        }
+        resultsDiv.innerHTML += '</div>';
+
+        // Test 3: Check what the main app logic would do
+        resultsDiv.innerHTML += '<div class="result"><h3>Test 3: Main App Logic Check</h3>';
+
+        if (serviceData && serviceData.length > 0) {
+          const hasRealFoodStalls = serviceData.length > 0 && serviceData[0].id;
+          resultsDiv.innerHTML += `<p>Data length > 0: ${serviceData.length > 0 ? '✅ Yes' : '❌ No'}</p>`;
+          resultsDiv.innerHTML += `<p>First record has 'id': ${serviceData[0].id ? '✅ Yes' : '❌ No'}</p>`;
+          resultsDiv.innerHTML += `<p>Would use: ${hasRealFoodStalls ? 'Database' : 'Sample'} data</p>`;
+        } else {
+          resultsDiv.innerHTML += '<p>No data returned from service</p>';
+        }
+        resultsDiv.innerHTML += '</div>';
+
+      } catch (error) {
+        resultsDiv.innerHTML += `<div class="result error">❌ Test failed: ${error.message}</div>`;
+        console.error('Test error:', error);
+      }
+    }
+
+    // Run the test when page loads
+    document.addEventListener('DOMContentLoaded', testFoodStalls);
+  </script>
+</body>
+
+</html>

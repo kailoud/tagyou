@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug Food Stalls Data</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .debug-section {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+    }
+
+    .success {
+      background: #e6ffe6;
+      border-color: #99ff99;
+    }
+
+    .error {
+      background: #ffe6e6;
+      border-color: #ff9999;
+    }
+
+    .info {
+      background: #e6f3ff;
+      border-color: #99ccff;
+    }
+
+    pre {
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #f2f2f2;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🔍 Debug Food Stalls Data</h1>
+
+  <div id="status">Loading...</div>
+  <div id="results"></div>
+
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Initialize Supabase Client -->
+  <script src="supabase-config-secret.js"></script>
+
+  <script>
+    async function debugFoodStalls() {
+      const statusDiv = document.getElementById('status');
+      const resultsDiv = document.getElementById('results');
+
+      try {
+        statusDiv.innerHTML = '<div class="info">🔄 Connecting to Supabase...</div>';
+
+        // Initialize Supabase
+        if (window.supabase && window.supabaseConfig) {
+          window.supabaseClient = window.supabase.createClient(
+            window.supabaseConfig.supabaseUrl,
+            window.supabaseConfig.supabaseAnonKey
+          );
+          console.log('✅ Supabase client initialized');
+        } else {
+          throw new Error('Supabase config not available');
+        }
+
+        statusDiv.innerHTML = '<div class="info">🔄 Debugging food stalls data...</div>';
+
+        let resultsHTML = '';
+
+        // 1. Check all carnivals
+        const { data: carnivals, error: carnivalsError } = await window.supabaseClient
+          .from('carnivals')
+          .select('*')
+          .order('id');
+
+        resultsHTML += '<div class="debug-section info">';
+        resultsHTML += '<h3>1. Carnivals Table</h3>';
+        if (carnivalsError) {
+          resultsHTML += `<p class="error">Error: ${carnivalsError.message}</p>`;
+        } else {
+          resultsHTML += `<p>Found ${carnivals.length} carnivals:</p>`;
+          resultsHTML += '<table>';
+          resultsHTML += '<tr><th>ID</th><th>Name</th><th>Location</th><th>Status</th></tr>';
+          carnivals.forEach(carnival => {
+            resultsHTML += `<tr>
+                            <td><strong>${carnival.id}</strong></td>
+                            <td>${carnival.name}</td>
+                            <td>${carnival.location}</td>
+                            <td>${carnival.status}</td>
+                        </tr>`;
+          });
+          resultsHTML += '</table>';
+        }
+        resultsHTML += '</div>';
+
+        // 2. Check all food stalls
+        const { data: foodStalls, error: foodStallsError } = await window.supabaseClient
+          .from('food_stalls')
+          .select('*')
+          .order('id');
+
+        resultsHTML += '<div class="debug-section info">';
+        resultsHTML += '<h3>2. Food Stalls Table</h3>';
+        if (foodStallsError) {
+          resultsHTML += `<p class="error">Error: ${foodStallsError.message}</p>`;
+        } else {
+          resultsHTML += `<p>Found ${foodStalls.length} food stalls:</p>`;
+          resultsHTML += '<table>';
+          resultsHTML += '<tr><th>ID</th><th>Carnival ID</th><th>Name</th><th>Cuisine</th><th>Location</th><th>Status</th></tr>';
+          foodStalls.forEach(stall => {
+            resultsHTML += `<tr>
+                            <td><strong>${stall.id}</strong></td>
+                            <td>${stall.carnival_id}</td>
+                            <td>${stall.name}</td>
+                            <td>${stall.cuisine}</td>
+                            <td>${stall.location}</td>
+                            <td>${stall.status}</td>
+                        </tr>`;
+          });
+          resultsHTML += '</table>';
+        }
+        resultsHTML += '</div>';
+
+        // 3. Check food stalls with carnival info
+        const { data: foodStallsWithCarnival, error: joinError } = await window.supabaseClient
+          .from('food_stalls')
+          .select(`
+                        *,
+                        carnivals!inner(name, location, status)
+                    `)
+          .order('id');
+
+        resultsHTML += '<div class="debug-section info">';
+        resultsHTML += '<h3>3. Food Stalls with Carnival Info (JOIN)</h3>';
+        if (joinError) {
+          resultsHTML += `<p class="error">Error: ${joinError.message}</p>`;
+        } else {
+          resultsHTML += `<p>Found ${foodStallsWithCarnival.length} food stalls with carnival info:</p>`;
+          resultsHTML += '<table>';
+          resultsHTML += '<tr><th>Food Stall ID</th><th>Name</th><th>Carnival ID</th><th>Carnival Name</th><th>Status</th></tr>';
+          foodStallsWithCarnival.forEach(stall => {
+            resultsHTML += `<tr>
+                            <td><strong>${stall.id}</strong></td>
+                            <td>${stall.name}</td>
+                            <td>${stall.carnival_id}</td>
+                            <td>${stall.carnivals?.name || 'N/A'}</td>
+                            <td>${stall.status}</td>
+                        </tr>`;
+          });
+          resultsHTML += '</table>';
+        }
+        resultsHTML += '</div>';
+
+        // 4. Test the FoodStallsService
+        resultsHTML += '<div class="debug-section info">';
+        resultsHTML += '<h3>4. Testing FoodStallsService</h3>';
+
+        try {
+          const { FoodStallsService } = await import('./supabase-service.js');
+          const serviceData = await FoodStallsService.getAllFoodStalls();
+
+          resultsHTML += `<p class="success">✅ FoodStallsService.getAllFoodStalls() returned ${serviceData.length} records</p>`;
+          resultsHTML += '<pre>' + JSON.stringify(serviceData, null, 2) + '</pre>';
+        } catch (error) {
+          resultsHTML += `<p class="error">❌ FoodStallsService error: ${error.message}</p>`;
+        }
+        resultsHTML += '</div>';
+
+        // 5. Check for carnival_id mismatch
+        resultsHTML += '<div class="debug-section info">';
+        resultsHTML += '<h3>5. Carnival ID Analysis</h3>';
+
+        if (carnivals && foodStalls) {
+          const carnivalIds = carnivals.map(c => c.id);
+          const foodStallCarnivalIds = [...new Set(foodStalls.map(f => f.carnival_id))];
+
+          resultsHTML += `<p><strong>Carnival IDs in carnivals table:</strong> ${carnivalIds.join(', ')}</p>`;
+          resultsHTML += `<p><strong>Carnival IDs in food_stalls table:</strong> ${foodStallCarnivalIds.join(', ')}</p>`;
+
+          const mismatchedIds = foodStallCarnivalIds.filter(id => !carnivalIds.includes(id));
+          if (mismatchedIds.length > 0) {
+            resultsHTML += `<p class="error">❌ Mismatched carnival IDs: ${mismatchedIds.join(', ')}</p>`;
+            resultsHTML += '<p>These carnival IDs in food_stalls table don\'t exist in carnivals table!</p>';
+          } else {
+            resultsHTML += '<p class="success">✅ All carnival IDs match correctly</p>';
+          }
+        }
+        resultsHTML += '</div>';
+
+        // 6. Recommendations
+        resultsHTML += '<div class="debug-section info">';
+        resultsHTML += '<h3>6. Recommendations</h3>';
+
+        if (foodStalls && foodStalls.length > 0) {
+          resultsHTML += '<p class="success">✅ Food stalls data exists in database</p>';
+          resultsHTML += '<p>If the pull-up panel is not showing this data, the issue is likely:</p>';
+          resultsHTML += '<ul>';
+          resultsHTML += '<li>JavaScript import/export issues</li>';
+          resultsHTML += '<li>Service initialization problems</li>';
+          resultsHTML += '<li>Data filtering (carnival_id mismatch)</li>';
+          resultsHTML += '</ul>';
+        } else {
+          resultsHTML += '<p class="error">❌ No food stalls data found</p>';
+          resultsHTML += '<p>Run the complete-festival-schema.sql to create tables and sample data</p>';
+        }
+        resultsHTML += '</div>';
+
+        statusDiv.innerHTML = '<div class="success">✅ Debug complete</div>';
+        resultsDiv.innerHTML = resultsHTML;
+
+      } catch (error) {
+        console.error('❌ Error debugging food stalls:', error);
+        statusDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+        resultsDiv.innerHTML = `<p>Error details: ${error.stack}</p>`;
+      }
+    }
+
+    // Run the debug when page loads
+    document.addEventListener('DOMContentLoaded', debugFoodStalls);
+  </script>
+</body>
+
+</html>

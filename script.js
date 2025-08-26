@@ -260,32 +260,14 @@ async function loadInitialData(FoodStallsService, ArtistsService, FloatTrucksSer
     console.log('✅ Loaded float trucks from Supabase:', floatTrucksData.length);
     console.log('📊 Float trucks data:', floatTrucksData);
 
-    // Check if we got real data from Supabase
-    const hasRealFoodStalls = foodStallsData.length > 0 && foodStallsData[0].id;
-    const hasRealArtists = artistsData.length > 0 && artistsData[0].id;
-    const hasRealFloatTrucks = floatTrucksData.length > 0 && floatTrucksData[0].id;
-
+    // Always use database data - no fallback to sample data
     console.log('🔍 Data source check:', {
-      foodStalls: hasRealFoodStalls ? 'Database' : 'Sample',
-      artists: hasRealArtists ? 'Database' : 'Sample',
-      floatTrucks: hasRealFloatTrucks ? 'Database' : 'Sample'
+      foodStalls: 'Database',
+      artists: 'Database',
+      floatTrucks: 'Database'
     });
 
-    // If no data from Supabase, load sample data for testing
-    if (!hasRealFoodStalls) {
-      console.log('📝 Loading sample food stalls data...');
-      foodStallsData = getSampleFoodStalls();
-    }
-
-    if (!hasRealArtists) {
-      console.log('📝 Loading sample artists data...');
-      artistsData = getSampleArtists();
-    }
-
-    if (!hasRealFloatTrucks) {
-      console.log('📝 Loading sample float trucks data...');
-      floatTrucksData = getSampleFloatTrucks();
-    }
+    console.log('✅ Using database data only - no sample data fallback');
 
     // Check if data is properly structured
     if (foodStallsData.length > 0) {
@@ -303,13 +285,13 @@ async function loadInitialData(FoodStallsService, ArtistsService, FloatTrucksSer
 
   } catch (error) {
     console.error('❌ Error loading data from Supabase:', error);
-    console.log('🔄 Loading sample data for testing...');
-    // Initialize with sample data
-    foodStallsData = getSampleFoodStalls();
-    artistsData = getSampleArtists();
-    floatTrucksData = getSampleFloatTrucks();
+    console.log('❌ No fallback to sample data - using empty arrays');
+    // Use empty arrays if database fails
+    foodStallsData = [];
+    artistsData = [];
+    floatTrucksData = [];
 
-    // Populate the pull-up panel with sample data
+    // Populate the pull-up panel with empty data
     populatePullUpPanel();
   }
 }

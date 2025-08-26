@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Database Status Check</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .status-box {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+
+    .error {
+      color: red;
+      background: #ffe6e6;
+      border-color: #ff9999;
+    }
+
+    .success {
+      color: green;
+      background: #e6ffe6;
+      border-color: #99ff99;
+    }
+
+    .warning {
+      color: orange;
+      background: #fff3e6;
+      border-color: #ffcc99;
+    }
+
+    .info {
+      color: blue;
+      background: #e6f3ff;
+      border-color: #99ccff;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+    }
+
+    .data-table th,
+    .data-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .data-table th {
+      background-color: #f2f2f2;
+    }
+
+    pre {
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🔍 Database Status Check</h1>
+
+  <div id="status">Loading...</div>
+  <div id="results"></div>
+
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Initialize Supabase Client -->
+  <script src="supabase-config-secret.js"></script>
+
+  <script>
+    async function checkDatabaseStatus() {
+      const statusDiv = document.getElementById('status');
+      const resultsDiv = document.getElementById('results');
+
+      try {
+        statusDiv.innerHTML = '<div class="info">🔄 Connecting to Supabase...</div>';
+
+        // Initialize Supabase
+        if (window.supabase && window.supabaseConfig) {
+          window.supabaseClient = window.supabase.createClient(
+            window.supabaseConfig.supabaseUrl,
+            window.supabaseConfig.supabaseAnonKey
+          );
+          console.log('✅ Supabase client initialized');
+        } else {
+          throw new Error('Supabase config not available');
+        }
+
+        statusDiv.innerHTML = '<div class="info">🔄 Checking database tables...</div>';
+
+        const results = [];
+
+        // Test connection
+        try {
+          const { data: connectionTest, error: connectionError } = await window.supabaseClient
+            .from('profiles')
+            .select('count')
+            .limit(1);
+
+          if (connectionError) {
+            results.push({
+              table: 'Connection Test',
+              status: 'Error',
+              message: connectionError.message,
+              data: null
+            });
+          } else {
+            results.push({
+              table: 'Connection Test',
+              status: 'Success',
+              message: 'Database connection working',
+              data: connectionTest
+            });
+          }
+        } catch (error) {
+          results.push({
+            table: 'Connection Test',
+            status: 'Error',
+            message: error.message,
+            data: null
+          });
+        }
+
+        // Check carnivals table
+        try {
+          const { data: carnivalsData, error: carnivalsError } = await window.supabaseClient
+            .from('carnivals')
+            .select('*')
+            .limit(5);
+
+          if (carnivalsError) {
+            results.push({
+              table: 'carnivals',
+              status: 'Error',
+              message: carnivalsError.message,
+              data: null
+            });
+          } else {
+            results.push({
+              table: 'carnivals',
+              status: 'Success',
+              message: `Found ${carnivalsData.length} carnival records`,
+              data: carnivalsData
+            });
+          }
+        } catch (error) {
+          results.push({
+            table: 'carnivals',
+            status: 'Error',
+            message: error.message,
+            data: null
+          });
+        }
+
+        // Check food_stalls table
+        try {
+          const { data: foodStallsData, error: foodStallsError } = await window.supabaseClient
+            .from('food_stalls')
+            .select('*')
+            .limit(5);
+
+          if (foodStallsError) {
+            results.push({
+              table: 'food_stalls',
+              status: 'Error',
+              message: foodStallsError.message,
+              data: null
+            });
+          } else {
+            results.push({
+              table: 'food_stalls',
+              status: 'Success',
+              message: `Found ${foodStallsData.length} food stall records`,
+              data: foodStallsData
+            });
+          }
+        } catch (error) {
+          results.push({
+            table: 'food_stalls',
+            status: 'Error',
+            message: error.message,
+            data: null
+          });
+        }
+
+        // Check artists table
+        try {
+          const { data: artistsData, error: artistsError } = await window.supabaseClient
+            .from('artists')
+            .select('*')
+            .limit(5);
+
+          if (artistsError) {
+            results.push({
+              table: 'artists',
+              status: 'Error',
+              message: artistsError.message,
+              data: null
+            });
+          } else {
+            results.push({
+              table: 'artists',
+              status: 'Success',
+              message: `Found ${artistsData.length} artist records`,
+              data: artistsData
+            });
+          }
+        } catch (error) {
+          results.push({
+            table: 'artists',
+            status: 'Error',
+            message: error.message,
+            data: null
+          });
+        }
+
+        // Check float_trucks table
+        try {
+          const { data: floatTrucksData, error: floatTrucksError } = await window.supabaseClient
+            .from('float_trucks')
+            .select('*')
+            .limit(5);
+
+          if (floatTrucksError) {
+            results.push({
+              table: 'float_trucks',
+              status: 'Error',
+              message: floatTrucksError.message,
+              data: null
+            });
+          } else {
+            results.push({
+              table: 'float_trucks',
+              status: 'Success',
+              message: `Found ${floatTrucksData.length} float truck records`,
+              data: floatTrucksData
+            });
+          }
+        } catch (error) {
+          results.push({
+            table: 'float_trucks',
+            status: 'Error',
+            message: error.message,
+            data: null
+          });
+        }
+
+        // Display results
+        let statusClass = 'success';
+        let statusMessage = 'Database check complete';
+
+        const errors = results.filter(r => r.status === 'Error');
+        if (errors.length > 0) {
+          statusClass = errors.length === results.length ? 'error' : 'warning';
+          statusMessage = `Found ${errors.length} issues`;
+        }
+
+        statusDiv.innerHTML = `<div class="${statusClass}">${statusMessage}</div>`;
+
+        // Create results table
+        let resultsHTML = '<h2>Database Table Status</h2>';
+        resultsHTML += '<table class="data-table">';
+        resultsHTML += '<tr><th>Table</th><th>Status</th><th>Message</th><th>Data Preview</th></tr>';
+
+        results.forEach(result => {
+          const rowClass = result.status === 'Error' ? 'error' :
+            result.status === 'Success' ? 'success' : 'warning';
+
+          resultsHTML += `<tr class="${rowClass}">`;
+          resultsHTML += `<td><strong>${result.table}</strong></td>`;
+          resultsHTML += `<td>${result.status}</td>`;
+          resultsHTML += `<td>${result.message}</td>`;
+          resultsHTML += `<td>`;
+
+          if (result.data && result.data.length > 0) {
+            resultsHTML += `<pre>${JSON.stringify(result.data[0], null, 2)}</pre>`;
+          } else if (result.data) {
+            resultsHTML += `<pre>${JSON.stringify(result.data, null, 2)}</pre>`;
+          } else {
+            resultsHTML += '<em>No data</em>';
+          }
+
+          resultsHTML += `</td>`;
+          resultsHTML += `</tr>`;
+        });
+
+        resultsHTML += '</table>';
+
+        // Add recommendations
+        resultsHTML += '<h2>Recommendations</h2>';
+        const missingTables = results.filter(r => r.status === 'Error' && r.message.includes('does not exist'));
+
+        if (missingTables.length > 0) {
+          resultsHTML += '<div class="warning">';
+          resultsHTML += '<h3>Missing Tables:</h3>';
+          resultsHTML += '<p>The following tables need to be created:</p>';
+          resultsHTML += '<ul>';
+          missingTables.forEach(table => {
+            resultsHTML += `<li><strong>${table.table}</strong> - ${table.message}</li>`;
+          });
+          resultsHTML += '</ul>';
+          resultsHTML += '<p><strong>Action:</strong> Run the <code>complete-festival-schema.sql</code> file in your Supabase SQL Editor.</p>';
+          resultsHTML += '</div>';
+        }
+
+        if (results.some(r => r.table === 'food_stalls' && r.status === 'Success' && r.data.length === 0)) {
+          resultsHTML += '<div class="info">';
+          resultsHTML += '<h3>Empty Tables:</h3>';
+          resultsHTML += '<p>The food_stalls table exists but has no data.</p>';
+          resultsHTML += '<p><strong>Action:</strong> The sample data should have been inserted automatically. Check if the SQL script ran completely.</p>';
+          resultsHTML += '</div>';
+        }
+
+        resultsDiv.innerHTML = resultsHTML;
+
+      } catch (error) {
+        console.error('❌ Error checking database status:', error);
+        statusDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+        resultsDiv.innerHTML = `<p>Error details: ${error.stack}</p>`;
+      }
+    }
+
+    // Run the check when page loads
+    document.addEventListener('DOMContentLoaded', checkDatabaseStatus);
+  </script>
+</body>
+
+</html>
