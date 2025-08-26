@@ -1158,10 +1158,9 @@ body {
 }
 
 /* Fix for mirror image text on flip card back */
-.flip-card-back .back-header h5,
-.flip-card-back .info-section h6,
-.flip-card-back .info-section p,
-.flip-card-back .flip-back-btn {
+.flip-card-back .back-header,
+.flip-card-back .back-content,
+.flip-card-back .back-footer {
   transform: rotateY(180deg);
 }
 
