@@ -96,8 +96,14 @@ async function initializeSupabase() {
         console.log('🔄 Continuing with direct client approach...');
       }
 
-      // Set the global Supabase instance
-      setSupabaseInstance(supabaseClient);
+      // Set the global Supabase instance (only if function exists)
+      try {
+        if (typeof setSupabaseInstance === 'function') {
+          setSupabaseInstance(supabaseClient);
+        }
+      } catch (error) {
+        console.warn('⚠️ Could not set Supabase instance:', error.message);
+      }
 
       // Also set it for the auth service
       window.supabase = supabaseClient;
@@ -165,31 +171,43 @@ async function initializeAuthService() {
     console.log('✅ Supabase ready, loading auth service...');
 
     // Import and initialize auth service
-    const { supabaseAuthService, setSupabaseInstance } = await import('./supabase-auth-service.js');
+    try {
+      const { supabaseAuthService, setSupabaseInstance } = await import('./supabase-auth-service.js');
 
-    // Set the global supabase instance
-    setSupabaseInstance(window.supabase);
+      // Set the global supabase instance (only if function exists)
+      if (typeof setSupabaseInstance === 'function') {
+        setSupabaseInstance(window.supabase);
+      }
+    } catch (importError) {
+      console.warn('⚠️ Could not import auth service:', importError.message);
+      return false;
+    }
 
     // Make auth service globally accessible
-    window.authService = supabaseAuthService;
+    if (supabaseAuthService) {
+      window.authService = supabaseAuthService;
 
-    // Initialize the auth service
-    const success = await supabaseAuthService.initialize();
+      // Initialize the auth service
+      const success = await supabaseAuthService.initialize();
 
-    if (success) {
-      // Set up auth state listener
-      supabaseAuthService.onAuthStateChanged((user) => {
-        console.log('🔐 Auth state changed:', user ? `User: ${user.email}` : 'No user');
-        currentUser = user;
+      if (success) {
+        // Set up auth state listener
+        supabaseAuthService.onAuthStateChanged((user) => {
+          console.log('🔐 Auth state changed:', user ? `User: ${user.email}` : 'No user');
+          currentUser = user;
 
-        // Update UI based on auth state
-        updateAuthenticatedUI(user);
-      });
+          // Update UI based on auth state
+          updateAuthenticatedUI(user);
+        });
 
-      console.log('✅ Authentication service initialized');
-      return true;
+        console.log('✅ Authentication service initialized');
+        return true;
+      } else {
+        console.error('❌ Authentication service initialization failed');
+        return false;
+      }
     } else {
-      console.error('❌ Authentication service initialization failed');
+      console.warn('⚠️ Auth service not available, continuing without authentication');
       return false;
     }
   } catch (error) {
