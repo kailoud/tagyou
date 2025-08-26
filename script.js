@@ -244,7 +244,7 @@ async function loadInitialDataDirect() {
 
     // Load food stalls with detailed logging
     console.log('🍽️ Fetching food stalls from Supabase...');
-    const { data: foodStallsResult, error: foodStallsError } = await supabaseClient
+    const { data: foodStallsResult, error: foodStallsError } = await window.supabaseClient
       .from('food_stalls')
       .select('*')
       .order('name');
@@ -260,7 +260,7 @@ async function loadInitialDataDirect() {
 
     // Load artists with detailed logging
     console.log('🎵 Fetching artists from Supabase...');
-    const { data: artistsResult, error: artistsError } = await supabaseClient
+    const { data: artistsResult, error: artistsError } = await window.supabaseClient
       .from('artists')
       .select('*')
       .order('name');
@@ -276,7 +276,7 @@ async function loadInitialDataDirect() {
 
     // Load float trucks with detailed logging
     console.log('🚛 Fetching float trucks from Supabase...');
-    const { data: floatTrucksResult, error: floatTrucksError } = await supabaseClient
+    const { data: floatTrucksResult, error: floatTrucksError } = await window.supabaseClient
       .from('float_trucks')
       .select('*')
       .order('name');
