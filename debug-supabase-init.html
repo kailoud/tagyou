@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug Supabase Initialization</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .debug-section {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+    }
+
+    .success {
+      background: #e6ffe6;
+      border-color: #99ff99;
+    }
+
+    .error {
+      background: #ffe6e6;
+      border-color: #ff9999;
+    }
+
+    .info {
+      background: #e6f3ff;
+      border-color: #99ccff;
+    }
+
+    pre {
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🔍 Debug Supabase Initialization</h1>
+  <div id="status">Loading...</div>
+  <div id="results"></div>
+
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Initialize Supabase Client -->
+  <script src="supabase-config-secret.js"></script>
+
+  <script type="module">
+    async function debugSupabaseInit() {
+      const statusDiv = document.getElementById('status');
+      const resultsDiv = document.getElementById('results');
+
+      try {
+        statusDiv.innerHTML = '<div class="info">🔄 Starting Supabase initialization debug...</div>';
+
+        let resultsHTML = '';
+
+        // Step 1: Check if Supabase SDK is available
+        resultsHTML += '<div class="debug-section info">';
+        resultsHTML += '<h3>Step 1: Supabase SDK Check</h3>';
+
+        if (window.supabase) {
+          resultsHTML += '<p class="success">✅ Supabase SDK is available</p>';
+        } else {
+          resultsHTML += '<p class="error">❌ Supabase SDK not available</p>';
+          return;
+        }
+        resultsHTML += '</div>';
+
+        // Step 2: Check if config is available
+        resultsHTML += '<div class="debug-section info">';
+        resultsHTML += '<h3>Step 2: Config Check</h3>';
+
+        if (window.supabaseConfig) {
+          resultsHTML += '<p class="success">✅ Supabase config is available</p>';
+          resultsHTML += `<p>URL: ${window.supabaseConfig.supabaseUrl}</p>`;
+          resultsHTML += `<p>Key: ${window.supabaseConfig.supabaseAnonKey.substring(0, 20)}...</p>`;
+        } else {
+          resultsHTML += '<p class="error">❌ Supabase config not available</p>';
+          return;
+        }
+        resultsHTML += '</div>';
+
+        // Step 3: Create Supabase client
+        resultsHTML += '<div class="debug-section info">';
+        resultsHTML += '<h3>Step 3: Create Supabase Client</h3>';
+
+        const supabaseClient = window.supabase.createClient(
+          window.supabaseConfig.supabaseUrl,
+          window.supabaseConfig.supabaseAnonKey
+        );
+        resultsHTML += '<p class="success">✅ Supabase client created</p>';
+        resultsHTML += '</div>';
+
+        // Step 4: Test connection
+        resultsHTML += '<div class="debug-section info">';
+        resultsHTML += '<h3>Step 4: Test Connection</h3>';
+
+        try {
+          const { data: connectionTest, error: connectionError } = await supabaseClient
+            .from('profiles')
+            .select('count')
+            .limit(1);
+
+          if (connectionError) {
+            resultsHTML += `<p class="error">❌ Connection error: ${connectionError.message}</p>`;
+          } else {
+            resultsHTML += '<p class="success">✅ Connection successful</p>';
+          }
+        } catch (error) {
+          resultsHTML += `<p class="error">❌ Connection test failed: ${error.message}</p>`;
+        }
+        resultsHTML += '</div>';
+
+        // Step 5: Test food_stalls table
+        resultsHTML += '<div class="debug-section info">';
+        resultsHTML += '<h3>Step 5: Test Food Stalls Table</h3>';
+
+        try {
+          const { data: foodStallsData, error: foodStallsError } = await supabaseClient
+            .from('food_stalls')
+            .select('*')
+            .order('id');
+
+          if (foodStallsError) {
+            resultsHTML += `<p class="error">❌ Food stalls error: ${foodStallsError.message}</p>`;
+          } else {
+            resultsHTML += `<p class="success">✅ Food stalls query successful: ${foodStallsData.length} records</p>`;
+            if (foodStallsData.length > 0) {
+              resultsHTML += '<pre>' + JSON.stringify(foodStallsData, null, 2) + '</pre>';
+            }
+          }
+        } catch (error) {
+          resultsHTML += `<p class="error">❌ Food stalls test failed: ${error.message}</p>`;
+        }
+        resultsHTML += '</div>';
+
+        // Step 6: Test FoodStallsService
+        resultsHTML += '<div class="debug-section info">';
+        resultsHTML += '<h3>Step 6: Test FoodStallsService</h3>';
+
+        try {
+          const { FoodStallsService } = await import('./supabase-service.js');
+          const serviceData = await FoodStallsService.getAllFoodStalls();
+
+          resultsHTML += `<p class="success">✅ FoodStallsService returned: ${serviceData.length} records</p>`;
+          if (serviceData.length > 0) {
+            resultsHTML += '<pre>' + JSON.stringify(serviceData, null, 2) + '</pre>';
+          }
+        } catch (error) {
+          resultsHTML += `<p class="error">❌ FoodStallsService error: ${error.message}</p>`;
+        }
+        resultsHTML += '</div>';
+
+        // Step 7: Test the exact script.js initialization
+        resultsHTML += '<div class="debug-section info">';
+        resultsHTML += '<h3>Step 7: Test Script.js Initialization</h3>';
+
+        try {
+          // Import the same modules as script.js
+          const {
+            FoodStallsService,
+            ArtistsService,
+            FloatTrucksService,
+            initializeDefaultData
+          } = await import('./supabase-service.js');
+
+          resultsHTML += '<p class="success">✅ All services imported successfully</p>';
+
+          // Test initializeDefaultData
+          await initializeDefaultData();
+          resultsHTML += '<p class="success">✅ initializeDefaultData completed</p>';
+
+          // Test loadInitialData (simplified version)
+          console.log('🚀 Loading data from Supabase...');
+          console.log('🍽️ Fetching food stalls from Supabase...');
+          const foodStallsData = await FoodStallsService.getAllFoodStalls();
+          console.log('✅ Loaded food stalls from Supabase:', foodStallsData.length);
+
+          resultsHTML += `<p class="success">✅ loadInitialData test: ${foodStallsData.length} food stalls loaded</p>`;
+
+        } catch (error) {
+          resultsHTML += `<p class="error">❌ Script.js initialization error: ${error.message}</p>`;
+        }
+        resultsHTML += '</div>';
+
+        statusDiv.innerHTML = '<div class="success">✅ Debug complete</div>';
+        resultsDiv.innerHTML = resultsHTML;
+
+      } catch (error) {
+        console.error('❌ Debug error:', error);
+        statusDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+        resultsDiv.innerHTML = `<p>Error details: ${error.stack}</p>`;
+      }
+    }
+
+    // Run the debug when page loads
+    document.addEventListener('DOMContentLoaded', debugSupabaseInit);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Module Load</title>
+</head>
+
+<body>
+  <h1>Test Module Load</h1>
+  <div id="result">Testing...</div>
+
+  <script type="module">
+    async function testModuleLoad() {
+      const resultDiv = document.getElementById('result');
+
+      try {
+        console.log('🔄 Attempting to load supabase-service.js...');
+
+        const module = await import('./supabase-service.js');
+        console.log('✅ Module loaded successfully:', module);
+
+        resultDiv.innerHTML = '<p style="color: green;">✅ Module loaded successfully!</p>';
+        resultDiv.innerHTML += '<pre>' + JSON.stringify(Object.keys(module), null, 2) + '</pre>';
+
+      } catch (error) {
+        console.error('❌ Module load failed:', error);
+        resultDiv.innerHTML = '<p style="color: red;">❌ Module load failed:</p>';
+        resultDiv.innerHTML += '<pre>' + error.message + '</pre>';
+        resultDiv.innerHTML += '<pre>' + error.stack + '</pre>';
+      }
+    }
+
+    testModuleLoad();
+  </script>
+</body>
+
+</html>

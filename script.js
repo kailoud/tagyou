@@ -102,8 +102,8 @@ async function initializeSupabase() {
       await initializeDefaultData();
       supabaseInitialized = true;
 
-      // Load initial data
-      await loadInitialData(FoodStallsService, ArtistsService, FloatTrucksService);
+      // Load initial data using direct Supabase client (workaround for module import issue)
+      await loadInitialDataDirect();
 
       // Set up real-time listeners
       setupRealtimeListeners(RealtimeService);
@@ -237,28 +237,58 @@ function updateProtectedFeatures(isAuthenticated) {
   console.log('🔒 Protected features updated:', isAuthenticated ? 'enabled' : 'disabled');
 }
 
-// Load initial data from Supabase
-async function loadInitialData(FoodStallsService, ArtistsService, FloatTrucksService) {
+// Load initial data directly from Supabase (workaround for module import issue)
+async function loadInitialDataDirect() {
   try {
     console.log('🚀 Loading data from Supabase...');
 
     // Load food stalls with detailed logging
     console.log('🍽️ Fetching food stalls from Supabase...');
-    foodStallsData = await FoodStallsService.getAllFoodStalls();
-    console.log('✅ Loaded food stalls from Supabase:', foodStallsData.length);
-    console.log('📊 Food stalls data:', foodStallsData);
+    const { data: foodStallsResult, error: foodStallsError } = await supabaseClient
+      .from('food_stalls')
+      .select('*')
+      .order('name');
+
+    if (foodStallsError) {
+      console.error('❌ Food stalls error:', foodStallsError);
+      foodStallsData = [];
+    } else {
+      foodStallsData = foodStallsResult || [];
+      console.log('✅ Loaded food stalls from Supabase:', foodStallsData.length);
+      console.log('📊 Food stalls data:', foodStallsData);
+    }
 
     // Load artists with detailed logging
     console.log('🎵 Fetching artists from Supabase...');
-    artistsData = await ArtistsService.getAllArtists();
-    console.log('✅ Loaded artists from Supabase:', artistsData.length);
-    console.log('📊 Artists data:', artistsData);
+    const { data: artistsResult, error: artistsError } = await supabaseClient
+      .from('artists')
+      .select('*')
+      .order('name');
+
+    if (artistsError) {
+      console.error('❌ Artists error:', artistsError);
+      artistsData = [];
+    } else {
+      artistsData = artistsResult || [];
+      console.log('✅ Loaded artists from Supabase:', artistsData.length);
+      console.log('📊 Artists data:', artistsData);
+    }
 
     // Load float trucks with detailed logging
     console.log('🚛 Fetching float trucks from Supabase...');
-    floatTrucksData = await FloatTrucksService.getAllFloatTrucks();
-    console.log('✅ Loaded float trucks from Supabase:', floatTrucksData.length);
-    console.log('📊 Float trucks data:', floatTrucksData);
+    const { data: floatTrucksResult, error: floatTrucksError } = await supabaseClient
+      .from('float_trucks')
+      .select('*')
+      .order('name');
+
+    if (floatTrucksError) {
+      console.error('❌ Float trucks error:', floatTrucksError);
+      floatTrucksData = [];
+    } else {
+      floatTrucksData = floatTrucksResult || [];
+      console.log('✅ Loaded float trucks from Supabase:', floatTrucksData.length);
+      console.log('📊 Float trucks data:', floatTrucksData);
+    }
 
     // Always use database data - no fallback to sample data
     console.log('🔍 Data source check:', {
