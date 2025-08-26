@@ -250,52 +250,55 @@ async function loadInitialDataDirect() {
     console.log('🔍 Checking if window.supabaseClient exists:', !!window.supabaseClient);
     console.log('🔍 window.supabaseClient:', window.supabaseClient);
 
-    // Load food stalls with detailed logging
+    // Load food stalls with detailed logging (using admin site pattern)
     console.log('🍽️ Fetching food stalls from Supabase...');
-    const { data: foodStallsResult, error: foodStallsError } = await window.supabaseClient
-      .from('food_stalls')
-      .select('*')
-      .order('name');
-
-    if (foodStallsError) {
-      console.error('❌ Food stalls error:', foodStallsError);
-      foodStallsData = [];
-    } else {
-      foodStallsData = foodStallsResult || [];
+    try {
+      const supabase = window.supabase;
+      if (!supabase) {
+        throw new Error('Supabase not initialized');
+      }
+      const { data, error } = await supabase.from('food_stalls').select('*');
+      if (error) throw error;
+      foodStallsData = data || [];
       console.log('✅ Loaded food stalls from Supabase:', foodStallsData.length);
       console.log('📊 Food stalls data:', foodStallsData);
+    } catch (error) {
+      console.error('❌ Food stalls error:', error);
+      foodStallsData = [];
     }
 
-    // Load artists with detailed logging
+    // Load artists with detailed logging (using admin site pattern)
     console.log('🎵 Fetching artists from Supabase...');
-    const { data: artistsResult, error: artistsError } = await window.supabaseClient
-      .from('artists')
-      .select('*')
-      .order('name');
-
-    if (artistsError) {
-      console.error('❌ Artists error:', artistsError);
-      artistsData = [];
-    } else {
-      artistsData = artistsResult || [];
+    try {
+      const supabase = window.supabase;
+      if (!supabase) {
+        throw new Error('Supabase not initialized');
+      }
+      const { data, error } = await supabase.from('artists').select('*');
+      if (error) throw error;
+      artistsData = data || [];
       console.log('✅ Loaded artists from Supabase:', artistsData.length);
       console.log('📊 Artists data:', artistsData);
+    } catch (error) {
+      console.error('❌ Artists error:', error);
+      artistsData = [];
     }
 
-    // Load float trucks with detailed logging
+    // Load float trucks with detailed logging (using admin site pattern)
     console.log('🚛 Fetching float trucks from Supabase...');
-    const { data: floatTrucksResult, error: floatTrucksError } = await window.supabaseClient
-      .from('float_trucks')
-      .select('*')
-      .order('name');
-
-    if (floatTrucksError) {
-      console.error('❌ Float trucks error:', floatTrucksError);
-      floatTrucksData = [];
-    } else {
-      floatTrucksData = floatTrucksResult || [];
+    try {
+      const supabase = window.supabase;
+      if (!supabase) {
+        throw new Error('Supabase not initialized');
+      }
+      const { data, error } = await supabase.from('float_trucks').select('*');
+      if (error) throw error;
+      floatTrucksData = data || [];
       console.log('✅ Loaded float trucks from Supabase:', floatTrucksData.length);
       console.log('📊 Float trucks data:', floatTrucksData);
+    } catch (error) {
+      console.error('❌ Float trucks error:', error);
+      floatTrucksData = [];
     }
 
     // Always use database data - no fallback to sample data
