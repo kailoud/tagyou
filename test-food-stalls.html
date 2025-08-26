@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Food Stalls Data</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .food-stall {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+
+    .error {
+      color: red;
+      background: #ffe6e6;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .success {
+      color: green;
+      background: #e6ffe6;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .loading {
+      color: blue;
+      background: #e6f3ff;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🍽️ Food Stalls Data Test</h1>
+
+  <div id="status">Loading...</div>
+  <div id="data-container"></div>
+
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Initialize Supabase Client -->
+  <script src="supabase-config-secret.js"></script>
+  <script src="supabase-service.js"></script>
+
+  <script>
+    async function testFoodStallsData() {
+      const statusDiv = document.getElementById('status');
+      const dataContainer = document.getElementById('data-container');
+
+      try {
+        statusDiv.innerHTML = '<div class="loading">🔄 Connecting to Supabase...</div>';
+
+        // Initialize Supabase
+        if (window.supabase && window.supabaseConfig) {
+          window.supabaseClient = window.supabase.createClient(
+            window.supabaseConfig.supabaseUrl,
+            window.supabaseConfig.supabaseAnonKey
+          );
+          console.log('✅ Supabase client initialized');
+        } else {
+          throw new Error('Supabase config not available');
+        }
+
+        statusDiv.innerHTML = '<div class="loading">🔄 Fetching food stalls data...</div>';
+
+        // Import and use FoodStallsService
+        const { FoodStallsService } = await import('./supabase-service.js');
+
+        // Fetch food stalls data
+        const foodStalls = await FoodStallsService.getAllFoodStalls();
+
+        console.log('📊 Food stalls data:', foodStalls);
+
+        if (foodStalls && foodStalls.length > 0) {
+          statusDiv.innerHTML = `<div class="success">✅ Successfully loaded ${foodStalls.length} food stalls from database!</div>`;
+
+          // Display the data
+          dataContainer.innerHTML = `
+                        <h2>Food Stalls from Database:</h2>
+                        ${foodStalls.map(stall => `
+                            <div class="food-stall">
+                                <h3>${stall.name}</h3>
+                                <p><strong>Cuisine:</strong> ${stall.cuisine}</p>
+                                <p><strong>Location:</strong> ${stall.location}</p>
+                                <p><strong>Description:</strong> ${stall.description}</p>
+                                <p><strong>Rating:</strong> ${stall.rating} ⭐</p>
+                                <p><strong>Price Range:</strong> ${stall.price_range}</p>
+                                <p><strong>Status:</strong> ${stall.status}</p>
+                                ${stall.image_url ? `<img src="${stall.image_url}" alt="${stall.name}" style="max-width: 200px; height: auto;">` : ''}
+                            </div>
+                        `).join('')}
+                    `;
+        } else {
+          statusDiv.innerHTML = '<div class="error">❌ No food stalls found in database</div>';
+          dataContainer.innerHTML = '<p>No food stalls data available. Please check if data exists in the food_stalls table.</p>';
+        }
+
+      } catch (error) {
+        console.error('❌ Error testing food stalls data:', error);
+        statusDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+        dataContainer.innerHTML = `<p>Error details: ${error.stack}</p>`;
+      }
+    }
+
+    // Run the test when page loads
+    document.addEventListener('DOMContentLoaded', testFoodStallsData);
+  </script>
+</body>
+
+</html>

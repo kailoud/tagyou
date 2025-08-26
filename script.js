@@ -118,8 +118,17 @@ async function initializeSupabase() {
         } else {
           console.log('✅ Supabase connection and profiles table working!');
         }
+
+        // Test food_stalls table specifically
+        const { data: foodStallsTest, error: foodStallsError } = await supabaseClient.from('food_stalls').select('*').limit(1);
+        if (foodStallsError) {
+          console.warn('⚠️ Food stalls table not found or no access:', foodStallsError.message);
+        } else {
+          console.log('✅ Food stalls table accessible! Found', foodStallsTest.length, 'records');
+        }
+
       } catch (error) {
-        console.warn('⚠️ Could not test profiles table:', error.message);
+        console.warn('⚠️ Could not test database tables:', error.message);
       }
     } else {
       throw new Error('Supabase core initialization failed');
@@ -251,31 +260,42 @@ async function loadInitialData(FoodStallsService, ArtistsService, FloatTrucksSer
     console.log('✅ Loaded float trucks from Supabase:', floatTrucksData.length);
     console.log('📊 Float trucks data:', floatTrucksData);
 
+    // Check if we got real data from Supabase
+    const hasRealFoodStalls = foodStallsData.length > 0 && foodStallsData[0].id;
+    const hasRealArtists = artistsData.length > 0 && artistsData[0].id;
+    const hasRealFloatTrucks = floatTrucksData.length > 0 && floatTrucksData[0].id;
+
+    console.log('🔍 Data source check:', {
+      foodStalls: hasRealFoodStalls ? 'Database' : 'Sample',
+      artists: hasRealArtists ? 'Database' : 'Sample',
+      floatTrucks: hasRealFloatTrucks ? 'Database' : 'Sample'
+    });
+
     // If no data from Supabase, load sample data for testing
-    if (foodStallsData.length === 0) {
+    if (!hasRealFoodStalls) {
       console.log('📝 Loading sample food stalls data...');
       foodStallsData = getSampleFoodStalls();
     }
 
-    if (artistsData.length === 0) {
+    if (!hasRealArtists) {
       console.log('📝 Loading sample artists data...');
       artistsData = getSampleArtists();
     }
 
-    if (floatTrucksData.length === 0) {
+    if (!hasRealFloatTrucks) {
       console.log('📝 Loading sample float trucks data...');
       floatTrucksData = getSampleFloatTrucks();
     }
 
     // Check if data is properly structured
     if (foodStallsData.length > 0) {
-      console.log('🔍 Sample food stall structure:', foodStallsData[0]);
+      console.log('🔍 Food stall structure:', foodStallsData[0]);
     }
     if (artistsData.length > 0) {
-      console.log('🔍 Sample artist structure:', artistsData[0]);
+      console.log('🔍 Artist structure:', artistsData[0]);
     }
     if (floatTrucksData.length > 0) {
-      console.log('🔍 Sample float truck structure:', floatTrucksData[0]);
+      console.log('🔍 Float truck structure:', floatTrucksData[0]);
     }
 
     // Populate the pull-up panel with data
