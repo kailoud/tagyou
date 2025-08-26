@@ -1157,6 +1157,11 @@ body {
   flex-direction: column;
 }
 
+/* Fix for mirror image text on flip card back */
+.flip-card-back * {
+  transform: rotateY(180deg);
+}
+
 /* Responsive Grid */
 @media (max-width: 1400px) {
   .content-list {
