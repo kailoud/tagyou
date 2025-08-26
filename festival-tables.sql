@@ -245,3 +245,4 @@ COMMENT ON COLUMN float_trucks.special_effects IS 'JSON array of special effects
 
 COMMENT ON COLUMN artists.setlist IS 'JSON array of songs to be performed';
 COMMENT ON COLUMN artists.special_requirements IS 'JSON object of technical requirements and backstage needs';
+
