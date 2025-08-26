@@ -285,6 +285,26 @@ async function loadInitialDataDirect() {
     // Populate the pull-up panel with data
     populatePullUpPanel();
 
+    // Add CSS for no-image placeholder
+    if (!document.getElementById('no-image-styles')) {
+      const style = document.createElement('style');
+      style.id = 'no-image-styles';
+      style.textContent = `
+        .no-image {
+          width: 100%;
+          height: 100px;
+          background: #f5f5f5;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #999;
+          font-size: 12px;
+          border-radius: 8px;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
   } catch (error) {
     console.error('❌ Error loading data from Supabase:', error);
     console.log('❌ No fallback to sample data - using empty arrays');
@@ -445,26 +465,41 @@ function getSampleFloatTrucks() {
 function populatePullUpPanel() {
   console.log('🎭 Populating pull-up panel with festival data...');
 
-  // Populate food stalls
+  // Populate food stalls (using admin pattern)
   const foodStallsList = document.getElementById('food-stalls-list');
   if (foodStallsList && foodStallsData.length > 0) {
     console.log('🍽️ Populating food stalls list with', foodStallsData.length, 'items');
-    foodStallsList.innerHTML = foodStallsData.map(stall => `
-      <div class="content-item">
-        <div class="item-image">
-          <img src="${stall.image_url || ''}" alt="${stall.name}" onerror="this.style.display='none'">
-        </div>
-        <div class="item-content">
-          <div class="item-icon">🍽️</div>
-          <div class="item-info">
-            <h5>${stall.name || 'Unnamed Stall'}</h5>
-            <p>${stall.description || 'No description available'}</p>
-            <div class="item-location">📍 ${stall.location || 'Location not specified'}</div>
-            <div class="item-rating">⭐ ${stall.rating || 'N/A'} • ${stall.price_range || 'Price not specified'}</div>
+
+    foodStallsList.innerHTML = foodStallsData.map(stall => {
+      // Get main image URL (admin pattern)
+      let mainImageUrl = stall.image_url || stall.image;
+      if (!mainImageUrl && stall.all_images && stall.all_images.length > 0) {
+        const mainIndex = stall.main_image_index !== null ? stall.main_image_index : 0;
+        mainImageUrl = stall.all_images[mainIndex] || stall.all_images[0];
+      }
+
+      // Create image display
+      const imageDisplay = mainImageUrl ?
+        `<img src="${mainImageUrl}" alt="${stall.name}" onerror="this.style.display='none'">` :
+        '<div class="no-image">No Image</div>';
+
+      return `
+        <div class="content-item">
+          <div class="item-image">
+            ${imageDisplay}
+          </div>
+          <div class="item-content">
+            <div class="item-icon">🍽️</div>
+            <div class="item-info">
+              <h5>${stall.name || 'Unnamed Stall'}</h5>
+              <p>${stall.description || 'No description'}</p>
+              <div class="item-location">📍 ${stall.location || 'Location not specified'}</div>
+              <div class="item-rating">⭐ ${stall.rating || 'N/A'} • ${stall.price_range || 'Price not specified'}</div>
+            </div>
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   } else {
     console.log('🍽️ No food stalls data available, showing empty state');
   }
