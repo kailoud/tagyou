@@ -116,11 +116,11 @@ function populatePullUpPanel() {
 }
 
 function setupFlipCardListeners() {
-  // Add click listeners to flip cards
-  document.querySelectorAll('.flip-card').forEach(card => {
+  // Add click listeners to artist cards
+  document.querySelectorAll('.artist-card').forEach(card => {
     card.addEventListener('click', function (e) {
-      // Don't flip if clicking on the back button
-      if (e.target.classList.contains('flip-back-btn')) {
+      // Don't flip if clicking on the close button
+      if (e.target.closest('.close-details-btn')) {
         e.stopPropagation();
         this.classList.remove('flipped');
         return;
@@ -229,11 +229,18 @@ function populateArtists() {
   }
 
   container.innerHTML = artistsData.map((artist, index) => `
-      <div class="flip-card" data-index="${index}">
-        <div class="flip-card-inner">
-          <!-- Front Side (Basic Info) -->
-          <div class="flip-card-front">
-            <div class="item-image">
+      <div class="artist-card" data-index="${index}">
+        <div class="card-inner">
+          <!-- Front Side (Professional Display) -->
+          <div class="card-front">
+            <div class="card-image-container">
+              <div class="image-overlay">
+                <div class="genre-badge">${artist.genre || 'Music'}</div>
+                <div class="flip-indicator">
+                  <span class="flip-icon">↻</span>
+                  <span class="flip-text">View Details</span>
+                </div>
+              </div>
               ${(() => {
       // Priority: featured_image > all_images[0] > image_url > other fields
       const imageSource = artist.featured_image ||
@@ -243,61 +250,93 @@ function populateArtists() {
         artist.img_url ||
         artist.img;
 
-      if (!imageSource) return '<div class="no-image">🎵</div>';
+      if (!imageSource) return '<div class="no-image-placeholder"><div class="music-icon">🎵</div><div class="placeholder-text">No Image</div></div>';
 
-      return `<img src="${imageSource}" alt="${artist.name}" onerror="this.parentElement.innerHTML='<div class=\\"no-image\\">🎵</div>'; console.warn('Failed to load image for ${artist.name}:', '${imageSource}')">`;
+      return `<img src="${imageSource}" alt="${artist.name}" class="artist-image" onerror="this.parentElement.innerHTML='<div class=\\"no-image-placeholder\\"><div class=\\"music-icon\\">🎵</div><div class=\\"placeholder-text\\">Image Error</div></div>'; console.warn('Failed to load image for ${artist.name}:', '${imageSource}')">`;
     })()}
             </div>
-            <div class="item-content">
-              <div class="item-header">
-                <h5>${artist.name || 'Unnamed Artist'}</h5>
-                <div class="item-badge genre-badge">${artist.genre || 'Music'}</div>
-              </div>
-              <p class="item-description">${artist.description || 'Amazing live performance and entertainment at the festival.'}</p>
-              <div class="item-details">
-                <div class="detail-row">
-                  <span class="item-stage">🎤 ${artist.stage || 'Main Stage'}</span>
-                  <span class="item-rating">⭐ ${artist.rating || '4.8'}</span>
+            <div class="card-content">
+              <div class="artist-header">
+                <h3 class="artist-name">${artist.name || 'Unnamed Artist'}</h3>
+                <div class="rating-display">
+                  <span class="stars">${'⭐'.repeat(Math.floor(parseFloat(artist.rating || 4.8)))}</span>
+                  <span class="rating-text">${artist.rating || '4.8'}</span>
                 </div>
               </div>
-              <div class="flip-hint">Click for more info</div>
+              <p class="artist-description">${artist.description || 'Amazing live performance and entertainment at the festival.'}</p>
+              <div class="artist-meta">
+                <div class="meta-item">
+                  <span class="meta-icon">🎤</span>
+                  <span class="meta-text">${artist.stage || 'Main Stage'}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-icon">🕐</span>
+                  <span class="meta-text">${artist.performance_time || 'TBA'}</span>
+                </div>
+              </div>
             </div>
           </div>
           
-          <!-- Back Side (Detailed Info) -->
-          <div class="flip-card-back">
+          <!-- Back Side (Detailed Information) -->
+          <div class="card-back">
             <div class="back-header">
-              <h5>${artist.name || 'Unnamed Artist'}</h5>
-              <div class="item-badge genre-badge">${artist.genre || 'Music'}</div>
+              <div class="back-title">
+                <h3 class="artist-name">${artist.name || 'Unnamed Artist'}</h3>
+                <div class="genre-badge">${artist.genre || 'Music'}</div>
+              </div>
+              <button class="close-details-btn" aria-label="Close details">
+                <span class="close-icon">×</span>
+              </button>
             </div>
             <div class="back-content">
-              <div class="info-section">
-                <h6>🎤 Stage</h6>
-                <p>${artist.stage || 'Main Stage'}</p>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <div class="detail-icon">🎤</div>
+                  <div class="detail-info">
+                    <h4>Stage</h4>
+                    <p>${artist.stage || 'Main Stage'}</p>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-icon">🕐</div>
+                  <div class="detail-info">
+                    <h4>Performance Time</h4>
+                    <p>${artist.performance_time || 'TBA'}</p>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-icon">⏱️</div>
+                  <div class="detail-info">
+                    <h4>Duration</h4>
+                    <p>${artist.duration || '60 min'}</p>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-icon">⭐</div>
+                  <div class="detail-info">
+                    <h4>Rating</h4>
+                    <p>${artist.rating || '4.8'} / 5.0</p>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-icon">🎵</div>
+                  <div class="detail-info">
+                    <h4>Specialties</h4>
+                    <p>${artist.specialties || 'Live Performance'}</p>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-icon">📍</div>
+                  <div class="detail-info">
+                    <h4>Location</h4>
+                    <p>${artist.location || 'Festival Grounds'}</p>
+                  </div>
+                </div>
               </div>
-              <div class="info-section">
-                <h6>🕐 Performance Time</h6>
-                <p>${artist.performance_time || 'TBA'}</p>
-              </div>
-              <div class="info-section">
-                <h6>⏱️ Duration</h6>
-                <p>${artist.duration || '60 min'}</p>
-              </div>
-              <div class="info-section">
-                <h6>⭐ Rating</h6>
-                <p>${artist.rating || '4.8'} / 5.0</p>
-              </div>
-              <div class="info-section">
-                <h6>🎵 Specialties</h6>
-                <p>${artist.specialties || 'Live Performance'}</p>
-              </div>
-              <div class="info-section">
-                <h6>📝 Description</h6>
+              <div class="description-section">
+                <h4>About</h4>
                 <p>${artist.description || 'Amazing live performance and entertainment at the festival.'}</p>
               </div>
-            </div>
-            <div class="back-footer">
-              <button class="flip-back-btn">← Back</button>
             </div>
           </div>
         </div>
