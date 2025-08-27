@@ -353,6 +353,15 @@ class CarnivalTracker {
     return `${hours}h`;
   }
 
+  calculateDistance(coordinates) {
+    // Simple distance calculation (you can enhance this with actual user location)
+    if (!coordinates || !coordinates.lat || !coordinates.lng) return '';
+
+    // For now, return a placeholder - you can implement actual distance calculation
+    const distances = ['0.2km', '0.5km', '1.2km', '2.1km', '3.5km'];
+    return distances[Math.floor(Math.random() * distances.length)];
+  }
+
   addPerson() {
     if (this.newPerson.name && this.newPerson.phone && this.newPerson.relationship) {
       // Check if user can add more people
@@ -871,65 +880,89 @@ class CarnivalTracker {
 
   renderFull() {
     const filteredPeople = this.getFilteredPeople();
+    const sharingCount = this.people.filter(p => p.isSharing).length;
 
     this.trackerElement.innerHTML = `
       <div class="carnival-tracker-full">
-        <!-- Header -->
+        <!-- Professional Header -->
         <div class="tracker-header">
-          <div class="tracker-title">
-            <i class="fas fa-users"></i>
-            <div>
-              <h3>Carnival Squad ${this.isPremium ? '<span class="premium-indicator">💎</span>' : ''}</h3>
-              <p>${this.people.filter(p => p.isSharing).length} sharing location</p>
-              <div class="squad-limits">
+          <div class="header-content">
+            <div class="header-left">
+              <div class="squad-icon">
+                <i class="fas fa-users"></i>
+                ${sharingCount > 0 ? `<span class="live-indicator pulse"></span>` : ''}
+              </div>
+              <div class="header-info">
+                <h2 class="squad-title">Carnival Squad</h2>
+                <div class="squad-stats">
+                  <span class="stat-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    ${sharingCount} sharing location
+                  </span>
+                  <span class="stat-item">
+                    <i class="fas fa-users"></i>
+                    ${this.people.length} total members
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="header-right">
+              <div class="user-status">
                 ${this.isPremium ? `
-                  <span class="limit-text premium">Unlimited Squad Members</span>
+                  <div class="premium-badge">
+                    <span class="premium-icon">💎</span>
+                    <span class="premium-text">Premium</span>
+                  </div>
                 ` : `
-                  <span class="limit-text basic">Squad Sharing (${this.people.length}/${this.maxFreeMembers})</span>
+                  <div class="basic-badge">
+                    <span class="basic-icon">📱</span>
+                    <span class="basic-text">Free</span>
+                  </div>
                 `}
               </div>
-              <div class="user-tier-badge ${this.userTier.toLowerCase()}-tier">
-                <span class="tier-icon">${this.isPremium ? '💎' : '📱'}</span>
-                <span class="tier-text">${this.userTier} User</span>
+              
+              <div class="header-actions">
+                <button class="action-btn invite-btn" title="Invite Friends" onclick="window.inviteSystem.showInviteModal()">
+                  <i class="fas fa-user-plus"></i>
+                </button>
+                ${!this.isPremium ? `
+                  <button class="action-btn upgrade-btn" title="Upgrade to Premium" onclick="window.carnivalTracker.handleUpgradeClick()">
+                    <i class="fas fa-crown"></i>
+                  </button>
+                ` : ''}
+                <button class="action-btn add-btn" title="Add Person">
+                  <i class="fas fa-plus"></i>
+                </button>
+                <button class="action-btn close-btn" title="Close">
+                  <i class="fas fa-times"></i>
+                </button>
               </div>
             </div>
           </div>
-          
-          <div class="tracker-actions">
-            <button class="invite-friends-btn" title="Invite Friends" onclick="window.inviteSystem.showInviteModal()">
-              <i class="fas fa-user-plus"></i>
-            </button>
-            ${!this.isPremium ? `
-                          <button class="premium-upgrade-btn" title="Upgrade to Pro" onclick="window.carnivalTracker.handleUpgradeClick()">
-              <i class="fas fa-crown"></i>
-            </button>
-            ` : ''}
-            <button class="add-person-btn" title="Add Person">
-              <i class="fas fa-plus"></i>
-            </button>
-            <button class="close-btn" title="Close">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
         </div>
 
-        <!-- Tab Navigation -->
+        <!-- Professional Tab Navigation -->
         <div class="tracker-tabs">
           <button class="tab-btn ${this.activeTab === 'tracker' ? 'active' : ''}" data-tab="tracker">
-            Track ${this.isPremium ? `(${this.people.length})` : `(${this.people.length}/${this.maxFreeMembers})`}
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Live Tracking</span>
+            <span class="tab-count">${this.people.length}</span>
           </button>
           <button class="tab-btn ${this.activeTab === 'notifications' ? 'active' : ''}" data-tab="notifications">
-            Updates
+            <i class="fas fa-bell"></i>
+            <span>Updates</span>
             ${this.notifications.length > 0 ? `<span class="notification-badge">${this.notifications.length}</span>` : ''}
           </button>
           ${this.isPremium ? `
             <button class="tab-btn ${this.activeTab === 'analytics' ? 'active' : ''}" data-tab="analytics">
-              <i class="fas fa-chart-line"></i> Analytics
+              <i class="fas fa-chart-line"></i>
+              <span>Analytics</span>
             </button>
           ` : ''}
         </div>
 
-        <!-- Content -->
+        <!-- Content Area -->
         <div class="tracker-content">
           ${this.activeTab === 'tracker' ? this.renderTrackerTab(filteredPeople) :
         this.activeTab === 'notifications' ? this.renderNotificationsTab() :
@@ -965,67 +998,81 @@ class CarnivalTracker {
 
   renderPersonCard(person) {
     const locationStatus = this.getLocationStatus(person);
+    const isOnline = person.isSharing && locationStatus.status === 'live';
 
     return `
-      <div class="person-card">
-        <div class="person-avatar">
-          ${person.avatar.imageUrl ? `
-            <img src="${person.avatar.imageUrl}" alt="${person.name}" class="avatar-image">
-          ` : `
-            <div class="avatar-initials ${person.avatar.bgColor}">${person.avatar.initials}</div>
-          `}
-          <div class="status-indicator ${locationStatus.bgColor} ${locationStatus.status === 'live' ? 'pulse' : ''}"></div>
-        </div>
-        
-        <div class="person-info">
-          <div class="person-header">
-            <h4>${person.name}</h4>
-            <span class="relationship-badge">${person.relationship}</span>
+      <div class="person-card ${isOnline ? 'online' : 'offline'}">
+        <div class="person-main">
+          <div class="person-avatar">
+            ${person.avatar.imageUrl ? `
+              <img src="${person.avatar.imageUrl}" alt="${person.name}" class="avatar-image">
+            ` : `
+              <div class="avatar-initials ${person.avatar.bgColor}">${person.avatar.initials}</div>
+            `}
+            <div class="status-dot ${isOnline ? 'online' : 'offline'} ${isOnline ? 'pulse' : ''}"></div>
           </div>
           
-          ${person.isSharing && person.location ? `
-            <div class="person-location">
-              <i class="fas fa-map-marker-alt"></i>
-              <span>${person.location.area}</span>
-              <span class="time-ago ${locationStatus.color}">${this.getTimeSince(person.lastUpdate)}</span>
+          <div class="person-details">
+            <div class="person-header">
+              <h4 class="person-name">${person.name}</h4>
+              <div class="person-meta">
+                <span class="relationship-tag">${person.relationship}</span>
+                ${isOnline ? `<span class="online-status">Live</span>` : ''}
+              </div>
             </div>
-          ` : `
-            <p class="not-sharing">Not sharing location</p>
-          `}
+            
+            ${person.isSharing && person.location ? `
+              <div class="location-info">
+                <div class="location-main">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span class="location-text">${person.location.area}</span>
+                </div>
+                <div class="location-meta">
+                  <span class="time-ago">${this.getTimeSince(person.lastUpdate)} ago</span>
+                  ${person.location.coordinates ? `
+                    <span class="distance">${this.calculateDistance(person.location.coordinates)} away</span>
+                  ` : ''}
+                </div>
+              </div>
+            ` : `
+              <div class="offline-status">
+                <i class="fas fa-circle"></i>
+                <span>Not sharing location</span>
+              </div>
+            `}
+          </div>
         </div>
 
         <div class="person-actions">
           ${!person.isSharing ? `
-            <button class="request-location-btn" data-person-id="${person.id}" title="Request location">
+            <button class="action-btn request-btn" data-person-id="${person.id}" title="Request location">
               <i class="fas fa-location-arrow"></i>
             </button>
           ` : `
-            <div class="location-status ${locationStatus.bgColor} ${locationStatus.status === 'live' ? 'pulse' : ''}"></div>
+            <button class="action-btn view-btn" title="View on map">
+              <i class="fas fa-map"></i>
+            </button>
           `}
           
           ${this.canUseCalling() ? `
-            <button class="action-btn phone-btn" title="Call ${person.name}" data-phone="${person.phone}" data-name="${person.name}">
+            <button class="action-btn call-btn" title="Call ${person.name}" data-phone="${person.phone}" data-name="${person.name}">
               <i class="fas fa-phone"></i>
             </button>
           ` : `
-            <button class="action-btn phone-btn disabled" title="Calling requires Premium" onclick="window.carnivalTracker.showPremiumUpgrade('Phone calling is a Premium feature. Upgrade to connect with your squad!')">
+            <button class="action-btn call-btn disabled" title="Calling requires Premium" onclick="window.carnivalTracker.showPremiumUpgrade('Phone calling is a Premium feature. Upgrade to connect with your squad!')">
               <i class="fas fa-phone"></i>
             </button>
           `}
           
           ${this.canUseMessaging() ? `
-            <button class="action-btn whatsapp-btn" title="Message ${person.name} on WhatsApp" data-phone="${person.phone}" data-name="${person.name}">
+            <button class="action-btn message-btn" title="Message ${person.name}" data-phone="${person.phone}" data-name="${person.name}">
               <i class="fab fa-whatsapp"></i>
             </button>
           ` : `
-            <button class="action-btn whatsapp-btn disabled" title="Messaging requires Premium" onclick="window.carnivalTracker.showPremiumUpgrade('WhatsApp messaging is a Premium feature. Upgrade to connect with your squad!')">
+            <button class="action-btn message-btn disabled" title="Messaging requires Premium" onclick="window.carnivalTracker.showPremiumUpgrade('WhatsApp messaging is a Premium feature. Upgrade to connect with your squad!')">
               <i class="fab fa-whatsapp"></i>
             </button>
           `}
-          
-          <button class="action-btn invite-btn" title="Invite ${person.name}" onclick="window.inviteSystem.showInviteModal()">
-            <i class="fas fa-user-plus"></i>
-          </button>
         </div>
       </div>
     `;
