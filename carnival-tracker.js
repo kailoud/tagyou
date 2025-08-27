@@ -884,89 +884,62 @@ class CarnivalTracker {
 
     this.trackerElement.innerHTML = `
       <div class="carnival-tracker-full">
-        <!-- Professional Header -->
+        <!-- Clean Header -->
         <div class="tracker-header">
           <div class="header-content">
             <div class="header-left">
-              <div class="squad-icon">
-                <i class="fas fa-users"></i>
-                ${sharingCount > 0 ? `<span class="live-indicator pulse"></span>` : ''}
-              </div>
-              <div class="header-info">
-                <h2 class="squad-title">Carnival Squad</h2>
-                <div class="squad-stats">
+              <h3 class="squad-title">Carnival Squad</h3>
+              <div class="squad-stats">
+                <span class="stat-item">
+                  <i class="fas fa-map-marker-alt"></i>
+                  ${sharingCount}
+                </span>
+                <span class="stat-item">
+                  <i class="fas fa-users"></i>
+                  ${this.people.length}
+                </span>
+                ${this.isPremium ? `
                   <span class="stat-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    ${sharingCount} sharing location
+                    <i class="fas fa-crown"></i>
+                    <span class="premium-tag">💎</span>
                   </span>
-                  <span class="stat-item">
-                    <i class="fas fa-users"></i>
-                    ${this.people.length} total members
-                  </span>
-                </div>
+                ` : ''}
               </div>
             </div>
             
-            <div class="header-right">
-              <div class="user-status">
-                ${this.isPremium ? `
-                  <div class="premium-badge">
-                    <span class="premium-icon">💎</span>
-                    <span class="premium-text">Premium</span>
-                  </div>
-                ` : `
-                  <div class="basic-badge">
-                    <span class="basic-icon">📱</span>
-                    <span class="basic-text">Free</span>
-                  </div>
-                `}
-              </div>
-              
-              <div class="header-actions">
-                <button class="action-btn invite-btn" title="Invite Friends" onclick="window.inviteSystem.showInviteModal()">
-                  <i class="fas fa-user-plus"></i>
-                </button>
-                ${!this.isPremium ? `
-                  <button class="action-btn upgrade-btn" title="Upgrade to Premium" onclick="window.carnivalTracker.handleUpgradeClick()">
-                    <i class="fas fa-crown"></i>
-                  </button>
-                ` : ''}
-                <button class="action-btn add-btn" title="Add Person">
-                  <i class="fas fa-plus"></i>
-                </button>
-                <button class="action-btn close-btn" title="Close">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
+            <div class="header-actions">
+              <button class="action-btn add-btn" title="Add Person">
+                <i class="fas fa-plus"></i>
+              </button>
+              <button class="action-btn close-btn" title="Close">
+                <i class="fas fa-times"></i>
+              </button>
             </div>
           </div>
         </div>
 
-        <!-- Professional Tab Navigation -->
+        <!-- Compact Tabs -->
         <div class="tracker-tabs">
           <button class="tab-btn ${this.activeTab === 'tracker' ? 'active' : ''}" data-tab="tracker">
             <i class="fas fa-map-marker-alt"></i>
-            <span>Live Tracking</span>
-            <span class="tab-count">${this.people.length}</span>
+            <span>Live</span>
+          </button>
+          <button class="tab-btn ${this.activeTab === 'add' ? 'active' : ''}" data-tab="add">
+            <i class="fas fa-user-plus"></i>
+            <span>Add</span>
           </button>
           <button class="tab-btn ${this.activeTab === 'notifications' ? 'active' : ''}" data-tab="notifications">
             <i class="fas fa-bell"></i>
             <span>Updates</span>
-            ${this.notifications.length > 0 ? `<span class="notification-badge">${this.notifications.length}</span>` : ''}
           </button>
-          ${this.isPremium ? `
-            <button class="tab-btn ${this.activeTab === 'analytics' ? 'active' : ''}" data-tab="analytics">
-              <i class="fas fa-chart-line"></i>
-              <span>Analytics</span>
-            </button>
-          ` : ''}
         </div>
 
         <!-- Content Area -->
         <div class="tracker-content">
           ${this.activeTab === 'tracker' ? this.renderTrackerTab(filteredPeople) :
-        this.activeTab === 'notifications' ? this.renderNotificationsTab() :
-          this.activeTab === 'analytics' ? this.renderAnalyticsTab() : ''}
+        this.activeTab === 'add' ? this.renderAddTab() :
+          this.activeTab === 'notifications' ? this.renderNotificationsTab() :
+            this.activeTab === 'analytics' ? this.renderAnalyticsTab() : ''}
         </div>
       </div>
     `;
@@ -1073,6 +1046,34 @@ class CarnivalTracker {
               <i class="fab fa-whatsapp"></i>
             </button>
           `}
+        </div>
+      </div>
+    `;
+  }
+
+  renderAddTab() {
+    return `
+      <div class="add-tab-content">
+        <div class="add-form">
+          <div class="form-group">
+            <input type="text" placeholder="Name" class="form-input" id="newPersonName">
+          </div>
+          <div class="form-group">
+            <input type="tel" placeholder="Phone" class="form-input" id="newPersonPhone">
+          </div>
+          <div class="form-group">
+            <select class="form-input" id="newPersonRelationship">
+              <option value="">Select relationship</option>
+              <option value="Friend">Friend</option>
+              <option value="Family">Family</option>
+              <option value="Colleague">Colleague</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <button class="add-person-btn" onclick="window.carnivalTracker.addPerson()">
+            <i class="fas fa-plus"></i>
+            Add Person
+          </button>
         </div>
       </div>
     `;
