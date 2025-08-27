@@ -362,27 +362,122 @@ class CarnivalTracker {
     return distances[Math.floor(Math.random() * distances.length)];
   }
 
+  importWhatsAppContacts() {
+    // This would integrate with WhatsApp Web API or similar
+    console.log('Importing WhatsApp contacts...');
+
+    // For demo purposes, show a modal
+    this.showImportModal('WhatsApp', 'Import your WhatsApp contacts to add them to your squad');
+  }
+
+  importPhoneContacts() {
+    // This would use the Web Contacts API
+    console.log('Importing phone contacts...');
+
+    if (navigator.contacts) {
+      navigator.contacts.select(['name', 'tel'], { multiple: true })
+        .then(contacts => {
+          console.log('Selected contacts:', contacts);
+          this.processImportedContacts(contacts);
+        })
+        .catch(err => {
+          console.error('Error accessing contacts:', err);
+          this.showImportModal('Phone Contacts', 'Unable to access contacts. Please add manually.');
+        });
+    } else {
+      this.showImportModal('Phone Contacts', 'Contact access not available. Please add manually.');
+    }
+  }
+
+  showImportModal(type, message) {
+    const modal = document.createElement('div');
+    modal.className = 'import-modal';
+    modal.innerHTML = `
+      <div class="import-overlay">
+        <div class="import-content">
+          <h3>Import ${type} Contacts</h3>
+          <p>${message}</p>
+          <div class="import-actions">
+            <button class="import-btn" onclick="this.closest('.import-modal').remove()">
+              Continue
+            </button>
+            <button class="cancel-btn" onclick="this.closest('.import-modal').remove()">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  processImportedContacts(contacts) {
+    // Process imported contacts and add them to the squad
+    contacts.forEach(contact => {
+      if (contact.name && contact.tel) {
+        const avatar = this.generateAvatar(contact.name);
+        this.people.push({
+          id: Date.now() + Math.random(),
+          name: contact.name,
+          phone: contact.tel[0],
+          relationship: 'Contact',
+          lastUpdate: new Date(),
+          isSharing: false,
+          location: null,
+          avatar
+        });
+      }
+    });
+    this.render();
+    this.updateToolbarCount();
+  }
+
   addPerson() {
-    if (this.newPerson.name && this.newPerson.phone && this.newPerson.relationship) {
+    const nameInput = document.getElementById('newPersonName');
+    const phoneInput = document.getElementById('newPersonPhone');
+    const relationshipInput = document.getElementById('newPersonRelationship');
+
+    if (!nameInput || !phoneInput || !relationshipInput) {
+      console.error('Form inputs not found');
+      return;
+    }
+
+    const name = nameInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const relationship = relationshipInput.value;
+
+    if (name && phone && relationship) {
       // Check if user can add more people
       if (!this.canAddPerson()) {
         this.showPremiumUpgrade(`You've reached the limit of ${this.maxFreeMembers} person for Basic users. Upgrade to Pro for unlimited squad members!`);
         return;
       }
 
-      const avatar = this.generateAvatar(this.newPerson.name);
+      const avatar = this.generateAvatar(name);
       this.people.push({
-        ...this.newPerson,
+        name,
+        phone,
+        relationship,
         id: Date.now(),
         lastUpdate: new Date(),
         isSharing: false,
         location: null,
         avatar
       });
-      this.newPerson = { name: "", phone: "", relationship: "", attending: true, notes: "" };
-      this.showAddForm = false;
+
+      // Clear form
+      nameInput.value = '';
+      phoneInput.value = '';
+      relationshipInput.value = '';
+
+      // Switch back to tracker tab
+      this.activeTab = 'tracker';
       this.render();
       this.updateToolbarCount();
+
+      console.log('Person added successfully:', name);
+    } else {
+      console.log('Please fill in all fields');
     }
   }
 
@@ -1073,6 +1168,20 @@ class CarnivalTracker {
           <button class="add-person-btn" onclick="window.carnivalTracker.addPerson()">
             <i class="fas fa-plus"></i>
             Add Person
+          </button>
+          
+          <div class="divider">
+            <span>or</span>
+          </div>
+          
+          <button class="whatsapp-import-btn" onclick="window.carnivalTracker.importWhatsAppContacts()">
+            <i class="fab fa-whatsapp"></i>
+            Import from WhatsApp
+          </button>
+          
+          <button class="contacts-import-btn" onclick="window.carnivalTracker.importPhoneContacts()">
+            <i class="fas fa-address-book"></i>
+            Import from Contacts
           </button>
         </div>
       </div>

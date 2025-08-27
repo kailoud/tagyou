@@ -92,14 +92,63 @@
 }
 
 .premium-tag {
-  font-size: 10px;
+  font-size: 12px;
   color: #fbbf24;
-  margin-left: 2px;
+  margin-left: 4px;
+  position: relative;
+  animation: sparkle 2s infinite;
+}
+
+.premium-tag::before {
+  content: '✨';
+  position: absolute;
+  top: -8px;
+  left: -4px;
+  font-size: 8px;
+  animation: sparkle 1.5s infinite 0.5s;
+}
+
+.premium-tag::after {
+  content: '✨';
+  position: absolute;
+  bottom: -8px;
+  right: -4px;
+  font-size: 8px;
+  animation: sparkle 1.5s infinite 1s;
+}
+
+@keyframes sparkle {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8) rotate(0deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(180deg);
+  }
 }
 
 .header-actions {
   display: flex;
   gap: 8px;
+}
+
+.header-actions .action-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.header-actions .action-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
 }
 
 .squad-limits {
@@ -324,6 +373,144 @@
 .add-person-btn:hover {
   background: #5a67d8;
   transform: translateY(-1px);
+}
+
+.divider {
+  text-align: center;
+  margin: 16px 0;
+  position: relative;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.divider span {
+  background: white;
+  padding: 0 12px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.whatsapp-import-btn,
+.contacts-import-btn {
+  background: white;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.whatsapp-import-btn:hover {
+  background: #f0f9ff;
+  border-color: #0ea5e9;
+  color: #0ea5e9;
+}
+
+.contacts-import-btn:hover {
+  background: #f0fdf4;
+  border-color: #10b981;
+  color: #10b981;
+}
+
+/* Import Modal */
+.import-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.import-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.import-content {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+}
+
+.import-content h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.import-content p {
+  margin: 0 0 20px 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.import-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.import-btn,
+.cancel-btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.import-btn {
+  background: #667eea;
+  color: white;
+}
+
+.import-btn:hover {
+  background: #5a67d8;
+}
+
+.cancel-btn {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.cancel-btn:hover {
+  background: #e5e7eb;
 }
 
 /* Search */
