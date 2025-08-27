@@ -91,9 +91,8 @@ class AvatarSystem {
       }
 
       if (!window.supabase) {
-        console.warn('AUTH DEBUG: Supabase not available, will continue without it');
-        this.authService = this.createFallbackAuthService();
-        return;
+        console.error('AUTH DEBUG: Supabase not available - authentication will not work');
+        throw new Error('Supabase is required for authentication');
       }
 
       // Wait for Supabase client to be fully initialized (reduced timeout)
@@ -104,19 +103,19 @@ class AvatarSystem {
       }
 
       if (!window.supabaseClient) {
-        console.warn('AUTH DEBUG: Supabase client not available, will try to create one');
+        console.log('AUTH DEBUG: Creating Supabase client...');
       }
 
       console.log('AUTH DEBUG: Supabase is ready, proceeding with initialization...');
 
-      // Try to import the auth service - handle missing file gracefully
+      // Import the auth service
       let authModule;
       try {
         authModule = await import('./supabase-auth-service.js');
         this.authService = authModule.supabaseAuthService;
       } catch (importError) {
-        console.warn('AUTH DEBUG: Failed to import auth service, creating fallback');
-        this.authService = this.createFallbackAuthService();
+        console.error('AUTH DEBUG: Failed to import auth service:', importError);
+        throw new Error('Authentication service is required');
       }
 
       // Set the global supabase instance for the auth service
@@ -127,19 +126,21 @@ class AvatarSystem {
       } else {
         // Create our own Supabase client if none exists
         try {
-          const config = await import('./supabase-config-secret.js');
-          const supabaseClient = window.supabase.createClient(
-            config.default.supabaseUrl,
-            config.default.supabaseAnonKey
-          );
-          window.supabaseClient = supabaseClient;
-          if (authModule && authModule.setSupabaseInstance) {
-            authModule.setSupabaseInstance(supabaseClient);
+          if (window.supabaseConfig) {
+            const supabaseClient = window.supabase.createClient(
+              window.supabaseConfig.supabaseUrl,
+              window.supabaseConfig.supabaseAnonKey
+            );
+            window.supabaseClient = supabaseClient;
+            if (authModule && authModule.setSupabaseInstance) {
+              authModule.setSupabaseInstance(supabaseClient);
+            }
+          } else {
+            throw new Error('Supabase config not available');
           }
         } catch (error) {
-          console.warn('AUTH DEBUG: Failed to create Supabase client, using fallback');
-          this.authService = this.createFallbackAuthService();
-          return;
+          console.error('AUTH DEBUG: Failed to create Supabase client:', error);
+          throw new Error('Failed to initialize Supabase client');
         }
       }
 
@@ -172,8 +173,8 @@ class AvatarSystem {
 
         console.log('AUTH DEBUG: Supabase Auth Service initialized');
       } catch (error) {
-        console.warn('AUTH DEBUG: Auth service initialization failed, using fallback');
-        this.authService = this.createFallbackAuthService();
+        console.error('AUTH DEBUG: Auth service initialization failed:', error);
+        throw new Error('Failed to initialize authentication service');
       }
     } catch (error) {
       console.error('AUTH DEBUG: Error initializing Supabase Auth Service:', error);
@@ -186,104 +187,7 @@ class AvatarSystem {
     return emailRegex.test(email);
   }
 
-  // Fallback auth service for when the module is missing
-  createFallbackAuthService() {
-    return {
-      isInitialized: true,
-      initialize: async () => true,
-      getCurrentUser: () => {
-        try {
-          const storedUser = sessionStorage.getItem('supabase_user');
-          return storedUser ? JSON.parse(storedUser) : null;
-        } catch {
-          return null;
-        }
-      },
-      signIn: async (email, password) => {
-        console.log('AUTH DEBUG: Fallback signIn called with:', email);
-        try {
-          if (!window.supabaseClient) {
-            console.error('AUTH DEBUG: Supabase client not available');
-            return { success: false, error: 'Authentication service not available. Please refresh the page.' };
-          }
 
-          const { data, error } = await window.supabaseClient.auth.signInWithPassword({
-            email,
-            password
-          });
-
-          console.log('AUTH DEBUG: Supabase signIn response:', { data, error });
-
-          if (error) {
-            return { success: false, error: error.message };
-          }
-
-          if (data.user) {
-            sessionStorage.setItem('supabase_user', JSON.stringify(data.user));
-            return { success: true, user: data.user };
-          }
-
-          return { success: false, error: 'No user returned from sign in' };
-        } catch (error) {
-          console.error('AUTH DEBUG: Fallback signIn error:', error);
-          return { success: false, error: error.message };
-        }
-      },
-      signUp: async (email, password) => {
-        console.log('AUTH DEBUG: Fallback signUp called with:', email);
-        try {
-          if (!window.supabaseClient) {
-            console.error('AUTH DEBUG: Supabase client not available');
-            return { success: false, error: 'Authentication service not available. Please refresh the page.' };
-          }
-
-          const { data, error } = await window.supabaseClient.auth.signUp({
-            email,
-            password
-          });
-
-          console.log('AUTH DEBUG: Supabase signUp response:', { data, error });
-
-          if (error) {
-            return { success: false, error: error.message };
-          }
-
-          return { success: true, user: data.user };
-        } catch (error) {
-          console.error('AUTH DEBUG: Fallback signUp error:', error);
-          return { success: false, error: error.message };
-        }
-      },
-      signOut: async () => {
-        console.log('AUTH DEBUG: Fallback signOut called');
-        try {
-          if (!window.supabaseClient) {
-            console.error('AUTH DEBUG: Supabase client not available');
-            return { success: false, error: 'Authentication service not available. Please refresh the page.' };
-          }
-
-          const { error } = await window.supabaseClient.auth.signOut();
-          if (error) {
-            console.error('AUTH DEBUG: SignOut error:', error);
-          }
-          sessionStorage.removeItem('supabase_user');
-          return { success: !error };
-        } catch (error) {
-          console.error('AUTH DEBUG: Fallback signOut error:', error);
-          return { success: false, error: error.message };
-        }
-      },
-      onAuthStateChanged: (callback) => {
-        if (window.supabaseClient && window.supabaseClient.auth) {
-          return window.supabaseClient.auth.onAuthStateChange((event, session) => {
-            console.log('AUTH DEBUG: Auth state change event:', event, session?.user?.email);
-            callback(session?.user || null);
-          });
-        }
-        return { data: { subscription: { unsubscribe: () => { } } } };
-      }
-    };
-  }
 
   async init() {
     // Initialize authentication in background
@@ -1067,6 +971,12 @@ class AvatarSystem {
         console.log('AUTH DEBUG: Validation passed, proceeding with signup');
 
         // Step 2: Attempt signup
+        if (!this.authService || !this.authService.signUp) {
+          this.authError = 'Authentication service not available. Please refresh the page.';
+          console.error('AUTH DEBUG: Auth service not available for signup');
+          return;
+        }
+
         const result = await this.authService.signUp(this.formData.email, this.formData.password);
         console.log('AUTH DEBUG: Signup result:', result);
 
@@ -1118,6 +1028,12 @@ class AvatarSystem {
         console.log('AUTH DEBUG: Validation passed, proceeding with signin');
 
         // Step 2: Attempt signin
+        if (!this.authService || !this.authService.signIn) {
+          this.authError = 'Authentication service not available. Please refresh the page.';
+          console.error('AUTH DEBUG: Auth service not available for signin');
+          return;
+        }
+
         const result = await this.authService.signIn(this.formData.email, this.formData.password);
         console.log('AUTH DEBUG: Signin result:', result);
 
