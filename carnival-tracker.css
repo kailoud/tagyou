@@ -205,7 +205,7 @@
   background: white;
   border-radius: 12px;
   width: 90%;
-  max-width: 350px;
+  max-width: 450px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   animation: modalSlideIn 0.3s ease-out;
@@ -262,6 +262,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+  min-width: 0;
 }
 
 .feature-item {
