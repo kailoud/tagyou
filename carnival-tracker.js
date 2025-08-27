@@ -987,6 +987,7 @@ class CarnivalTracker {
                   <div class="premium-banner">
                     <span class="premium-icon">💎</span>
                     <span class="premium-text">Premium Squad</span>
+                    <span class="unlimited-text">unlimited</span>
                   </div>
                 ` : `
                   <h3 class="squad-title">Carnival Squad</h3>
@@ -1005,7 +1006,12 @@ class CarnivalTracker {
                       <i class="fas fa-crown"></i>
                       <span class="premium-tag">💎</span>
                     </span>
-                  ` : ''}
+                  ` : `
+                    <span class="stat-item">
+                      <i class="fas fa-crown"></i>
+                      <span class="basic-limit">0/1</span>
+                    </span>
+                  `}
                 </div>
               </div>
             

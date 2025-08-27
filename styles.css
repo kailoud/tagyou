@@ -702,21 +702,21 @@ body {
 }
 
 #floatTruckBtn {
-  border-color: rgba(59, 130, 246, 0.3);
-  color: #3b82f6;
+  border-color: rgba(236, 72, 153, 0.3);
+  color: #ec4899;
 }
 
 #floatTruckBtn:hover {
-  border-color: rgba(59, 130, 246, 0.5);
-  color: #60a5fa;
-  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(236, 72, 153, 0.5);
+  color: #f472b6;
+  background: rgba(236, 72, 153, 0.1);
 }
 
 #floatTruckBtn.active {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  border-color: #60a5fa;
+  background: linear-gradient(135deg, #ec4899, #db2777);
+  border-color: #f472b6;
   color: #ffffff;
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
 }
 
 #artistBandBtn {
@@ -738,21 +738,21 @@ body {
 }
 
 #carnivalTrackerBtn {
-  border-color: rgba(236, 72, 153, 0.3);
-  color: #ec4899;
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #3b82f6;
 }
 
 #carnivalTrackerBtn:hover {
-  border-color: rgba(236, 72, 153, 0.5);
-  color: #f472b6;
-  background: rgba(236, 72, 153, 0.1);
+  border-color: rgba(59, 130, 246, 0.5);
+  color: #60a5fa;
+  background: rgba(59, 130, 246, 0.1);
 }
 
 #carnivalTrackerBtn.active {
-  background: linear-gradient(135deg, #ec4899, #db2777);
-  border-color: #f472b6;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-color: #60a5fa;
   color: #ffffff;
-  box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
 }
 
 .location-btn {
