@@ -77,6 +77,14 @@ async function getArtists() {
     if (error) throw error;
     artistsData = data || [];
     console.log('✅ Loaded artists:', artistsData.length);
+
+    // Debug: Log the first artist data to see structure
+    if (artistsData.length > 0) {
+      console.log('🔍 First artist data:', artistsData[0]);
+      console.log('🔍 Artist all_images:', artistsData[0].all_images);
+      console.log('🔍 Artist image_url:', artistsData[0].image_url);
+      console.log('🔍 All artist columns:', Object.keys(artistsData[0]));
+    }
   } catch (error) {
     console.error('❌ Error loading artists:', error);
     artistsData = [];
@@ -204,9 +212,18 @@ function populateArtists() {
   const container = document.getElementById('artists-list');
   if (!container) return;
 
+  console.log('🎵 Populating artists, data length:', artistsData.length);
+
   if (artistsData.length === 0) {
     container.innerHTML = '<div class="empty-state"><p>No artists available.</p></div>';
     return;
+  }
+
+  // Debug: Check first artist image
+  if (artistsData.length > 0) {
+    console.log('🔍 First artist in populate:', artistsData[0]);
+    console.log('🔍 All images check:', artistsData[0].all_images ? 'Has all_images' : 'No all_images');
+    console.log('🔍 Image URL check:', artistsData[0].image_url ? 'Has URL' : 'No URL');
   }
 
   container.innerHTML = artistsData.map((artist, index) => `
@@ -215,10 +232,15 @@ function populateArtists() {
           <!-- Front Side (Basic Info) -->
           <div class="flip-card-front">
             <div class="item-image">
-              ${artist.image_url ?
-      `<img src="${artist.image_url}" alt="${artist.name}" onerror="this.parentElement.innerHTML='<div class=\\"no-image\\">🎵</div>'">` :
-      '<div class="no-image">🎵</div>'
-    }
+              ${(() => {
+      const imageSource = artist.all_images || artist.image_url || artist.image || artist.img_url || artist.img;
+      if (!imageSource) return '<div class="no-image">🎵</div>';
+
+      // Handle if all_images is an array
+      const imageUrl = Array.isArray(imageSource) ? imageSource[0] : imageSource;
+
+      return `<img src="${imageUrl}" alt="${artist.name}" onerror="this.parentElement.innerHTML='<div class=\\"no-image\\">🎵</div>'; console.warn('Failed to load image for ${artist.name}:', '${imageUrl}')">`;
+    })()}
             </div>
             <div class="item-content">
               <div class="item-header">

@@ -1112,89 +1112,99 @@ body {
   align-items: start;
 }
 
-/* Simple Page Turn Card Styles - Enhanced for consistency */
-.flip-card,
-#food-stalls-list .flip-card,
-#artists-list .flip-card,
-#float-trucks-list .flip-card {
-  height: 340px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  border-radius: 12px;
-}
-
-.flip-card-inner,
-#food-stalls-list .flip-card-inner,
-#artists-list .flip-card-inner,
-#float-trucks-list .flip-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
+/* Empty State */
+.empty-state {
+  grid-column: 1 / -1;
   text-align: center;
-  transition: transform 0.4s ease;
+  padding: 40px 20px;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-.flip-card.flipped .flip-card-inner,
-#food-stalls-list .flip-card.flipped .flip-card-inner,
-#artists-list .flip-card.flipped .flip-card-inner,
-#float-trucks-list .flip-card.flipped .flip-card-inner {
-  transform: translateX(-100%);
+.empty-state p {
+  font-size: 16px;
+  margin: 0;
+  font-weight: 500;
 }
 
-.flip-card-front,
-.flip-card-back,
-#food-stalls-list .flip-card-front,
-#food-stalls-list .flip-card-back,
-#artists-list .flip-card-front,
-#artists-list .flip-card-back,
-#float-trucks-list .flip-card-front,
-#float-trucks-list .flip-card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.flip-card-front,
-#food-stalls-list .flip-card-front,
-#artists-list .flip-card-front,
-#float-trucks-list .flip-card-front {
-  left: 0;
-  top: 0;
-}
-
-.flip-card-back,
-#food-stalls-list .flip-card-back,
-#artists-list .flip-card-back,
-#float-trucks-list .flip-card-back {
-  left: 100%;
-  top: 0;
+/* Settings List */
+.settings-list {
   display: flex;
   flex-direction: column;
+  gap: 15px;
 }
 
-/* Force consistent rendering for all cards - but allow page turn animation */
-.flip-card-inner,
-#food-stalls-list .flip-card-inner,
-#artists-list .flip-card-inner,
-#float-trucks-list .flip-card-inner {
-  /* Allow transform for page turn animation */
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.flip-card-front *,
-.flip-card-back *,
-#food-stalls-list .flip-card-front *,
-#food-stalls-list .flip-card-back *,
-#artists-list .flip-card-front *,
-#artists-list .flip-card-back *,
-#float-trucks-list .flip-card-front *,
-#float-trucks-list .flip-card-back * {
-  transform: none !important;
+.setting-info h5 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 5px 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.setting-info p {
+  font-size: 13px;
+  margin: 0;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+/* Switch Toggle for Settings */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: 0.3s;
+  border-radius: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked+.slider {
+  background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+input:checked+.slider:before {
+  transform: translateX(26px);
 }
 
 /* Responsive Grid */
