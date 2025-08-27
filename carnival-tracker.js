@@ -983,13 +983,14 @@ class CarnivalTracker {
         <div class="tracker-header">
           <div class="header-content">
                           <div class="header-left">
-                <h3 class="squad-title">Carnival Squad</h3>
                 ${this.isPremium ? `
                   <div class="premium-banner">
                     <span class="premium-icon">💎</span>
                     <span class="premium-text">Premium Squad</span>
                   </div>
-                ` : ''}
+                ` : `
+                  <h3 class="squad-title">Carnival Squad</h3>
+                `}
                 <div class="squad-stats">
                   <span class="stat-item">
                     <i class="fas fa-map-marker-alt"></i>
