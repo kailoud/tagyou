@@ -81,6 +81,7 @@ async function getArtists() {
     // Debug: Log the first artist data to see structure
     if (artistsData.length > 0) {
       console.log('🔍 First artist data:', artistsData[0]);
+      console.log('🔍 Artist featured_image:', artistsData[0].featured_image);
       console.log('🔍 Artist all_images:', artistsData[0].all_images);
       console.log('🔍 Artist image_url:', artistsData[0].image_url);
       console.log('🔍 All artist columns:', Object.keys(artistsData[0]));
@@ -222,6 +223,7 @@ function populateArtists() {
   // Debug: Check first artist image
   if (artistsData.length > 0) {
     console.log('🔍 First artist in populate:', artistsData[0]);
+    console.log('🔍 Featured image check:', artistsData[0].featured_image ? 'Has featured_image' : 'No featured_image');
     console.log('🔍 All images check:', artistsData[0].all_images ? 'Has all_images' : 'No all_images');
     console.log('🔍 Image URL check:', artistsData[0].image_url ? 'Has URL' : 'No URL');
   }
@@ -233,13 +235,17 @@ function populateArtists() {
           <div class="flip-card-front">
             <div class="item-image">
               ${(() => {
-      const imageSource = artist.all_images || artist.image_url || artist.image || artist.img_url || artist.img;
+      // Priority: featured_image > all_images[0] > image_url > other fields
+      const imageSource = artist.featured_image ||
+        (artist.all_images && Array.isArray(artist.all_images) ? artist.all_images[0] : null) ||
+        artist.image_url ||
+        artist.image ||
+        artist.img_url ||
+        artist.img;
+
       if (!imageSource) return '<div class="no-image">🎵</div>';
 
-      // Handle if all_images is an array
-      const imageUrl = Array.isArray(imageSource) ? imageSource[0] : imageSource;
-
-      return `<img src="${imageUrl}" alt="${artist.name}" onerror="this.parentElement.innerHTML='<div class=\\"no-image\\">🎵</div>'; console.warn('Failed to load image for ${artist.name}:', '${imageUrl}')">`;
+      return `<img src="${imageSource}" alt="${artist.name}" onerror="this.parentElement.innerHTML='<div class=\\"no-image\\">🎵</div>'; console.warn('Failed to load image for ${artist.name}:', '${imageSource}')">`;
     })()}
             </div>
             <div class="item-content">
