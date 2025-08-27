@@ -982,25 +982,31 @@ class CarnivalTracker {
         <!-- Clean Header -->
         <div class="tracker-header">
           <div class="header-content">
-            <div class="header-left">
-              <h3 class="squad-title">Carnival Squad</h3>
-              <div class="squad-stats">
-                <span class="stat-item">
-                  <i class="fas fa-map-marker-alt"></i>
-                  ${sharingCount}
-                </span>
-                <span class="stat-item">
-                  <i class="fas fa-users"></i>
-                  ${this.people.length}
-                </span>
+                          <div class="header-left">
+                <h3 class="squad-title">Carnival Squad</h3>
                 ${this.isPremium ? `
-                  <span class="stat-item">
-                    <i class="fas fa-crown"></i>
-                    <span class="premium-tag">💎</span>
-                  </span>
+                  <div class="premium-banner">
+                    <span class="premium-icon">💎</span>
+                    <span class="premium-text">Premium Squad</span>
+                  </div>
                 ` : ''}
+                <div class="squad-stats">
+                  <span class="stat-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    ${sharingCount}
+                  </span>
+                  <span class="stat-item">
+                    <i class="fas fa-users"></i>
+                    ${this.people.length}
+                  </span>
+                  ${this.isPremium ? `
+                    <span class="stat-item">
+                      <i class="fas fa-crown"></i>
+                      <span class="premium-tag">💎</span>
+                    </span>
+                  ` : ''}
+                </div>
               </div>
-            </div>
             
             <div class="header-actions">
               <button class="action-btn add-btn" title="Add Person">
