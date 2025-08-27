@@ -363,11 +363,155 @@ class CarnivalTracker {
   }
 
   importWhatsAppContacts() {
-    // This would integrate with WhatsApp Web API or similar
     console.log('Importing WhatsApp contacts...');
 
-    // For demo purposes, show a modal
-    this.showImportModal('WhatsApp', 'Import your WhatsApp contacts to add them to your squad');
+    // Check if Web Contacts API is available
+    if (navigator.contacts) {
+      // Request contacts with WhatsApp numbers
+      navigator.contacts.select(['name', 'tel'], { multiple: true })
+        .then(contacts => {
+          console.log('Selected contacts:', contacts);
+
+          // Filter contacts that might have WhatsApp (any phone number)
+          const whatsappContacts = contacts.filter(contact =>
+            contact.name && contact.tel && contact.tel.length > 0
+          );
+
+          if (whatsappContacts.length === 0) {
+            alert('No contacts with phone numbers found. Please select contacts with phone numbers to send WhatsApp invites.');
+            return;
+          }
+
+          // Show WhatsApp invite modal
+          this.showWhatsAppInviteModal(whatsappContacts);
+        })
+        .catch(err => {
+          console.error('Error accessing contacts:', err);
+          alert('Unable to access contacts. Please ensure you have granted contact permissions.');
+        });
+    } else {
+      // Fallback for browsers without Contacts API
+      this.showWhatsAppInviteModal([]);
+    }
+  }
+
+  showWhatsAppInviteModal(contacts) {
+    const modal = document.createElement('div');
+    modal.className = 'whatsapp-invite-modal';
+
+    const contactsList = contacts.length > 0 ?
+      contacts.map(contact => `
+        <div class="contact-item">
+          <div class="contact-info">
+            <span class="contact-name">${contact.name}</span>
+            <span class="contact-phone">${contact.tel ? contact.tel[0] : 'No phone'}</span>
+          </div>
+          <button class="send-invite-btn" onclick="window.carnivalTracker.sendWhatsAppInvite('${contact.name}', '${contact.tel ? contact.tel[0] : ''}')">
+            <i class="fab fa-whatsapp"></i>
+            Send Invite
+          </button>
+        </div>
+      `).join('') :
+      '<p class="no-contacts">No contacts selected. Please use your phone\'s contact app to share contacts.</p>';
+
+    modal.innerHTML = `
+      <div class="whatsapp-invite-overlay">
+        <div class="whatsapp-invite-content">
+          <div class="whatsapp-invite-header">
+            <i class="fab fa-whatsapp"></i>
+            <h3>Send WhatsApp Invites</h3>
+            <button class="close-invite-btn" onclick="this.closest('.whatsapp-invite-modal').remove()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          
+          <div class="invite-message">
+            <label>Invite Message:</label>
+            <textarea id="inviteMessage" rows="3" placeholder="Hey! Join my Carnival Squad on TagYou to stay connected during the festival! 🎭">
+Hey! Join my Carnival Squad on TagYou to stay connected during the festival! 🎭
+
+Download the app and add me: ${window.location.origin}
+
+See you at the carnival! 🎪</textarea>
+          </div>
+          
+          <div class="contacts-list">
+            <h4>Selected Contacts (${contacts.length})</h4>
+            ${contactsList}
+          </div>
+          
+          <div class="invite-actions">
+            <button class="send-all-btn" onclick="window.carnivalTracker.sendAllWhatsAppInvites()">
+              <i class="fab fa-whatsapp"></i>
+              Send All Invites
+            </button>
+            <button class="cancel-invite-btn" onclick="this.closest('.whatsapp-invite-modal').remove()">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+  }
+
+  sendWhatsAppInvite(name, phone) {
+    const message = document.getElementById('inviteMessage')?.value ||
+      `Hey ${name}! Join my Carnival Squad on TagYou to stay connected during the festival! 🎭\n\nDownload the app and add me: ${window.location.origin}\n\nSee you at the carnival! 🎪`;
+
+    // Create WhatsApp URL with pre-filled message
+    const whatsappUrl = `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+
+    // Open WhatsApp in new tab/window
+    window.open(whatsappUrl, '_blank');
+
+    // Show success message
+    this.showInviteSuccess(name);
+  }
+
+  sendAllWhatsAppInvites() {
+    const contactItems = document.querySelectorAll('.contact-item');
+    const message = document.getElementById('inviteMessage')?.value ||
+      `Hey! Join my Carnival Squad on TagYou to stay connected during the festival! 🎭\n\nDownload the app and add me: ${window.location.origin}\n\nSee you at the carnival! 🎪`;
+
+    contactItems.forEach((item, index) => {
+      const name = item.querySelector('.contact-name').textContent;
+      const phone = item.querySelector('.contact-phone').textContent;
+
+      if (phone && phone !== 'No phone') {
+        // Add delay between opening multiple WhatsApp windows
+        setTimeout(() => {
+          const whatsappUrl = `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+          window.open(whatsappUrl, '_blank');
+        }, index * 500); // 500ms delay between each
+      }
+    });
+
+    // Close modal and show success
+    document.querySelector('.whatsapp-invite-modal')?.remove();
+    this.showInviteSuccess('all contacts');
+  }
+
+  showInviteSuccess(name) {
+    const successModal = document.createElement('div');
+    successModal.className = 'invite-success-modal';
+    successModal.innerHTML = `
+      <div class="invite-success-overlay">
+        <div class="invite-success-content">
+          <i class="fab fa-whatsapp"></i>
+          <h3>Invite Sent!</h3>
+          <p>WhatsApp invite sent to ${name}</p>
+          <button onclick="this.closest('.invite-success-modal').remove()">OK</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(successModal);
+
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+      successModal.remove();
+    }, 3000);
   }
 
   importPhoneContacts() {
