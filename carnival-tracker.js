@@ -1009,7 +1009,7 @@ class CarnivalTracker {
                   ` : `
                     <span class="stat-item">
                       <i class="fas fa-crown"></i>
-                      <span class="basic-limit">0/1</span>
+                      <span class="basic-limit" onclick="window.carnivalTracker.showUpgradeForm()">0/1</span>
                     </span>
                   `}
                 </div>
@@ -1536,6 +1536,63 @@ class CarnivalTracker {
     }
 
     return 'Nearby Area';
+  }
+
+  showUpgradeForm() {
+    // Create upgrade modal
+    const modal = document.createElement('div');
+    modal.className = 'upgrade-modal';
+    modal.innerHTML = `
+      <div class="upgrade-content">
+        <div class="upgrade-header">
+          <h3>Upgrade to Premium</h3>
+          <button class="close-upgrade-btn" onclick="this.closest('.upgrade-modal').remove()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="upgrade-body">
+          <div class="premium-features">
+            <div class="feature-item">
+              <i class="fas fa-infinity"></i>
+              <span>Unlimited Squad Members</span>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-star"></i>
+              <span>Premium Features</span>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-crown"></i>
+              <span>Gold Crown Badge</span>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-bell"></i>
+              <span>Priority Notifications</span>
+            </div>
+          </div>
+          <div class="upgrade-actions">
+            <button class="upgrade-btn" onclick="window.carnivalTracker.handleUpgrade()">
+              <i class="fas fa-crown"></i>
+              Upgrade Now
+            </button>
+            <button class="cancel-btn" onclick="this.closest('.upgrade-modal').remove()">
+              Maybe Later
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+  }
+
+  handleUpgrade() {
+    // Close modal
+    document.querySelector('.upgrade-modal')?.remove();
+
+    // Redirect to pricing page or show payment form
+    // You can customize this based on your payment integration
+    alert('Redirecting to premium upgrade...');
+    // window.location.href = '/pricing.html'; // Uncomment and set your pricing page URL
   }
 }
 
