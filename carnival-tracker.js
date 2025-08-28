@@ -434,6 +434,19 @@ class CarnivalTracker {
     return distances[Math.floor(Math.random() * distances.length)];
   }
 
+  openWhatsApp() {
+    console.log('📱 Opening WhatsApp...');
+
+    // Open WhatsApp directly
+    const whatsappUrl = 'https://wa.me/';
+    window.open(whatsappUrl, '_blank');
+
+    // Show a helpful message
+    setTimeout(() => {
+      alert('WhatsApp opened! You can now share your carnival squad invites directly through WhatsApp.');
+    }, 500);
+  }
+
   importWhatsAppContacts() {
     console.log('Importing WhatsApp contacts...');
 
@@ -1557,7 +1570,7 @@ See you at the carnival! 🎪</textarea>
             <span>or</span>
           </div>
           
-          <button class="whatsapp-import-btn" onclick="window.carnivalTracker.importWhatsAppContacts()">
+          <button class="whatsapp-import-btn" onclick="window.carnivalTracker.openWhatsApp()">
             <i class="fab fa-whatsapp"></i>
             Import from WhatsApp
           </button>
