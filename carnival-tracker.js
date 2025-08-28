@@ -7,11 +7,7 @@ class CarnivalTracker {
     this.searchTerm = "";
     this.notifications = [];
 
-    // Development flag - show debug tools only in development
-    this.isDevelopment = window.location.hostname === 'localhost' ||
-      window.location.hostname.includes('dev') ||
-      window.location.hostname.includes('127.0.0.1') ||
-      window.location.hostname.includes('tagyou.app') && window.location.hostname.includes('dev');
+
 
     // Flag to track auth operations (for debugging)
     this.isPerformingAuthOperation = false;
@@ -60,12 +56,7 @@ class CarnivalTracker {
     this.checkPremiumStatus();
     this.loadInitialData();
 
-    // Log development status
-    if (this.isDevelopment) {
-      console.log('🔧 Development mode: Debug tools are available');
-    } else {
-      console.log('🚀 Production mode: Debug tools are hidden');
-    }
+
   }
 
   async loadInitialData() {
@@ -378,29 +369,7 @@ class CarnivalTracker {
     }
   }
 
-  // Debug premium status
-  debugPremiumStatus() {
-    console.log('🔍 Premium Status Debug:');
-    console.log('  - isPremium:', this.isPremium);
-    console.log('  - userTier:', this.userTier);
-    console.log('  - canUseCalling():', this.canUseCalling());
-    console.log('  - canUseMessaging():', this.canUseMessaging());
 
-    const currentUser = this.getCurrentUserSafely();
-    console.log('  - Current user:', currentUser?.email || 'No user');
-
-    if (currentUser?.email) {
-      const premiumStatus = localStorage.getItem(`premium_${currentUser.email}`);
-      console.log('  - localStorage premium status:', premiumStatus);
-    }
-  }
-
-  // Toggle debug mode (for testing)
-  toggleDebugMode() {
-    this.isDevelopment = !this.isDevelopment;
-    console.log(this.isDevelopment ? '🔧 Debug mode enabled' : '🚀 Debug mode disabled');
-    this.render(); // Re-render to show/hide debug tools
-  }
 
 
 
@@ -478,12 +447,10 @@ class CarnivalTracker {
   }
 
   canUseMessaging() {
-    console.log('💬 canUseMessaging check:', this.isPremium, 'User tier:', this.userTier);
     return this.isPremium;
   }
 
   canUseCalling() {
-    console.log('📞 canUseCalling check:', this.isPremium, 'User tier:', this.userTier);
     return this.isPremium;
   }
 
@@ -501,13 +468,7 @@ class CarnivalTracker {
   }
 
   setupEventListeners() {
-    // Keyboard shortcut for debug mode (Ctrl+Shift+D)
-    document.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-        e.preventDefault();
-        this.toggleDebugMode();
-      }
-    });
+
 
     // Event delegation for dynamic elements
     this.trackerElement.addEventListener('click', (e) => {
@@ -541,21 +502,17 @@ class CarnivalTracker {
 
       // Call button - show call/WhatsApp options (only for premium users)
       if (e.target.closest('.call-btn') && !e.target.closest('.call-btn').classList.contains('disabled')) {
-        console.log('📞 Call button clicked - Premium user detected');
         const button = e.target.closest('.call-btn');
         const phoneNumber = button.dataset.phone;
         const personName = button.dataset.name;
-        console.log('📞 Calling:', personName, 'at', phoneNumber);
         this.showPhoneOptions(phoneNumber, personName);
       }
 
       // Message button - open WhatsApp (only for premium users)
       if (e.target.closest('.message-btn') && !e.target.closest('.message-btn').classList.contains('disabled')) {
-        console.log('💬 Message button clicked - Premium user detected');
         const button = e.target.closest('.message-btn');
         const phoneNumber = button.dataset.phone;
         const personName = button.dataset.name;
-        console.log('💬 Messaging:', personName, 'at', phoneNumber);
         this.openWhatsApp(phoneNumber, personName);
       }
 
@@ -1588,7 +1545,6 @@ See you at the carnival! 🎪</textarea>
       // Show total squad members count instead of just sharing count
       const totalSquadMembers = this.people.length;
       trackerCount.textContent = totalSquadMembers;
-      console.log('🎭 Toolbar count updated:', totalSquadMembers, 'squad members');
     }
   }
 
@@ -1688,12 +1644,6 @@ See you at the carnival! 🎪</textarea>
   renderTrackerTab(filteredPeople) {
     const shouldShowScrollbar = filteredPeople.length >= 2;
     const peopleListClass = shouldShowScrollbar ? 'people-list with-scrollbar' : 'people-list';
-
-    console.log('🎭 Squad list rendering:', {
-      peopleCount: filteredPeople.length,
-      shouldShowScrollbar,
-      peopleListClass
-    });
 
     return `
       <div class="tracker-tab-content">
@@ -1838,31 +1788,7 @@ See you at the carnival! 🎪</textarea>
             Import from Contacts
           </button>
           
-          ${this.isDevelopment ? `
-            <div class="divider">
-              <span>Debug Tools (Development Only)</span>
-            </div>
-            
-            <button class="test-btn" onclick="window.carnivalTracker.testAddPerson()" style="background: #ef4444; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
-              🧪 Test Add Person (Debug)
-            </button>
-            
-            <button class="test-btn" onclick="window.carnivalTracker.debugPremiumStatus()" style="background: #3b82f6; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
-              🔍 Debug Premium Status
-            </button>
-            
-            <button class="debug-btn" onclick="window.carnivalTracker.diagnoseSystem()" style="background: #3b82f6; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
-              🔍 System Diagnosis
-            </button>
-            
-            <button class="test-save-btn" onclick="window.carnivalTracker.testSquadSaving()" style="background: #10b981; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
-              🧪 Test Squad Saving
-            </button>
-            
-            <button class="test-debug-btn" onclick="window.carnivalTracker.testDebug()" style="background: #8b5cf6; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
-              🧪 Test Debug 1
-            </button>
-          ` : ''}
+
         </div>
       </div>
     `;
