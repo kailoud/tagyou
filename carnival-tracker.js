@@ -336,14 +336,14 @@ class CarnivalTracker {
 
   // Maintain panel state after adding squad member
   maintainPanelState() {
-    // If panel is collapsed, expand it to halfway
+    // Always open panel to halfway when squad member is added
     const pullUpPanel = document.getElementById('pullUpPanel');
     if (pullUpPanel) {
-      if (!pullUpPanel.classList.contains('expanded') && !pullUpPanel.classList.contains('halfway')) {
-        // Panel is collapsed, expand to halfway
-        pullUpPanel.classList.add('halfway');
-        console.log('📱 Panel expanded to halfway after adding squad member');
-      }
+      // Remove any existing states
+      pullUpPanel.classList.remove('expanded', 'halfway');
+      // Force to halfway
+      pullUpPanel.classList.add('halfway');
+      console.log('📱 Panel forced to halfway after adding squad member');
     }
   }
 
@@ -351,11 +351,10 @@ class CarnivalTracker {
   ensurePanelOpen() {
     const pullUpPanel = document.getElementById('pullUpPanel');
     if (pullUpPanel) {
-      if (!pullUpPanel.classList.contains('expanded') && !pullUpPanel.classList.contains('halfway')) {
-        // Panel is collapsed, expand to halfway
-        pullUpPanel.classList.add('halfway');
-        console.log('📱 Panel expanded to halfway when carnival tracker shown');
-      }
+      // Always force to halfway when carnival tracker is shown
+      pullUpPanel.classList.remove('expanded', 'halfway');
+      pullUpPanel.classList.add('halfway');
+      console.log('📱 Panel forced to halfway when carnival tracker shown');
     }
   }
 
