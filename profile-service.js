@@ -3,15 +3,63 @@
 
 class ProfileService {
   constructor() {
-    this.supabase = window.supabaseClient;
+    this.supabase = null;
+    this.initializeSupabase();
+  }
+
+  // Initialize Supabase client with retry logic
+  async initializeSupabase() {
+    try {
+      // Try to get supabase client from multiple sources
+      if (window.supabaseClient) {
+        this.supabase = window.supabaseClient;
+        console.log('✅ ProfileService: Supabase client initialized from window.supabaseClient');
+      } else if (window.supabase && window.supabaseConfig) {
+        // Create client if not available
+        this.supabase = window.supabase.createClient(
+          window.supabaseConfig.supabaseUrl,
+          window.supabaseConfig.supabaseAnonKey
+        );
+        console.log('✅ ProfileService: Supabase client created from window.supabase');
+      } else {
+        // Wait for supabase to be available
+        let attempts = 0;
+        const maxAttempts = 50;
+        while (!this.supabase && attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+
+          if (window.supabaseClient) {
+            this.supabase = window.supabaseClient;
+            console.log('✅ ProfileService: Supabase client initialized after waiting');
+          } else if (window.supabase && window.supabaseConfig) {
+            this.supabase = window.supabase.createClient(
+              window.supabaseConfig.supabaseUrl,
+              window.supabaseConfig.supabaseAnonKey
+            );
+            console.log('✅ ProfileService: Supabase client created after waiting');
+          }
+          attempts++;
+        }
+
+        if (!this.supabase) {
+          console.warn('⚠️ ProfileService: Could not initialize Supabase client after retries');
+        }
+      }
+    } catch (error) {
+      console.error('❌ ProfileService: Error initializing Supabase:', error);
+    }
   }
 
   // Get user profile from Supabase
   async getUserProfile(userId) {
     try {
+      // Ensure Supabase client is available
       if (!this.supabase) {
-        console.error('ProfileService: Supabase client not available');
-        return null;
+        await this.initializeSupabase();
+        if (!this.supabase) {
+          console.error('ProfileService: Supabase client not available');
+          return null;
+        }
       }
 
       const { data, error } = await this.supabase
@@ -36,9 +84,13 @@ class ProfileService {
   // Create or update user profile
   async upsertUserProfile(profileData) {
     try {
+      // Ensure Supabase client is available
       if (!this.supabase) {
-        console.error('ProfileService: Supabase client not available');
-        return { success: false, error: 'Supabase client not available' };
+        await this.initializeSupabase();
+        if (!this.supabase) {
+          console.error('ProfileService: Supabase client not available');
+          return { success: false, error: 'Supabase client not available' };
+        }
       }
 
       const { data, error } = await this.supabase
@@ -65,9 +117,13 @@ class ProfileService {
   // Update specific profile fields
   async updateProfile(userId, updates) {
     try {
+      // Ensure Supabase client is available
       if (!this.supabase) {
-        console.error('ProfileService: Supabase client not available');
-        return { success: false, error: 'Supabase client not available' };
+        await this.initializeSupabase();
+        if (!this.supabase) {
+          console.error('ProfileService: Supabase client not available');
+          return { success: false, error: 'Supabase client not available' };
+        }
       }
 
       console.log('ProfileService: Updating profile for user:', userId, 'with updates:', updates);
@@ -94,9 +150,13 @@ class ProfileService {
   // Upload avatar image to Supabase Storage
   async uploadAvatar(userId, file) {
     try {
+      // Ensure Supabase client is available
       if (!this.supabase) {
-        console.error('ProfileService: Supabase client not available');
-        return { success: false, error: 'Supabase client not available' };
+        await this.initializeSupabase();
+        if (!this.supabase) {
+          console.error('ProfileService: Supabase client not available');
+          return { success: false, error: 'Supabase client not available' };
+        }
       }
 
       // Skip bucket check for faster upload (assume bucket exists)

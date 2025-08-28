@@ -340,6 +340,34 @@ class CarnivalTracker {
     console.log('🔍 Is performing auth operation:', this.isPerformingAuthOperation);
     console.log('🔍 User tier:', this.userTier);
     console.log('🔍 Is premium:', this.isPremium);
+    console.log('🔍 ProfileService available:', !!window.profileService);
+  }
+
+  // Test squad saving functionality
+  async testSquadSaving() {
+    console.log('🧪 Testing squad saving functionality...');
+
+    const testPerson = {
+      name: 'Test Squad Member',
+      phone: '1234567890',
+      relationship: 'Friend'
+    };
+
+    // Simulate form inputs
+    const nameInput = document.getElementById('newPersonName');
+    const phoneInput = document.getElementById('newPersonPhone');
+    const relationshipInput = document.getElementById('newPersonRelationship');
+
+    if (nameInput && phoneInput && relationshipInput) {
+      nameInput.value = testPerson.name;
+      phoneInput.value = testPerson.phone;
+      relationshipInput.value = testPerson.relationship;
+
+      console.log('🧪 Form inputs set, calling addPerson...');
+      await this.addPerson();
+    } else {
+      console.error('🧪 Form inputs not found');
+    }
   }
 
   // Force refresh premium status and update UI
@@ -1705,6 +1733,10 @@ See you at the carnival! 🎪</textarea>
           
           <button class="debug-btn" onclick="window.carnivalTracker.diagnoseSystem()" style="background: #3b82f6; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
             🔍 System Diagnosis
+          </button>
+          
+          <button class="test-save-btn" onclick="window.carnivalTracker.testSquadSaving()" style="background: #10b981; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
+            🧪 Test Squad Saving
           </button>
         </div>
       </div>
