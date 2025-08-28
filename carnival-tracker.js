@@ -395,6 +395,28 @@ class CarnivalTracker {
     }
   }
 
+  // Test debug function
+  testDebug() {
+    console.log('🧪 Test Debug 1 - Carnival Tracker Status:');
+    console.log('🧪 Is visible:', this.isVisible);
+    console.log('🧪 Active tab:', this.activeTab);
+    console.log('🧪 People count:', this.people.length);
+    console.log('🧪 Current user:', this.getCurrentUserSafely()?.email || 'No user');
+    console.log('🧪 Panel state:', window.pullUpPanelState || 'Unknown');
+
+    // Test tab switching
+    const tabs = ['tracker', 'add', 'notifications'];
+    const currentIndex = tabs.indexOf(this.activeTab);
+    const nextTab = tabs[(currentIndex + 1) % tabs.length];
+
+    console.log('🧪 Switching from', this.activeTab, 'to', nextTab);
+    this.activeTab = nextTab;
+    this.render();
+
+    // Show success message
+    alert(`🧪 Test Debug 1 Complete!\nSwitched to ${nextTab} tab\nPeople count: ${this.people.length}`);
+  }
+
   // Force refresh premium status and update UI
   async refreshPremiumStatus() {
     console.log('🔄 Forcing carnival tracker premium status refresh...');
@@ -458,11 +480,14 @@ class CarnivalTracker {
         this.render();
       }
 
-      // Tab buttons
-      if (e.target.closest('.tab-btn')) {
-        const tab = e.target.closest('.tab-btn').dataset.tab;
+      // Tab buttons (both regular and compact)
+      if (e.target.closest('.tab-btn') || e.target.closest('.tab-btn-compact')) {
+        const tabButton = e.target.closest('.tab-btn') || e.target.closest('.tab-btn-compact');
+        const tab = tabButton.dataset.tab;
+        console.log('🎭 Tab button clicked:', tab, 'Current active tab:', this.activeTab);
         this.activeTab = tab;
         this.render();
+        console.log('🎭 Switched to tab:', tab);
       }
 
       // Request location sharing
@@ -491,6 +516,11 @@ class CarnivalTracker {
       if (e.target.closest('.add-person-submit')) {
         e.preventDefault();
         this.addPerson();
+      }
+
+      // Test debug button
+      if (e.target.closest('.test-debug-btn')) {
+        this.testDebug();
       }
     });
 
@@ -1766,6 +1796,10 @@ See you at the carnival! 🎪</textarea>
           
           <button class="test-save-btn" onclick="window.carnivalTracker.testSquadSaving()" style="background: #10b981; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
             🧪 Test Squad Saving
+          </button>
+          
+          <button class="test-debug-btn" style="background: #8b5cf6; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
+            🧪 Test Debug 1
           </button>
         </div>
       </div>
