@@ -542,6 +542,9 @@ function initPullUpPanel() {
 
   let panelState = 'collapsed'; // 'collapsed', 'halfway', 'expanded'
 
+  // Make panelState globally accessible for carnival tracker
+  window.pullUpPanelState = panelState;
+
   panelHandle.addEventListener('click', function (e) {
     e.stopPropagation();
     togglePanel();
@@ -573,6 +576,7 @@ function initPullUpPanel() {
     pullUpPanel.classList.remove('expanded');
     pullUpPanel.classList.add('halfway');
     panelState = 'halfway';
+    window.pullUpPanelState = panelState; // Sync global state
     updateHandleText();
     console.log('📱 Panel halfway');
   }
@@ -581,6 +585,7 @@ function initPullUpPanel() {
     pullUpPanel.classList.remove('halfway');
     pullUpPanel.classList.add('expanded');
     panelState = 'expanded';
+    window.pullUpPanelState = panelState; // Sync global state
     updateHandleText();
     console.log('📱 Panel expanded');
   }
@@ -588,6 +593,7 @@ function initPullUpPanel() {
   function collapsePanel() {
     pullUpPanel.classList.remove('expanded', 'halfway');
     panelState = 'collapsed';
+    window.pullUpPanelState = panelState; // Sync global state
     updateHandleText();
     console.log('📱 Panel collapsed');
   }

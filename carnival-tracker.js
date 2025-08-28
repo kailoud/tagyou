@@ -343,6 +343,10 @@ class CarnivalTracker {
       pullUpPanel.classList.remove('expanded', 'halfway');
       // Force to halfway
       pullUpPanel.classList.add('halfway');
+      // Update global state to keep main panel in sync
+      if (window.pullUpPanelState !== undefined) {
+        window.pullUpPanelState = 'halfway';
+      }
       console.log('📱 Panel forced to halfway after adding squad member');
     }
   }
@@ -354,6 +358,10 @@ class CarnivalTracker {
       // Always force to halfway when carnival tracker is shown
       pullUpPanel.classList.remove('expanded', 'halfway');
       pullUpPanel.classList.add('halfway');
+      // Update global state to keep main panel in sync
+      if (window.pullUpPanelState !== undefined) {
+        window.pullUpPanelState = 'halfway';
+      }
       console.log('📱 Panel forced to halfway when carnival tracker shown');
     }
   }
