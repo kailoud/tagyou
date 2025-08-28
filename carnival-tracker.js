@@ -514,6 +514,27 @@ See you at the carnival! 🎪</textarea>
     }, 3000);
   }
 
+  showAddSuccess(name) {
+    const successModal = document.createElement('div');
+    successModal.className = 'add-success-modal';
+    successModal.innerHTML = `
+      <div class="add-success-overlay">
+        <div class="add-success-content">
+          <i class="fas fa-user-plus"></i>
+          <h3>Added to Squad!</h3>
+          <p>${name} has been added to your Carnival Squad</p>
+          <button onclick="this.closest('.add-success-modal').remove()">OK</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(successModal);
+
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+      successModal.remove();
+    }, 3000);
+  }
+
   importPhoneContacts() {
     // This would use the Web Contacts API
     console.log('Importing phone contacts...');
@@ -577,18 +598,29 @@ See you at the carnival! 🎪</textarea>
   }
 
   addPerson() {
+    console.log('addPerson function called');
+
     const nameInput = document.getElementById('newPersonName');
     const phoneInput = document.getElementById('newPersonPhone');
     const relationshipInput = document.getElementById('newPersonRelationship');
 
+    console.log('Form inputs found:', {
+      nameInput: !!nameInput,
+      phoneInput: !!phoneInput,
+      relationshipInput: !!relationshipInput
+    });
+
     if (!nameInput || !phoneInput || !relationshipInput) {
       console.error('Form inputs not found');
+      alert('Form inputs not found. Please try again.');
       return;
     }
 
     const name = nameInput.value.trim();
     const phone = phoneInput.value.trim();
     const relationship = relationshipInput.value;
+
+    console.log('Form values:', { name, phone, relationship });
 
     if (name && phone && relationship) {
       // Check if user can add more people
@@ -620,6 +652,9 @@ See you at the carnival! 🎪</textarea>
       this.updateToolbarCount();
 
       console.log('Person added successfully:', name);
+
+      // Show success message
+      this.showAddSuccess(name);
     } else {
       console.log('Please fill in all fields');
     }

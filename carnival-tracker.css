@@ -779,6 +779,64 @@
   transform: translateY(-1px);
 }
 
+/* Add Success Modal */
+.add-success-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  backdrop-filter: blur(4px);
+}
+
+.add-success-overlay {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+.add-success-content i {
+  font-size: 48px;
+  color: #10b981;
+  margin-bottom: 16px;
+}
+
+.add-success-content h3 {
+  margin: 0 0 8px 0;
+  color: #374151;
+  font-size: 20px;
+}
+
+.add-success-content p {
+  margin: 0 0 20px 0;
+  color: #6b7280;
+}
+
+.add-success-content button {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-success-content button:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
 .whatsapp-import-btn,
 .contacts-import-btn {
   background: white;
