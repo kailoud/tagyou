@@ -17,6 +17,14 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 async function initializeSupabase() {
   try {
+    // Use centralized Supabase client if available
+    if (window.getSupabaseClient) {
+      supabaseClient = window.getSupabaseClient();
+      console.log('✅ Using centralized Supabase client');
+      return true;
+    }
+
+    // Fallback to creating our own client
     if (!window.supabase || !window.supabaseConfig) {
       throw new Error('Supabase SDK or config not available');
     }

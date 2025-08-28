@@ -68,22 +68,20 @@ class CarnivalTracker {
 
           if (!user) {
             // Only try direct auth calls if we don't have a user from safe sources
-            if (window.supabaseClient) {
-              const { data: { user: supabaseUser } } = await window.supabaseClient.auth.getUser();
+            const supabaseInstance = window.getSupabaseClient ? window.getSupabaseClient() : (window.supabaseClient || window.supabase);
+
+            if (supabaseInstance) {
+              const { data: { user: supabaseUser } } = await supabaseInstance.auth.getUser();
               user = supabaseUser;
-              console.log('✅ Got user from supabase client for loading:', user?.email);
-            } else if (window.supabase) {
-              const { data: { user: supabaseUser } } = await window.supabase.auth.getUser();
-              user = supabaseUser;
-              console.log('✅ Got user from window.supabase for loading:', user?.email);
+              console.log('✅ Got user from shared supabase client for loading:', user?.email);
             }
           } else {
             console.log('✅ Got user safely for loading without auth conflicts:', user.email);
           }
 
           if (user) {
-            // Load squad members from database using supabaseClient if available
-            const supabaseInstance = window.supabaseClient || window.supabase;
+            // Load squad members from database using shared supabase client
+            const supabaseInstance = window.getSupabaseClient ? window.getSupabaseClient() : (window.supabaseClient || window.supabase);
             const { data, error } = await supabaseInstance
               .from('carnival_squad_members')
               .select('*')
@@ -857,14 +855,12 @@ See you at the carnival! 🎪</textarea>
 
             if (!user) {
               // Only try direct auth calls if we don't have a user from safe sources
-              if (window.supabaseClient) {
-                const { data: { user: supabaseUser } } = await window.supabaseClient.auth.getUser();
+              const supabaseInstance = window.getSupabaseClient ? window.getSupabaseClient() : (window.supabaseClient || window.supabase);
+
+              if (supabaseInstance) {
+                const { data: { user: supabaseUser } } = await supabaseInstance.auth.getUser();
                 user = supabaseUser;
-                console.log('✅ Got user from supabase client:', user?.email);
-              } else if (window.supabase) {
-                const { data: { user: supabaseUser } } = await window.supabase.auth.getUser();
-                user = supabaseUser;
-                console.log('✅ Got user from window.supabase:', user?.email);
+                console.log('✅ Got user from shared supabase client:', user?.email);
               }
             } else {
               console.log('✅ Got user safely without auth conflicts:', user.email);
@@ -873,8 +869,8 @@ See you at the carnival! 🎪</textarea>
             if (user) {
               const avatar = this.generateAvatar(name);
 
-              // Insert into database using supabaseClient if available
-              const supabaseInstance = window.supabaseClient || window.supabase;
+              // Insert into database using shared supabase client
+              const supabaseInstance = window.getSupabaseClient ? window.getSupabaseClient() : (window.supabaseClient || window.supabase);
               const { data, error } = await supabaseInstance
                 .from('carnival_squad_members')
                 .insert([

@@ -1,72 +1,64 @@
-// Supabase Configuration
-// Using CDN imports for better compatibility with live server
+// Centralized Supabase Configuration
+// This ensures only one GoTrueClient instance is created
 
-// Supabase Configuration
-let supabaseConfig = null;
-let supabase = null;
+let supabaseClient = null;
+let isInitializing = false;
 
-// Load Supabase configuration securely
-async function loadSupabaseConfig() {
-  try {
-    // Try to load from secret configuration file (for development)
-    const secretConfig = await import('./supabase-config-secret.js');
-    supabaseConfig = secretConfig.default;
-    console.log('✅ Supabase configuration loaded from secret file');
-    return true;
-  } catch (error) {
-    console.warn('⚠️ Supabase configuration not found. Please create supabase-config-secret.js with your credentials.');
-    console.warn('Copy supabase-config-secret.template.js to supabase-config-secret.js and add your actual Supabase config.');
-    supabaseConfig = null;
-    return false;
-  }
-}
-
-// Initialize Supabase only if config is available
+// Initialize Supabase client once
 async function initializeSupabase() {
-  console.log('🚀 Starting Supabase initialization...');
-
-  // Wait for Supabase to be available
-  let attempts = 0;
-  const maxAttempts = 30;
-
-  while (attempts < maxAttempts) {
-    if (typeof window !== 'undefined' && window.supabase) {
-      console.log('✅ Supabase SDK available, proceeding with initialization...');
-      break;
-    }
-    attempts++;
-    await new Promise(resolve => setTimeout(resolve, 1000));
+  if (supabaseClient) {
+    return supabaseClient;
   }
 
-  if (attempts >= maxAttempts) {
-    throw new Error('Supabase SDK not available after 30 seconds');
+  if (isInitializing) {
+    // Wait for initialization to complete
+    while (isInitializing) {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+    return supabaseClient;
   }
 
-  const configLoaded = await loadSupabaseConfig();
+  isInitializing = true;
 
-  if (configLoaded && supabaseConfig) {
-    try {
-      // Use the global supabase object directly
-      supabase = window.supabase.createClient(
-        supabaseConfig.supabaseUrl,
-        supabaseConfig.supabaseAnonKey
-      );
-
-      // Set the global supabase instance
-      window.supabase = supabase;
-
-      console.log('✅ Supabase initialized successfully');
-      console.log('🌐 Project URL:', supabaseConfig.supabaseUrl);
-      return true;
-    } catch (error) {
-      console.error('❌ Supabase initialization error:', error);
-      throw error;
+  try {
+    if (!window.supabase || !window.supabaseConfig) {
+      throw new Error('Supabase SDK or config not available');
     }
-  } else {
-    console.warn('⚠️ Supabase not initialized - no configuration found');
-    return false;
+
+    // Create single client instance
+    supabaseClient = window.supabase.createClient(
+      window.supabaseConfig.supabaseUrl,
+      window.supabaseConfig.supabaseAnonKey
+    );
+
+    // Set as global for backward compatibility
+    window.supabaseClient = supabaseClient;
+
+    console.log('✅ Single Supabase client initialized');
+    return supabaseClient;
+  } catch (error) {
+    console.error('❌ Failed to initialize Supabase:', error);
+    throw error;
+  } finally {
+    isInitializing = false;
   }
 }
 
-// Export Supabase client (will be null if not initialized)
-export { supabase, initializeSupabase };
+// Get the shared Supabase client
+function getSupabaseClient() {
+  if (!supabaseClient) {
+    throw new Error('Supabase client not initialized. Call initializeSupabase() first.');
+  }
+  return supabaseClient;
+}
+
+// Export for use in other modules
+window.initializeSupabase = initializeSupabase;
+window.getSupabaseClient = getSupabaseClient;
+
+// Auto-initialize when this script loads
+document.addEventListener('DOMContentLoaded', () => {
+  initializeSupabase().catch(error => {
+    console.warn('Supabase initialization failed:', error);
+  });
+});

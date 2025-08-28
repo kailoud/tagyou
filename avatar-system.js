@@ -81,28 +81,25 @@ class AvatarSystem {
     try {
       console.log('AUTH DEBUG: Initializing Supabase...');
 
-      // Wait for Supabase to be available (reduced timeout)
+      // Wait for centralized Supabase client to be available
       let attempts = 0;
       const maxAttempts = 50; // Reduced from 300 to 50 (5 seconds max)
 
-      while (!window.supabase && attempts < maxAttempts) {
+      while (!window.getSupabaseClient && !window.supabase && attempts < maxAttempts) {
         await new Promise(resolve => setTimeout(resolve, 100));
         attempts++;
       }
 
-      if (!window.supabase) {
+      if (!window.getSupabaseClient && !window.supabase) {
         console.error('AUTH DEBUG: Supabase not available - authentication will not work');
         throw new Error('Supabase is required for authentication');
       }
 
-      // Wait for Supabase client to be fully initialized (reduced timeout)
-      attempts = 0;
-      while (!window.supabaseClient && attempts < maxAttempts) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-        attempts++;
-      }
-
-      if (!window.supabaseClient) {
+      // Use centralized client if available
+      if (window.getSupabaseClient) {
+        window.supabaseClient = window.getSupabaseClient();
+        console.log('AUTH DEBUG: Using centralized Supabase client');
+      } else if (!window.supabaseClient) {
         console.log('AUTH DEBUG: Creating Supabase client...');
       }
 

@@ -10,40 +10,40 @@ class ProfileService {
   // Initialize Supabase client with retry logic
   async initializeSupabase() {
     try {
-      // Try to get supabase client from multiple sources
+      // Use the centralized Supabase client
+      if (window.getSupabaseClient) {
+        this.supabase = window.getSupabaseClient();
+        console.log('✅ ProfileService: Using centralized Supabase client');
+        return;
+      }
+
+      // Fallback to window.supabaseClient
       if (window.supabaseClient) {
         this.supabase = window.supabaseClient;
         console.log('✅ ProfileService: Supabase client initialized from window.supabaseClient');
-      } else if (window.supabase && window.supabaseConfig) {
-        // Create client if not available
-        this.supabase = window.supabase.createClient(
-          window.supabaseConfig.supabaseUrl,
-          window.supabaseConfig.supabaseAnonKey
-        );
-        console.log('✅ ProfileService: Supabase client created from window.supabase');
-      } else {
-        // Wait for supabase to be available
-        let attempts = 0;
-        const maxAttempts = 50;
-        while (!this.supabase && attempts < maxAttempts) {
-          await new Promise(resolve => setTimeout(resolve, 100));
+        return;
+      }
 
-          if (window.supabaseClient) {
-            this.supabase = window.supabaseClient;
-            console.log('✅ ProfileService: Supabase client initialized after waiting');
-          } else if (window.supabase && window.supabaseConfig) {
-            this.supabase = window.supabase.createClient(
-              window.supabaseConfig.supabaseUrl,
-              window.supabaseConfig.supabaseAnonKey
-            );
-            console.log('✅ ProfileService: Supabase client created after waiting');
-          }
-          attempts++;
-        }
+      // Wait for centralized client to be available
+      let attempts = 0;
+      const maxAttempts = 50;
+      while (!this.supabase && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-        if (!this.supabase) {
-          console.warn('⚠️ ProfileService: Could not initialize Supabase client after retries');
+        if (window.getSupabaseClient) {
+          this.supabase = window.getSupabaseClient();
+          console.log('✅ ProfileService: Using centralized Supabase client after waiting');
+          return;
+        } else if (window.supabaseClient) {
+          this.supabase = window.supabaseClient;
+          console.log('✅ ProfileService: Supabase client initialized after waiting');
+          return;
         }
+        attempts++;
+      }
+
+      if (!this.supabase) {
+        console.warn('⚠️ ProfileService: Could not initialize Supabase client after retries');
       }
     } catch (error) {
       console.error('❌ ProfileService: Error initializing Supabase:', error);
