@@ -435,16 +435,33 @@ class CarnivalTracker {
   }
 
   openWhatsApp() {
-    console.log('📱 Opening WhatsApp...');
+    console.log('📱 Opening WhatsApp application...');
 
-    // Open WhatsApp directly
-    const whatsappUrl = 'https://wa.me/';
-    window.open(whatsappUrl, '_blank');
+    // Try to open WhatsApp mobile app first
+    const whatsappAppUrl = 'whatsapp://';
+    const whatsappWebUrl = 'https://wa.me/';
+
+    // Create a link element to trigger the app
+    const link = document.createElement('a');
+    link.href = whatsappAppUrl;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+
+    // Try to open the app
+    link.click();
+
+    // Remove the link element
+    document.body.removeChild(link);
+
+    // Fallback to WhatsApp Web after a short delay
+    setTimeout(() => {
+      window.open(whatsappWebUrl, '_blank');
+    }, 1000);
 
     // Show a helpful message
     setTimeout(() => {
       alert('WhatsApp opened! You can now share your carnival squad invites directly through WhatsApp.');
-    }, 500);
+    }, 1500);
   }
 
   importWhatsAppContacts() {
