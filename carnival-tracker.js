@@ -382,6 +382,21 @@ class CarnivalTracker {
     }
   }
 
+  // Debug toolbar count
+  debugToolbarCount() {
+    console.log('🎭 Toolbar Count Debug:');
+    console.log('  - Total squad members:', this.people.length);
+    console.log('  - Sharing location:', this.people.filter(p => p.isSharing).length);
+
+    const trackerCount = document.getElementById('trackerCount');
+    console.log('  - Toolbar count element:', trackerCount);
+    console.log('  - Current toolbar count:', trackerCount?.textContent);
+
+    // Force update toolbar count
+    this.updateToolbarCount();
+    console.log('  - Updated toolbar count:', trackerCount?.textContent);
+  }
+
   // Test squad saving functionality
   async testSquadSaving() {
     console.log('🧪 Testing squad saving functionality...');
@@ -1077,6 +1092,8 @@ See you at the carnival! 🎪</textarea>
       if (stored) {
         this.people = JSON.parse(stored);
         console.log('🎭 Loaded squad members from localStorage:', this.people.length);
+        // Update toolbar count after loading data
+        this.updateToolbarCount();
       }
     } catch (error) {
       console.error('Error loading from localStorage:', error);
@@ -1553,8 +1570,10 @@ See you at the carnival! 🎪</textarea>
   updateToolbarCount() {
     const trackerCount = document.getElementById('trackerCount');
     if (trackerCount) {
-      const sharingCount = this.people.filter(p => p.isSharing).length;
-      trackerCount.textContent = sharingCount;
+      // Show total squad members count instead of just sharing count
+      const totalSquadMembers = this.people.length;
+      trackerCount.textContent = totalSquadMembers;
+      console.log('🎭 Toolbar count updated:', totalSquadMembers, 'squad members');
     }
   }
 
@@ -1814,6 +1833,10 @@ See you at the carnival! 🎪</textarea>
           
           <button class="test-btn" onclick="window.carnivalTracker.debugPremiumStatus()" style="background: #3b82f6; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
             🔍 Debug Premium Status
+          </button>
+          
+          <button class="test-btn" onclick="window.carnivalTracker.debugToolbarCount()" style="background: #10b981; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
+            🎭 Debug Toolbar Count
           </button>
           
           <button class="debug-btn" onclick="window.carnivalTracker.diagnoseSystem()" style="background: #3b82f6; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
