@@ -773,6 +773,52 @@ body {
   box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
 }
 
+/* User Location Pulsating Dot */
+.user-location-marker {
+  background: transparent;
+  border: none;
+}
+
+.pulsating-dot {
+  width: 20px;
+  height: 20px;
+  background: #3b82f6;
+  border-radius: 50%;
+  position: relative;
+  animation: pulse 2s infinite;
+  box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+}
+
+.pulsating-dot::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
 
 
 /* Responsive scaling for toolbar */

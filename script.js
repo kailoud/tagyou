@@ -463,8 +463,29 @@ function initMapToolbar() {
       navigator.geolocation.getCurrentPosition(function (position) {
         const userLat = position.coords.latitude;
         const userLng = position.coords.longitude;
+
+        // Remove existing user location marker if it exists
+        if (window.userLocationMarker) {
+          map.removeLayer(window.userLocationMarker);
+        }
+
+        // Create pulsating blue dot for user location
+        const userLocationIcon = L.divIcon({
+          className: 'user-location-marker',
+          html: '<div class="pulsating-dot"></div>',
+          iconSize: [20, 20],
+          iconAnchor: [10, 10]
+        });
+
+        // Add user location marker to map
+        window.userLocationMarker = L.marker([userLat, userLng], {
+          icon: userLocationIcon,
+          zIndexOffset: 1000
+        }).addTo(map);
+
+        // Center map on user location
         map.setView([userLat, userLng], 15);
-        console.log('📍 Map centered on user location');
+        console.log('📍 Map centered on user location with pulsating dot');
       }, function (error) {
         console.log('❌ Error getting location:', error);
         map.setView([51.5074, -0.1278], 12);
