@@ -1700,124 +1700,7 @@
   margin: 0;
 }
 
-/* Add Person Modal */
-.add-person-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2000;
-  display: flex;
-  align-items: flex-end;
-}
-
-.modal-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.modal-content {
-  background: white;
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-  border-radius: 16px 16px 0 0;
-  padding: 24px;
-  position: relative;
-  z-index: 1;
-  animation: slideUpModal 0.3s ease-out;
-}
-
-@keyframes slideUpModal {
-  from {
-    transform: translateY(100%);
-  }
-
-  to {
-    transform: translateY(0);
-  }
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.modal-header h3 {
-  font-size: 18px;
-  font-weight: bold;
-  margin: 0;
-  color: #111827;
-}
-
-.close-add-form {
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background-color 0.2s;
-}
-
-.close-add-form:hover {
-  background: #f3f4f6;
-}
-
-.add-person-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.add-person-input {
-  padding: 12px 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 16px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.add-person-input:focus {
-  border-color: #8b5cf6;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-}
-
-.add-person-submit {
-  background: linear-gradient(135deg, #8b5cf6, #ec4899);
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.add-person-submit:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-}
-
-.add-person-submit:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+/* Add Person Modal - REMOVED - Now using inline form in Add tab */
 
 /* Color Classes */
 .bg-red-500 {
@@ -1891,9 +1774,7 @@
 /* Ensure carnival tracker appears above other elements but below modals */
 /* z-index is already set to 1001 in the main .carnival-tracker rule above */
 
-.add-person-modal {
-  z-index: 2000;
-}
+/* Add Person Modal - REMOVED - Now using inline form in Add tab */
 
 /* Premium Features */
 .premium-indicator {

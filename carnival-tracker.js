@@ -5,7 +5,6 @@ class CarnivalTracker {
     this.isVisible = false;
     this.activeTab = "tracker";
     this.searchTerm = "";
-    this.showAddForm = false;
     this.notifications = [];
 
     // Flag to track auth operations (for debugging)
@@ -487,15 +486,10 @@ class CarnivalTracker {
         this.hide();
       }
 
-      // Add person button
+      // Add person button (now handled by inline form in Add tab)
       if (e.target.closest('.add-person-btn')) {
-        this.showAddForm = true;
-        this.render();
-      }
-
-      // Close add form
-      if (e.target.closest('.close-add-form')) {
-        this.showAddForm = false;
+        // Switch to Add tab instead of showing popup
+        this.activeTab = 'add';
         this.render();
       }
 
@@ -1580,9 +1574,7 @@ See you at the carnival! 🎪</textarea>
       this.renderFull();
     }
 
-    if (this.showAddForm) {
-      this.renderAddForm();
-    }
+
   }
 
   renderFull() {
@@ -1627,9 +1619,7 @@ See you at the carnival! 🎪</textarea>
             </div>
             
             <div class="header-actions-compact">
-              <button class="action-btn-compact add-btn" title="Add Person">
-                <i class="fas fa-plus"></i>
-              </button>
+              <!-- Add button removed - form is now inline in Add tab -->
             </div>
           </div>
         </div>
@@ -1936,42 +1926,7 @@ See you at the carnival! 🎪</textarea>
     `;
   }
 
-  renderAddForm() {
-    const modal = document.createElement('div');
-    modal.className = 'add-person-modal';
-    modal.innerHTML = `
-      <div class="modal-overlay">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3>Add to Squad</h3>
-            <button class="close-add-form">×</button>
-          </div>
-          
-          <form class="add-person-form">
-            <input type="text" class="add-person-input" data-field="name" placeholder="Name" value="${this.newPerson.name}" required>
-            <input type="tel" class="add-person-input" data-field="phone" placeholder="Phone Number" value="${this.newPerson.phone}" required>
-            <select class="add-person-input" data-field="relationship" required>
-              <option value="">Relationship</option>
-              ${this.relationships.map(rel => `
-                <option value="${rel}" ${this.newPerson.relationship === rel ? 'selected' : ''}>${rel}</option>
-              `).join('')}
-            </select>
-            <button type="submit" class="add-person-submit">Add to Squad</button>
-          </form>
-        </div>
-      </div>
-    `;
 
-    document.body.appendChild(modal);
-
-    // Remove modal when clicking overlay or close button
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal || e.target.closest('.close-add-form')) {
-        document.body.removeChild(modal);
-        this.showAddForm = false;
-      }
-    });
-  }
 
   openWhatsApp(phoneNumber, personName) {
     // Clean phone number (remove spaces, dashes, parentheses)
