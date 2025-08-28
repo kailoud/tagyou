@@ -311,8 +311,30 @@ class LocationSharingToggle {
   }
 
   // Sync with avatar system
-  syncWithAvatarSystem() {
+  async syncWithAvatarSystem() {
     console.log('📍 Syncing with avatar system...');
+
+    // Wait for avatar system to be ready
+    let attempts = 0;
+    const maxAttempts = 50; // 5 seconds max
+
+    while (!window.avatarSystem && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+
+    if (!window.avatarSystem) {
+      console.log('📍 Avatar system not available after waiting');
+      return;
+    }
+
+    // Wait for user to be loaded
+    attempts = 0;
+    while (!window.avatarSystem.user && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+
     const avatarUser = window.avatarSystem?.user;
     if (avatarUser) {
       console.log('📍 Found user in avatar system:', avatarUser.email);
@@ -320,22 +342,25 @@ class LocationSharingToggle {
       this.loadSharingState();
       this.updateToggleUI();
     } else {
-      console.log('📍 No user found in avatar system');
+      console.log('📍 No user found in avatar system (after waiting)');
     }
   }
 }
 
 // Initialize location sharing toggle
+// TEMPORARILY DISABLED FOR TESTING
+/*
 document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
+  setTimeout(async () => {
     window.locationSharingToggle = new LocationSharingToggle();
     console.log('📍 Location sharing toggle initialized');
 
-    // Additional sync after initialization
-    setTimeout(() => {
+    // Additional sync after initialization (with proper waiting)
+    setTimeout(async () => {
       if (window.locationSharingToggle) {
-        window.locationSharingToggle.syncWithAvatarSystem();
+        await window.locationSharingToggle.syncWithAvatarSystem();
       }
     }, 500);
   }, 100);
 });
+*/
