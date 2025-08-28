@@ -434,7 +434,7 @@ class CarnivalTracker {
     return distances[Math.floor(Math.random() * distances.length)];
   }
 
-  openWhatsApp() {
+  openWhatsAppDirect() {
     console.log('📱 Opening WhatsApp application...');
 
     // Try to open WhatsApp mobile app first
@@ -1587,7 +1587,7 @@ See you at the carnival! 🎪</textarea>
             <span>or</span>
           </div>
           
-          <button class="whatsapp-import-btn" onclick="window.carnivalTracker.openWhatsApp()">
+          <button class="whatsapp-import-btn" onclick="window.carnivalTracker.openWhatsAppDirect()">
             <i class="fab fa-whatsapp"></i>
             Import from WhatsApp
           </button>
