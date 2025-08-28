@@ -178,9 +178,12 @@ class CarnivalTracker {
     }
 
     // Update avatar system if available
+    // Temporarily disabled to prevent authentication conflicts
+    /*
     if (window.avatarSystem) {
       window.avatarSystem.setPremiumStatus(email, isPremium);
     }
+    */
 
     console.log('✅ Premium status updated manually');
   }
@@ -199,6 +202,12 @@ class CarnivalTracker {
 
   // Sync premium status with avatar system
   syncPremiumStatus() {
+    // Temporarily disabled to prevent authentication conflicts
+    console.log('🎭 Avatar system sync disabled to prevent conflicts');
+    return;
+
+    // Original code commented out:
+    /*
     if (window.avatarSystem && window.avatarSystem.user) {
       const avatarTier = window.avatarSystem.userTier;
       const avatarIsPremium = window.avatarSystem.isPremium;
@@ -208,6 +217,7 @@ class CarnivalTracker {
         this.setUserTier(avatarTier);
       }
     }
+    */
   }
 
   // Force refresh premium status and update UI
@@ -630,7 +640,7 @@ See you at the carnival! 🎪</textarea>
       }
 
       const avatar = this.generateAvatar(name);
-      this.people.push({
+      const newPerson = {
         name,
         phone,
         relationship,
@@ -639,7 +649,10 @@ See you at the carnival! 🎪</textarea>
         isSharing: false,
         location: null,
         avatar
-      });
+      };
+
+      // Add to people array
+      this.people.push(newPerson);
 
       // Clear form
       nameInput.value = '';
@@ -657,6 +670,7 @@ See you at the carnival! 🎪</textarea>
       this.showAddSuccess(name);
     } else {
       console.log('Please fill in all fields');
+      alert('Please fill in all fields (Name, Phone, and Relationship)');
     }
   }
 
@@ -1724,15 +1738,25 @@ See you at the carnival! 🎪</textarea>
 document.addEventListener('DOMContentLoaded', () => {
   // Small delay to ensure other components are loaded
   setTimeout(() => {
-    window.carnivalTracker = new CarnivalTracker();
+    try {
+      window.carnivalTracker = new CarnivalTracker();
 
-    // Make it globally accessible
-    window.toggleCarnivalTracker = () => {
-      if (window.carnivalTracker) {
-        window.carnivalTracker.toggle();
-      }
-    };
+      // Make it globally accessible
+      window.toggleCarnivalTracker = () => {
+        if (window.carnivalTracker) {
+          window.carnivalTracker.toggle();
+        }
+      };
 
-    console.log('🎭 Carnival tracker initialized');
-  }, 50); // Reduced delay for faster loading
+      console.log('🎭 Carnival tracker initialized successfully');
+
+      // Test the add person functionality
+      console.log('🧪 Testing carnival tracker functionality...');
+      console.log('🧪 Carnival tracker object:', window.carnivalTracker);
+      console.log('🧪 Add person function:', typeof window.carnivalTracker.addPerson);
+
+    } catch (error) {
+      console.error('❌ Error initializing carnival tracker:', error);
+    }
+  }, 100); // Slightly longer delay to avoid conflicts
 });
