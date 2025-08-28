@@ -8,7 +8,7 @@ class CarnivalTracker {
     this.showAddForm = false;
     this.notifications = [];
 
-    // Flag to prevent avatar system conflicts
+    // Flag to track auth operations (for debugging)
     this.isPerformingAuthOperation = false;
 
     this.newPerson = {
@@ -285,12 +285,6 @@ class CarnivalTracker {
 
   // Sync premium status with avatar system
   syncPremiumStatus() {
-    // Temporarily disabled to prevent authentication conflicts
-    console.log('🎭 Avatar system sync disabled to prevent conflicts');
-    return;
-
-    // Original code commented out:
-    /*
     if (window.avatarSystem && window.avatarSystem.user) {
       const avatarTier = window.avatarSystem.userTier;
       const avatarIsPremium = window.avatarSystem.isPremium;
@@ -300,7 +294,6 @@ class CarnivalTracker {
         this.setUserTier(avatarTier);
       }
     }
-    */
   }
 
   // Add a method to safely get user without triggering auth conflicts
@@ -821,7 +814,7 @@ See you at the carnival! 🎪</textarea>
   async addPerson() {
     console.log('addPerson function called');
 
-    // Set flag to prevent avatar system conflicts
+    // Set flag to track auth operations
     this.isPerformingAuthOperation = true;
 
     const nameInput = document.getElementById('newPersonName');
@@ -982,7 +975,7 @@ See you at the carnival! 🎪</textarea>
       alert('Please fill in all fields (Name, Phone, and Relationship)');
     }
 
-    // Clear flag to allow avatar system operations
+    // Clear flag after auth operation
     this.isPerformingAuthOperation = false;
   }
 
