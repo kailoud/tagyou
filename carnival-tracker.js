@@ -50,6 +50,68 @@ class CarnivalTracker {
     this.setupEventListeners();
     this.updateToolbarCount();
     this.checkPremiumStatus();
+    this.loadInitialData();
+  }
+
+  async loadInitialData() {
+    try {
+      console.log('🎭 Loading carnival squad data...');
+
+      // Try database first
+      if (window.supabase) {
+        try {
+          // Get current user
+          const { data: { user } } = await window.supabase.auth.getUser();
+
+          if (user) {
+            // Load squad members from database
+            const { data, error } = await window.supabase
+              .from('carnival_squad_members')
+              .select('*')
+              .eq('user_id', user.id)
+              .order('created_at', { ascending: false });
+
+            if (!error && data) {
+              // Convert database format to local format
+              this.people = data.map(member => ({
+                id: member.id,
+                name: member.name,
+                phone: member.phone,
+                relationship: member.relationship,
+                email: member.email,
+                isSharing: member.is_sharing,
+                location: member.location_lat && member.location_lng ? {
+                  latitude: member.location_lat,
+                  longitude: member.location_lng,
+                  area: member.location_area
+                } : null,
+                lastUpdate: new Date(member.last_update),
+                avatar: member.avatar_data || this.generateAvatar(member.name)
+              }));
+
+              console.log('🎭 Loaded squad members from database:', this.people.length);
+              this.render();
+              this.updateToolbarCount();
+              return;
+            }
+          }
+        } catch (dbError) {
+          console.log('🎭 Database load failed, trying localStorage:', dbError);
+        }
+      }
+
+      // Fallback to localStorage
+      this.loadFromLocalStorage();
+      this.render();
+      this.updateToolbarCount();
+
+    } catch (error) {
+      console.error('🎭 Error in loadInitialData:', error);
+      // Final fallback to localStorage
+      this.loadFromLocalStorage();
+      this.render();
+      this.updateToolbarCount();
+    }
   }
 
   async checkPremiumStatus() {
@@ -545,6 +607,37 @@ See you at the carnival! 🎪</textarea>
     }, 3000);
   }
 
+  testAddPerson() {
+    console.log('🧪 Test add person function called');
+
+    // Add a test person directly
+    const testPerson = {
+      name: 'Test User',
+      phone: '1234567890',
+      relationship: 'Friend',
+      id: Date.now(),
+      lastUpdate: new Date(),
+      isSharing: false,
+      location: null,
+      avatar: this.generateAvatar('Test User')
+    };
+
+    this.people.push(testPerson);
+
+    // Switch to tracker tab
+    this.activeTab = 'tracker';
+    this.render();
+    this.updateToolbarCount();
+
+    console.log('🧪 Test person added successfully');
+    console.log('🧪 Current people count:', this.people.length);
+
+    // Show success message
+    this.showAddSuccess('Test User');
+
+    alert('🧪 Test person added! Check console for details.');
+  }
+
   importPhoneContacts() {
     // This would use the Web Contacts API
     console.log('Importing phone contacts...');
@@ -607,7 +700,7 @@ See you at the carnival! 🎪</textarea>
     this.updateToolbarCount();
   }
 
-  addPerson() {
+  async addPerson() {
     console.log('addPerson function called');
 
     const nameInput = document.getElementById('newPersonName');
@@ -639,38 +732,122 @@ See you at the carnival! 🎪</textarea>
         return;
       }
 
-      const avatar = this.generateAvatar(name);
-      const newPerson = {
-        name,
-        phone,
-        relationship,
-        id: Date.now(),
-        lastUpdate: new Date(),
-        isSharing: false,
-        location: null,
-        avatar
-      };
+      try {
+        // Try database first, fallback to local storage
+        let newPerson;
 
-      // Add to people array
-      this.people.push(newPerson);
+        if (window.supabase) {
+          try {
+            // Get current user ID from Supabase auth
+            const { data: { user } } = await window.supabase.auth.getUser();
 
-      // Clear form
-      nameInput.value = '';
-      phoneInput.value = '';
-      relationshipInput.value = '';
+            if (user) {
+              const avatar = this.generateAvatar(name);
 
-      // Switch back to tracker tab
-      this.activeTab = 'tracker';
-      this.render();
-      this.updateToolbarCount();
+              // Insert into database
+              const { data, error } = await window.supabase
+                .from('carnival_squad_members')
+                .insert([
+                  {
+                    user_id: user.id,
+                    name: name,
+                    phone: phone,
+                    relationship: relationship,
+                    avatar_data: avatar,
+                    is_sharing: false
+                  }
+                ])
+                .select();
 
-      console.log('Person added successfully:', name);
+              if (error) {
+                console.error('Database error:', error);
+                throw new Error('Database insert failed');
+              }
 
-      // Show success message
-      this.showAddSuccess(name);
+              console.log('Database insert successful:', data);
+
+              newPerson = {
+                id: data[0].id,
+                name,
+                phone,
+                relationship,
+                lastUpdate: new Date(),
+                isSharing: false,
+                location: null,
+                avatar
+              };
+            } else {
+              throw new Error('No authenticated user');
+            }
+          } catch (dbError) {
+            console.log('Database operation failed, using local storage:', dbError);
+            throw dbError;
+          }
+        }
+
+        // Fallback to local storage
+        if (!newPerson) {
+          const avatar = this.generateAvatar(name);
+          newPerson = {
+            id: Date.now(),
+            name,
+            phone,
+            relationship,
+            lastUpdate: new Date(),
+            isSharing: false,
+            location: null,
+            avatar
+          };
+
+          // Save to localStorage
+          this.saveToLocalStorage();
+        }
+
+        // Add to local array for immediate UI update
+        this.people.push(newPerson);
+
+        // Clear form
+        nameInput.value = '';
+        phoneInput.value = '';
+        relationshipInput.value = '';
+
+        // Switch back to tracker tab
+        this.activeTab = 'tracker';
+        this.render();
+        this.updateToolbarCount();
+
+        console.log('Person added successfully:', name);
+
+        // Show success message
+        this.showAddSuccess(name);
+      } catch (error) {
+        console.error('Error adding person:', error);
+        alert('Error adding squad member. Please try again.');
+      }
     } else {
       console.log('Please fill in all fields');
       alert('Please fill in all fields (Name, Phone, and Relationship)');
+    }
+  }
+
+  saveToLocalStorage() {
+    try {
+      localStorage.setItem('carnival_squad_members', JSON.stringify(this.people));
+      console.log('🎭 Saved squad members to localStorage');
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
+  }
+
+  loadFromLocalStorage() {
+    try {
+      const stored = localStorage.getItem('carnival_squad_members');
+      if (stored) {
+        this.people = JSON.parse(stored);
+        console.log('🎭 Loaded squad members from localStorage:', this.people.length);
+      }
+    } catch (error) {
+      console.error('Error loading from localStorage:', error);
     }
   }
 
@@ -1388,6 +1565,14 @@ See you at the carnival! 🎪</textarea>
           <button class="contacts-import-btn" onclick="window.carnivalTracker.importPhoneContacts()">
             <i class="fas fa-address-book"></i>
             Import from Contacts
+          </button>
+          
+          <div class="divider">
+            <span>Debug</span>
+          </div>
+          
+          <button class="test-btn" onclick="window.carnivalTracker.testAddPerson()" style="background: #ef4444; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
+            🧪 Test Add Person (Debug)
           </button>
         </div>
       </div>
