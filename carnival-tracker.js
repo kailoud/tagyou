@@ -1153,7 +1153,7 @@ See you at the carnival! 🎪</textarea>
                   ` : `
                     <span class="stat-item">
                       <i class="fas fa-crown"></i>
-                      <span class="basic-limit" onclick="window.carnivalTracker.showPremiumUpgrade('Upgrade to Premium for unlimited squad members!')">0/1</span>
+                      <span class="basic-limit" onclick="window.carnivalTracker.showPremiumUpgrade('Upgrade to Premium for unlimited squad members!')">${this.people.length}/${this.maxFreeMembers}</span>
                     </span>
                   `}
                 </div>
@@ -1324,7 +1324,7 @@ See you at the carnival! 🎪</textarea>
           </div>
           <button class="add-person-btn" onclick="window.carnivalTracker.addPerson()">
             <i class="fas fa-plus"></i>
-            Add Person
+            Add Squad
           </button>
           
           <div class="divider">
