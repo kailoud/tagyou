@@ -334,6 +334,31 @@ class CarnivalTracker {
     console.log('🔍 ProfileService available:', !!window.profileService);
   }
 
+  // Maintain panel state after adding squad member
+  maintainPanelState() {
+    // If panel is collapsed, expand it to halfway
+    const pullUpPanel = document.getElementById('pullUpPanel');
+    if (pullUpPanel) {
+      if (!pullUpPanel.classList.contains('expanded') && !pullUpPanel.classList.contains('halfway')) {
+        // Panel is collapsed, expand to halfway
+        pullUpPanel.classList.add('halfway');
+        console.log('📱 Panel expanded to halfway after adding squad member');
+      }
+    }
+  }
+
+  // Ensure panel is open when carnival tracker is shown
+  ensurePanelOpen() {
+    const pullUpPanel = document.getElementById('pullUpPanel');
+    if (pullUpPanel) {
+      if (!pullUpPanel.classList.contains('expanded') && !pullUpPanel.classList.contains('halfway')) {
+        // Panel is collapsed, expand to halfway
+        pullUpPanel.classList.add('halfway');
+        console.log('📱 Panel expanded to halfway when carnival tracker shown');
+      }
+    }
+  }
+
   // Test squad saving functionality
   async testSquadSaving() {
     console.log('🧪 Testing squad saving functionality...');
@@ -356,6 +381,8 @@ class CarnivalTracker {
 
       console.log('🧪 Form inputs set, calling addPerson...');
       await this.addPerson();
+
+      // Panel state will be maintained by addPerson function
     } else {
       console.error('🧪 Form inputs not found');
     }
@@ -744,6 +771,9 @@ See you at the carnival! 🎪</textarea>
     // Show success message
     this.showAddSuccess('Test User');
 
+    // Maintain panel state - keep it open at halfway or full view
+    this.maintainPanelState();
+
     alert('🧪 Test person added! Check console for details.');
   }
 
@@ -954,6 +984,9 @@ See you at the carnival! 🎪</textarea>
 
         // Show success message
         this.showAddSuccess(name);
+
+        // Maintain panel state - keep it open at halfway or full view
+        this.maintainPanelState();
       } catch (error) {
         console.error('Error adding person:', error);
 
@@ -1958,6 +1991,9 @@ See you at the carnival! 🎪</textarea>
     // Debug: Log current user state
     const currentUser = this.getCurrentUserSafely();
     console.log('🎭 Current user state:', currentUser ? currentUser.email : 'No user');
+
+    // Ensure panel is open when carnival tracker is shown
+    this.ensurePanelOpen();
   }
 
   hide() {
