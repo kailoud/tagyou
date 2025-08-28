@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Premium Admin Dashboard - Carnival Tracker</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .status-bar {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-item {
+      text-align: center;
+    }
+
+    .status-label {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin-bottom: 5px;
+    }
+
+    .status-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #495057;
+    }
+
+    .premium-badge {
+      background: linear-gradient(45deg, #ffd700, #ffed4e);
+      color: #333;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #e9ecef;
+      margin-bottom: 30px;
+    }
+
+    .tab {
+      padding: 15px 30px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .tab.active {
+      border-bottom-color: #667eea;
+      color: #667eea;
+    }
+
+    .tab:hover {
+      background: #f8f9fa;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 10px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .card h3 {
+      color: #495057;
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #495057;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: transform 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+    }
+
+    .btn-success {
+      background: #28a745;
+    }
+
+    .member-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .member-card {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      border-left: 4px solid #667eea;
+    }
+
+    .member-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #495057;
+      margin-bottom: 10px;
+    }
+
+    .member-info {
+      color: #6c757d;
+      margin-bottom: 5px;
+    }
+
+    .member-actions {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .alert {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .alert-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .group-tag {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin: 2px;
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .analytics-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 25px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .analytics-number {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .analytics-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎭 Premium Admin Dashboard</h1>
+      <p>Carnival Tracker - Squad Management & Analytics</p>
+    </div>
+
+    <div class="content">
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <div class="status-item">
+          <div class="status-label">Premium Status</div>
+          <div id="premiumStatus" class="premium-badge">Loading...</div>
+        </div>
+        <div class="status-item">
+          <div class="status-label">Squad Members</div>
+          <div id="memberCount" class="status-value">-</div>
+        </div>
+        <div class="status-item">
+          <div class="status-label">Active Groups</div>
+          <div id="groupCount" class="status-value">-</div>
+        </div>
+        <div class="status-item">
+          <div class="status-label">Safety Alerts</div>
+          <div id="alertCount" class="status-value">-</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab active" onclick="showTab('dashboard')">📊 Dashboard</div>
+        <div class="tab" onclick="showTab('members')">👥 Squad Members</div>
+        <div class="tab" onclick="showTab('groups')">🏷️ Groups</div>
+        <div class="tab" onclick="showTab('safety')">🚨 Safety</div>
+        <div class="tab" onclick="showTab('messages')">💬 Messages</div>
+        <div class="tab" onclick="showTab('settings')">⚙️ Settings</div>
+      </div>
+
+      <!-- Dashboard Tab -->
+      <div id="dashboard" class="tab-content active">
+        <div class="analytics-grid" id="analyticsGrid">
+          <div class="loading">Loading analytics...</div>
+        </div>
+
+        <div class="card">
+          <h3>Recent Activity</h3>
+          <div id="recentActivity">Loading...</div>
+        </div>
+      </div>
+
+      <!-- Members Tab -->
+      <div id="members" class="tab-content">
+        <div class="card">
+          <h3>Add New Squad Member</h3>
+          <form id="addMemberForm">
+            <div class="form-group">
+              <label for="memberName">Name *</label>
+              <input type="text" id="memberName" required>
+            </div>
+            <div class="form-group">
+              <label for="memberPhone">Phone</label>
+              <input type="tel" id="memberPhone">
+            </div>
+            <div class="form-group">
+              <label for="memberEmail">Email</label>
+              <input type="email" id="memberEmail">
+            </div>
+            <div class="form-group">
+              <label for="memberRelationship">Relationship</label>
+              <select id="memberRelationship">
+                <option value="Friend">Friend</option>
+                <option value="Family">Family</option>
+                <option value="Colleague">Colleague</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <button type="submit" class="btn">Add Member</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>Squad Members</h3>
+          <div id="membersList" class="member-list">
+            <div class="loading">Loading members...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Groups Tab -->
+      <div id="groups" class="tab-content">
+        <div class="card">
+          <h3>Create New Group</h3>
+          <form id="addGroupForm">
+            <div class="form-group">
+              <label for="groupName">Group Name *</label>
+              <input type="text" id="groupName" required>
+            </div>
+            <div class="form-group">
+              <label for="groupDescription">Description</label>
+              <textarea id="groupDescription" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="groupColor">Color</label>
+              <input type="color" id="groupColor" value="#3B82F6">
+            </div>
+            <button type="submit" class="btn">Create Group</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>Squad Groups</h3>
+          <div id="groupsList">
+            <div class="loading">Loading groups...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Safety Tab -->
+      <div id="safety" class="tab-content">
+        <div class="card">
+          <h3>Create Safety Alert</h3>
+          <form id="safetyAlertForm">
+            <div class="form-group">
+              <label for="alertType">Alert Type *</label>
+              <select id="alertType" required>
+                <option value="emergency">Emergency</option>
+                <option value="lost">Lost</option>
+                <option value="check_in">Check-in</option>
+                <option value="sos">SOS</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="alertMessage">Message</label>
+              <textarea id="alertMessage" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-danger">Create Alert</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>Safety Alerts</h3>
+          <div id="safetyAlertsList">
+            <div class="loading">Loading alerts...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages Tab -->
+      <div id="messages" class="tab-content">
+        <div class="card">
+          <h3>Send Message</h3>
+          <form id="messageForm">
+            <div class="form-group">
+              <label for="messageMember">To Member</label>
+              <select id="messageMember">
+                <option value="">Select member...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="messageText">Message *</label>
+              <textarea id="messageText" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn">Send Message</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>Recent Messages</h3>
+          <div id="messagesList">
+            <div class="loading">Loading messages...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div id="settings" class="tab-content">
+        <div class="card">
+          <h3>Notification Preferences</h3>
+          <form id="notificationForm">
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="emailNotifications" checked>
+                Email Notifications
+              </label>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="pushNotifications" checked>
+                Push Notifications
+              </label>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="locationAlerts" checked>
+                Location Alerts
+              </label>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="safetyAlerts" checked>
+                Safety Alerts
+              </label>
+            </div>
+            <button type="submit" class="btn">Save Preferences</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include the Premium Admin Service -->
+  <script src="premium-admin-service.js"></script>
+
+  <script>
+    // Initialize the premium admin service
+    let premiumAdmin;
+
+    async function initializeApp() {
+      try {
+        // Initialize Supabase (you'll need to add your own config)
+        const supabaseUrl = 'YOUR_SUPABASE_URL';
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+
+        window.supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Initialize premium admin service
+        premiumAdmin = new PremiumAdminService();
+        const initialized = await premiumAdmin.initialize();
+
+        if (initialized) {
+          await loadDashboard();
+          showAlert('Premium Admin Service initialized successfully!', 'success');
+        } else {
+          showAlert('Failed to initialize Premium Admin Service', 'error');
+        }
+      } catch (error) {
+        console.error('Error initializing app:', error);
+        showAlert('Error initializing application', 'error');
+      }
+    }
+
+    // Tab switching
+    function showTab(tabName) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+
+      // Remove active class from all tabs
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Show selected tab content
+      document.getElementById(tabName).classList.add('active');
+
+      // Add active class to selected tab
+      event.target.classList.add('active');
+
+      // Load tab-specific data
+      switch (tabName) {
+        case 'dashboard':
+          loadDashboard();
+          break;
+        case 'members':
+          loadMembers();
+          break;
+        case 'groups':
+          loadGroups();
+          break;
+        case 'safety':
+          loadSafetyAlerts();
+          break;
+        case 'messages':
+          loadMessages();
+          break;
+        case 'settings':
+          loadSettings();
+          break;
+      }
+    }
+
+    // Load dashboard data
+    async function loadDashboard() {
+      try {
+        updateStatusBar();
+
+        if (premiumAdmin.isPremium()) {
+          const analytics = await premiumAdmin.getDashboardAnalytics();
+          displayAnalytics(analytics);
+        } else {
+          document.getElementById('analyticsGrid').innerHTML =
+            '<div class="alert alert-info">Premium features require a premium subscription.</div>';
+        }
+      } catch (error) {
+        console.error('Error loading dashboard:', error);
+        showAlert('Error loading dashboard data', 'error');
+      }
+    }
+
+    // Update status bar
+    async function updateStatusBar() {
+      try {
+        const members = await premiumAdmin.getSquadMembers();
+        const groups = await premiumAdmin.getSquadGroups();
+        const alerts = await premiumAdmin.getSafetyAlerts();
+
+        document.getElementById('memberCount').textContent = members.length;
+        document.getElementById('groupCount').textContent = groups.length;
+        document.getElementById('alertCount').textContent = alerts.filter(a => a.status === 'active').length;
+
+        if (premiumAdmin.isPremium()) {
+          document.getElementById('premiumStatus').textContent = 'PREMIUM';
+        } else {
+          document.getElementById('premiumStatus').textContent = 'FREE';
+          document.getElementById('premiumStatus').style.background = '#6c757d';
+        }
+      } catch (error) {
+        console.error('Error updating status bar:', error);
+      }
+    }
+
+    // Display analytics
+    function displayAnalytics(analytics) {
+      if (!analytics) {
+        document.getElementById('analyticsGrid').innerHTML =
+          '<div class="alert alert-info">No analytics data available.</div>';
+        return;
+      }
+
+      const grid = document.getElementById('analyticsGrid');
+      grid.innerHTML = `
+                <div class="analytics-card">
+                    <div class="analytics-number">${analytics.total_squad_members || 0}</div>
+                    <div class="analytics-label">Total Members</div>
+                </div>
+                <div class="analytics-card">
+                    <div class="analytics-number">${analytics.active_sharing_members || 0}</div>
+                    <div class="analytics-label">Active Sharing</div>
+                </div>
+                <div class="analytics-card">
+                    <div class="analytics-number">${analytics.total_groups || 0}</div>
+                    <div class="analytics-label">Groups</div>
+                </div>
+                <div class="analytics-card">
+                    <div class="analytics-number">${analytics.total_safety_alerts || 0}</div>
+                    <div class="analytics-label">Safety Alerts</div>
+                </div>
+            `;
+    }
+
+    // Load squad members
+    async function loadMembers() {
+      try {
+        const members = await premiumAdmin.getSquadMembers();
+        displayMembers(members);
+      } catch (error) {
+        console.error('Error loading members:', error);
+        showAlert('Error loading squad members', 'error');
+      }
+    }
+
+    // Display members
+    function displayMembers(members) {
+      const container = document.getElementById('membersList');
+
+      if (members.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">No squad members found.</div>';
+        return;
+      }
+
+      container.innerHTML = members.map(member => `
+                <div class="member-card">
+                    <div class="member-name">${member.name}</div>
+                    <div class="member-info">📞 ${member.phone || 'No phone'}</div>
+                    <div class="member-info">📧 ${member.email || 'No email'}</div>
+                    <div class="member-info">👥 ${member.relationship || 'No relationship'}</div>
+                    <div class="member-info">📍 ${member.is_sharing ? 'Sharing location' : 'Not sharing'}</div>
+                    ${member.squad_member_groups && member.squad_member_groups.length > 0 ?
+          `<div class="member-info">🏷️ Groups: ${member.squad_member_groups.map(g =>
+            `<span class="group-tag" style="background: ${g.squad_groups.color}20; color: ${g.squad_groups.color}">${g.squad_groups.name}</span>`
+          ).join('')}</div>` : ''
+        }
+                    <div class="member-actions">
+                        <button class="btn btn-secondary" onclick="editMember(${member.id})">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteMember(${member.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+    }
+
+    // Add member form handler
+    document.getElementById('addMemberForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      try {
+        const memberData = {
+          name: document.getElementById('memberName').value,
+          phone: document.getElementById('memberPhone').value,
+          email: document.getElementById('memberEmail').value,
+          relationship: document.getElementById('memberRelationship').value
+        };
+
+        await premiumAdmin.addSquadMember(memberData);
+        showAlert('Squad member added successfully!', 'success');
+        document.getElementById('addMemberForm').reset();
+        loadMembers();
+        updateStatusBar();
+      } catch (error) {
+        console.error('Error adding member:', error);
+        showAlert('Error adding squad member: ' + error.message, 'error');
+      }
+    });
+
+    // Delete member
+    async function deleteMember(memberId) {
+      if (!confirm('Are you sure you want to delete this squad member?')) {
+        return;
+      }
+
+      try {
+        await premiumAdmin.deleteSquadMember(memberId);
+        showAlert('Squad member deleted successfully!', 'success');
+        loadMembers();
+        updateStatusBar();
+      } catch (error) {
+        console.error('Error deleting member:', error);
+        showAlert('Error deleting squad member: ' + error.message, 'error');
+      }
+    }
+
+    // Load groups
+    async function loadGroups() {
+      try {
+        const groups = await premiumAdmin.getSquadGroups();
+        displayGroups(groups);
+      } catch (error) {
+        console.error('Error loading groups:', error);
+        showAlert('Error loading groups', 'error');
+      }
+    }
+
+    // Display groups
+    function displayGroups(groups) {
+      const container = document.getElementById('groupsList');
+
+      if (groups.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">No groups found.</div>';
+        return;
+      }
+
+      container.innerHTML = groups.map(group => `
+                <div class="member-card">
+                    <div class="member-name" style="color: ${group.color}">${group.name}</div>
+                    <div class="member-info">${group.description || 'No description'}</div>
+                    <div class="member-info">Created: ${new Date(group.created_at).toLocaleDateString()}</div>
+                    <div class="member-actions">
+                        <button class="btn btn-secondary" onclick="editGroup('${group.id}')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteGroup('${group.id}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+    }
+
+    // Add group form handler
+    document.getElementById('addGroupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      try {
+        const groupData = {
+          name: document.getElementById('groupName').value,
+          description: document.getElementById('groupDescription').value,
+          color: document.getElementById('groupColor').value
+        };
+
+        await premiumAdmin.createSquadGroup(groupData);
+        showAlert('Group created successfully!', 'success');
+        document.getElementById('addGroupForm').reset();
+        loadGroups();
+        updateStatusBar();
+      } catch (error) {
+        console.error('Error creating group:', error);
+        showAlert('Error creating group: ' + error.message, 'error');
+      }
+    });
+
+    // Load safety alerts
+    async function loadSafetyAlerts() {
+      try {
+        const alerts = await premiumAdmin.getSafetyAlerts();
+        displaySafetyAlerts(alerts);
+      } catch (error) {
+        console.error('Error loading safety alerts:', error);
+        showAlert('Error loading safety alerts', 'error');
+      }
+    }
+
+    // Display safety alerts
+    function displaySafetyAlerts(alerts) {
+      const container = document.getElementById('safetyAlertsList');
+
+      if (alerts.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">No safety alerts found.</div>';
+        return;
+      }
+
+      container.innerHTML = alerts.map(alert => `
+                <div class="member-card">
+                    <div class="member-name">${alert.alert_type.toUpperCase()}</div>
+                    <div class="member-info">${alert.message || 'No message'}</div>
+                    <div class="member-info">Status: ${alert.status}</div>
+                    <div class="member-info">Created: ${new Date(alert.created_at).toLocaleString()}</div>
+                    ${alert.status === 'active' ?
+          `<div class="member-actions">
+                            <button class="btn btn-success" onclick="resolveAlert('${alert.id}')">Resolve</button>
+                        </div>` : ''
+        }
+                </div>
+            `).join('');
+    }
+
+    // Resolve alert
+    async function resolveAlert(alertId) {
+      try {
+        await premiumAdmin.resolveSafetyAlert(alertId);
+        showAlert('Alert resolved successfully!', 'success');
+        loadSafetyAlerts();
+        updateStatusBar();
+      } catch (error) {
+        console.error('Error resolving alert:', error);
+        showAlert('Error resolving alert: ' + error.message, 'error');
+      }
+    }
+
+    // Safety alert form handler
+    document.getElementById('safetyAlertForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      try {
+        const alertData = {
+          alert_type: document.getElementById('alertType').value,
+          message: document.getElementById('alertMessage').value
+        };
+
+        await premiumAdmin.createSafetyAlert(alertData);
+        showAlert('Safety alert created successfully!', 'success');
+        document.getElementById('safetyAlertForm').reset();
+        loadSafetyAlerts();
+        updateStatusBar();
+      } catch (error) {
+        console.error('Error creating alert:', error);
+        showAlert('Error creating safety alert: ' + error.message, 'error');
+      }
+    });
+
+    // Load messages
+    async function loadMessages() {
+      try {
+        const messages = await premiumAdmin.getSquadMessages();
+        displayMessages(messages);
+        loadMembersForMessageSelect();
+      } catch (error) {
+        console.error('Error loading messages:', error);
+        showAlert('Error loading messages', 'error');
+      }
+    }
+
+    // Display messages
+    function displayMessages(messages) {
+      const container = document.getElementById('messagesList');
+
+      if (messages.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">No messages found.</div>';
+        return;
+      }
+
+      container.innerHTML = messages.map(message => `
+                <div class="member-card">
+                    <div class="member-name">${message.carnival_squad_members?.name || 'Unknown'}</div>
+                    <div class="member-info">${message.message_text}</div>
+                    <div class="member-info">Type: ${message.message_type}</div>
+                    <div class="member-info">Sent: ${new Date(message.created_at).toLocaleString()}</div>
+                    <div class="member-info">Read: ${message.is_read ? 'Yes' : 'No'}</div>
+                </div>
+            `).join('');
+    }
+
+    // Load members for message select
+    async function loadMembersForMessageSelect() {
+      try {
+        const members = await premiumAdmin.getSquadMembers();
+        const select = document.getElementById('messageMember');
+        select.innerHTML = '<option value="">Select member...</option>' +
+          members.map(member => `<option value="${member.id}">${member.name}</option>`).join('');
+      } catch (error) {
+        console.error('Error loading members for message select:', error);
+      }
+    }
+
+    // Message form handler
+    document.getElementById('messageForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      try {
+        const messageData = {
+          squad_member_id: document.getElementById('messageMember').value,
+          message_text: document.getElementById('messageText').value
+        };
+
+        if (!messageData.squad_member_id) {
+          showAlert('Please select a squad member', 'error');
+          return;
+        }
+
+        await premiumAdmin.sendSquadMessage(messageData);
+        showAlert('Message sent successfully!', 'success');
+        document.getElementById('messageForm').reset();
+        loadMessages();
+      } catch (error) {
+        console.error('Error sending message:', error);
+        showAlert('Error sending message: ' + error.message, 'error');
+      }
+    });
+
+    // Load settings
+    async function loadSettings() {
+      try {
+        const preferences = await premiumAdmin.getNotificationPreferences();
+        if (preferences) {
+          document.getElementById('emailNotifications').checked = preferences.email_notifications;
+          document.getElementById('pushNotifications').checked = preferences.push_notifications;
+          document.getElementById('locationAlerts').checked = preferences.location_alerts;
+          document.getElementById('safetyAlerts').checked = preferences.safety_alerts;
+        }
+      } catch (error) {
+        console.error('Error loading settings:', error);
+        showAlert('Error loading settings', 'error');
+      }
+    }
+
+    // Notification preferences form handler
+    document.getElementById('notificationForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      try {
+        const preferences = {
+          email_notifications: document.getElementById('emailNotifications').checked,
+          push_notifications: document.getElementById('pushNotifications').checked,
+          location_alerts: document.getElementById('locationAlerts').checked,
+          safety_alerts: document.getElementById('safetyAlerts').checked
+        };
+
+        await premiumAdmin.updateNotificationPreferences(preferences);
+        showAlert('Notification preferences updated successfully!', 'success');
+      } catch (error) {
+        console.error('Error updating preferences:', error);
+        showAlert('Error updating preferences: ' + error.message, 'error');
+      }
+    });
+
+    // Utility function to show alerts
+    function showAlert(message, type) {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type}`;
+      alertDiv.textContent = message;
+
+      const content = document.querySelector('.content');
+      content.insertBefore(alertDiv, content.firstChild);
+
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 5000);
+    }
+
+    // Initialize the app when the page loads
+    document.addEventListener('DOMContentLoaded', initializeApp);
+  </script>
+</body>
+
+</html>
