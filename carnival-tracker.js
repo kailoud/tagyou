@@ -8,6 +8,9 @@ class CarnivalTracker {
     this.showAddForm = false;
     this.notifications = [];
 
+    // Flag to prevent avatar system conflicts
+    this.isPerformingAuthOperation = false;
+
     this.newPerson = {
       name: "",
       phone: "",
@@ -60,12 +63,28 @@ class CarnivalTracker {
       // Try database first
       if (window.supabase) {
         try {
-          // Get current user
-          const { data: { user } } = await window.supabase.auth.getUser();
+          // Get current user safely without triggering auth conflicts
+          let user = this.getCurrentUserSafely();
+
+          if (!user) {
+            // Only try direct auth calls if we don't have a user from safe sources
+            if (window.supabaseClient) {
+              const { data: { user: supabaseUser } } = await window.supabaseClient.auth.getUser();
+              user = supabaseUser;
+              console.log('✅ Got user from supabase client for loading:', user?.email);
+            } else if (window.supabase) {
+              const { data: { user: supabaseUser } } = await window.supabase.auth.getUser();
+              user = supabaseUser;
+              console.log('✅ Got user from window.supabase for loading:', user?.email);
+            }
+          } else {
+            console.log('✅ Got user safely for loading without auth conflicts:', user.email);
+          }
 
           if (user) {
-            // Load squad members from database
-            const { data, error } = await window.supabase
+            // Load squad members from database using supabaseClient if available
+            const supabaseInstance = window.supabaseClient || window.supabase;
+            const { data, error } = await supabaseInstance
               .from('carnival_squad_members')
               .select('*')
               .eq('user_id', user.id)
@@ -93,6 +112,8 @@ class CarnivalTracker {
               this.render();
               this.updateToolbarCount();
               return;
+            } else if (error) {
+              console.log('🎭 Database load error:', error);
             }
           }
         } catch (dbError) {
@@ -280,6 +301,45 @@ class CarnivalTracker {
       }
     }
     */
+  }
+
+  // Add a method to safely get user without triggering auth conflicts
+  getCurrentUserSafely() {
+    // Try to get user from avatar system first (prevents auth conflicts)
+    if (window.avatarSystem && window.avatarSystem.user) {
+      return window.avatarSystem.user;
+    }
+
+    // Try to get from session storage
+    try {
+      const storedUser = sessionStorage.getItem('supabase_user');
+      if (storedUser) {
+        return JSON.parse(storedUser);
+      }
+    } catch (error) {
+      console.log('Error parsing stored user:', error);
+    }
+
+    return null;
+  }
+
+  // Method to check if carnival tracker is performing auth operations
+  isPerformingAuthOperations() {
+    return this.isPerformingAuthOperation;
+  }
+
+  // Diagnostic method to check system status
+  diagnoseSystem() {
+    console.log('🔍 Carnival Tracker System Diagnosis:');
+    console.log('🔍 Avatar System available:', !!window.avatarSystem);
+    console.log('🔍 Avatar System user:', window.avatarSystem?.user?.email || 'No user');
+    console.log('🔍 Supabase available:', !!window.supabase);
+    console.log('🔍 Supabase Client available:', !!window.supabaseClient);
+    console.log('🔍 Current user (safe method):', this.getCurrentUserSafely()?.email || 'No user');
+    console.log('🔍 People count:', this.people.length);
+    console.log('🔍 Is performing auth operation:', this.isPerformingAuthOperation);
+    console.log('🔍 User tier:', this.userTier);
+    console.log('🔍 Is premium:', this.isPremium);
   }
 
   // Force refresh premium status and update UI
@@ -733,6 +793,9 @@ See you at the carnival! 🎪</textarea>
   async addPerson() {
     console.log('addPerson function called');
 
+    // Set flag to prevent avatar system conflicts
+    this.isPerformingAuthOperation = true;
+
     const nameInput = document.getElementById('newPersonName');
     const phoneInput = document.getElementById('newPersonPhone');
     const relationshipInput = document.getElementById('newPersonRelationship');
@@ -768,14 +831,30 @@ See you at the carnival! 🎪</textarea>
 
         if (window.supabase) {
           try {
-            // Get current user ID from Supabase auth
-            const { data: { user } } = await window.supabase.auth.getUser();
+            // Get current user ID safely without triggering auth conflicts
+            let user = this.getCurrentUserSafely();
+
+            if (!user) {
+              // Only try direct auth calls if we don't have a user from safe sources
+              if (window.supabaseClient) {
+                const { data: { user: supabaseUser } } = await window.supabaseClient.auth.getUser();
+                user = supabaseUser;
+                console.log('✅ Got user from supabase client:', user?.email);
+              } else if (window.supabase) {
+                const { data: { user: supabaseUser } } = await window.supabase.auth.getUser();
+                user = supabaseUser;
+                console.log('✅ Got user from window.supabase:', user?.email);
+              }
+            } else {
+              console.log('✅ Got user safely without auth conflicts:', user.email);
+            }
 
             if (user) {
               const avatar = this.generateAvatar(name);
 
-              // Insert into database
-              const { data, error } = await window.supabase
+              // Insert into database using supabaseClient if available
+              const supabaseInstance = window.supabaseClient || window.supabase;
+              const { data, error } = await supabaseInstance
                 .from('carnival_squad_members')
                 .insert([
                   {
@@ -791,7 +870,12 @@ See you at the carnival! 🎪</textarea>
 
               if (error) {
                 console.error('Database error:', error);
-                throw new Error('Database insert failed');
+                // Check if it's an RLS policy error
+                if (error.code === '42501' || error.message.includes('permission')) {
+                  console.error('RLS policy error - user may not be properly authenticated');
+                  throw new Error('Authentication required. Please sign in to save squad members.');
+                }
+                throw new Error(`Database insert failed: ${error.message}`);
               }
 
               console.log('Database insert successful:', data);
@@ -807,11 +891,11 @@ See you at the carnival! 🎪</textarea>
                 avatar
               };
             } else {
-              throw new Error('No authenticated user');
+              throw new Error('No authenticated user found. Please sign in to save squad members.');
             }
           } catch (dbError) {
             console.log('Database operation failed, using local storage:', dbError);
-            throw dbError;
+            // Don't throw here, let it fall through to localStorage
           }
         }
 
@@ -833,6 +917,9 @@ See you at the carnival! 🎪</textarea>
           this.saveToLocalStorage();
         }
 
+        // Always save to localStorage as backup
+        this.saveToLocalStorage();
+
         // Add to local array for immediate UI update
         this.people.push(newPerson);
 
@@ -852,12 +939,23 @@ See you at the carnival! 🎪</textarea>
         this.showAddSuccess(name);
       } catch (error) {
         console.error('Error adding person:', error);
-        alert('Error adding squad member. Please try again.');
+
+        // Show more specific error messages
+        if (error.message.includes('Authentication required')) {
+          alert('Please sign in to save squad members to the cloud. Your data will be saved locally for now.');
+        } else if (error.message.includes('Database insert failed')) {
+          alert('Unable to save to cloud storage. Your squad member has been saved locally.');
+        } else {
+          alert('Error adding squad member. Please try again.');
+        }
       }
     } else {
       console.log('Please fill in all fields');
       alert('Please fill in all fields (Name, Phone, and Relationship)');
     }
+
+    // Clear flag to allow avatar system operations
+    this.isPerformingAuthOperation = false;
   }
 
   saveToLocalStorage() {
@@ -1604,6 +1702,10 @@ See you at the carnival! 🎪</textarea>
           <button class="test-btn" onclick="window.carnivalTracker.testAddPerson()" style="background: #ef4444; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
             🧪 Test Add Person (Debug)
           </button>
+          
+          <button class="debug-btn" onclick="window.carnivalTracker.diagnoseSystem()" style="background: #3b82f6; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
+            🔍 System Diagnosis
+          </button>
         </div>
       </div>
     `;
@@ -1831,6 +1933,10 @@ See you at the carnival! 🎪</textarea>
     this.isVisible = true;
     this.render();
     console.log('🎭 Carnival tracker shown');
+
+    // Debug: Log current user state
+    const currentUser = this.getCurrentUserSafely();
+    console.log('🎭 Current user state:', currentUser ? currentUser.email : 'No user');
   }
 
   hide() {
