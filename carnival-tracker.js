@@ -1639,6 +1639,15 @@ See you at the carnival! 🎪</textarea>
   }
 
   renderTrackerTab(filteredPeople) {
+    const shouldShowScrollbar = filteredPeople.length >= 2;
+    const peopleListClass = shouldShowScrollbar ? 'people-list with-scrollbar' : 'people-list';
+
+    console.log('🎭 Squad list rendering:', {
+      peopleCount: filteredPeople.length,
+      shouldShowScrollbar,
+      peopleListClass
+    });
+
     return `
       <div class="tracker-tab-content">
         <!-- Search -->
@@ -1648,7 +1657,7 @@ See you at the carnival! 🎪</textarea>
         </div>
 
         <!-- People List -->
-        <div class="people-list">
+        <div class="${peopleListClass}">
           ${filteredPeople.map(person => this.renderPersonCard(person)).join('')}
         </div>
 
