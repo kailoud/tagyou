@@ -366,6 +366,23 @@ class CarnivalTracker {
     }
   }
 
+  // Debug premium status
+  debugPremiumStatus() {
+    console.log('🔍 Premium Status Debug:');
+    console.log('  - isPremium:', this.isPremium);
+    console.log('  - userTier:', this.userTier);
+    console.log('  - canUseCalling():', this.canUseCalling());
+    console.log('  - canUseMessaging():', this.canUseMessaging());
+
+    const currentUser = this.getCurrentUserSafely();
+    console.log('  - Current user:', currentUser?.email || 'No user');
+
+    if (currentUser?.email) {
+      const premiumStatus = localStorage.getItem(`premium_${currentUser.email}`);
+      console.log('  - localStorage premium status:', premiumStatus);
+    }
+  }
+
   // Test squad saving functionality
   async testSquadSaving() {
     console.log('🧪 Testing squad saving functionality...');
@@ -440,10 +457,12 @@ class CarnivalTracker {
   }
 
   canUseMessaging() {
+    console.log('💬 canUseMessaging check:', this.isPremium, 'User tier:', this.userTier);
     return this.isPremium;
   }
 
   canUseCalling() {
+    console.log('📞 canUseCalling check:', this.isPremium, 'User tier:', this.userTier);
     return this.isPremium;
   }
 
@@ -496,19 +515,23 @@ class CarnivalTracker {
         this.requestLocationSharing(personId);
       }
 
-      // Phone button - show call/WhatsApp options (only for premium users)
-      if (e.target.closest('.phone-btn') && !e.target.closest('.phone-btn').classList.contains('disabled')) {
-        const button = e.target.closest('.phone-btn');
+      // Call button - show call/WhatsApp options (only for premium users)
+      if (e.target.closest('.call-btn') && !e.target.closest('.call-btn').classList.contains('disabled')) {
+        console.log('📞 Call button clicked - Premium user detected');
+        const button = e.target.closest('.call-btn');
         const phoneNumber = button.dataset.phone;
         const personName = button.dataset.name;
+        console.log('📞 Calling:', personName, 'at', phoneNumber);
         this.showPhoneOptions(phoneNumber, personName);
       }
 
-      // WhatsApp button (only for premium users)
-      if (e.target.closest('.whatsapp-btn') && !e.target.closest('.whatsapp-btn').classList.contains('disabled')) {
-        const button = e.target.closest('.whatsapp-btn');
+      // Message button - open WhatsApp (only for premium users)
+      if (e.target.closest('.message-btn') && !e.target.closest('.message-btn').classList.contains('disabled')) {
+        console.log('💬 Message button clicked - Premium user detected');
+        const button = e.target.closest('.message-btn');
         const phoneNumber = button.dataset.phone;
         const personName = button.dataset.name;
+        console.log('💬 Messaging:', personName, 'at', phoneNumber);
         this.openWhatsApp(phoneNumber, personName);
       }
 
@@ -1797,6 +1820,10 @@ See you at the carnival! 🎪</textarea>
           
           <button class="test-btn" onclick="window.carnivalTracker.testAddPerson()" style="background: #ef4444; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
             🧪 Test Add Person (Debug)
+          </button>
+          
+          <button class="test-btn" onclick="window.carnivalTracker.debugPremiumStatus()" style="background: #3b82f6; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
+            🔍 Debug Premium Status
           </button>
           
           <button class="debug-btn" onclick="window.carnivalTracker.diagnoseSystem()" style="background: #3b82f6; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
