@@ -540,7 +540,7 @@ function initPullUpPanel() {
     return;
   }
 
-  let isExpanded = false;
+  let panelState = 'collapsed'; // 'collapsed', 'halfway', 'expanded'
 
   panelHandle.addEventListener('click', function (e) {
     e.stopPropagation();
@@ -560,23 +560,53 @@ function initPullUpPanel() {
   });
 
   function togglePanel() {
-    if (isExpanded) {
-      collapsePanel();
-    } else {
+    if (panelState === 'collapsed') {
+      expandHalfway();
+    } else if (panelState === 'halfway') {
       expandPanel();
+    } else {
+      collapsePanel();
     }
   }
 
+  function expandHalfway() {
+    pullUpPanel.classList.remove('expanded');
+    pullUpPanel.classList.add('halfway');
+    panelState = 'halfway';
+    updateHandleText();
+    console.log('📱 Panel halfway');
+  }
+
   function expandPanel() {
+    pullUpPanel.classList.remove('halfway');
     pullUpPanel.classList.add('expanded');
-    isExpanded = true;
+    panelState = 'expanded';
+    updateHandleText();
     console.log('📱 Panel expanded');
   }
 
   function collapsePanel() {
-    pullUpPanel.classList.remove('expanded');
-    isExpanded = false;
+    pullUpPanel.classList.remove('expanded', 'halfway');
+    panelState = 'collapsed';
+    updateHandleText();
     console.log('📱 Panel collapsed');
+  }
+
+  function updateHandleText() {
+    const handleText = document.querySelector('.handle-text');
+    if (handleText) {
+      switch (panelState) {
+        case 'collapsed':
+          handleText.textContent = 'Pull up for more';
+          break;
+        case 'halfway':
+          handleText.textContent = 'Pull up for full view';
+          break;
+        case 'expanded':
+          handleText.textContent = 'Pull down to close';
+          break;
+      }
+    }
   }
 
   function switchTab(tabName) {

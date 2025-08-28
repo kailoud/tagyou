@@ -972,6 +972,10 @@ body {
   transform: translateY(0);
 }
 
+.pull-up-panel.halfway {
+  transform: translateY(50%);
+}
+
 .panel-handle {
   display: flex;
   flex-direction: column;
