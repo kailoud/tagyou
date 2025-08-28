@@ -136,6 +136,71 @@
   transform: scale(0.95);
 }
 
+/* Mobile optimization for carnival tracker compact */
+@media (max-width: 768px) {
+  .tracker-header-compact {
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+
+  .squad-title-compact {
+    font-size: 14px;
+  }
+
+  .squad-stats-compact {
+    gap: 8px;
+    font-size: 11px;
+  }
+
+  .tracker-tabs-compact {
+    gap: 1px;
+    margin-bottom: 10px;
+    padding: 1px;
+  }
+
+  .tab-btn-compact {
+    padding: 6px 8px;
+    gap: 4px;
+    font-size: 11px;
+  }
+
+  .tracker-content-compact {
+    max-height: 250px;
+    padding: 6px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .tracker-header-compact {
+    padding: 8px 10px;
+    margin-bottom: 8px;
+  }
+
+  .squad-title-compact {
+    font-size: 12px;
+  }
+
+  .squad-stats-compact {
+    gap: 6px;
+    font-size: 10px;
+  }
+
+  .tracker-tabs-compact {
+    margin-bottom: 8px;
+  }
+
+  .tab-btn-compact {
+    padding: 4px 6px;
+    gap: 2px;
+    font-size: 10px;
+  }
+
+  .tracker-content-compact {
+    max-height: 200px;
+    padding: 4px 0;
+  }
+}
+
 .tracker-content-compact {
   max-height: 300px;
   overflow-y: auto;

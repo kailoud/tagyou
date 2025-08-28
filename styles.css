@@ -1002,6 +1002,21 @@ body {
   letter-spacing: 0.5px;
 }
 
+/* Mobile optimization for handle text */
+@media (max-width: 768px) {
+  .handle-text {
+    font-size: 11px;
+    letter-spacing: 0.3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .handle-text {
+    font-size: 10px;
+    letter-spacing: 0.2px;
+  }
+}
+
 .panel-content {
   padding: 0 20px 30px 20px;
   max-height: 70vh;
@@ -1103,6 +1118,68 @@ body {
   font-weight: 600;
   text-align: center;
   line-height: 1.2;
+}
+
+/* Mobile optimization for tabs */
+@media (max-width: 768px) {
+  .tab-navigation {
+    gap: 4px;
+    margin-bottom: 16px;
+    padding: 0 2px;
+  }
+
+  .tab-btn {
+    padding: 8px 6px;
+    min-width: 60px;
+    gap: 2px;
+  }
+
+  .tab-btn i {
+    font-size: 14px;
+    margin-bottom: 1px;
+  }
+
+  .tab-btn span {
+    font-size: 9px;
+    line-height: 1.1;
+  }
+
+  .tab-header h4 {
+    font-size: 16px;
+    margin: 0 0 6px 0;
+  }
+
+  .tab-header p {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tab-navigation {
+    gap: 2px;
+    margin-bottom: 12px;
+  }
+
+  .tab-btn {
+    padding: 6px 4px;
+    min-width: 50px;
+  }
+
+  .tab-btn i {
+    font-size: 12px;
+  }
+
+  .tab-btn span {
+    font-size: 8px;
+  }
+
+  .tab-header h4 {
+    font-size: 14px;
+  }
+
+  .tab-header p {
+    font-size: 12px;
+  }
 }
 
 /* Tab Content */
