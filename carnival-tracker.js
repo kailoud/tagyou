@@ -336,7 +336,7 @@ class CarnivalTracker {
 
   // Maintain panel state after adding squad member
   maintainPanelState() {
-    // Always open panel to halfway when squad member is added
+    // Always open pull-up panel to halfway when squad member is added
     const pullUpPanel = document.getElementById('pullUpPanel');
     if (pullUpPanel) {
       // Remove any existing states
@@ -347,7 +347,7 @@ class CarnivalTracker {
       if (window.pullUpPanelState !== undefined) {
         window.pullUpPanelState = 'halfway';
       }
-      console.log('📱 Panel forced to halfway after adding squad member');
+      console.log('📱 Pull-up panel forced to halfway after adding squad member');
     }
   }
 
@@ -362,7 +362,7 @@ class CarnivalTracker {
       if (window.pullUpPanelState !== undefined) {
         window.pullUpPanelState = 'halfway';
       }
-      console.log('📱 Panel forced to halfway when carnival tracker shown');
+      console.log('📱 Pull-up panel forced to halfway when carnival tracker shown');
     }
   }
 
@@ -426,15 +426,15 @@ class CarnivalTracker {
   }
 
   createTrackerElement() {
-    // Create the main tracker container
-    this.trackerElement = document.createElement('div');
-    this.trackerElement.id = 'carnival-tracker';
-    this.trackerElement.className = 'carnival-tracker';
+    // Use the existing pull-up panel instead of creating a separate overlay
+    this.trackerElement = document.getElementById('carnival-squad-content');
 
-    // Add to the page
-    document.body.appendChild(this.trackerElement);
+    if (!this.trackerElement) {
+      console.error('❌ Carnival squad content container not found');
+      return;
+    }
 
-    // Start hidden by default
+    // Start hidden by default (will be shown when tab is active)
     this.trackerElement.style.display = 'none';
   }
 
@@ -1513,15 +1513,19 @@ See you at the carnival! 🎪</textarea>
 
   render() {
     if (!this.isVisible) {
-      this.trackerElement.style.display = 'none';
+      if (this.trackerElement) {
+        this.trackerElement.style.display = 'none';
+      }
       return;
     }
 
     // Sync premium status with avatar system when rendering
     this.syncPremiumStatus();
 
-    this.trackerElement.style.display = 'block';
-    this.renderFull();
+    if (this.trackerElement) {
+      this.trackerElement.style.display = 'block';
+      this.renderFull();
+    }
 
     if (this.showAddForm) {
       this.renderAddForm();
@@ -1533,72 +1537,68 @@ See you at the carnival! 🎪</textarea>
     const sharingCount = this.people.filter(p => p.isSharing).length;
 
     this.trackerElement.innerHTML = `
-      <div class="carnival-tracker-full">
-        <!-- Clean Header -->
-        <div class="tracker-header">
-          <div class="header-content">
-                          <div class="header-left">
-                ${this.isPremium ? `
-                  <div class="premium-banner">
-                    <span class="premium-icon">💎</span>
-                    <span class="premium-text">Premium Squad</span>
-                    <span class="unlimited-text">unlimited</span>
-                  </div>
-                ` : `
-                  <h3 class="squad-title">Carnival Squad</h3>
-                `}
-                <div class="squad-stats">
-                  <span class="stat-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    ${sharingCount}
-                  </span>
-                  <span class="stat-item">
-                    <i class="fas fa-users"></i>
-                    ${this.people.length}
-                  </span>
-                  ${this.isPremium ? `
-                    <span class="stat-item">
-                      <i class="fas fa-crown"></i>
-                      <span class="premium-tag">💎</span>
-                    </span>
-                  ` : `
-                    <span class="stat-item">
-                      <i class="fas fa-crown"></i>
-                      <span class="basic-limit" onclick="window.carnivalTracker.showPremiumUpgrade('Upgrade to Premium for unlimited squad members!')">${this.people.length}/${this.maxFreeMembers}</span>
-                    </span>
-                  `}
+      <div class="carnival-tracker-content">
+        <!-- Compact Header -->
+        <div class="tracker-header-compact">
+          <div class="header-content-compact">
+            <div class="header-left-compact">
+              ${this.isPremium ? `
+                <div class="premium-banner-compact">
+                  <span class="premium-icon">💎</span>
+                  <span class="premium-text">Premium Squad</span>
                 </div>
+              ` : `
+                <h4 class="squad-title-compact">Carnival Squad</h4>
+              `}
+              <div class="squad-stats-compact">
+                <span class="stat-item-compact">
+                  <i class="fas fa-map-marker-alt"></i>
+                  ${sharingCount}
+                </span>
+                <span class="stat-item-compact">
+                  <i class="fas fa-users"></i>
+                  ${this.people.length}
+                </span>
+                ${this.isPremium ? `
+                  <span class="stat-item-compact">
+                    <i class="fas fa-crown"></i>
+                    <span class="premium-tag">💎</span>
+                  </span>
+                ` : `
+                  <span class="stat-item-compact">
+                    <i class="fas fa-crown"></i>
+                    <span class="basic-limit" onclick="window.carnivalTracker.showPremiumUpgrade('Upgrade to Premium for unlimited squad members!')">${this.people.length}/${this.maxFreeMembers}</span>
+                  </span>
+                `}
               </div>
+            </div>
             
-            <div class="header-actions">
-              <button class="action-btn add-btn" title="Add Person">
+            <div class="header-actions-compact">
+              <button class="action-btn-compact add-btn" title="Add Person">
                 <i class="fas fa-plus"></i>
-              </button>
-              <button class="action-btn close-btn" title="Close">
-                <i class="fas fa-times"></i>
               </button>
             </div>
           </div>
         </div>
 
         <!-- Compact Tabs -->
-        <div class="tracker-tabs">
-          <button class="tab-btn ${this.activeTab === 'tracker' ? 'active' : ''}" data-tab="tracker">
+        <div class="tracker-tabs-compact">
+          <button class="tab-btn-compact ${this.activeTab === 'tracker' ? 'active' : ''}" data-tab="tracker">
             <i class="fas fa-map-marker-alt"></i>
             <span>Live</span>
           </button>
-          <button class="tab-btn ${this.activeTab === 'add' ? 'active' : ''}" data-tab="add">
+          <button class="tab-btn-compact ${this.activeTab === 'add' ? 'active' : ''}" data-tab="add">
             <i class="fas fa-user-plus"></i>
             <span>Add</span>
           </button>
-          <button class="tab-btn ${this.activeTab === 'notifications' ? 'active' : ''}" data-tab="notifications">
+          <button class="tab-btn-compact ${this.activeTab === 'notifications' ? 'active' : ''}" data-tab="notifications">
             <i class="fas fa-bell"></i>
             <span>Updates</span>
           </button>
         </div>
 
         <!-- Content Area -->
-        <div class="tracker-content">
+        <div class="tracker-content-compact">
           ${this.activeTab === 'tracker' ? this.renderTrackerTab(filteredPeople) :
         this.activeTab === 'add' ? this.renderAddTab() :
           this.activeTab === 'notifications' ? this.renderNotificationsTab() :
@@ -1999,8 +1999,11 @@ See you at the carnival! 🎪</textarea>
     const currentUser = this.getCurrentUserSafely();
     console.log('🎭 Current user state:', currentUser ? currentUser.email : 'No user');
 
-    // Ensure panel is open when carnival tracker is shown
+    // Ensure pull-up panel is open when carnival tracker is shown
     this.ensurePanelOpen();
+
+    // Switch to carnival squad tab
+    this.switchToCarnivalSquadTab();
   }
 
   hide() {
@@ -2014,6 +2017,27 @@ See you at the carnival! 🎪</textarea>
       this.hide();
     } else {
       this.show();
+    }
+  }
+
+  // Switch to carnival squad tab in pull-up panel
+  switchToCarnivalSquadTab() {
+    const tabButton = document.querySelector('[data-tab="carnivalsquad"]');
+    if (tabButton) {
+      // Remove active class from all tabs
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      // Add active class to carnival squad tab
+      tabButton.classList.add('active');
+
+      // Hide all tab panes
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+      // Show carnival squad tab pane
+      const carnivalSquadPane = document.getElementById('carnivalsquad');
+      if (carnivalSquadPane) {
+        carnivalSquadPane.classList.add('active');
+      }
+
+      console.log('🎭 Switched to carnival squad tab');
     }
   }
 
