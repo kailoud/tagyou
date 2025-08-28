@@ -7,6 +7,12 @@ class CarnivalTracker {
     this.searchTerm = "";
     this.notifications = [];
 
+    // Development flag - show debug tools only in development
+    this.isDevelopment = window.location.hostname === 'localhost' ||
+      window.location.hostname.includes('dev') ||
+      window.location.hostname.includes('127.0.0.1') ||
+      window.location.hostname.includes('tagyou.app') && window.location.hostname.includes('dev');
+
     // Flag to track auth operations (for debugging)
     this.isPerformingAuthOperation = false;
 
@@ -53,6 +59,13 @@ class CarnivalTracker {
     this.updateToolbarCount();
     this.checkPremiumStatus();
     this.loadInitialData();
+
+    // Log development status
+    if (this.isDevelopment) {
+      console.log('🔧 Development mode: Debug tools are available');
+    } else {
+      console.log('🚀 Production mode: Debug tools are hidden');
+    }
   }
 
   async loadInitialData() {
@@ -382,20 +395,14 @@ class CarnivalTracker {
     }
   }
 
-  // Debug toolbar count
-  debugToolbarCount() {
-    console.log('🎭 Toolbar Count Debug:');
-    console.log('  - Total squad members:', this.people.length);
-    console.log('  - Sharing location:', this.people.filter(p => p.isSharing).length);
-
-    const trackerCount = document.getElementById('trackerCount');
-    console.log('  - Toolbar count element:', trackerCount);
-    console.log('  - Current toolbar count:', trackerCount?.textContent);
-
-    // Force update toolbar count
-    this.updateToolbarCount();
-    console.log('  - Updated toolbar count:', trackerCount?.textContent);
+  // Toggle debug mode (for testing)
+  toggleDebugMode() {
+    this.isDevelopment = !this.isDevelopment;
+    console.log(this.isDevelopment ? '🔧 Debug mode enabled' : '🚀 Debug mode disabled');
+    this.render(); // Re-render to show/hide debug tools
   }
+
+
 
   // Test squad saving functionality
   async testSquadSaving() {
@@ -494,6 +501,14 @@ class CarnivalTracker {
   }
 
   setupEventListeners() {
+    // Keyboard shortcut for debug mode (Ctrl+Shift+D)
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        e.preventDefault();
+        this.toggleDebugMode();
+      }
+    });
+
     // Event delegation for dynamic elements
     this.trackerElement.addEventListener('click', (e) => {
       // Close button
@@ -1823,33 +1838,31 @@ See you at the carnival! 🎪</textarea>
             Import from Contacts
           </button>
           
-          <div class="divider">
-            <span>Debug</span>
-          </div>
-          
-          <button class="test-btn" onclick="window.carnivalTracker.testAddPerson()" style="background: #ef4444; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
-            🧪 Test Add Person (Debug)
-          </button>
-          
-          <button class="test-btn" onclick="window.carnivalTracker.debugPremiumStatus()" style="background: #3b82f6; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
-            🔍 Debug Premium Status
-          </button>
-          
-          <button class="test-btn" onclick="window.carnivalTracker.debugToolbarCount()" style="background: #10b981; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
-            🎭 Debug Toolbar Count
-          </button>
-          
-          <button class="debug-btn" onclick="window.carnivalTracker.diagnoseSystem()" style="background: #3b82f6; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
-            🔍 System Diagnosis
-          </button>
-          
-          <button class="test-save-btn" onclick="window.carnivalTracker.testSquadSaving()" style="background: #10b981; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
-            🧪 Test Squad Saving
-          </button>
-          
-          <button class="test-debug-btn" style="background: #8b5cf6; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
-            🧪 Test Debug 1
-          </button>
+          ${this.isDevelopment ? `
+            <div class="divider">
+              <span>Debug Tools (Development Only)</span>
+            </div>
+            
+            <button class="test-btn" onclick="window.carnivalTracker.testAddPerson()" style="background: #ef4444; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
+              🧪 Test Add Person (Debug)
+            </button>
+            
+            <button class="test-btn" onclick="window.carnivalTracker.debugPremiumStatus()" style="background: #3b82f6; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
+              🔍 Debug Premium Status
+            </button>
+            
+            <button class="debug-btn" onclick="window.carnivalTracker.diagnoseSystem()" style="background: #3b82f6; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
+              🔍 System Diagnosis
+            </button>
+            
+            <button class="test-save-btn" onclick="window.carnivalTracker.testSquadSaving()" style="background: #10b981; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
+              🧪 Test Squad Saving
+            </button>
+            
+            <button class="test-debug-btn" onclick="window.carnivalTracker.testDebug()" style="background: #8b5cf6; color: white; padding: 8px 16px; border: none; border-radius: 6px; margin: 8px 0; width: 100%;">
+              🧪 Test Debug 1
+            </button>
+          ` : ''}
         </div>
       </div>
     `;
