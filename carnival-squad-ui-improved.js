@@ -12,6 +12,7 @@ class ImprovedCarnivalSquadUI {
     this.currentUser = null;
     this.isPremium = false;
     this.userTier = 'Basic';
+    this.isAuthenticated = false; // New flag to track authentication status
 
     // Performance optimization flags
     this.isInitialized = false;
@@ -36,8 +37,10 @@ class ImprovedCarnivalSquadUI {
     // Initialize with better error handling
     await this.initializeWithRetry();
 
-    // Set up auto-refresh
-    this.setupAutoRefresh();
+    // Set up auto-refresh only if authenticated
+    if (this.isAuthenticated) {
+      this.setupAutoRefresh();
+    }
 
     console.log('✅ Improved Carnival Squad UI initialized');
   }
@@ -67,30 +70,48 @@ class ImprovedCarnivalSquadUI {
           <p>Loading squad data...</p>
         </div>
         
-        <div class="squad-stats">
-          <div class="stat-item">
-            <span class="stat-number" id="memberCount">0</span>
-            <span class="stat-label">Members</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-number" id="sharingCount">0</span>
-            <span class="stat-label">Sharing</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-number" id="premiumStatus">Basic</span>
-            <span class="stat-label">Tier</span>
-          </div>
-        </div>
-        
-        <div class="squad-members" id="squadMembers">
-          <div class="empty-state" id="emptyState">
-            <p>No squad members found</p>
-            <button id="addFirstMember" class="add-member-btn">Add Your First Member</button>
+        <!-- Authentication Required State -->
+        <div id="authRequiredState" class="auth-required-state" style="display: none;">
+          <div class="auth-message">
+            <h3>🔐 Sign In Required</h3>
+            <p>To use Carnival Squad features, please sign in to your account.</p>
+            <div class="auth-actions">
+              <button id="signInBtn" class="btn-primary">Sign In</button>
+              <button id="signUpBtn" class="btn-secondary">Sign Up</button>
+            </div>
+            <div class="demo-mode-notice">
+              <p><strong>Demo Mode:</strong> You can view the interface but cannot add or modify squad members.</p>
+            </div>
           </div>
         </div>
         
-        <div class="add-member-section">
-          <button id="addMemberBtn" class="add-member-btn">+ Add Squad Member</button>
+        <!-- Authenticated Content -->
+        <div id="authenticatedContent" class="authenticated-content">
+          <div class="squad-stats">
+            <div class="stat-item">
+              <span class="stat-number" id="memberCount">0</span>
+              <span class="stat-label">Members</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="sharingCount">0</span>
+              <span class="stat-label">Sharing</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="premiumStatus">Basic</span>
+              <span class="stat-label">Tier</span>
+            </div>
+          </div>
+          
+          <div class="squad-members" id="squadMembers">
+            <div class="empty-state" id="emptyState">
+              <p>No squad members found</p>
+              <button id="addFirstMember" class="add-member-btn">Add Your First Member</button>
+            </div>
+          </div>
+          
+          <div class="add-member-section">
+            <button id="addMemberBtn" class="add-member-btn">+ Add Squad Member</button>
+          </div>
         </div>
       </div>
       
@@ -230,6 +251,52 @@ class ImprovedCarnivalSquadUI {
         100% { transform: rotate(360deg); }
       }
 
+      .auth-required-state {
+        text-align: center;
+        padding: 40px 20px;
+      }
+
+      .auth-message h3 {
+        color: #495057;
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+      }
+
+      .auth-message p {
+        color: #6c757d;
+        margin-bottom: 25px;
+        font-size: 1.1rem;
+      }
+
+      .auth-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 30px;
+      }
+
+      .demo-mode-notice {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 20px;
+      }
+
+      .demo-mode-notice p {
+        margin: 0;
+        color: #856404;
+        font-size: 0.9rem;
+      }
+
+      .authenticated-content {
+        display: none;
+      }
+
+      .authenticated-content.show {
+        display: block;
+      }
+
       .squad-stats {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -349,6 +416,12 @@ class ImprovedCarnivalSquadUI {
         transform: translateY(-2px);
       }
 
+      .add-member-btn:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+      }
+
       .modal {
         display: none;
         position: fixed;
@@ -466,6 +539,38 @@ class ImprovedCarnivalSquadUI {
         margin-bottom: 15px;
         font-size: 0.9rem;
       }
+
+      .auth-required-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255,255,255,0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 5;
+      }
+
+      .auth-required-overlay .auth-prompt {
+        text-align: center;
+        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        max-width: 400px;
+      }
+
+      .auth-required-overlay h4 {
+        color: #495057;
+        margin-bottom: 10px;
+      }
+
+      .auth-required-overlay p {
+        color: #6c757d;
+        margin-bottom: 15px;
+      }
     `;
 
     document.head.appendChild(style);
@@ -475,19 +580,31 @@ class ImprovedCarnivalSquadUI {
     // Refresh button
     const refreshBtn = document.getElementById('refreshBtn');
     if (refreshBtn) {
-      refreshBtn.addEventListener('click', () => this.refreshData());
+      refreshBtn.addEventListener('click', () => this.handleRefresh());
     }
 
     // Add member button
     const addMemberBtn = document.getElementById('addMemberBtn');
     if (addMemberBtn) {
-      addMemberBtn.addEventListener('click', () => this.showAddMemberModal());
+      addMemberBtn.addEventListener('click', () => this.handleAddMemberClick());
     }
 
     // Add first member button
     const addFirstMember = document.getElementById('addFirstMember');
     if (addFirstMember) {
-      addFirstMember.addEventListener('click', () => this.showAddMemberModal());
+      addFirstMember.addEventListener('click', () => this.handleAddMemberClick());
+    }
+
+    // Sign in/up buttons
+    const signInBtn = document.getElementById('signInBtn');
+    const signUpBtn = document.getElementById('signUpBtn');
+
+    if (signInBtn) {
+      signInBtn.addEventListener('click', () => this.triggerAvatarSignIn());
+    }
+
+    if (signUpBtn) {
+      signUpBtn.addEventListener('click', () => this.triggerAvatarSignUp());
     }
 
     // Modal events
@@ -530,6 +647,16 @@ class ImprovedCarnivalSquadUI {
     try {
       this.showLoading(true);
 
+      // Check authentication status first
+      await this.checkAuthenticationStatus();
+
+      if (!this.isAuthenticated) {
+        // Show unauthenticated state
+        this.showUnauthenticatedState();
+        this.updateSyncStatus('🔒 Sign in required');
+        return;
+      }
+
       // Wait for avatar system to be ready
       await this.waitForAvatarSystem();
 
@@ -537,8 +664,8 @@ class ImprovedCarnivalSquadUI {
       this.currentUser = await this.getCurrentUser();
 
       if (!this.currentUser) {
-        console.log('⚠️ No user found, showing empty state');
-        this.showEmptyState();
+        console.log('⚠️ No user found, showing unauthenticated state');
+        this.showUnauthenticatedState();
         return;
       }
 
@@ -555,6 +682,9 @@ class ImprovedCarnivalSquadUI {
       this.isInitialized = true;
       this.updateSyncStatus('✅ Synced');
 
+      // Show authenticated content
+      this.showAuthenticatedState();
+
     } catch (error) {
       console.error('❌ Initialization failed:', error);
       this.retryAttempts++;
@@ -569,6 +699,116 @@ class ImprovedCarnivalSquadUI {
     } finally {
       this.showLoading(false);
     }
+  }
+
+  async checkAuthenticationStatus() {
+    try {
+      // Check multiple sources for authentication
+      const sources = [
+        () => window.avatarSystem?.user,
+        () => {
+          try {
+            const stored = sessionStorage.getItem('supabase_user');
+            return stored ? JSON.parse(stored) : null;
+          } catch (e) {
+            return null;
+          }
+        },
+        async () => {
+          if (window.supabase) {
+            const { data: { user } } = await window.supabase.auth.getUser();
+            return user;
+          }
+          return null;
+        }
+      ];
+
+      for (const source of sources) {
+        try {
+          const user = await source();
+          if (user) {
+            this.isAuthenticated = true;
+            console.log('✅ User authenticated:', user.email);
+            return;
+          }
+        } catch (error) {
+          console.log('⚠️ Auth source failed:', error);
+        }
+      }
+
+      this.isAuthenticated = false;
+      console.log('⚠️ No authenticated user found');
+
+    } catch (error) {
+      console.error('❌ Error checking authentication:', error);
+      this.isAuthenticated = false;
+    }
+  }
+
+  showUnauthenticatedState() {
+    const authRequiredState = document.getElementById('authRequiredState');
+    const authenticatedContent = document.getElementById('authenticatedContent');
+
+    if (authRequiredState) authRequiredState.style.display = 'block';
+    if (authenticatedContent) authenticatedContent.classList.remove('show');
+
+    console.log('🔒 Showing unauthenticated state');
+  }
+
+  showAuthenticatedState() {
+    const authRequiredState = document.getElementById('authRequiredState');
+    const authenticatedContent = document.getElementById('authenticatedContent');
+
+    if (authRequiredState) authRequiredState.style.display = 'none';
+    if (authenticatedContent) authenticatedContent.classList.add('show');
+
+    console.log('✅ Showing authenticated state');
+  }
+
+  triggerAvatarSignIn() {
+    console.log('🔐 Triggering avatar sign in...');
+
+    // Try to trigger the avatar system sign in
+    if (window.avatarSystem && window.avatarSystem.showSignInModal) {
+      window.avatarSystem.showSignInModal();
+    } else if (window.avatarSystem && window.avatarSystem.toggleDropdown) {
+      window.avatarSystem.toggleDropdown();
+    } else {
+      // Fallback: show a message to sign in
+      this.showErrorMessage('Please sign in using the avatar dropdown in the top right corner.');
+    }
+  }
+
+  triggerAvatarSignUp() {
+    console.log('🔐 Triggering avatar sign up...');
+
+    // Try to trigger the avatar system sign up
+    if (window.avatarSystem && window.avatarSystem.showSignUpModal) {
+      window.avatarSystem.showSignUpModal();
+    } else if (window.avatarSystem && window.avatarSystem.toggleDropdown) {
+      window.avatarSystem.toggleDropdown();
+    } else {
+      // Fallback: show a message to sign up
+      this.showErrorMessage('Please sign up using the avatar dropdown in the top right corner.');
+    }
+  }
+
+  handleRefresh() {
+    if (!this.isAuthenticated) {
+      this.triggerAvatarSignIn();
+      return;
+    }
+
+    this.refreshData();
+  }
+
+  handleAddMemberClick() {
+    if (!this.isAuthenticated) {
+      this.triggerAvatarSignIn();
+      return;
+    }
+
+    this.showAddMemberModal();
   }
 
   async waitForAvatarSystem() {
@@ -825,17 +1065,24 @@ class ImprovedCarnivalSquadUI {
   }
 
   setupAutoRefresh() {
-    // Auto-refresh every 30 seconds
-    this.syncInterval = setInterval(() => {
-      if (this.isInitialized && !this.isLoading) {
-        this.refreshData(true); // Silent refresh
-      }
-    }, 30000);
+    // Auto-refresh every 30 seconds only if authenticated
+    if (this.isAuthenticated) {
+      this.syncInterval = setInterval(() => {
+        if (this.isInitialized && !this.isLoading) {
+          this.refreshData(true); // Silent refresh
+        }
+      }, 30000);
+    }
   }
 
   async refreshData(silent = false) {
     if (this.isLoading) {
       console.log('⚠️ Refresh already in progress');
+      return;
+    }
+
+    if (!this.isAuthenticated) {
+      this.triggerAvatarSignIn();
       return;
     }
 
@@ -866,6 +1113,11 @@ class ImprovedCarnivalSquadUI {
   }
 
   showAddMemberModal() {
+    if (!this.isAuthenticated) {
+      this.triggerAvatarSignIn();
+      return;
+    }
+
     const modal = document.getElementById('addMemberModal');
     if (modal) {
       modal.style.display = 'block';
@@ -883,6 +1135,11 @@ class ImprovedCarnivalSquadUI {
 
   async handleAddMember() {
     try {
+      if (!this.isAuthenticated) {
+        this.triggerAvatarSignIn();
+        return;
+      }
+
       const formData = {
         name: document.getElementById('memberName').value.trim(),
         phone: document.getElementById('memberPhone').value.trim(),
@@ -988,6 +1245,24 @@ class ImprovedCarnivalSquadUI {
 
   isPremiumUser() {
     return this.isPremium;
+  }
+
+  isUserAuthenticated() {
+    return this.isAuthenticated;
+  }
+
+  // Method to recheck authentication status (useful after sign in/out)
+  async recheckAuthentication() {
+    await this.checkAuthenticationStatus();
+
+    if (this.isAuthenticated) {
+      // Reinitialize if now authenticated
+      await this.performInitialization();
+    } else {
+      // Show unauthenticated state
+      this.showUnauthenticatedState();
+      this.updateSyncStatus('🔒 Sign in required');
+    }
   }
 
   // Cleanup method
