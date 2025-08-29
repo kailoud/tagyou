@@ -752,6 +752,9 @@ class ImprovedCarnivalSquadUI {
     if (authRequiredState) authRequiredState.style.display = 'block';
     if (authenticatedContent) authenticatedContent.classList.remove('show');
 
+    // Disable features when not authenticated
+    this.updateFeatureAccessibility();
+
     console.log('🔒 Showing unauthenticated state');
   }
 
@@ -762,7 +765,63 @@ class ImprovedCarnivalSquadUI {
     if (authRequiredState) authRequiredState.style.display = 'none';
     if (authenticatedContent) authenticatedContent.classList.add('show');
 
+    // Enable features when authenticated
+    this.updateFeatureAccessibility();
+
     console.log('✅ Showing authenticated state');
+  }
+
+  updateFeatureAccessibility() {
+    const refreshBtn = document.getElementById('refreshBtn');
+    const addMemberBtn = document.getElementById('addMemberBtn');
+    const addFirstMember = document.getElementById('addFirstMember');
+
+    if (!this.isAuthenticated) {
+      // Disable refresh button
+      if (refreshBtn) {
+        refreshBtn.disabled = true;
+        refreshBtn.title = 'Sign in required to refresh data';
+        refreshBtn.style.opacity = '0.5';
+        refreshBtn.style.cursor = 'not-allowed';
+      }
+
+      // Disable add member buttons
+      if (addMemberBtn) {
+        addMemberBtn.disabled = true;
+        addMemberBtn.title = 'Sign in required to add members';
+        addMemberBtn.style.opacity = '0.5';
+        addMemberBtn.style.cursor = 'not-allowed';
+      }
+
+      if (addFirstMember) {
+        addFirstMember.disabled = true;
+        addFirstMember.title = 'Sign in required to add members';
+        addFirstMember.style.opacity = '0.5';
+        addFirstMember.style.cursor = 'not-allowed';
+      }
+    } else {
+      // Enable features when authenticated
+      if (refreshBtn) {
+        refreshBtn.disabled = false;
+        refreshBtn.title = 'Refresh Data';
+        refreshBtn.style.opacity = '1';
+        refreshBtn.style.cursor = 'pointer';
+      }
+
+      if (addMemberBtn) {
+        addMemberBtn.disabled = false;
+        addMemberBtn.title = 'Add Squad Member';
+        addMemberBtn.style.opacity = '1';
+        addMemberBtn.style.cursor = 'pointer';
+      }
+
+      if (addFirstMember) {
+        addFirstMember.disabled = false;
+        addFirstMember.title = 'Add Your First Member';
+        addFirstMember.style.opacity = '1';
+        addFirstMember.style.cursor = 'pointer';
+      }
+    }
   }
 
   triggerAvatarSignIn() {
