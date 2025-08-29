@@ -2343,7 +2343,7 @@ See you at the carnival! 🎪</textarea>
 
     const debouncedRender = () => {
       // Don't render if user is actively interacting with form
-      if (isUserInteracting) {
+      if (this.isUserInteracting) {
         console.log('⏸️ Skipping render - user is interacting with form');
         return;
       }
@@ -2359,6 +2359,12 @@ See you at the carnival! 🎪</textarea>
 
     // Function to check auth and update UI if needed
     const checkAuthAndUpdate = async () => {
+      // Skip auth check if user is interacting with form
+      if (this.isUserInteracting) {
+        console.log('⏸️ Skipping auth check - user is interacting with form');
+        return;
+      }
+
       const wasAuthenticated = this.isAuthenticated;
       const wasPremium = this.isPremium;
 
@@ -2571,6 +2577,51 @@ See you at the carnival! 🎪</textarea>
     console.log('✅ Carnival Tracker: Flickering stopped');
   }
 
+  // Completely disable authentication listener
+  disableAuthListener() {
+    console.log('🛑 Carnival Tracker: Disabling authentication listener...');
+
+    // Clear the auth check interval
+    if (this.authCheckInterval) {
+      clearInterval(this.authCheckInterval);
+      this.authCheckInterval = null;
+    }
+
+    // Clear input timeout
+    if (this.inputTimeout) {
+      clearTimeout(this.inputTimeout);
+      this.inputTimeout = null;
+    }
+
+    // Remove event listeners
+    if (this.storageListener) {
+      window.removeEventListener('storage', this.storageListener);
+      this.storageListener = null;
+    }
+    if (this.authStateListener) {
+      window.removeEventListener('authStateChanged', this.authStateListener);
+      this.authStateListener = null;
+    }
+    if (this.userSignedInListener) {
+      window.removeEventListener('userSignedIn', this.userSignedInListener);
+      this.userSignedInListener = null;
+    }
+    if (this.userSignedOutListener) {
+      window.removeEventListener('userSignedOut', this.userSignedOutListener);
+      this.userSignedOutListener = null;
+    }
+
+    // Force stable state
+    this.isAuthenticated = true;
+    this.isPremium = true;
+    this.isUserInteracting = false;
+
+    // Single render
+    this.render();
+
+    console.log('✅ Carnival Tracker: Authentication listener completely disabled');
+  }
+
   // Track form interactions to prevent re-renders during input
   setupFormInteractionTracking() {
     console.log('🔧 Setting up form interaction tracking...');
@@ -2725,6 +2776,13 @@ document.addEventListener('DOMContentLoaded', () => {
           console.log('🔍 Form interaction state:', window.carnivalTracker.isUserInteracting);
           console.log('🔍 Input timeout active:', !!window.carnivalTracker.inputTimeout);
           console.log('🔍 Active element:', document.activeElement?.tagName, document.activeElement?.className);
+        }
+      };
+
+      // Completely disable authentication listener
+      window.disableCarnivalAuth = () => {
+        if (window.carnivalTracker) {
+          window.carnivalTracker.disableAuthListener();
         }
       };
 
