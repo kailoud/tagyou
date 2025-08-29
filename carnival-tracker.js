@@ -140,9 +140,32 @@ class CarnivalTracker {
 
   async checkPremiumStatus() {
     try {
-      // Get current user email
-      const currentUser = window.avatarSystem?.user;
-      const email = currentUser?.email || '';
+      // Get current user email from multiple sources
+      let email = '';
+
+      // Try avatarSystem first
+      if (window.avatarSystem?.user?.email) {
+        email = window.avatarSystem.user.email;
+        console.log('🔍 Got email from avatarSystem:', email);
+      }
+      // Try currentUser from Carnival Tracker
+      else if (this.currentUser?.email) {
+        email = this.currentUser.email;
+        console.log('🔍 Got email from currentUser:', email);
+      }
+      // Try sessionStorage
+      else {
+        try {
+          const stored = sessionStorage.getItem('supabase_user');
+          if (stored) {
+            const user = JSON.parse(stored);
+            email = user.email;
+            console.log('🔍 Got email from sessionStorage:', email);
+          }
+        } catch (e) {
+          console.log('⚠️ Error parsing sessionStorage:', e);
+        }
+      }
 
       if (!email) {
         console.log('🔍 No user email found, defaulting to Basic tier');
@@ -2205,6 +2228,11 @@ See you at the carnival! 🎪</textarea>
             this.isAuthenticated = true;
             this.currentUser = user;
             console.log('✅ Carnival Tracker: User authenticated:', user.email);
+
+            // Immediately check premium status when user is found
+            console.log('🔍 Carnival Tracker: Immediately checking premium status for:', user.email);
+            await this.checkPremiumStatus();
+
             return;
           }
         } catch (error) {
@@ -2272,8 +2300,8 @@ See you at the carnival! 🎪</textarea>
     this.userSignedInListener = checkAuthAndUpdate;
     this.userSignedOutListener = checkAuthAndUpdate;
 
-    // Check auth state every 500ms for faster response
-    this.authCheckInterval = setInterval(checkAuthAndUpdate, 500);
+    // Check auth state every 200ms for instant response
+    this.authCheckInterval = setInterval(checkAuthAndUpdate, 200);
 
     // Listen for session storage changes (when user signs in/out)
     window.addEventListener('storage', this.storageListener);
@@ -2364,9 +2392,38 @@ See you at the carnival! 🎪</textarea>
   // Force immediate premium banner update
   async forcePremiumUpdate() {
     console.log('💎 Carnival Tracker: Forcing premium banner update...');
+
+    // First check authentication
+    await this.checkAuthenticationStatus();
+
+    // Then check premium status
+    await this.checkPremiumStatus();
+
+    // Force render
+    this.render();
+
+    console.log('✅ Carnival Tracker: Premium banner updated');
+    console.log('💎 Current premium status:', this.isPremium);
+    console.log('🔐 Current auth status:', this.isAuthenticated);
+  }
+
+  // Force immediate full update (auth + premium + render)
+  async forceFullUpdate() {
+    console.log('🚀 Carnival Tracker: Forcing full update...');
+
+    // Clear any cached data
+    if (this.currentUser?.email) {
+      localStorage.removeItem(`premium_${this.currentUser.email}`);
+    }
+
+    // Check everything fresh
+    await this.checkAuthenticationStatus();
     await this.checkPremiumStatus();
     this.render();
-    console.log('✅ Carnival Tracker: Premium banner updated');
+
+    console.log('✅ Carnival Tracker: Full update complete');
+    console.log('💎 Premium status:', this.isPremium);
+    console.log('🔐 Auth status:', this.isAuthenticated);
   }
 
   // Cleanup method to remove listeners
@@ -2408,14 +2465,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       };
 
-      // Add global method for immediate premium banner update
+      // Add global methods for immediate updates
       window.updateCarnivalTrackerPremium = () => {
         if (window.carnivalTracker) {
           window.carnivalTracker.forcePremiumUpdate();
         }
       };
 
+      window.forceCarnivalTrackerUpdate = () => {
+        if (window.carnivalTracker) {
+          window.carnivalTracker.forceFullUpdate();
+        }
+      };
+
+      // Auto-trigger update when avatar system is ready
+      if (window.avatarSystem) {
+        const originalSetUser = window.avatarSystem.setUser;
+        if (originalSetUser) {
+          window.avatarSystem.setUser = function (user) {
+            const result = originalSetUser.call(this, user);
+            // Trigger carnival tracker update after user is set
+            setTimeout(() => {
+              if (window.forceCarnivalTrackerUpdate) {
+                window.forceCarnivalTrackerUpdate();
+              }
+            }, 100);
+            return result;
+          };
+        }
+      }
+
       console.log('🎭 Carnival tracker initialized successfully');
+
+      // Force immediate check of current state
+      setTimeout(() => {
+        if (window.carnivalTracker) {
+          console.log('🚀 Carnival Tracker: Performing initial state check...');
+          window.carnivalTracker.forceFullUpdate();
+        }
+      }, 500);
 
       // Test the add person functionality
       console.log('🧪 Testing carnival tracker functionality...');
