@@ -1810,8 +1810,13 @@ See you at the carnival! 🎪</textarea>
   }
 
   renderAddTab() {
-    // Check if user is authenticated
-    if (!this.isAuthenticated) {
+    console.log('🔍 renderAddTab - Auth status:', this.isAuthenticated, 'Premium:', this.isPremium, 'People count:', this.people.length);
+
+    // Check if user is authenticated - also check for any user presence
+    const hasUser = this.isAuthenticated || window.avatarSystem?.user || sessionStorage.getItem('supabase_user');
+
+    if (!hasUser) {
+      console.log('🔒 User not authenticated, showing sign-in required message');
       return `
         <div class="add-tab-content">
           <div class="add-form-disabled">
@@ -1831,6 +1836,7 @@ See you at the carnival! 🎪</textarea>
 
     // Check if non-premium user has reached the limit
     if (!this.isPremium && this.people.length >= this.maxFreeMembers) {
+      console.log('🔒 Non-premium user reached limit, showing premium required message');
       return `
         <div class="add-tab-content">
           <div class="add-form-disabled">
@@ -1847,6 +1853,8 @@ See you at the carnival! 🎪</textarea>
         </div>
       `;
     }
+
+    console.log('✅ User authenticated and can add, showing form');
 
     return `
       <div class="add-tab-content">
@@ -2503,6 +2511,15 @@ See you at the carnival! 🎪</textarea>
     console.log('✅ Carnival Tracker: UI refreshed');
   }
 
+  // Temporary method to force enable form for testing
+  forceEnableForm() {
+    console.log('🔧 Carnival Tracker: Force enabling form...');
+    this.isAuthenticated = true;
+    this.isPremium = true;
+    this.render();
+    console.log('✅ Carnival Tracker: Form enabled');
+  }
+
   // Cleanup method to remove listeners
   destroy() {
     if (this.authCheckInterval) {
@@ -2552,6 +2569,13 @@ document.addEventListener('DOMContentLoaded', () => {
       window.forceCarnivalTrackerUpdate = () => {
         if (window.carnivalTracker) {
           window.carnivalTracker.forceFullUpdate();
+        }
+      };
+
+      // Temporary method to force enable form
+      window.forceEnableCarnivalForm = () => {
+        if (window.carnivalTracker) {
+          window.carnivalTracker.forceEnableForm();
         }
       };
 
