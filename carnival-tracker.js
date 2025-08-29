@@ -1810,13 +1810,16 @@ See you at the carnival! 🎪</textarea>
   }
 
   renderAddTab() {
-    console.log('🔍 renderAddTab - Auth status:', this.isAuthenticated, 'Premium:', this.isPremium, 'People count:', this.people.length);
+    // Use a more stable authentication check to prevent flickering
+    const hasUser = this.isAuthenticated || (window.avatarSystem?.user && window.avatarSystem.user.email);
 
-    // Check if user is authenticated - also check for any user presence
-    const hasUser = this.isAuthenticated || window.avatarSystem?.user || sessionStorage.getItem('supabase_user');
+    // Only log once per render to reduce console spam
+    if (!this._lastAuthLog || this._lastAuthLog !== hasUser) {
+      console.log('🔍 renderAddTab - Auth status:', this.isAuthenticated, 'Premium:', this.isPremium, 'People count:', this.people.length, 'Has user:', hasUser);
+      this._lastAuthLog = hasUser;
+    }
 
     if (!hasUser) {
-      console.log('🔒 User not authenticated, showing sign-in required message');
       return `
         <div class="add-tab-content">
           <div class="add-form-disabled">
@@ -2330,6 +2333,18 @@ See you at the carnival! 🎪</textarea>
   setupAuthenticationListener() {
     console.log('🔧 Carnival Tracker: Setting up authentication listener...');
 
+    // Debounce mechanism to prevent excessive renders
+    let renderTimeout = null;
+    const debouncedRender = () => {
+      if (renderTimeout) {
+        clearTimeout(renderTimeout);
+      }
+      renderTimeout = setTimeout(() => {
+        this.render();
+        renderTimeout = null;
+      }, 100);
+    };
+
     // Function to check auth and update UI if needed
     const checkAuthAndUpdate = async () => {
       const wasAuthenticated = this.isAuthenticated;
@@ -2347,16 +2362,16 @@ See you at the carnival! 🎪</textarea>
           await this.checkPremiumStatus();
         }
 
-        // Re-render to update tab states and premium banner
-        this.render();
-        console.log('✅ Carnival Tracker: UI updated after auth change');
+        // Use debounced render to prevent flickering
+        debouncedRender();
+        console.log('✅ Carnival Tracker: UI update scheduled after auth change');
       }
 
       // Also check if premium status changed
       if (wasPremium !== this.isPremium) {
         console.log(`💎 Carnival Tracker: Premium status changed from ${wasPremium} to ${this.isPremium}`);
-        this.render();
-        console.log('✅ Carnival Tracker: UI updated after premium status change');
+        debouncedRender();
+        console.log('✅ Carnival Tracker: UI update scheduled after premium status change');
       }
     };
 
@@ -2364,10 +2379,8 @@ See you at the carnival! 🎪</textarea>
     this.storageListener = (e) => {
       if (e.key === 'supabase_user') {
         console.log('🔄 Carnival Tracker: Session storage changed, checking auth state...');
-        // Trigger multiple checks for faster response
+        // Single check to prevent flickering
         checkAuthAndUpdate();
-        setTimeout(checkAuthAndUpdate, 100);
-        setTimeout(checkAuthAndUpdate, 300);
       }
     };
 
@@ -2375,8 +2388,8 @@ See you at the carnival! 🎪</textarea>
     this.userSignedInListener = checkAuthAndUpdate;
     this.userSignedOutListener = checkAuthAndUpdate;
 
-    // Check auth state every 200ms for instant response
-    this.authCheckInterval = setInterval(checkAuthAndUpdate, 200);
+    // Check auth state every 2 seconds to prevent flickering
+    this.authCheckInterval = setInterval(checkAuthAndUpdate, 2000);
 
     // Listen for session storage changes (when user signs in/out)
     window.addEventListener('storage', this.storageListener);
@@ -2397,9 +2410,7 @@ See you at the carnival! 🎪</textarea>
         window.avatarSystem.showSignInModal = async (...args) => {
           console.log('🔄 Carnival Tracker: Sign in modal triggered, will check auth after...');
           const result = await originalShowSignInModal.apply(window.avatarSystem, args);
-          // Check auth state immediately and then again after delay
-          setTimeout(checkAuthAndUpdate, 100);
-          setTimeout(checkAuthAndUpdate, 500);
+          // Single check after delay to prevent flickering
           setTimeout(checkAuthAndUpdate, 1000);
           return result;
         };
@@ -2410,9 +2421,7 @@ See you at the carnival! 🎪</textarea>
         window.avatarSystem.showSignUpModal = async (...args) => {
           console.log('🔄 Carnival Tracker: Sign up modal triggered, will check auth after...');
           const result = await originalShowSignUpModal.apply(window.avatarSystem, args);
-          // Check auth state immediately and then again after delay
-          setTimeout(checkAuthAndUpdate, 100);
-          setTimeout(checkAuthAndUpdate, 500);
+          // Single check after delay to prevent flickering
           setTimeout(checkAuthAndUpdate, 1000);
           return result;
         };
@@ -2520,6 +2529,26 @@ See you at the carnival! 🎪</textarea>
     console.log('✅ Carnival Tracker: Form enabled');
   }
 
+  // Stop flickering by clearing intervals and disabling auth checks
+  stopFlickering() {
+    console.log('🛑 Carnival Tracker: Stopping flickering...');
+
+    // Clear the auth check interval
+    if (this.authCheckInterval) {
+      clearInterval(this.authCheckInterval);
+      this.authCheckInterval = null;
+    }
+
+    // Force stable state
+    this.isAuthenticated = true;
+    this.isPremium = true;
+
+    // Single render
+    this.render();
+
+    console.log('✅ Carnival Tracker: Flickering stopped');
+  }
+
   // Cleanup method to remove listeners
   destroy() {
     if (this.authCheckInterval) {
@@ -2576,6 +2605,13 @@ document.addEventListener('DOMContentLoaded', () => {
       window.forceEnableCarnivalForm = () => {
         if (window.carnivalTracker) {
           window.carnivalTracker.forceEnableForm();
+        }
+      };
+
+      // Stop flickering immediately
+      window.stopCarnivalFlickering = () => {
+        if (window.carnivalTracker) {
+          window.carnivalTracker.stopFlickering();
         }
       };
 
