@@ -7,7 +7,9 @@ class CarnivalTracker {
     this.searchTerm = "";
     this.notifications = [];
 
-
+    // Authentication status
+    this.isAuthenticated = false;
+    this.currentUser = null;
 
     // Flag to track auth operations (for debugging)
     this.isPerformingAuthOperation = false;
