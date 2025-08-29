@@ -2554,9 +2554,16 @@ See you at the carnival! 🎪</textarea>
       this.authCheckInterval = null;
     }
 
+    // Clear input timeout
+    if (this.inputTimeout) {
+      clearTimeout(this.inputTimeout);
+      this.inputTimeout = null;
+    }
+
     // Force stable state
     this.isAuthenticated = true;
     this.isPremium = true;
+    this.isUserInteracting = false;
 
     // Single render
     this.render();
@@ -2566,11 +2573,19 @@ See you at the carnival! 🎪</textarea>
 
   // Track form interactions to prevent re-renders during input
   setupFormInteractionTracking() {
+    console.log('🔧 Setting up form interaction tracking...');
+
     // Use event delegation to track form interactions
     document.addEventListener('focusin', (e) => {
       if (e.target.closest('.add-form') || e.target.closest('.add-person-input')) {
         this.isUserInteracting = true;
         console.log('👆 User started interacting with form');
+
+        // Clear any existing timeout
+        if (this.inputTimeout) {
+          clearTimeout(this.inputTimeout);
+          this.inputTimeout = null;
+        }
       }
     });
 
@@ -2581,22 +2596,45 @@ See you at the carnival! 🎪</textarea>
           const activeElement = document.activeElement;
           if (!activeElement || !activeElement.closest('.add-form')) {
             this.isUserInteracting = false;
-            console.log('👆 User stopped interacting with form');
+            console.log('👆 User stopped interacting with form (focusout)');
           }
-        }, 100);
+        }, 200);
       }
     });
 
-    // Also track input events
+    // Track input events with longer timeout
     document.addEventListener('input', (e) => {
       if (e.target.closest('.add-form') || e.target.closest('.add-person-input')) {
         this.isUserInteracting = true;
-        // Reset after 2 seconds of no input
-        clearTimeout(this.inputTimeout);
+        console.log('👆 User typing in form');
+
+        // Clear existing timeout and set new one
+        if (this.inputTimeout) {
+          clearTimeout(this.inputTimeout);
+        }
+
         this.inputTimeout = setTimeout(() => {
           this.isUserInteracting = false;
-          console.log('👆 User stopped typing in form');
-        }, 2000);
+          console.log('👆 User stopped typing in form (timeout)');
+        }, 3000); // Increased to 3 seconds
+      }
+    });
+
+    // Track keydown events to detect when user stops typing
+    document.addEventListener('keydown', (e) => {
+      if (e.target.closest('.add-form') || e.target.closest('.add-person-input')) {
+        this.isUserInteracting = true;
+
+        // Clear existing timeout
+        if (this.inputTimeout) {
+          clearTimeout(this.inputTimeout);
+        }
+
+        // Set new timeout
+        this.inputTimeout = setTimeout(() => {
+          this.isUserInteracting = false;
+          console.log('👆 User stopped typing in form (keydown timeout)');
+        }, 3000);
       }
     });
   }
@@ -2678,6 +2716,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.carnivalTracker) {
           window.carnivalTracker.isUserInteracting = false;
           console.log('🔧 Form interaction tracking disabled');
+        }
+      };
+
+      // Check form interaction state
+      window.checkFormInteraction = () => {
+        if (window.carnivalTracker) {
+          console.log('🔍 Form interaction state:', window.carnivalTracker.isUserInteracting);
+          console.log('🔍 Input timeout active:', !!window.carnivalTracker.inputTimeout);
+          console.log('🔍 Active element:', document.activeElement?.tagName, document.activeElement?.className);
         }
       };
 
