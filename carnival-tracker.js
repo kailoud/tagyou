@@ -2133,7 +2133,63 @@ See you at the carnival! 🎪</textarea>
     return 'Nearby Area';
   }
 
+  showAuthenticationRequiredMessage() {
+    // Show a message to the user that authentication is required
+    const message = '🔐 Sign in required to use this feature';
+    console.log(message);
 
+    // You can implement a toast notification here
+    if (window.showToast) {
+      window.showToast(message, 'warning');
+    } else {
+      alert(message);
+    }
+
+    // Try to trigger avatar sign in
+    if (window.avatarSystem && window.avatarSystem.showSignInModal) {
+      window.avatarSystem.showSignInModal();
+    } else if (window.avatarSystem && window.avatarSystem.toggleDropdown) {
+      window.avatarSystem.toggleDropdown();
+    }
+  }
+
+  // Manual method to re-check authentication (can be called externally)
+  async recheckAuthentication() {
+    console.log('🔄 Carnival Tracker: Manual authentication re-check requested');
+    const wasAuthenticated = this.isAuthenticated;
+    await this.checkAuthenticationStatus();
+
+    if (wasAuthenticated !== this.isAuthenticated) {
+      console.log(`🔄 Carnival Tracker: Auth state changed from ${wasAuthenticated} to ${this.isAuthenticated}`);
+      this.render(); // Re-render to update tab states
+    }
+
+    return this.isAuthenticated;
+  }
+
+  // Cleanup method to remove listeners
+  destroy() {
+    if (this.authCheckInterval) {
+      clearInterval(this.authCheckInterval);
+      this.authCheckInterval = null;
+    }
+
+    // Remove event listeners
+    if (this.storageListener) {
+      window.removeEventListener('storage', this.storageListener);
+    }
+    if (this.authStateListener) {
+      window.removeEventListener('authStateChanged', this.authStateListener);
+    }
+    if (this.userSignedInListener) {
+      window.removeEventListener('userSignedIn', this.userSignedInListener);
+    }
+    if (this.userSignedOutListener) {
+      window.removeEventListener('userSignedOut', this.userSignedOutListener);
+    }
+
+    console.log('🧹 Carnival Tracker: Authentication listeners cleaned up');
+  }
 }
 
 // Initialize the carnival tracker when the page loads
