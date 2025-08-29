@@ -56,9 +56,9 @@ class CarnivalTracker {
     this.setupEventListeners();
     this.updateToolbarCount();
     this.checkPremiumStatus();
+    this.checkAuthenticationStatus();
+    this.setupAuthenticationListener();
     this.loadInitialData();
-
-
   }
 
   async loadInitialData() {
@@ -490,6 +490,14 @@ class CarnivalTracker {
       if (e.target.closest('.tab-btn') || e.target.closest('.tab-btn-compact')) {
         const tabButton = e.target.closest('.tab-btn') || e.target.closest('.tab-btn-compact');
         const tab = tabButton.dataset.tab;
+
+        // Check authentication for restricted tabs
+        if ((tab === 'add' || tab === 'notifications') && !this.isAuthenticated) {
+          console.log('🔒 Authentication required for tab:', tab);
+          this.showAuthenticationRequiredMessage();
+          return;
+        }
+
         console.log('🎭 Tab button clicked:', tab, 'Current active tab:', this.activeTab);
         this.activeTab = tab;
         this.render();
@@ -521,6 +529,14 @@ class CarnivalTracker {
       // Add person form submit
       if (e.target.closest('.add-person-submit')) {
         e.preventDefault();
+
+        // Check authentication before adding person
+        if (!this.isAuthenticated) {
+          console.log('🔒 Authentication required to add person');
+          this.showAuthenticationRequiredMessage();
+          return;
+        }
+
         this.addPerson();
       }
 
@@ -2131,6 +2147,151 @@ See you at the carnival! 🎪</textarea>
     }
 
     return 'Nearby Area';
+  }
+
+  async checkAuthenticationStatus() {
+    try {
+      console.log('🔍 Carnival Tracker: Checking authentication status...');
+
+      // Check multiple sources for authentication
+      const sources = [
+        // Source 1: Check avatarSystem user
+        () => {
+          const user = window.avatarSystem?.user;
+          if (user) {
+            console.log('✅ Carnival Tracker: Found user in avatarSystem:', user.email);
+            return user;
+          }
+          return null;
+        },
+
+        // Source 2: Check sessionStorage
+        () => {
+          try {
+            const stored = sessionStorage.getItem('supabase_user');
+            if (stored) {
+              const user = JSON.parse(stored);
+              console.log('✅ Carnival Tracker: Found user in sessionStorage:', user.email);
+              return user;
+            }
+          } catch (e) {
+            console.log('⚠️ Carnival Tracker: Error parsing sessionStorage:', e);
+          }
+          return null;
+        },
+
+        // Source 3: Check Supabase auth directly
+        async () => {
+          if (window.supabase) {
+            try {
+              const { data: { user } } = await window.supabase.auth.getUser();
+              if (user) {
+                console.log('✅ Carnival Tracker: Found user in Supabase auth:', user.email);
+                return user;
+              }
+            } catch (e) {
+              console.log('⚠️ Carnival Tracker: Error checking Supabase auth:', e);
+            }
+          }
+          return null;
+        }
+      ];
+
+      // Try each source in order
+      for (let i = 0; i < sources.length; i++) {
+        try {
+          const user = await sources[i]();
+          if (user) {
+            this.isAuthenticated = true;
+            this.currentUser = user;
+            console.log('✅ Carnival Tracker: User authenticated:', user.email);
+            return;
+          }
+        } catch (error) {
+          console.log(`⚠️ Carnival Tracker: Auth source ${i + 1} failed:`, error);
+        }
+      }
+
+      // No user found
+      this.isAuthenticated = false;
+      this.currentUser = null;
+      console.log('⚠️ Carnival Tracker: No authenticated user found');
+
+    } catch (error) {
+      console.error('❌ Carnival Tracker: Error checking authentication:', error);
+      this.isAuthenticated = false;
+      this.currentUser = null;
+    }
+  }
+
+  setupAuthenticationListener() {
+    console.log('🔧 Carnival Tracker: Setting up authentication listener...');
+
+    // Function to check auth and update UI if needed
+    const checkAuthAndUpdate = async () => {
+      const wasAuthenticated = this.isAuthenticated;
+      await this.checkAuthenticationStatus();
+
+      // If authentication state changed, re-render the UI
+      if (wasAuthenticated !== this.isAuthenticated) {
+        console.log(`🔄 Carnival Tracker: Auth state changed from ${wasAuthenticated} to ${this.isAuthenticated}`);
+        this.render(); // Re-render to update tab states
+      }
+    };
+
+    // Store references to listeners for cleanup
+    this.storageListener = (e) => {
+      if (e.key === 'supabase_user') {
+        console.log('🔄 Carnival Tracker: Session storage changed, checking auth state...');
+        checkAuthAndUpdate();
+      }
+    };
+
+    this.authStateListener = checkAuthAndUpdate;
+    this.userSignedInListener = checkAuthAndUpdate;
+    this.userSignedOutListener = checkAuthAndUpdate;
+
+    // Check auth state every 2 seconds
+    this.authCheckInterval = setInterval(checkAuthAndUpdate, 2000);
+
+    // Listen for session storage changes (when user signs in/out)
+    window.addEventListener('storage', this.storageListener);
+
+    // Listen for custom auth events
+    window.addEventListener('authStateChanged', this.authStateListener);
+    window.addEventListener('userSignedIn', this.userSignedInListener);
+    window.addEventListener('userSignedOut', this.userSignedOutListener);
+
+    // Patch avatarSystem methods to trigger auth checks
+    if (window.avatarSystem) {
+      // Store original methods
+      const originalShowSignInModal = window.avatarSystem.showSignInModal;
+      const originalShowSignUpModal = window.avatarSystem.showSignUpModal;
+
+      // Patch showSignInModal
+      if (originalShowSignInModal) {
+        window.avatarSystem.showSignInModal = async (...args) => {
+          console.log('🔄 Carnival Tracker: Sign in modal triggered, will check auth after...');
+          const result = await originalShowSignInModal.apply(window.avatarSystem, args);
+          // Check auth state after sign in attempt
+          setTimeout(checkAuthAndUpdate, 1000);
+          return result;
+        };
+      }
+
+      // Patch showSignUpModal
+      if (originalShowSignUpModal) {
+        window.avatarSystem.showSignUpModal = async (...args) => {
+          console.log('🔄 Carnival Tracker: Sign up modal triggered, will check auth after...');
+          const result = await originalShowSignUpModal.apply(window.avatarSystem, args);
+          // Check auth state after sign up attempt
+          setTimeout(checkAuthAndUpdate, 1000);
+          return result;
+        };
+      }
+    }
+
+    console.log('✅ Carnival Tracker: Authentication listener set up successfully');
   }
 
   showAuthenticationRequiredMessage() {
