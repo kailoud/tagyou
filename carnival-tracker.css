@@ -137,21 +137,38 @@
 }
 
 .tab-btn-compact.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  color: #94a3b8;
-  background: transparent;
-  pointer-events: none;
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  color: #94a3b8 !important;
+  background: transparent !important;
+  pointer-events: none !important;
+  position: relative;
 }
 
 .tab-btn-compact.disabled:hover {
-  color: #94a3b8;
-  background: transparent;
-  transform: none;
+  color: #94a3b8 !important;
+  background: transparent !important;
+  transform: none !important;
 }
 
 .tab-btn-compact.disabled:active {
-  transform: none;
+  transform: none !important;
+}
+
+.tab-btn-compact.disabled::after {
+  content: "🔒";
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  font-size: 8px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Disabled form styles */
@@ -209,6 +226,15 @@
 
 .sign-in-btn:active {
   transform: translateY(0);
+}
+
+/* Premium required message */
+.auth-required-message .fa-crown {
+  color: #fbbf24;
+}
+
+.auth-required-message .fa-lock {
+  color: #94a3b8;
 }
 
 /* Mobile optimization for carnival tracker compact */

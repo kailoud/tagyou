@@ -934,10 +934,10 @@ See you at the carnival! 🎪</textarea>
     // Set flag to track auth operations
     this.isPerformingAuthOperation = true;
 
-    // Get form inputs using the new structure
-    const nameInput = document.querySelector('.add-person-input[data-field="name"]');
-    const phoneInput = document.querySelector('.add-person-input[data-field="phone"]');
-    const relationshipInput = document.querySelector('.add-person-input[data-field="relationship"]');
+    // Get form inputs using IDs (more reliable)
+    const nameInput = document.getElementById('newPersonName');
+    const phoneInput = document.getElementById('newPersonPhone');
+    const relationshipInput = document.getElementById('newPersonRelationship');
 
     console.log('Form inputs found:', {
       nameInput: !!nameInput,
@@ -960,6 +960,13 @@ See you at the carnival! 🎪</textarea>
     if (name && phone && relationship) {
       // Check if user can add more people
       if (!this.canAddPerson()) {
+        this.showPremiumUpgrade(`You've reached the limit of ${this.maxFreeMembers} person for Basic users. Upgrade to Pro for unlimited squad members!`);
+        return;
+      }
+
+      // Additional check for non-premium users
+      if (!this.isPremium && this.people.length >= this.maxFreeMembers) {
+        console.log('🔒 Non-premium user trying to exceed limit');
         this.showPremiumUpgrade(`You've reached the limit of ${this.maxFreeMembers} person for Basic users. Upgrade to Pro for unlimited squad members!`);
         return;
       }
@@ -1065,10 +1072,9 @@ See you at the carnival! 🎪</textarea>
         phoneInput.value = '';
         relationshipInput.value = '';
 
-        // Switch back to tracker tab
+        // Switch back to tracker tab and force UI refresh
         this.activeTab = 'tracker';
-        this.render();
-        this.updateToolbarCount();
+        this.forceUIRefresh();
 
         console.log('Person added successfully:', name);
 
@@ -1823,17 +1829,36 @@ See you at the carnival! 🎪</textarea>
       `;
     }
 
+    // Check if non-premium user has reached the limit
+    if (!this.isPremium && this.people.length >= this.maxFreeMembers) {
+      return `
+        <div class="add-tab-content">
+          <div class="add-form-disabled">
+            <div class="auth-required-message">
+              <i class="fas fa-crown"></i>
+              <h3>Premium Required</h3>
+              <p>You've reached the limit of ${this.maxFreeMembers} squad member for Basic users</p>
+              <button class="sign-in-btn" onclick="window.carnivalTracker.showPremiumUpgrade('Upgrade to Premium for unlimited squad members!')">
+                <i class="fas fa-crown"></i>
+                Upgrade to Premium
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     return `
       <div class="add-tab-content">
         <div class="add-form">
           <div class="form-group">
-            <input type="text" placeholder="Name" class="form-input add-person-input" data-field="name" value="${this.newPerson.name}">
+            <input type="text" id="newPersonName" name="newPersonName" placeholder="Name" class="form-input add-person-input" data-field="name" value="${this.newPerson.name}">
           </div>
           <div class="form-group">
-            <input type="tel" placeholder="Phone" class="form-input add-person-input" data-field="phone" value="${this.newPerson.phone}">
+            <input type="tel" id="newPersonPhone" name="newPersonPhone" placeholder="Phone" class="form-input add-person-input" data-field="phone" value="${this.newPerson.phone}">
           </div>
           <div class="form-group">
-            <select class="form-input add-person-input" data-field="relationship" value="${this.newPerson.relationship}">
+            <select id="newPersonRelationship" name="newPersonRelationship" class="form-input add-person-input" data-field="relationship">
               <option value="">Select relationship</option>
               <option value="Friend" ${this.newPerson.relationship === 'Friend' ? 'selected' : ''}>Friend</option>
               <option value="Family" ${this.newPerson.relationship === 'Family' ? 'selected' : ''}>Family</option>
@@ -1841,7 +1866,7 @@ See you at the carnival! 🎪</textarea>
               <option value="Other" ${this.newPerson.relationship === 'Other' ? 'selected' : ''}>Other</option>
             </select>
           </div>
-          <button class="add-person-submit">
+          <button class="add-person-submit" type="button">
             <i class="fas fa-plus"></i>
             Add Squad
           </button>
@@ -1850,12 +1875,12 @@ See you at the carnival! 🎪</textarea>
             <span>or</span>
           </div>
           
-          <button class="whatsapp-import-btn" onclick="window.carnivalTracker.openWhatsAppDirect()">
+          <button type="button" class="whatsapp-import-btn" onclick="window.carnivalTracker.openWhatsAppDirect()">
             <i class="fab fa-whatsapp"></i>
             Import from WhatsApp
           </button>
           
-          <button class="contacts-import-btn" onclick="window.carnivalTracker.importPhoneContacts()">
+          <button type="button" class="contacts-import-btn" onclick="window.carnivalTracker.importPhoneContacts()">
             <i class="fas fa-address-book"></i>
             Import from Contacts
           </button>
@@ -2466,6 +2491,16 @@ See you at the carnival! 🎪</textarea>
     console.log('✅ Carnival Tracker: Full update complete');
     console.log('💎 Premium status:', this.isPremium);
     console.log('🔐 Auth status:', this.isAuthenticated);
+    console.log('👥 People count:', this.people.length);
+    console.log('📊 Max free members:', this.maxFreeMembers);
+  }
+
+  // Force UI refresh after adding person
+  forceUIRefresh() {
+    console.log('🔄 Carnival Tracker: Forcing UI refresh...');
+    this.render();
+    this.updateToolbarCount();
+    console.log('✅ Carnival Tracker: UI refreshed');
   }
 
   // Cleanup method to remove listeners
