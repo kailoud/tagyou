@@ -2230,12 +2230,30 @@ See you at the carnival! 🎪</textarea>
     // Function to check auth and update UI if needed
     const checkAuthAndUpdate = async () => {
       const wasAuthenticated = this.isAuthenticated;
+      const wasPremium = this.isPremium;
+
       await this.checkAuthenticationStatus();
 
-      // If authentication state changed, re-render the UI
+      // Also check premium status when auth changes
       if (wasAuthenticated !== this.isAuthenticated) {
         console.log(`🔄 Carnival Tracker: Auth state changed from ${wasAuthenticated} to ${this.isAuthenticated}`);
-        this.render(); // Re-render to update tab states
+
+        // Check premium status immediately after auth change
+        if (this.isAuthenticated) {
+          console.log('🔍 Carnival Tracker: Checking premium status after auth change...');
+          await this.checkPremiumStatus();
+        }
+
+        // Re-render to update tab states and premium banner
+        this.render();
+        console.log('✅ Carnival Tracker: UI updated after auth change');
+      }
+
+      // Also check if premium status changed
+      if (wasPremium !== this.isPremium) {
+        console.log(`💎 Carnival Tracker: Premium status changed from ${wasPremium} to ${this.isPremium}`);
+        this.render();
+        console.log('✅ Carnival Tracker: UI updated after premium status change');
       }
     };
 
@@ -2243,7 +2261,10 @@ See you at the carnival! 🎪</textarea>
     this.storageListener = (e) => {
       if (e.key === 'supabase_user') {
         console.log('🔄 Carnival Tracker: Session storage changed, checking auth state...');
+        // Trigger multiple checks for faster response
         checkAuthAndUpdate();
+        setTimeout(checkAuthAndUpdate, 100);
+        setTimeout(checkAuthAndUpdate, 300);
       }
     };
 
@@ -2251,8 +2272,8 @@ See you at the carnival! 🎪</textarea>
     this.userSignedInListener = checkAuthAndUpdate;
     this.userSignedOutListener = checkAuthAndUpdate;
 
-    // Check auth state every 2 seconds
-    this.authCheckInterval = setInterval(checkAuthAndUpdate, 2000);
+    // Check auth state every 500ms for faster response
+    this.authCheckInterval = setInterval(checkAuthAndUpdate, 500);
 
     // Listen for session storage changes (when user signs in/out)
     window.addEventListener('storage', this.storageListener);
@@ -2273,7 +2294,9 @@ See you at the carnival! 🎪</textarea>
         window.avatarSystem.showSignInModal = async (...args) => {
           console.log('🔄 Carnival Tracker: Sign in modal triggered, will check auth after...');
           const result = await originalShowSignInModal.apply(window.avatarSystem, args);
-          // Check auth state after sign in attempt
+          // Check auth state immediately and then again after delay
+          setTimeout(checkAuthAndUpdate, 100);
+          setTimeout(checkAuthAndUpdate, 500);
           setTimeout(checkAuthAndUpdate, 1000);
           return result;
         };
@@ -2284,7 +2307,9 @@ See you at the carnival! 🎪</textarea>
         window.avatarSystem.showSignUpModal = async (...args) => {
           console.log('🔄 Carnival Tracker: Sign up modal triggered, will check auth after...');
           const result = await originalShowSignUpModal.apply(window.avatarSystem, args);
-          // Check auth state after sign up attempt
+          // Check auth state immediately and then again after delay
+          setTimeout(checkAuthAndUpdate, 100);
+          setTimeout(checkAuthAndUpdate, 500);
           setTimeout(checkAuthAndUpdate, 1000);
           return result;
         };
@@ -2318,14 +2343,30 @@ See you at the carnival! 🎪</textarea>
   async recheckAuthentication() {
     console.log('🔄 Carnival Tracker: Manual authentication re-check requested');
     const wasAuthenticated = this.isAuthenticated;
+    const wasPremium = this.isPremium;
+
     await this.checkAuthenticationStatus();
 
-    if (wasAuthenticated !== this.isAuthenticated) {
+    // Also check premium status
+    if (this.isAuthenticated) {
+      await this.checkPremiumStatus();
+    }
+
+    if (wasAuthenticated !== this.isAuthenticated || wasPremium !== this.isPremium) {
       console.log(`🔄 Carnival Tracker: Auth state changed from ${wasAuthenticated} to ${this.isAuthenticated}`);
-      this.render(); // Re-render to update tab states
+      console.log(`💎 Carnival Tracker: Premium state changed from ${wasPremium} to ${this.isPremium}`);
+      this.render(); // Re-render to update tab states and premium banner
     }
 
     return this.isAuthenticated;
+  }
+
+  // Force immediate premium banner update
+  async forcePremiumUpdate() {
+    console.log('💎 Carnival Tracker: Forcing premium banner update...');
+    await this.checkPremiumStatus();
+    this.render();
+    console.log('✅ Carnival Tracker: Premium banner updated');
   }
 
   // Cleanup method to remove listeners
@@ -2364,6 +2405,13 @@ document.addEventListener('DOMContentLoaded', () => {
       window.toggleCarnivalTracker = () => {
         if (window.carnivalTracker) {
           window.carnivalTracker.toggle();
+        }
+      };
+
+      // Add global method for immediate premium banner update
+      window.updateCarnivalTrackerPremium = () => {
+        if (window.carnivalTracker) {
+          window.carnivalTracker.forcePremiumUpdate();
         }
       };
 
