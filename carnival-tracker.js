@@ -14,6 +14,10 @@ class CarnivalTracker {
     // Flag to track auth operations (for debugging)
     this.isPerformingAuthOperation = false;
 
+    // Flag to track user interaction with form
+    this.isUserInteracting = false;
+    this.inputTimeout = null;
+
     this.newPerson = {
       name: "",
       phone: "",
@@ -2335,7 +2339,15 @@ See you at the carnival! 🎪</textarea>
 
     // Debounce mechanism to prevent excessive renders
     let renderTimeout = null;
+    let isUserInteracting = false;
+
     const debouncedRender = () => {
+      // Don't render if user is actively interacting with form
+      if (isUserInteracting) {
+        console.log('⏸️ Skipping render - user is interacting with form');
+        return;
+      }
+
       if (renderTimeout) {
         clearTimeout(renderTimeout);
       }
@@ -2390,6 +2402,9 @@ See you at the carnival! 🎪</textarea>
 
     // Check auth state every 2 seconds to prevent flickering
     this.authCheckInterval = setInterval(checkAuthAndUpdate, 2000);
+
+    // Track user interaction with form to prevent re-renders during input
+    this.setupFormInteractionTracking();
 
     // Listen for session storage changes (when user signs in/out)
     window.addEventListener('storage', this.storageListener);
@@ -2549,11 +2564,54 @@ See you at the carnival! 🎪</textarea>
     console.log('✅ Carnival Tracker: Flickering stopped');
   }
 
+  // Track form interactions to prevent re-renders during input
+  setupFormInteractionTracking() {
+    // Use event delegation to track form interactions
+    document.addEventListener('focusin', (e) => {
+      if (e.target.closest('.add-form') || e.target.closest('.add-person-input')) {
+        this.isUserInteracting = true;
+        console.log('👆 User started interacting with form');
+      }
+    });
+
+    document.addEventListener('focusout', (e) => {
+      if (e.target.closest('.add-form') || e.target.closest('.add-person-input')) {
+        // Delay to allow for tab navigation between form fields
+        setTimeout(() => {
+          const activeElement = document.activeElement;
+          if (!activeElement || !activeElement.closest('.add-form')) {
+            this.isUserInteracting = false;
+            console.log('👆 User stopped interacting with form');
+          }
+        }, 100);
+      }
+    });
+
+    // Also track input events
+    document.addEventListener('input', (e) => {
+      if (e.target.closest('.add-form') || e.target.closest('.add-person-input')) {
+        this.isUserInteracting = true;
+        // Reset after 2 seconds of no input
+        clearTimeout(this.inputTimeout);
+        this.inputTimeout = setTimeout(() => {
+          this.isUserInteracting = false;
+          console.log('👆 User stopped typing in form');
+        }, 2000);
+      }
+    });
+  }
+
   // Cleanup method to remove listeners
   destroy() {
     if (this.authCheckInterval) {
       clearInterval(this.authCheckInterval);
       this.authCheckInterval = null;
+    }
+
+    // Clear input timeout
+    if (this.inputTimeout) {
+      clearTimeout(this.inputTimeout);
+      this.inputTimeout = null;
     }
 
     // Remove event listeners
@@ -2612,6 +2670,14 @@ document.addEventListener('DOMContentLoaded', () => {
       window.stopCarnivalFlickering = () => {
         if (window.carnivalTracker) {
           window.carnivalTracker.stopFlickering();
+        }
+      };
+
+      // Disable form interaction tracking for testing
+      window.disableFormTracking = () => {
+        if (window.carnivalTracker) {
+          window.carnivalTracker.isUserInteracting = false;
+          console.log('🔧 Form interaction tracking disabled');
         }
       };
 
