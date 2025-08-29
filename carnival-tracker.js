@@ -924,12 +924,20 @@ See you at the carnival! 🎪</textarea>
   async addPerson() {
     console.log('addPerson function called');
 
+    // Check authentication first
+    if (!this.isAuthenticated) {
+      console.log('🔒 Authentication required to add person');
+      this.showAuthenticationRequiredMessage();
+      return;
+    }
+
     // Set flag to track auth operations
     this.isPerformingAuthOperation = true;
 
-    const nameInput = document.getElementById('newPersonName');
-    const phoneInput = document.getElementById('newPersonPhone');
-    const relationshipInput = document.getElementById('newPersonRelationship');
+    // Get form inputs using the new structure
+    const nameInput = document.querySelector('.add-person-input[data-field="name"]');
+    const phoneInput = document.querySelector('.add-person-input[data-field="phone"]');
+    const relationshipInput = document.querySelector('.add-person-input[data-field="relationship"]');
 
     console.log('Form inputs found:', {
       nameInput: !!nameInput,
@@ -1796,25 +1804,44 @@ See you at the carnival! 🎪</textarea>
   }
 
   renderAddTab() {
+    // Check if user is authenticated
+    if (!this.isAuthenticated) {
+      return `
+        <div class="add-tab-content">
+          <div class="add-form-disabled">
+            <div class="auth-required-message">
+              <i class="fas fa-lock"></i>
+              <h3>Sign In Required</h3>
+              <p>You need to sign in to add squad members</p>
+              <button class="sign-in-btn" onclick="window.carnivalTracker.showAuthenticationRequiredMessage()">
+                <i class="fas fa-sign-in-alt"></i>
+                Sign In
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     return `
       <div class="add-tab-content">
         <div class="add-form">
           <div class="form-group">
-            <input type="text" placeholder="Name" class="form-input" id="newPersonName">
+            <input type="text" placeholder="Name" class="form-input add-person-input" data-field="name" value="${this.newPerson.name}">
           </div>
           <div class="form-group">
-            <input type="tel" placeholder="Phone" class="form-input" id="newPersonPhone">
+            <input type="tel" placeholder="Phone" class="form-input add-person-input" data-field="phone" value="${this.newPerson.phone}">
           </div>
           <div class="form-group">
-            <select class="form-input" id="newPersonRelationship">
+            <select class="form-input add-person-input" data-field="relationship" value="${this.newPerson.relationship}">
               <option value="">Select relationship</option>
-              <option value="Friend">Friend</option>
-              <option value="Family">Family</option>
-              <option value="Colleague">Colleague</option>
-              <option value="Other">Other</option>
+              <option value="Friend" ${this.newPerson.relationship === 'Friend' ? 'selected' : ''}>Friend</option>
+              <option value="Family" ${this.newPerson.relationship === 'Family' ? 'selected' : ''}>Family</option>
+              <option value="Colleague" ${this.newPerson.relationship === 'Colleague' ? 'selected' : ''}>Colleague</option>
+              <option value="Other" ${this.newPerson.relationship === 'Other' ? 'selected' : ''}>Other</option>
             </select>
           </div>
-          <button class="add-person-btn" onclick="window.carnivalTracker.addPerson()">
+          <button class="add-person-submit">
             <i class="fas fa-plus"></i>
             Add Squad
           </button>
@@ -1832,14 +1859,29 @@ See you at the carnival! 🎪</textarea>
             <i class="fas fa-address-book"></i>
             Import from Contacts
           </button>
-          
-
         </div>
       </div>
     `;
   }
 
   renderNotificationsTab() {
+    // Check if user is authenticated
+    if (!this.isAuthenticated) {
+      return `
+        <div class="notifications-tab-content">
+          <div class="auth-required-message">
+            <i class="fas fa-lock"></i>
+            <h3>Sign In Required</h3>
+            <p>You need to sign in to view updates</p>
+            <button class="sign-in-btn" onclick="window.carnivalTracker.showAuthenticationRequiredMessage()">
+              <i class="fas fa-sign-in-alt"></i>
+              Sign In
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
     return `
       <div class="notifications-tab-content">
         ${this.notifications.map(notification => `
