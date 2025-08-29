@@ -62,6 +62,8 @@ class CarnivalTracker {
     this.checkPremiumStatus();
     this.checkAuthenticationStatus();
     this.setupAuthenticationListener();
+    this.setupBasicUserCleanup();
+    this.setupSquadMemberCleanup();
     this.loadInitialData();
   }
 
@@ -1011,7 +1013,11 @@ See you at the carnival! 🎪</textarea>
                     phone: phone,
                     relationship: relationship,
                     avatar_data: avatar,
-                    is_sharing: false
+                    is_sharing: false,
+                    expires_at: this.isPremium ? null : new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 hour for added person to sign in
+                    member_type: 'added', // The person who was added (needs to sign in)
+                    added_by_user_id: user.id, // Who added them
+                    needs_signin: true // Flag that they need to sign in
                   }
                 ])
                 .select();
@@ -2311,6 +2317,9 @@ See you at the carnival! 🎪</textarea>
             this.currentUser = user;
             console.log('✅ Carnival Tracker: User authenticated:', user.email);
 
+            // Check if this user was added as a squad member
+            await this.checkIfAddedMember();
+
             // Immediately check premium status when user is found
             console.log('🔍 Carnival Tracker: Immediately checking premium status for:', user.email);
             await this.checkPremiumStatus();
@@ -2719,6 +2728,538 @@ See you at the carnival! 🎪</textarea>
 
     console.log('🧹 Carnival Tracker: Authentication listeners cleaned up');
   }
+
+  // User tier management system
+  async upgradeUserToPremium(email, paymentData = {}) {
+    try {
+      console.log('🔄 Carnival Tracker: Upgrading user to premium:', email);
+
+      // Step 1: Get user's current squad members
+      const currentSquadMembers = await this.getUserSquadMembers(email);
+      console.log('📊 Current squad members:', currentSquadMembers.length);
+
+      // Step 2: Add user to premium users table
+      if (window.PremiumUsersService) {
+        await window.PremiumUsersService.addPremiumUser(email, paymentData);
+        console.log('✅ User added to premium table');
+      }
+
+      // Step 3: Remove user from basic users table (if exists)
+      await this.removeUserFromBasicTable(email);
+
+      // Step 4: Update local storage
+      localStorage.setItem(`premium_${email}`, 'true');
+
+      // Step 5: Update current state
+      this.isPremium = true;
+      this.userTier = 'Premium';
+
+      // Step 6: Re-render UI
+      this.render();
+
+      console.log('✅ Carnival Tracker: User successfully upgraded to premium');
+      return true;
+
+    } catch (error) {
+      console.error('❌ Carnival Tracker: Error upgrading user to premium:', error);
+      return false;
+    }
+  }
+
+  async downgradeUserToBasic(email) {
+    try {
+      console.log('🔄 Carnival Tracker: Downgrading user to basic:', email);
+
+      // Step 1: Remove user from premium users table
+      if (window.PremiumUsersService) {
+        await window.PremiumUsersService.removePremiumUser(email);
+        console.log('✅ User removed from premium table');
+      }
+
+      // Step 2: Add user to basic users table
+      await this.addUserToBasicTable(email);
+
+      // Step 3: Update local storage
+      localStorage.setItem(`premium_${email}`, 'false');
+
+      // Step 4: Update current state
+      this.isPremium = false;
+      this.userTier = 'Basic';
+
+      // Step 5: Re-render UI
+      this.render();
+
+      console.log('✅ Carnival Tracker: User successfully downgraded to basic');
+      return true;
+
+    } catch (error) {
+      console.error('❌ Carnival Tracker: Error downgrading user to basic:', error);
+      return false;
+    }
+  }
+
+  async getUserSquadMembers(email) {
+    try {
+      if (window.supabase) {
+        const { data, error } = await window.supabase
+          .from('carnival_squad_members')
+          .select('*')
+          .eq('user_email', email);
+
+        if (error) {
+          console.error('❌ Error fetching squad members:', error);
+          return [];
+        }
+
+        return data || [];
+      }
+      return [];
+    } catch (error) {
+      console.error('❌ Error in getUserSquadMembers:', error);
+      return [];
+    }
+  }
+
+  async removeUserFromBasicTable(email) {
+    try {
+      if (window.supabase) {
+        const { error } = await window.supabase
+          .from('basic_users')
+          .delete()
+          .eq('email', email);
+
+        if (error) {
+          console.error('❌ Error removing user from basic table:', error);
+        } else {
+          console.log('✅ User removed from basic table');
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error in removeUserFromBasicTable:', error);
+    }
+  }
+
+  async addUserToBasicTable(email) {
+    try {
+      if (window.supabase) {
+        const { error } = await window.supabase
+          .from('basic_users')
+          .insert([{
+            email: email,
+            created_at: new Date().toISOString(),
+            expires_at: null, // No expiration - adder becomes permanent basic user
+            last_activity: new Date().toISOString(),
+            user_type: 'adder' // The person who adds squad members
+          }]);
+
+        if (error) {
+          console.error('❌ Error adding user to basic table:', error);
+        } else {
+          console.log('✅ User added to basic table (permanent basic user - adder)');
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error in addUserToBasicTable:', error);
+    }
+  }
+
+  // Basic user management system (no automatic cleanup)
+  async setupBasicUserCleanup() {
+    console.log('🔧 Carnival Tracker: Setting up basic user management system...');
+
+    // Check current user status on page load
+    await this.checkUserExpiration();
+  }
+
+  async cleanupExpiredBasicUsers() {
+    try {
+      console.log('🧹 Carnival Tracker: Running basic user cleanup...');
+
+      if (!window.supabase) {
+        console.log('⚠️ Supabase not available for cleanup');
+        return;
+      }
+
+      // Get current time
+      const now = new Date().toISOString();
+
+      // Find expired basic users (only if they have an expiration date)
+      const { data: expiredUsers, error: fetchError } = await window.supabase
+        .from('basic_users')
+        .select('email, expires_at')
+        .not('expires_at', 'is', null)
+        .lt('expires_at', now);
+
+      if (fetchError) {
+        console.error('❌ Error fetching expired users:', fetchError);
+        return;
+      }
+
+      if (!expiredUsers || expiredUsers.length === 0) {
+        console.log('✅ No expired basic users found');
+        return;
+      }
+
+      console.log(`🧹 Found ${expiredUsers.length} expired basic users`);
+
+      // Process each expired user
+      for (const user of expiredUsers) {
+        await this.cleanupExpiredUser(user.email);
+      }
+
+      console.log('✅ Basic user cleanup completed');
+
+    } catch (error) {
+      console.error('❌ Error in cleanupExpiredBasicUsers:', error);
+    }
+  }
+
+  async cleanupExpiredUser(email) {
+    try {
+      console.log(`🧹 Cleaning up expired user: ${email}`);
+
+      // Step 1: Delete all squad members for this user
+      const { error: squadError } = await window.supabase
+        .from('carnival_squad_members')
+        .delete()
+        .eq('user_email', email);
+
+      if (squadError) {
+        console.error('❌ Error deleting squad members:', squadError);
+      } else {
+        console.log(`✅ Deleted squad members for ${email}`);
+      }
+
+      // Step 2: Delete user from basic_users table
+      const { error: userError } = await window.supabase
+        .from('basic_users')
+        .delete()
+        .eq('email', email);
+
+      if (userError) {
+        console.error('❌ Error deleting basic user:', userError);
+      } else {
+        console.log(`✅ Deleted basic user: ${email}`);
+      }
+
+      // Step 3: Clear local storage
+      localStorage.removeItem(`premium_${email}`);
+
+      // Step 4: If this is the current user, update UI
+      if (this.currentUser && this.currentUser.email === email) {
+        this.isAuthenticated = false;
+        this.isPremium = false;
+        this.userTier = 'Basic';
+        this.people = [];
+        this.render();
+        console.log('🔄 Current user expired, updated UI');
+      }
+
+    } catch (error) {
+      console.error('❌ Error in cleanupExpiredUser:', error);
+    }
+  }
+
+  // Check if current user is expired (only for users with expiration dates)
+  async checkUserExpiration() {
+    try {
+      if (!this.currentUser || !this.currentUser.email) {
+        return;
+      }
+
+      if (!window.supabase) {
+        return;
+      }
+
+      const { data: userData, error } = await window.supabase
+        .from('basic_users')
+        .select('expires_at')
+        .eq('email', this.currentUser.email)
+        .not('expires_at', 'is', null)
+        .single();
+
+      if (error) {
+        // User not in basic_users table or has no expiration (permanent basic user)
+        return;
+      }
+
+      if (userData && userData.expires_at && new Date(userData.expires_at) < new Date()) {
+        console.log('⚠️ Current user has expired');
+        await this.cleanupExpiredUser(this.currentUser.email);
+      }
+
+    } catch (error) {
+      console.error('❌ Error checking user expiration:', error);
+    }
+  }
+
+  // Clean up expired squad members (runs every 5 minutes)
+  async setupSquadMemberCleanup() {
+    console.log('🔧 Carnival Tracker: Setting up squad member cleanup system...');
+
+    // Run cleanup every 5 minutes
+    setInterval(async () => {
+      await this.cleanupExpiredSquadMembers();
+    }, 5 * 60 * 1000); // 5 minutes
+
+    // Also run cleanup on page load
+    await this.cleanupExpiredSquadMembers();
+  }
+
+  async cleanupExpiredSquadMembers() {
+    try {
+      console.log('🧹 Carnival Tracker: Running squad member cleanup...');
+
+      if (!window.supabase) {
+        console.log('⚠️ Supabase not available for cleanup');
+        return;
+      }
+
+      // Get current time
+      const now = new Date().toISOString();
+
+      // Find expired squad members (all added persons with expiration dates - whether they signed up or not)
+      const { data: expiredMembers, error: fetchError } = await window.supabase
+        .from('carnival_squad_members')
+        .select('id, name, user_email, expires_at, member_type')
+        .not('expires_at', 'is', null)
+        .lt('expires_at', now)
+        .in('member_type', ['added', 'signed_up']); // Delete both added and signed_up members after expiration
+
+      if (fetchError) {
+        console.error('❌ Error fetching expired squad members:', fetchError);
+        return;
+      }
+
+      if (!expiredMembers || expiredMembers.length === 0) {
+        console.log('✅ No expired squad members found');
+        return;
+      }
+
+      console.log(`🧹 Found ${expiredMembers.length} expired added persons`);
+
+      // Delete expired added persons (whether they signed up or not)
+      const { error: deleteError } = await window.supabase
+        .from('carnival_squad_members')
+        .delete()
+        .not('expires_at', 'is', null)
+        .lt('expires_at', now)
+        .in('member_type', ['added', 'signed_up']); // Delete both added and signed_up members
+
+      if (deleteError) {
+        console.error('❌ Error deleting expired squad members:', deleteError);
+      } else {
+        console.log(`✅ Deleted ${expiredMembers.length} expired added persons`);
+
+        // Update local UI if current user's squad members were deleted
+        if (this.currentUser && this.currentUser.email) {
+          await this.loadInitialData(); // Reload squad members
+          this.render();
+        }
+      }
+
+    } catch (error) {
+      console.error('❌ Error in cleanupExpiredSquadMembers:', error);
+    }
+  }
+
+  // Extend squad member expiration (for basic users)
+  async extendSquadMemberExpiration(memberId) {
+    try {
+      if (!window.supabase) {
+        console.log('⚠️ Supabase not available');
+        return false;
+      }
+
+      const { error } = await window.supabase
+        .from('carnival_squad_members')
+        .update({
+          expires_at: new Date(Date.now() + 60 * 60 * 1000).toISOString() // Extend by 1 hour
+        })
+        .eq('id', memberId)
+        .not('expires_at', 'is', null); // Only extend if member has expiration
+
+      if (error) {
+        console.error('❌ Error extending squad member expiration:', error);
+        return false;
+      }
+
+      console.log('✅ Squad member expiration extended');
+      return true;
+
+    } catch (error) {
+      console.error('❌ Error in extendSquadMemberExpiration:', error);
+      return false;
+    }
+  }
+
+  // Handle when an added person signs up (converts them to permanent basic user)
+  async handleAddedPersonSignUp(email) {
+    try {
+      console.log('🔄 Carnival Tracker: Added person signing up:', email);
+
+      if (!window.supabase) {
+        console.log('⚠️ Supabase not available');
+        return false;
+      }
+
+      // Step 1: Check if this email was added as a squad member
+      const { data: squadMember, error: fetchError } = await window.supabase
+        .from('carnival_squad_members')
+        .select('*')
+        .eq('phone', email) // Using phone as identifier
+        .eq('member_type', 'added')
+        .eq('needs_signin', true)
+        .single();
+
+      if (fetchError || !squadMember) {
+        console.log('⚠️ No pending squad member found for:', email);
+        return false;
+      }
+
+      // Step 2: Add them to basic_users table as permanent basic user
+      await this.addUserToBasicTable(email);
+
+      // Step 3: Update squad member record (but keep expiration - they still expire after 1 hour)
+      const { error: updateError } = await window.supabase
+        .from('carnival_squad_members')
+        .update({
+          member_type: 'signed_up', // Changed from 'added' to 'signed_up' (but still expires)
+          needs_signin: false, // No longer needs to sign up
+          signed_in_at: new Date().toISOString()
+          // Keep expires_at as is - they still expire after 1 hour
+        })
+        .eq('id', squadMember.id);
+
+      if (updateError) {
+        console.error('❌ Error updating squad member:', updateError);
+        return false;
+      }
+
+      console.log('✅ Added person successfully signed up (but will still expire after 1 hour)');
+      return true;
+
+    } catch (error) {
+      console.error('❌ Error in handleAddedPersonSignUp:', error);
+      return false;
+    }
+  }
+
+  // Check if current user was added as a squad member and needs to sign in
+  async checkIfAddedMember() {
+    try {
+      if (!this.currentUser || !this.currentUser.email) {
+        return;
+      }
+
+      if (!window.supabase) {
+        return;
+      }
+
+      // Check if current user was added as a squad member
+      const { data: squadMember, error } = await window.supabase
+        .from('carnival_squad_members')
+        .select('*')
+        .eq('phone', this.currentUser.email) // Assuming phone is used as identifier
+        .eq('member_type', 'added')
+        .eq('needs_signin', true)
+        .single();
+
+      if (error || !squadMember) {
+        return; // Not an added member
+      }
+
+      console.log('🎯 Current user was added as squad member, converting to permanent basic user');
+      await this.handleAddedMemberSignIn(this.currentUser.email);
+
+    } catch (error) {
+      console.error('❌ Error checking if added member:', error);
+    }
+  }
+
+  // Handle when an added person signs in (becomes permanent basic user)
+  async handleAddedPersonSignIn(email) {
+    try {
+      console.log('🔄 Carnival Tracker: Added person signing in:', email);
+
+      if (!window.supabase) {
+        console.log('⚠️ Supabase not available');
+        return false;
+      }
+
+      // Step 1: Check if this person was added by someone and needs to sign in
+      const { data: addedMember, error: fetchError } = await window.supabase
+        .from('carnival_squad_members')
+        .select('*')
+        .eq('phone', email) // Assuming phone is used as identifier
+        .eq('needs_signin', true)
+        .single();
+
+      if (fetchError || !addedMember) {
+        console.log('✅ Person not found as added member or already signed in');
+        return false;
+      }
+
+      // Step 2: Add them to basic_users table as permanent basic user
+      await this.addUserToBasicTable(email);
+
+      // Step 3: Update the squad member record to remove expiration and signin requirement
+      const { error: updateError } = await window.supabase
+        .from('carnival_squad_members')
+        .update({
+          expires_at: null, // No expiration - now permanent
+          needs_signin: false, // No longer needs to sign in
+          member_type: 'permanent', // Now a permanent member
+          signed_in_at: new Date().toISOString()
+        })
+        .eq('id', addedMember.id);
+
+      if (updateError) {
+        console.error('❌ Error updating squad member after sign in:', updateError);
+        return false;
+      }
+
+      console.log('✅ Added person successfully signed in and became permanent basic user');
+      return true;
+
+    } catch (error) {
+      console.error('❌ Error in handleAddedPersonSignIn:', error);
+      return false;
+    }
+  }
+
+  // Check if current user was added by someone and needs to sign in
+  async checkIfUserWasAdded() {
+    try {
+      if (!this.currentUser || !this.currentUser.email) {
+        return;
+      }
+
+      if (!window.supabase) {
+        return;
+      }
+
+      // Check if current user was added by someone
+      const { data: addedMember, error } = await window.supabase
+        .from('carnival_squad_members')
+        .select('*')
+        .eq('phone', this.currentUser.email) // Assuming phone is used as identifier
+        .eq('needs_signin', true)
+        .single();
+
+      if (error || !addedMember) {
+        return; // Not an added person or already signed in
+      }
+
+      console.log('🔄 Current user was added by someone and needs to sign in');
+
+      // Handle the sign in process
+      await this.handleAddedPersonSignIn(this.currentUser.email);
+
+    } catch (error) {
+      console.error('❌ Error checking if user was added:', error);
+    }
+  }
 }
 
 // Initialize the carnival tracker when the page loads
@@ -2783,6 +3324,57 @@ document.addEventListener('DOMContentLoaded', () => {
       window.disableCarnivalAuth = () => {
         if (window.carnivalTracker) {
           window.carnivalTracker.disableAuthListener();
+        }
+      };
+
+      // User tier management methods
+      window.upgradeUserToPremium = (email, paymentData = {}) => {
+        if (window.carnivalTracker) {
+          return window.carnivalTracker.upgradeUserToPremium(email, paymentData);
+        }
+      };
+
+      window.downgradeUserToBasic = (email) => {
+        if (window.carnivalTracker) {
+          return window.carnivalTracker.downgradeUserToBasic(email);
+        }
+      };
+
+      window.forceCleanup = () => {
+        if (window.carnivalTracker) {
+          return window.carnivalTracker.cleanupExpiredBasicUsers();
+        }
+      };
+
+      window.checkUserExpiration = () => {
+        if (window.carnivalTracker) {
+          return window.carnivalTracker.checkUserExpiration();
+        }
+      };
+
+      // Squad member management methods
+      window.forceSquadCleanup = () => {
+        if (window.carnivalTracker) {
+          return window.carnivalTracker.cleanupExpiredSquadMembers();
+        }
+      };
+
+      window.extendSquadMemberExpiration = (memberId) => {
+        if (window.carnivalTracker) {
+          return window.carnivalTracker.extendSquadMemberExpiration(memberId);
+        }
+      };
+
+      // Added person management methods
+      window.handleAddedPersonSignUp = (email) => {
+        if (window.carnivalTracker) {
+          return window.carnivalTracker.handleAddedPersonSignUp(email);
+        }
+      };
+
+      window.checkIfAddedMember = () => {
+        if (window.carnivalTracker) {
+          return window.carnivalTracker.checkIfAddedMember();
         }
       };
 
