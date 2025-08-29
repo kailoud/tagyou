@@ -1622,11 +1622,15 @@ See you at the carnival! 🎪</textarea>
             <i class="fas fa-map-marker-alt"></i>
             <span>Live</span>
           </button>
-          <button class="tab-btn-compact ${this.activeTab === 'add' ? 'active' : ''}" data-tab="add">
+          <button class="tab-btn-compact ${this.activeTab === 'add' ? 'active' : ''} ${!this.isAuthenticated ? 'disabled' : ''}" 
+                  data-tab="add" 
+                  ${!this.isAuthenticated ? 'disabled title="Sign in required to add members"' : ''}>
             <i class="fas fa-user-plus"></i>
             <span>Add</span>
           </button>
-          <button class="tab-btn-compact ${this.activeTab === 'notifications' ? 'active' : ''}" data-tab="notifications">
+          <button class="tab-btn-compact ${this.activeTab === 'notifications' ? 'active' : ''} ${!this.isAuthenticated ? 'disabled' : ''}" 
+                  data-tab="notifications"
+                  ${!this.isAuthenticated ? 'disabled title="Sign in required to view updates"' : ''}>
             <i class="fas fa-bell"></i>
             <span>Updates</span>
           </button>

@@ -136,6 +136,24 @@
   transform: scale(0.95);
 }
 
+.tab-btn-compact.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: #94a3b8;
+  background: transparent;
+  pointer-events: none;
+}
+
+.tab-btn-compact.disabled:hover {
+  color: #94a3b8;
+  background: transparent;
+  transform: none;
+}
+
+.tab-btn-compact.disabled:active {
+  transform: none;
+}
+
 /* Mobile optimization for carnival tracker compact */
 @media (max-width: 768px) {
   .tracker-header-compact {
