@@ -129,9 +129,9 @@
     // Initialize Supabase
     async function initializeSupabase() {
       try {
-        // Replace with your actual Supabase URL and anon key
+        // Use the actual Supabase URL and anon key from your config
         const supabaseUrl = 'https://rpsbibwmbsllnvfithjw.supabase.co';
-        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc2JpYndtYnNsbG52Zml0aGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUyNzQ5NzQsImV4cCI6MjA1MDg1MDk3NH0.Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc2JpYndtYnNsbG52Zml0aGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzA5NjQsImV4cCI6MjA3MTYwNjk2NH0.MdZz53RGQUIuCORdUtnFT-Uo0rFEK1a6chnMtS4Jjss';
 
         supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
         return true;
