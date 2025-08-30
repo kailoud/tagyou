@@ -242,7 +242,7 @@ export class SupabaseAuthService {
         throw new Error(error.message);
       }
 
-      if (data.user) {
+      if (data && data.user) {
         this.currentUser = data.user;
         console.log('✅ Sign up successful:', this.currentUser.email);
 
@@ -253,7 +253,14 @@ export class SupabaseAuthService {
         return { success: true, user: this.currentUser };
       }
 
-      throw new Error('Sign up failed - no user data returned');
+      // If no user data but no error, check if we need to confirm email
+      if (data && !data.user) {
+        console.log('⚠️ Sign up completed but requires email confirmation');
+        return { success: true, message: 'Please check your email to confirm your account' };
+      }
+
+      console.error('❌ Sign up failed - unexpected data structure:', data);
+      throw new Error('Sign up failed - unexpected response from server');
     } catch (error) {
       console.error('❌ SupabaseAuthService.signUp error:', error);
       throw error;
