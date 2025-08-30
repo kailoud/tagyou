@@ -223,6 +223,23 @@ export class SupabaseAuthService {
 
           if (signInError) {
             console.error('❌ Sign in error:', signInError.message);
+
+            // If sign-in also fails with database error, try to create records manually
+            if (signInError.message.includes('Database error')) {
+              console.log('🔐 Database error during sign-in, attempting manual record creation...');
+
+              // Try to get user from auth.users directly
+              const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+
+              if (authUser) {
+                console.log('🔐 Found user in auth, creating records manually...');
+                await this.ensureUserRecords(authUser);
+                this.currentUser = authUser;
+                this.notifyAuthStateListeners();
+                return { success: true, user: this.currentUser, message: 'User authenticated with manual record creation' };
+              }
+            }
+
             throw new Error(signInError.message);
           }
 
