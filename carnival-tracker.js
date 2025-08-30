@@ -2320,6 +2320,9 @@ See you at the carnival! 🎪</textarea>
             // Check if this user was added as a squad member
             await this.checkIfAddedMember();
 
+            // Ensure user is registered in basic_users table if they're not premium
+            await this.ensureUserInBasicTable(user.email);
+
             // Immediately check premium status when user is found
             console.log('🔍 Carnival Tracker: Immediately checking premium status for:', user.email);
             await this.checkPremiumStatus();
@@ -3228,6 +3231,40 @@ See you at the carnival! 🎪</textarea>
     }
   }
 
+  // Ensure user is registered in basic_users table if they're not premium
+  async ensureUserInBasicTable(email) {
+    try {
+      if (!email || !window.supabase) {
+        return;
+      }
+
+      // Check if user is already in basic_users table
+      const { data: existingUser, error: checkError } = await window.supabase
+        .from('basic_users')
+        .select('email')
+        .eq('email', email)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error('❌ Error checking basic users table:', checkError);
+        return;
+      }
+
+      // If user doesn't exist in basic_users table and is not premium, add them
+      if (!existingUser && !this.isPremium) {
+        console.log('🔄 Adding user to basic_users table:', email);
+        await this.addUserToBasicTable(email);
+      } else if (existingUser) {
+        console.log('✅ User already exists in basic_users table:', email);
+      } else if (this.isPremium) {
+        console.log('💎 User is premium, not adding to basic_users table:', email);
+      }
+
+    } catch (error) {
+      console.error('❌ Error ensuring user in basic table:', error);
+    }
+  }
+
   // Check if current user was added by someone and needs to sign in
   async checkIfUserWasAdded() {
     try {
@@ -3375,6 +3412,12 @@ document.addEventListener('DOMContentLoaded', () => {
       window.checkIfAddedMember = () => {
         if (window.carnivalTracker) {
           return window.carnivalTracker.checkIfAddedMember();
+        }
+      };
+
+      window.ensureUserInBasicTable = (email) => {
+        if (window.carnivalTracker) {
+          return window.carnivalTracker.ensureUserInBasicTable(email);
         }
       };
 
