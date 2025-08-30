@@ -370,6 +370,46 @@ export class SupabaseAuthService {
         console.log('✅ Basic user record already exists');
       }
 
+      // Check if user tier record exists, create if not
+      const { data: existingTier, error: tierCheckError } = await supabase
+        .from('user_tiers')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+
+      if (tierCheckError && tierCheckError.code !== 'PGRST116') {
+        console.error('❌ Error checking user tier:', tierCheckError);
+      }
+
+      if (!existingTier) {
+        console.log('🔐 Creating user tier record...');
+        const { data: tierData, error: tierError } = await supabase
+          .from('user_tiers')
+          .insert([
+            {
+              id: user.id,
+              email: user.email,
+              tier_type: 'basic',
+              tier_status: 'permanent',
+              users_added_count: 0,
+              max_users_can_add: 1,
+              created_at: new Date().toISOString(),
+              expires_at: null,
+              last_activity: new Date().toISOString(),
+              is_active: true
+            }
+          ])
+          .select();
+
+        if (tierError) {
+          console.error('❌ User tier creation error:', tierError);
+        } else {
+          console.log('✅ User tier record created/verified');
+        }
+      } else {
+        console.log('✅ User tier record already exists');
+      }
+
     } catch (error) {
       console.error('❌ Error ensuring user records:', error);
       // Don't throw error as auth was successful
