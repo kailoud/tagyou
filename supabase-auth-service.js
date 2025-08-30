@@ -218,7 +218,7 @@ export class SupabaseAuthService {
         this.currentUser = data.user;
         console.log('✅ Sign up successful:', this.currentUser.email);
 
-        // Create profile in profiles table
+        // Create profile in profiles table (if not already created by trigger)
         try {
           console.log('🔐 Creating user profile in database...');
           console.log('🔐 User ID:', data.user.id);
@@ -249,6 +249,38 @@ export class SupabaseAuthService {
         } catch (profileError) {
           console.error('❌ Profile creation failed:', profileError);
           console.error('❌ Error details:', profileError.message);
+          // Don't throw error here as auth was successful
+        }
+
+        // Create basic user record (if not already created by trigger)
+        try {
+          console.log('🔐 Creating basic user record...');
+          const { data: basicUserData, error: basicUserError } = await supabase
+            .from('basic_users')
+            .insert([
+              {
+                id: data.user.id,
+                email: data.user.email,
+                created_at: new Date().toISOString(),
+                expires_at: null, // NULL = permanent basic user
+                last_activity: new Date().toISOString(),
+                is_active: true
+              }
+            ])
+            .select();
+
+          if (basicUserError) {
+            console.error('❌ Basic user creation error:', basicUserError);
+            console.error('❌ Error details:', basicUserError.message);
+            console.error('❌ Error code:', basicUserError.code);
+            // Don't throw error here as auth was successful
+          } else {
+            console.log('✅ Basic user record created successfully');
+            console.log('✅ Basic user data:', basicUserData);
+          }
+        } catch (basicUserError) {
+          console.error('❌ Basic user creation failed:', basicUserError);
+          console.error('❌ Error details:', basicUserError.message);
           // Don't throw error here as auth was successful
         }
 

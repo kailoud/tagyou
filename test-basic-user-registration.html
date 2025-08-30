@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Basic User Registration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .status {
+      padding: 15px;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
+
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .warning {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    button:disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+    }
+
+    .form-group {
+      margin: 15px 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    .results {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 15px 0;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🧪 Test Basic User Registration</h1>
+    <p>This page tests whether new user signups are properly creating basic user records in Supabase.</p>
+
+    <div id="status" class="status info">
+      Initializing...
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input type="email" id="email" placeholder="test@example.com">
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password:</label>
+      <input type="password" id="password" placeholder="password123">
+    </div>
+
+    <button onclick="testSignUp()" id="signupBtn">Test Sign Up</button>
+    <button onclick="checkCurrentUser()" id="checkBtn">Check Current User</button>
+    <button onclick="checkBasicUsers()" id="basicUsersBtn">Check Basic Users Table</button>
+    <button onclick="testSignOut()" id="signoutBtn">Sign Out</button>
+
+    <div id="results" class="results" style="display: none;"></div>
+  </div>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Your Supabase config -->
+  <script src="supabase-config.js"></script>
+
+  <!-- Auth service -->
+  <script type="module">
+    import { supabaseAuthService } from './supabase-auth-service.js';
+
+    // Make auth service globally available
+    window.authService = supabaseAuthService;
+
+    // Initialize Supabase client
+    const supabase = window.supabase.createClient(
+      window.supabaseConfig.supabaseUrl,
+      window.supabaseConfig.supabaseAnonKey
+    );
+
+    // Set the global supabase instance
+    window.supabaseAuthService.setSupabaseInstance(supabase);
+
+    // Initialize auth service
+    async function initialize() {
+      try {
+        updateStatus('Initializing auth service...', 'info');
+        await supabaseAuthService.initialize();
+        updateStatus('Auth service initialized successfully', 'success');
+
+        // Check if user is already signed in
+        const currentUser = supabaseAuthService.getCurrentUser();
+        if (currentUser) {
+          updateStatus(`User already signed in: ${currentUser.email}`, 'success');
+          updateButtons(true);
+        } else {
+          updateStatus('No user signed in', 'info');
+          updateButtons(false);
+        }
+      } catch (error) {
+        updateStatus(`Initialization failed: ${error.message}`, 'error');
+      }
+    }
+
+    function updateStatus(message, type) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.textContent = message;
+      statusDiv.className = `status ${type}`;
+      console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+
+    function updateButtons(signedIn) {
+      document.getElementById('signupBtn').disabled = signedIn;
+      document.getElementById('checkBtn').disabled = !signedIn;
+      document.getElementById('basicUsersBtn').disabled = !signedIn;
+      document.getElementById('signoutBtn').disabled = !signedIn;
+    }
+
+    function showResults(data) {
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.textContent = JSON.stringify(data, null, 2);
+      resultsDiv.style.display = 'block';
+    }
+
+    // Global functions for buttons
+    window.testSignUp = async function () {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        updateStatus('Please enter email and password', 'error');
+        return;
+      }
+
+      try {
+        updateStatus('Creating test account...', 'info');
+        const result = await supabaseAuthService.signUp(email, password);
+
+        if (result.success) {
+          updateStatus(`Sign up successful! User: ${result.user.email}`, 'success');
+          updateButtons(true);
+
+          // Check if basic user record was created
+          await checkBasicUserRecord(result.user.id, result.user.email);
+        }
+      } catch (error) {
+        updateStatus(`Sign up failed: ${error.message}`, 'error');
+      }
+    };
+
+    window.checkCurrentUser = async function () {
+      try {
+        const user = supabaseAuthService.getCurrentUser();
+        if (user) {
+          updateStatus(`Current user: ${user.email} (ID: ${user.id})`, 'success');
+          showResults({
+            user: {
+              id: user.id,
+              email: user.email,
+              created_at: user.created_at
+            }
+          });
+        } else {
+          updateStatus('No user signed in', 'warning');
+        }
+      } catch (error) {
+        updateStatus(`Error checking user: ${error.message}`, 'error');
+      }
+    };
+
+    window.checkBasicUsers = async function () {
+      try {
+        updateStatus('Checking basic users table...', 'info');
+
+        const { data, error } = await supabase
+          .from('basic_users')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (error) {
+          updateStatus(`Error querying basic_users: ${error.message}`, 'error');
+          return;
+        }
+
+        updateStatus(`Found ${data.length} basic users`, 'success');
+        showResults({
+          basic_users_count: data.length,
+          basic_users: data
+        });
+      } catch (error) {
+        updateStatus(`Error checking basic users: ${error.message}`, 'error');
+      }
+    };
+
+    window.testSignOut = async function () {
+      try {
+        await supabaseAuthService.signOut();
+        updateStatus('Signed out successfully', 'success');
+        updateButtons(false);
+        document.getElementById('results').style.display = 'none';
+      } catch (error) {
+        updateStatus(`Sign out failed: ${error.message}`, 'error');
+      }
+    };
+
+    async function checkBasicUserRecord(userId, userEmail) {
+      try {
+        updateStatus('Checking if basic user record was created...', 'info');
+
+        const { data, error } = await supabase
+          .from('basic_users')
+          .select('*')
+          .eq('id', userId)
+          .single();
+
+        if (error) {
+          updateStatus(`Basic user record not found: ${error.message}`, 'error');
+          return;
+        }
+
+        updateStatus(`✅ Basic user record created successfully!`, 'success');
+        showResults({
+          basic_user_record: data,
+          message: 'Basic user registration is working correctly!'
+        });
+      } catch (error) {
+        updateStatus(`Error checking basic user record: ${error.message}`, 'error');
+      }
+    }
+
+    // Initialize when page loads
+    initialize();
+  </script>
+</body>
+
+</html>

@@ -64,6 +64,21 @@ CREATE TABLE IF NOT EXISTS user_sessions (
     location_info JSONB
 );
 
+-- Create basic_users table for tracking basic users
+CREATE TABLE IF NOT EXISTS basic_users (
+    id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    expires_at TIMESTAMP WITH TIME ZONE NULL, -- NULL = permanent basic user, timestamp = temporary user
+    last_activity TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    is_active BOOLEAN DEFAULT true
+);
+
+-- Create indexes for basic_users table
+CREATE INDEX IF NOT EXISTS idx_basic_users_expires_at ON basic_users(expires_at);
+CREATE INDEX IF NOT EXISTS idx_basic_users_email ON basic_users(email);
+CREATE INDEX IF NOT EXISTS idx_basic_users_active ON basic_users(is_active);
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_profiles_email ON profiles(email);
 CREATE INDEX IF NOT EXISTS idx_profiles_display_name ON profiles(display_name);
@@ -75,6 +90,7 @@ CREATE INDEX IF NOT EXISTS idx_user_sessions_user_id ON user_sessions(user_id);
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE favorites ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE basic_users ENABLE ROW LEVEL SECURITY;
 
 -- Profiles RLS Policies
 CREATE POLICY "Users can view their own profile" ON profiles
@@ -114,16 +130,42 @@ CREATE POLICY "Users can insert their own sessions" ON user_sessions
 CREATE POLICY "Users can update their own sessions" ON user_sessions
     FOR UPDATE USING (auth.uid() = user_id);
 
+-- Basic Users RLS Policies
+CREATE POLICY "Users can view their own basic user record" ON basic_users
+    FOR SELECT USING (auth.uid() = id);
+
+CREATE POLICY "Users can insert their own basic user record" ON basic_users
+    FOR INSERT WITH CHECK (auth.uid() = id);
+
+CREATE POLICY "Users can update their own basic user record" ON basic_users
+    FOR UPDATE USING (auth.uid() = id);
+
+CREATE POLICY "Users can delete their own basic user record" ON basic_users
+    FOR DELETE USING (auth.uid() = id);
+
 -- Create function to handle user creation
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
+    -- Create profile record
     INSERT INTO profiles (id, email, display_name)
     VALUES (
         NEW.id,
         NEW.email,
         COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1))
     );
+    
+    -- Create basic user record (permanent basic user)
+    INSERT INTO basic_users (id, email, created_at, expires_at, last_activity, is_active)
+    VALUES (
+        NEW.id,
+        NEW.email,
+        NOW(),
+        NULL, -- NULL = permanent basic user
+        NOW(),
+        true
+    );
+    
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
