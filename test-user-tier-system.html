@@ -169,9 +169,9 @@
       <div id="userInfo" class="user-info">
         No user signed in
       </div>
-           <button onclick="getUserPermissions()" id="permissionsBtn" disabled>Get Permissions</button>
-     <button onclick="getUserTierInfo()" id="tierInfoBtn" disabled>Get Tier Info</button>
-     <button onclick="getGracePeriodStatus()" id="gracePeriodBtn" disabled>Get Grace Period Status</button>
+      <button onclick="getUserPermissions()" id="permissionsBtn" disabled>Get Permissions</button>
+      <button onclick="getUserTierInfo()" id="tierInfoBtn" disabled>Get Tier Info</button>
+      <button onclick="getGracePeriodStatus()" id="gracePeriodBtn" disabled>Get Grace Period Status</button>
     </div>
 
     <!-- User Management -->
@@ -193,9 +193,9 @@
     <div class="section">
       <h3>⭐ Premium Upgrade</h3>
       <button onclick="upgradeToPremium()" id="upgradeBtn" disabled>Upgrade to Premium</button>
-           <button onclick="getAllUsers()" id="allUsersBtn" disabled>Get All Users (Admin)</button>
-     <button onclick="getUserStats()" id="statsBtn" disabled>Get User Statistics</button>
-     <button onclick="resetGracePeriods()" id="resetGraceBtn" disabled>Reset Expired Grace Periods</button>
+      <button onclick="getAllUsers()" id="allUsersBtn" disabled>Get All Users (Admin)</button>
+      <button onclick="getUserStats()" id="statsBtn" disabled>Get User Statistics</button>
+      <button onclick="resetGracePeriods()" id="resetGraceBtn" disabled>Reset Expired Grace Periods</button>
     </div>
 
     <!-- Results -->
@@ -259,13 +259,13 @@
       document.getElementById('signoutBtn').disabled = !signedIn;
       document.getElementById('permissionsBtn').disabled = !signedIn;
       document.getElementById('tierInfoBtn').disabled = !signedIn;
-             document.getElementById('addUserBtn').disabled = !signedIn;
-       document.getElementById('addedUsersBtn').disabled = !signedIn;
-       document.getElementById('upgradeBtn').disabled = !signedIn;
-       document.getElementById('allUsersBtn').disabled = !signedIn;
-       document.getElementById('statsBtn').disabled = !signedIn;
-       document.getElementById('gracePeriodBtn').disabled = !signedIn;
-       document.getElementById('resetGraceBtn').disabled = !signedIn;
+      document.getElementById('addUserBtn').disabled = !signedIn;
+      document.getElementById('addedUsersBtn').disabled = !signedIn;
+      document.getElementById('upgradeBtn').disabled = !signedIn;
+      document.getElementById('allUsersBtn').disabled = !signedIn;
+      document.getElementById('statsBtn').disabled = !signedIn;
+      document.getElementById('gracePeriodBtn').disabled = !signedIn;
+      document.getElementById('resetGraceBtn').disabled = !signedIn;
     }
 
     function updateUserInfo(user) {
@@ -459,6 +459,28 @@
         showResults(stats);
       } catch (error) {
         updateStatus(`Error getting user stats: ${error.message}`, 'error');
+      }
+    };
+
+    window.getGracePeriodStatus = async function () {
+      try {
+        updateStatus('Getting grace period status...', 'info');
+        const status = await userTierService.getGracePeriodStatus();
+        updateStatus('Grace period status retrieved', 'success');
+        showResults(status);
+      } catch (error) {
+        updateStatus(`Error getting grace period status: ${error.message}`, 'error');
+      }
+    };
+
+    window.resetGracePeriods = async function () {
+      try {
+        updateStatus('Resetting expired grace periods...', 'info');
+        const result = await userTierService.resetExpiredGracePeriods();
+        updateStatus(`Reset ${result} expired grace periods`, 'success');
+        showResults({ reset_count: result });
+      } catch (error) {
+        updateStatus(`Error resetting grace periods: ${error.message}`, 'error');
       }
     };
 
