@@ -204,25 +204,7 @@ export class SupabaseAuthService {
 
       console.log('🔐 Attempting sign up for:', email);
 
-      // First, check if user already exists
-      const { data: existingUser } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
-
-      if (existingUser.user) {
-        // User already exists, try to sign them in and ensure their records exist
-        console.log('🔐 User already exists, ensuring records are created...');
-        this.currentUser = existingUser.user;
-
-        // Ensure profile and basic user records exist
-        await this.ensureUserRecords(existingUser.user);
-
-        this.notifyAuthStateListeners();
-        return { success: true, user: this.currentUser, message: 'User already exists, signed in successfully' };
-      }
-
-      // User doesn't exist, create new account
+      // Create new account directly
       const { data, error } = await supabase.auth.signUp({
         email: email,
         password: password
