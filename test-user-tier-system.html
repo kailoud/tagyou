@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Tier System Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .status {
+      padding: 15px;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
+
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .warning {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    button:disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+    }
+
+    .form-group {
+      margin: 15px 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    .results {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 15px 0;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+
+    .user-info {
+      background-color: #e9ecef;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 15px 0;
+    }
+
+    .tier-badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 12px;
+      font-weight: bold;
+      margin: 5px;
+    }
+
+    .tier-basic {
+      background-color: #17a2b8;
+      color: white;
+    }
+
+    .tier-premium {
+      background-color: #ffc107;
+      color: black;
+    }
+
+    .section {
+      border: 1px solid #ddd;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 5px;
+    }
+
+    .section h3 {
+      margin-top: 0;
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🔐 User Tier System Test</h1>
+    <p>Test the tiered user system: Permanent Basic Users (can add 1 Permanent Basic User) → Premium Users (can add
+      unlimited)</p>
+
+    <div id="status" class="status info">
+      Initializing...
+    </div>
+
+    <!-- Authentication Section -->
+    <div class="section">
+      <h3>🔑 Authentication</h3>
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" placeholder="test@example.com">
+      </div>
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" placeholder="password123">
+      </div>
+      <button onclick="testSignUp()" id="signupBtn">Test Sign Up</button>
+      <button onclick="testSignIn()" id="signinBtn">Test Sign In</button>
+      <button onclick="testSignOut()" id="signoutBtn">Sign Out</button>
+    </div>
+
+    <!-- Current User Info -->
+    <div class="section">
+      <h3>👤 Current User Information</h3>
+      <div id="userInfo" class="user-info">
+        No user signed in
+      </div>
+           <button onclick="getUserPermissions()" id="permissionsBtn" disabled>Get Permissions</button>
+     <button onclick="getUserTierInfo()" id="tierInfoBtn" disabled>Get Tier Info</button>
+     <button onclick="getGracePeriodStatus()" id="gracePeriodBtn" disabled>Get Grace Period Status</button>
+    </div>
+
+    <!-- User Management -->
+    <div class="section">
+      <h3>👥 User Management</h3>
+      <div class="form-group">
+        <label for="newUserEmail">New User Email:</label>
+        <input type="email" id="newUserEmail" placeholder="newuser@example.com">
+      </div>
+      <div class="form-group">
+        <label for="newUserName">New User Name (optional):</label>
+        <input type="text" id="newUserName" placeholder="New User">
+      </div>
+      <button onclick="addNewUser()" id="addUserBtn" disabled>Add New User</button>
+      <button onclick="getUsersAddedByMe()" id="addedUsersBtn" disabled>Get Users I Added</button>
+    </div>
+
+    <!-- Premium Upgrade -->
+    <div class="section">
+      <h3>⭐ Premium Upgrade</h3>
+      <button onclick="upgradeToPremium()" id="upgradeBtn" disabled>Upgrade to Premium</button>
+           <button onclick="getAllUsers()" id="allUsersBtn" disabled>Get All Users (Admin)</button>
+     <button onclick="getUserStats()" id="statsBtn" disabled>Get User Statistics</button>
+     <button onclick="resetGracePeriods()" id="resetGraceBtn" disabled>Reset Expired Grace Periods</button>
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="results" style="display: none;"></div>
+  </div>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Your Supabase config -->
+  <script src="supabase-config.js"></script>
+
+  <!-- Services -->
+  <script type="module">
+    import { supabaseAuthService } from './supabase-auth-service.js';
+    import { userTierService } from './user-tier-service.js';
+
+    // Initialize Supabase client
+    const supabase = window.supabase.createClient(
+      window.supabaseConfig.supabaseUrl,
+      window.supabaseConfig.supabaseAnonKey
+    );
+
+    // Set the global supabase instances
+    supabaseAuthService.setSupabaseInstance(supabase);
+    userTierService.setSupabaseInstance(supabase);
+
+    // Initialize services
+    async function initialize() {
+      try {
+        updateStatus('Initializing services...', 'info');
+        await supabaseAuthService.initialize();
+        await userTierService.initialize();
+        updateStatus('Services initialized successfully', 'success');
+
+        // Check if user is already signed in
+        const currentUser = supabaseAuthService.getCurrentUser();
+        if (currentUser) {
+          updateStatus(`User already signed in: ${currentUser.email}`, 'success');
+          updateUserInfo(currentUser);
+          updateButtons(true);
+        } else {
+          updateStatus('No user signed in', 'info');
+          updateButtons(false);
+        }
+      } catch (error) {
+        updateStatus(`Initialization failed: ${error.message}`, 'error');
+      }
+    }
+
+    function updateStatus(message, type) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.textContent = message;
+      statusDiv.className = `status ${type}`;
+      console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+
+    function updateButtons(signedIn) {
+      document.getElementById('signupBtn').disabled = signedIn;
+      document.getElementById('signinBtn').disabled = signedIn;
+      document.getElementById('signoutBtn').disabled = !signedIn;
+      document.getElementById('permissionsBtn').disabled = !signedIn;
+      document.getElementById('tierInfoBtn').disabled = !signedIn;
+             document.getElementById('addUserBtn').disabled = !signedIn;
+       document.getElementById('addedUsersBtn').disabled = !signedIn;
+       document.getElementById('upgradeBtn').disabled = !signedIn;
+       document.getElementById('allUsersBtn').disabled = !signedIn;
+       document.getElementById('statsBtn').disabled = !signedIn;
+       document.getElementById('gracePeriodBtn').disabled = !signedIn;
+       document.getElementById('resetGraceBtn').disabled = !signedIn;
+    }
+
+    function updateUserInfo(user) {
+      const userInfoDiv = document.getElementById('userInfo');
+      userInfoDiv.innerHTML = `
+                <strong>Email:</strong> ${user.email}<br>
+                <strong>ID:</strong> ${user.id}<br>
+                <strong>Created:</strong> ${new Date(user.created_at).toLocaleString()}
+            `;
+    }
+
+    function showResults(data) {
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.textContent = JSON.stringify(data, null, 2);
+      resultsDiv.style.display = 'block';
+    }
+
+    // Global functions for buttons
+    window.testSignUp = async function () {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        updateStatus('Please enter email and password', 'error');
+        return;
+      }
+
+      try {
+        updateStatus('Creating test account...', 'info');
+        const result = await supabaseAuthService.signUp(email, password);
+
+        if (result.success) {
+          updateStatus(`Sign up successful! User: ${result.user.email}`, 'success');
+          updateUserInfo(result.user);
+          updateButtons(true);
+
+          // Get user permissions
+          await getUserPermissions();
+        }
+      } catch (error) {
+        updateStatus(`Sign up failed: ${error.message}`, 'error');
+      }
+    };
+
+    window.testSignIn = async function () {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        updateStatus('Please enter email and password', 'error');
+        return;
+      }
+
+      try {
+        updateStatus('Signing in...', 'info');
+        const result = await supabaseAuthService.signIn(email, password);
+
+        if (result.success) {
+          updateStatus(`Sign in successful! User: ${result.user.email}`, 'success');
+          updateUserInfo(result.user);
+          updateButtons(true);
+
+          // Get user permissions
+          await getUserPermissions();
+        }
+      } catch (error) {
+        updateStatus(`Sign in failed: ${error.message}`, 'error');
+      }
+    };
+
+    window.testSignOut = async function () {
+      try {
+        await supabaseAuthService.signOut();
+        updateStatus('Signed out successfully', 'success');
+        updateButtons(false);
+        document.getElementById('userInfo').innerHTML = 'No user signed in';
+        document.getElementById('results').style.display = 'none';
+      } catch (error) {
+        updateStatus(`Sign out failed: ${error.message}`, 'error');
+      }
+    };
+
+    window.getUserPermissions = async function () {
+      try {
+        updateStatus('Getting user permissions...', 'info');
+        const permissions = await userTierService.getCurrentUserPermissions();
+
+        updateStatus('User permissions retrieved', 'success');
+
+        // Update user info with tier information
+        const userInfoDiv = document.getElementById('userInfo');
+        const currentUser = supabaseAuthService.getCurrentUser();
+        userInfoDiv.innerHTML = `
+                    <strong>Email:</strong> ${currentUser.email}<br>
+                    <strong>ID:</strong> ${currentUser.id}<br>
+                    <strong>Created:</strong> ${new Date(currentUser.created_at).toLocaleString()}<br>
+                    <strong>Tier:</strong> <span class="tier-badge tier-${permissions.tier_type}">${permissions.tier_type.toUpperCase()}</span><br>
+                    <strong>Status:</strong> ${permissions.tier_status}<br>
+                                         <strong>Users Added:</strong> ${permissions.users_added_count}/${permissions.max_users_can_add}<br>
+                     <strong>Can Add More:</strong> ${permissions.can_add_users ? '✅ Yes' : '❌ No'}<br>
+                     <strong>Can Add:</strong> ${permissions.tier_type === 'premium' ? 'Unlimited Users' : '1 Permanent Basic User'}<br>
+                     ${permissions.grace_period_active ? `<strong>⏰ Grace Period:</strong> Active (expires in ${Math.floor(permissions.time_remaining_seconds / 60)} minutes)` : ''}
+                `;
+
+        showResults(permissions);
+      } catch (error) {
+        updateStatus(`Error getting permissions: ${error.message}`, 'error');
+      }
+    };
+
+    window.getUserTierInfo = async function () {
+      try {
+        updateStatus('Getting user tier info...', 'info');
+        const tierInfo = await userTierService.getUserTierInfo();
+        updateStatus('User tier info retrieved', 'success');
+        showResults(tierInfo);
+      } catch (error) {
+        updateStatus(`Error getting tier info: ${error.message}`, 'error');
+      }
+    };
+
+    window.addNewUser = async function () {
+      const email = document.getElementById('newUserEmail').value;
+      const name = document.getElementById('newUserName').value;
+
+      if (!email) {
+        updateStatus('Please enter new user email', 'error');
+        return;
+      }
+
+      try {
+        updateStatus('Adding new user...', 'info');
+        const result = await userTierService.addNewUser(email, name);
+
+        if (result.success) {
+          updateStatus(`New user added successfully: ${email}`, 'success');
+          showResults(result);
+
+          // Refresh permissions
+          await getUserPermissions();
+        }
+      } catch (error) {
+        updateStatus(`Error adding user: ${error.message}`, 'error');
+      }
+    };
+
+    window.getUsersAddedByMe = async function () {
+      try {
+        updateStatus('Getting users added by me...', 'info');
+        const users = await userTierService.getUsersAddedByMe();
+        updateStatus(`Found ${users.length} users added by you`, 'success');
+        showResults(users);
+      } catch (error) {
+        updateStatus(`Error getting added users: ${error.message}`, 'error');
+      }
+    };
+
+    window.upgradeToPremium = async function () {
+      try {
+        updateStatus('Upgrading to premium...', 'info');
+        const result = await userTierService.upgradeToPremium();
+
+        if (result.success) {
+          updateStatus('Upgraded to premium successfully!', 'success');
+          showResults(result);
+
+          // Refresh permissions
+          await getUserPermissions();
+        }
+      } catch (error) {
+        updateStatus(`Error upgrading to premium: ${error.message}`, 'error');
+      }
+    };
+
+    window.getAllUsers = async function () {
+      try {
+        updateStatus('Getting all users...', 'info');
+        const users = await userTierService.getAllUsers();
+        updateStatus(`Found ${users.length} total users`, 'success');
+        showResults(users);
+      } catch (error) {
+        updateStatus(`Error getting all users: ${error.message}`, 'error');
+      }
+    };
+
+    window.getUserStats = async function () {
+      try {
+        updateStatus('Getting user statistics...', 'info');
+        const stats = await userTierService.getUserStats();
+        updateStatus('User statistics retrieved', 'success');
+        showResults(stats);
+      } catch (error) {
+        updateStatus(`Error getting user stats: ${error.message}`, 'error');
+      }
+    };
+
+    // Initialize when page loads
+    initialize();
+  </script>
+</body>
+
+</html>

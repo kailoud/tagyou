@@ -204,6 +204,25 @@ export class SupabaseAuthService {
 
       console.log('🔐 Attempting sign up for:', email);
 
+      // First, check if user already exists
+      const { data: existingUser } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (existingUser.user) {
+        // User already exists, try to sign them in and ensure their records exist
+        console.log('🔐 User already exists, ensuring records are created...');
+        this.currentUser = existingUser.user;
+
+        // Ensure profile and basic user records exist
+        await this.ensureUserRecords(existingUser.user);
+
+        this.notifyAuthStateListeners();
+        return { success: true, user: this.currentUser, message: 'User already exists, signed in successfully' };
+      }
+
+      // User doesn't exist, create new account
       const { data, error } = await supabase.auth.signUp({
         email: email,
         password: password
@@ -218,71 +237,8 @@ export class SupabaseAuthService {
         this.currentUser = data.user;
         console.log('✅ Sign up successful:', this.currentUser.email);
 
-        // Create profile in profiles table (if not already created by trigger)
-        try {
-          console.log('🔐 Creating user profile in database...');
-          console.log('🔐 User ID:', data.user.id);
-          console.log('🔐 User Email:', data.user.email);
-
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .insert([
-              {
-                id: data.user.id,
-                email: data.user.email,
-                display_name: data.user.email.split('@')[0].charAt(0).toUpperCase() + data.user.email.split('@')[0].slice(1),
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-              }
-            ])
-            .select();
-
-          if (profileError) {
-            console.error('❌ Profile creation error:', profileError);
-            console.error('❌ Error details:', profileError.message);
-            console.error('❌ Error code:', profileError.code);
-            // Don't throw error here as auth was successful
-          } else {
-            console.log('✅ User profile created successfully');
-            console.log('✅ Profile data:', profileData);
-          }
-        } catch (profileError) {
-          console.error('❌ Profile creation failed:', profileError);
-          console.error('❌ Error details:', profileError.message);
-          // Don't throw error here as auth was successful
-        }
-
-        // Create basic user record (if not already created by trigger)
-        try {
-          console.log('🔐 Creating basic user record...');
-          const { data: basicUserData, error: basicUserError } = await supabase
-            .from('basic_users')
-            .insert([
-              {
-                id: data.user.id,
-                email: data.user.email,
-                created_at: new Date().toISOString(),
-                expires_at: null, // NULL = permanent basic user
-                last_activity: new Date().toISOString(),
-                is_active: true
-              }
-            ])
-            .select();
-
-          if (basicUserError) {
-            console.error('❌ Basic user creation error:', basicUserError);
-            console.error('❌ Error details:', basicUserError.message);
-            console.error('❌ Error code:', basicUserError.code);
-            // Don't throw error here as auth was successful
-          } else {
-            console.log('✅ Basic user record created successfully');
-            console.log('✅ Basic user data:', basicUserData);
-          }
-        } catch (basicUserError) {
-          console.error('❌ Basic user creation failed:', basicUserError);
-          console.error('❌ Error details:', basicUserError.message);
-          // Don't throw error here as auth was successful
-        }
+        // Ensure profile and basic user records exist
+        await this.ensureUserRecords(data.user);
 
         this.notifyAuthStateListeners();
         return { success: true, user: this.currentUser };
@@ -292,6 +248,88 @@ export class SupabaseAuthService {
     } catch (error) {
       console.error('❌ SupabaseAuthService.signUp error:', error);
       throw error;
+    }
+  }
+
+  // Helper method to ensure user records exist
+  async ensureUserRecords(user) {
+    try {
+      console.log('🔐 Ensuring user records exist for:', user.email);
+
+      // Check if profile exists, create if not
+      const { data: existingProfile, error: profileCheckError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+
+      if (profileCheckError && profileCheckError.code !== 'PGRST116') {
+        console.error('❌ Error checking profile:', profileCheckError);
+      }
+
+      if (!existingProfile) {
+        console.log('🔐 Creating user profile...');
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              id: user.id,
+              email: user.email,
+              display_name: user.email.split('@')[0].charAt(0).toUpperCase() + user.email.split('@')[0].slice(1),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ])
+          .select();
+
+        if (profileError) {
+          console.error('❌ Profile creation error:', profileError);
+        } else {
+          console.log('✅ User profile created/verified');
+        }
+      } else {
+        console.log('✅ User profile already exists');
+      }
+
+      // Check if basic user record exists, create if not
+      const { data: existingBasicUser, error: basicUserCheckError } = await supabase
+        .from('basic_users')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+
+      if (basicUserCheckError && basicUserCheckError.code !== 'PGRST116') {
+        console.error('❌ Error checking basic user:', basicUserCheckError);
+      }
+
+      if (!existingBasicUser) {
+        console.log('🔐 Creating basic user record...');
+        const { data: basicUserData, error: basicUserError } = await supabase
+          .from('basic_users')
+          .insert([
+            {
+              id: user.id,
+              email: user.email,
+              created_at: new Date().toISOString(),
+              expires_at: null, // NULL = permanent basic user
+              last_activity: new Date().toISOString(),
+              is_active: true
+            }
+          ])
+          .select();
+
+        if (basicUserError) {
+          console.error('❌ Basic user creation error:', basicUserError);
+        } else {
+          console.log('✅ Basic user record created/verified');
+        }
+      } else {
+        console.log('✅ Basic user record already exists');
+      }
+
+    } catch (error) {
+      console.error('❌ Error ensuring user records:', error);
+      // Don't throw error as auth was successful
     }
   }
 
