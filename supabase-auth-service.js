@@ -211,6 +211,33 @@ export class SupabaseAuthService {
       });
 
       if (error) {
+        // Check if user already exists
+        if (error.message.includes('User already registered') || error.message.includes('already exists')) {
+          console.log('🔐 User already exists, attempting sign in...');
+
+          // Try to sign in instead
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+          });
+
+          if (signInError) {
+            console.error('❌ Sign in error:', signInError.message);
+            throw new Error(signInError.message);
+          }
+
+          if (signInData.user) {
+            this.currentUser = signInData.user;
+            console.log('✅ Sign in successful:', this.currentUser.email);
+
+            // Ensure profile and basic user records exist
+            await this.ensureUserRecords(signInData.user);
+
+            this.notifyAuthStateListeners();
+            return { success: true, user: this.currentUser, message: 'User already exists, signed in successfully' };
+          }
+        }
+
         console.error('❌ Sign up error:', error.message);
         throw new Error(error.message);
       }
