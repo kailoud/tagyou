@@ -160,8 +160,20 @@ export class FreshAuthService {
       if (data.user) {
         console.log('✅ Sign up successful:', data.user.email);
         
-        // Profile will be created automatically by the trigger
-        // We'll load it when the user signs in
+        // Try to create profile manually if trigger fails
+        try {
+          const { error: profileError } = await supabase.rpc('create_user_profile_manual', {
+            user_email: email,
+            user_id: data.user.id
+          });
+          
+          if (profileError) {
+            console.warn('⚠️ Manual profile creation failed:', profileError);
+            // Continue anyway - profile might be created by trigger
+          }
+        } catch (profileError) {
+          console.warn('⚠️ Manual profile creation error:', profileError);
+        }
         
         return {
           success: true,
