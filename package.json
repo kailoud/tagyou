@@ -1,0 +1,17 @@
+{
+  "name": "tagyou",
+  "version": "1.0.0",
+  "description": "TagYou Carnival Tracking App",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 3000 -o",
+    "dev": "npx http-server . -p 3000 -o",
+    "serve": "npx http-server . -p 3000"
+  },
+  "keywords": ["carnival", "tracking", "supabase"],
+  "author": "TagYou Team",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
