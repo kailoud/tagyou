@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Netlify Connection Test - TagYou</title>
+    <title>Fresh Netlify Connection Test - TagYou</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -88,6 +88,10 @@
             color: #333;
         }
 
+        .btn-danger {
+            background: #dc3545;
+        }
+
         .status {
             padding: 15px;
             border-radius: 10px;
@@ -111,6 +115,12 @@
             background: #d1ecf1;
             color: #0c5460;
             border: 1px solid #bee5eb;
+        }
+
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
         }
 
         .log {
@@ -149,16 +159,73 @@
             outline: none;
             border-color: #667eea;
         }
+
+        .troubleshooting-steps {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .troubleshooting-steps h4 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .troubleshooting-steps ol {
+            padding-left: 20px;
+        }
+
+        .troubleshooting-steps li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔗 Netlify Connection Test</h1>
-            <p>Testing Netlify Functions and Deployment</p>
+            <h1>🔗 Fresh Netlify Connection Test</h1>
+            <p>Comprehensive Netlify Diagnostics & Git Repository Troubleshooting</p>
         </div>
 
         <div class="content">
+            <!-- Git Repository Diagnostics -->
+            <div class="test-section">
+                <h3>🔧 Git Repository Diagnostics</h3>
+                <p>Based on your deployment log, there's a Git repository access issue. Let's diagnose and fix it.</p>
+                
+                <div class="status warning">
+                    <strong>⚠️ Current Issue:</strong> "Host key verification failed" - Git repository access problem
+                </div>
+
+                <div class="troubleshooting-steps">
+                    <h4>🔍 Troubleshooting Steps:</h4>
+                    <ol>
+                        <li><strong>Check Repository URL:</strong> Verify the repository URL in Netlify settings</li>
+                        <li><strong>Repository Access:</strong> Ensure Netlify has access to your repository</li>
+                        <li><strong>Branch Name:</strong> Confirm the correct branch name (main/master)</li>
+                        <li><strong>Repository Visibility:</strong> Check if repository is public or private</li>
+                        <li><strong>Netlify Integration:</strong> Verify Netlify app integration with your Git provider</li>
+                    </ol>
+                </div>
+
+                <button class="btn btn-warning" onclick="checkGitRepository()">Check Git Repository Status</button>
+                <button class="btn btn-danger" onclick="showGitFixSteps()">Show Fix Steps</button>
+                <div id="gitResult"></div>
+            </div>
+
             <!-- Basic Connection Test -->
             <div class="test-section">
                 <h3>🌐 Basic Connection Test</h3>
@@ -170,7 +237,7 @@
             <!-- Netlify Functions Test -->
             <div class="test-section">
                 <h3>⚡ Netlify Functions Test</h3>
-                <p>Test if Netlify Functions are working</p>
+                <p>Test if Netlify Functions are working (after deployment)</p>
                 <button class="btn" onclick="testNetlifyFunctions()">Test Functions</button>
                 <div id="functionsResult"></div>
             </div>
@@ -228,6 +295,88 @@
             element.innerHTML = `<div class="status ${type}">${message}</div>`;
         }
 
+        // Check Git repository status
+        function checkGitRepository() {
+            log('🔧 Checking Git repository status...');
+            
+            const gitResult = document.getElementById('gitResult');
+            gitResult.innerHTML = `
+                <div class="status warning">
+                    <strong>Git Repository Analysis:</strong><br><br>
+                    
+                    <strong>🔍 Issue Identified:</strong><br>
+                    • Error: "Host key verification failed"<br>
+                    • Stage: "preparing repo"<br>
+                    • Status: Build failed<br><br>
+                    
+                    <strong>📋 Possible Causes:</strong><br>
+                    1. Repository URL is incorrect<br>
+                    2. Netlify doesn't have access to the repository<br>
+                    3. Repository is private and not properly connected<br>
+                    4. Branch name mismatch (main vs master)<br>
+                    5. Git provider integration issue<br><br>
+                    
+                    <strong>🎯 Next Steps:</strong><br>
+                    • Check Netlify site settings<br>
+                    • Verify repository connection<br>
+                    • Ensure proper branch configuration
+                </div>
+            `;
+            
+            log('🔧 Git repository analysis completed');
+        }
+
+        // Show Git fix steps
+        function showGitFixSteps() {
+            log('🔧 Showing Git repository fix steps...');
+            
+            const gitResult = document.getElementById('gitResult');
+            gitResult.innerHTML = `
+                <div class="status info">
+                    <strong>🔧 Git Repository Fix Steps:</strong><br><br>
+                    
+                    <strong>Step 1: Check Netlify Site Settings</strong><br>
+                    • Go to Netlify Dashboard → Your Site → Site settings<br>
+                    • Check "Build & deploy" → "Build settings"<br>
+                    • Verify repository URL and branch name<br><br>
+                    
+                    <strong>Step 2: Repository Connection</strong><br>
+                    • Go to "Build & deploy" → "Continuous Deployment"<br>
+                    • Click "Connect to Git provider"<br>
+                    • Select your Git provider (GitHub, GitLab, Bitbucket)<br>
+                    • Authorize Netlify to access your repositories<br><br>
+                    
+                    <strong>Step 3: Repository Selection</strong><br>
+                    • Choose the correct repository<br>
+                    • Set branch to "main" (or your default branch)<br>
+                    • Configure build settings:<br>
+                    <div class="code-block">
+Build command: npm run build<br>
+Publish directory: .<br>
+                    </div>
+                    
+                    <strong>Step 4: Environment Variables</strong><br>
+                    • Go to "Build & deploy" → "Environment"<br>
+                    • Add your environment variables:<br>
+                    <div class="code-block">
+VITE_SUPABASE_URL=your_supabase_url<br>
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key<br>
+STRIPE_SECRET_KEY=your_stripe_secret_key<br>
+STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key<br>
+STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret<br>
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+                    </div>
+                    
+                    <strong>Step 5: Manual Deploy</strong><br>
+                    • After fixing settings, trigger a manual deploy<br>
+                    • Go to "Deploys" tab → "Trigger deploy"<br>
+                    • Monitor the build log for success
+                </div>
+            `;
+            
+            log('🔧 Git repository fix steps displayed');
+        }
+
         // Test basic connection
         async function testBasicConnection() {
             log('🔗 Testing basic Netlify connection...');
@@ -240,11 +389,11 @@
                     showStatus('basicConnectionResult', '✅ Netlify connection successful! Functions are accessible.', 'success');
                     log('✅ Basic connection test passed');
                 } else {
-                    showStatus('basicConnectionResult', `❌ Connection failed with status: ${response.status}`, 'error');
+                    showStatus('basicConnectionResult', `❌ Connection failed with status: ${response.status}. This is expected if deployment failed.`, 'error');
                     log(`❌ Connection failed with status: ${response.status}`);
                 }
             } catch (error) {
-                showStatus('basicConnectionResult', `❌ Connection error: ${error.message}`, 'error');
+                showStatus('basicConnectionResult', `❌ Connection error: ${error.message}. This is expected if deployment failed.`, 'error');
                 log(`❌ Connection error: ${error.message}`);
             }
         }
@@ -263,11 +412,11 @@
                     log('✅ Functions test passed');
                     log(`📊 Available offers: ${Object.keys(data.offers).join(', ')}`);
                 } else {
-                    showStatus('functionsResult', `❌ Functions test failed with status: ${response.status}`, 'error');
+                    showStatus('functionsResult', `❌ Functions test failed with status: ${response.status}. Deploy must succeed first.`, 'error');
                     log(`❌ Functions test failed with status: ${response.status}`);
                 }
             } catch (error) {
-                showStatus('functionsResult', `❌ Functions error: ${error.message}`, 'error');
+                showStatus('functionsResult', `❌ Functions error: ${error.message}. Deploy must succeed first.`, 'error');
                 log(`❌ Functions error: ${error.message}`);
             }
         }
@@ -301,11 +450,11 @@
                     log(`🔗 Checkout URL: ${data.url}`);
                 } else {
                     const errorData = await response.json();
-                    showStatus('stripeResult', `❌ Stripe test failed: ${errorData.error || 'Unknown error'}`, 'error');
+                    showStatus('stripeResult', `❌ Stripe test failed: ${errorData.error || 'Unknown error'}. Deploy must succeed first.`, 'error');
                     log(`❌ Stripe test failed: ${errorData.error || 'Unknown error'}`);
                 }
             } catch (error) {
-                showStatus('stripeResult', `❌ Stripe error: ${error.message}`, 'error');
+                showStatus('stripeResult', `❌ Stripe error: ${error.message}. Deploy must succeed first.`, 'error');
                 log(`❌ Stripe error: ${error.message}`);
             }
         }
@@ -324,11 +473,11 @@
                     log('✅ Environment variables test passed');
                     log(`💰 Default currency: ${data.defaults?.currency || 'Not set'}`);
                 } else {
-                    showStatus('envResult', `❌ Environment test failed with status: ${response.status}`, 'error');
+                    showStatus('envResult', `❌ Environment test failed with status: ${response.status}. Deploy must succeed first.`, 'error');
                     log(`❌ Environment test failed with status: ${response.status}`);
                 }
             } catch (error) {
-                showStatus('envResult', `❌ Environment error: ${error.message}`, 'error');
+                showStatus('envResult', `❌ Environment error: ${error.message}. Deploy must succeed first.`, 'error');
                 log(`❌ Environment error: ${error.message}`);
             }
         }
@@ -354,6 +503,18 @@
                     </div>
                 `;
                 
+                if (!isNetlify) {
+                    info += `
+                        <div class="status warning">
+                            <strong>⚠️ Local Development:</strong><br>
+                            You're running locally. To test Netlify functions, you need to:<br>
+                            1. Deploy to Netlify first<br>
+                            2. Fix the Git repository issue<br>
+                            3. Test on the Netlify domain
+                        </div>
+                    `;
+                }
+                
                 deploymentInfo.innerHTML = info;
                 log(`📊 Deployment info loaded. Is Netlify: ${isNetlify}`);
             } catch (error) {
@@ -368,7 +529,8 @@
 
         // Initialize
         window.onload = function() {
-            log('🚀 Netlify connection test initialized');
+            log('🚀 Fresh Netlify connection test initialized');
+            log('🔧 Detected Git repository access issue from deployment log');
             getDeploymentInfo();
         };
     </script>
