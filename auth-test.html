@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TagYou2 - Authentication Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #1f2937;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .status {
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-weight: 500;
+    }
+
+    .success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    .info {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #93c5fd;
+    }
+
+    .warning {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fcd34d;
+    }
+
+    .test-section {
+      margin: 30px 0;
+      padding: 20px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+    }
+
+    .test-section h3 {
+      margin-top: 0;
+      color: #374151;
+    }
+
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+
+    .user-info {
+      background: #f3f4f6;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 15px 0;
+    }
+
+    .log {
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 15px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      margin: 15px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🔐 TagYou2 Authentication Test</h1>
+
+    <div id="status" class="status info">
+      Initializing authentication system...
+    </div>
+
+    <div class="test-section">
+      <h3>📊 System Status</h3>
+      <div id="system-status">
+        <p>Checking system components...</p>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h3>👤 Current User</h3>
+      <div id="user-info" class="user-info">
+        <p>No user signed in</p>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h3>🔑 Authentication Tests</h3>
+
+      <div>
+        <h4>Sign Up</h4>
+        <input type="email" id="signup-email" placeholder="Email address">
+        <input type="password" id="signup-password" placeholder="Password (min 6 characters)">
+        <button onclick="testSignUp()">Sign Up</button>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <h4>Sign In</h4>
+        <input type="email" id="signin-email" placeholder="Email address">
+        <input type="password" id="signin-password" placeholder="Password">
+        <button onclick="testSignIn()">Sign In</button>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <h4>OAuth Tests</h4>
+        <button onclick="testGoogleSignIn()">Sign in with Google</button>
+        <button onclick="testFacebookSignIn()">Sign in with Facebook</button>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <h4>Account Management</h4>
+        <button onclick="testSignOut()" id="signout-btn" disabled>Sign Out</button>
+        <button onclick="testPasswordReset()">Reset Password</button>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h3>📝 Console Log</h3>
+      <div id="console-log" class="log"></div>
+      <button onclick="clearLog()">Clear Log</button>
+    </div>
+  </div>
+
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <script type="module">
+    // Import authentication service
+    import { supabaseAuthService, setSupabaseInstance } from './supabase-auth-service.js';
+
+    // Global variables
+    let authService = null;
+    let supabase = null;
+
+    // Logging function
+    function log(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString();
+      const logElement = document.getElementById('console-log');
+      const logEntry = document.createElement('div');
+      logEntry.innerHTML = `[${timestamp}] ${message}`;
+      logElement.appendChild(logEntry);
+      logElement.scrollTop = logElement.scrollHeight;
+      console.log(message);
+    }
+
+    // Update status
+    function updateStatus(message, type = 'info') {
+      const statusElement = document.getElementById('status');
+      statusElement.textContent = message;
+      statusElement.className = `status ${type}`;
+    }
+
+    // Update user info
+    function updateUserInfo(user) {
+      const userInfoElement = document.getElementById('user-info');
+      const signoutBtn = document.getElementById('signout-btn');
+
+      if (user) {
+        userInfoElement.innerHTML = `
+                    <h4>✅ Signed In</h4>
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>ID:</strong> ${user.id}</p>
+                    <p><strong>Created:</strong> ${new Date(user.created_at).toLocaleString()}</p>
+                    <p><strong>Last Sign In:</strong> ${new Date(user.last_sign_in_at).toLocaleString()}</p>
+                `;
+        signoutBtn.disabled = false;
+      } else {
+        userInfoElement.innerHTML = '<p>No user signed in</p>';
+        signoutBtn.disabled = true;
+      }
+    }
+
+    // Update system status
+    function updateSystemStatus() {
+      const systemStatusElement = document.getElementById('system-status');
+      systemStatusElement.innerHTML = `
+                <p><strong>Supabase SDK:</strong> ${typeof window.supabase !== 'undefined' ? '✅ Loaded' : '❌ Not loaded'}</p>
+                <p><strong>Supabase Client:</strong> ${supabase ? '✅ Initialized' : '❌ Not initialized'}</p>
+                <p><strong>Auth Service:</strong> ${authService ? '✅ Ready' : '❌ Not ready'}</p>
+                <p><strong>Current User:</strong> ${authService?.getCurrentUser() ? '✅ Signed in' : '❌ Not signed in'}</p>
+            `;
+    }
+
+    // Initialize authentication
+    async function initializeAuth() {
+      try {
+        log('🚀 Starting authentication initialization...');
+        updateStatus('Initializing Supabase...', 'info');
+
+        // Wait for Supabase SDK
+        let attempts = 0;
+        while (typeof window.supabase === 'undefined' && attempts < 30) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          attempts++;
+        }
+
+        if (typeof window.supabase === 'undefined') {
+          throw new Error('Supabase SDK not loaded');
+        }
+
+        log('✅ Supabase SDK loaded');
+
+        // Load configuration
+        const configModule = await import('./supabase-config-secret.js');
+        const config = configModule.default;
+
+        log('✅ Configuration loaded');
+
+        // Initialize Supabase client
+        supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+
+        log('✅ Supabase client initialized');
+
+        // Set global instance
+        setSupabaseInstance(supabase);
+
+        // Initialize auth service
+        authService = supabaseAuthService;
+        await authService.initialize();
+
+        log('✅ Authentication service initialized');
+
+        // Set up auth state listener
+        authService.onAuthStateChanged((user) => {
+          log(`🔐 Auth state changed: ${user ? 'Signed in' : 'Signed out'}`);
+          updateUserInfo(user);
+          updateSystemStatus();
+        });
+
+        updateStatus('Authentication system ready!', 'success');
+        updateSystemStatus();
+
+        log('🎉 Authentication initialization complete!');
+
+      } catch (error) {
+        log(`❌ Initialization error: ${error.message}`, 'error');
+        updateStatus(`Initialization failed: ${error.message}`, 'error');
+      }
+    }
+
+    // Test functions
+    window.testSignUp = async function () {
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+
+      if (!email || !password) {
+        log('❌ Please enter email and password', 'error');
+        return;
+      }
+
+      try {
+        log(`🔐 Attempting sign up for: ${email}`);
+        const result = await authService.signUp(email, password);
+        log('✅ Sign up successful!', 'success');
+      } catch (error) {
+        log(`❌ Sign up failed: ${error.message}`, 'error');
+      }
+    };
+
+    window.testSignIn = async function () {
+      const email = document.getElementById('signin-email').value;
+      const password = document.getElementById('signin-password').value;
+
+      if (!email || !password) {
+        log('❌ Please enter email and password', 'error');
+        return;
+      }
+
+      try {
+        log(`🔐 Attempting sign in for: ${email}`);
+        const result = await authService.signIn(email, password);
+        log('✅ Sign in successful!', 'success');
+      } catch (error) {
+        log(`❌ Sign in failed: ${error.message}`, 'error');
+      }
+    };
+
+    window.testSignOut = async function () {
+      try {
+        log('🔐 Attempting sign out...');
+        await authService.signOut();
+        log('✅ Sign out successful!', 'success');
+      } catch (error) {
+        log(`❌ Sign out failed: ${error.message}`, 'error');
+      }
+    };
+
+    window.testGoogleSignIn = async function () {
+      try {
+        log('🔐 Attempting Google sign in...');
+        await authService.signInWithGoogle();
+        log('✅ Google sign in initiated!', 'success');
+      } catch (error) {
+        log(`❌ Google sign in failed: ${error.message}`, 'error');
+      }
+    };
+
+    window.testFacebookSignIn = async function () {
+      try {
+        log('🔐 Attempting Facebook sign in...');
+        await authService.signInWithFacebook();
+        log('✅ Facebook sign in initiated!', 'success');
+      } catch (error) {
+        log(`❌ Facebook sign in failed: ${error.message}`, 'error');
+      }
+    };
+
+    window.testPasswordReset = async function () {
+      const email = document.getElementById('signin-email').value || document.getElementById('signup-email').value;
+
+      if (!email) {
+        log('❌ Please enter an email address', 'error');
+        return;
+      }
+
+      try {
+        log(`🔐 Attempting password reset for: ${email}`);
+        await authService.resetPassword(email);
+        log('✅ Password reset email sent!', 'success');
+      } catch (error) {
+        log(`❌ Password reset failed: ${error.message}`, 'error');
+      }
+    };
+
+    window.clearLog = function () {
+      document.getElementById('console-log').innerHTML = '';
+    };
+
+    // Start initialization
+    initializeAuth();
+  </script>
+</body>
+
+</html>

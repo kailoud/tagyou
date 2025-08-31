@@ -1,0 +1,508 @@
+/* 🎉 TagYou Invite System Styles */
+
+/* Invite Modal */
+.invite-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.invite-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+.invite-content {
+  background: white;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: slideUpModal 0.3s ease-out;
+}
+
+@keyframes slideUpModal {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Invite Header */
+.invite-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 24px 16px 24px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.invite-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.invite-title i {
+  font-size: 24px;
+  color: #25d366;
+}
+
+.invite-title h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.close-invite-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.close-invite-btn:hover {
+  background: #e5e7eb;
+}
+
+.close-invite-btn i {
+  font-size: 16px;
+  color: #6b7280;
+}
+
+/* Invite Search */
+.invite-search {
+  padding: 16px 24px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-wrapper i {
+  position: absolute;
+  left: 12px;
+  color: #9ca3af;
+  font-size: 16px;
+}
+
+#contactSearch {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 14px;
+  background: #f9fafb;
+  transition: all 0.2s;
+}
+
+#contactSearch:focus {
+  outline: none;
+  border-color: #25d366;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
+}
+
+/* Invite Stats */
+.invite-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: #f9fafb;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.selected-count {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.select-all-btn {
+  background: none;
+  border: none;
+  color: #25d366;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.select-all-btn:hover {
+  background: rgba(37, 211, 102, 0.1);
+}
+
+/* Contacts Container */
+.contacts-container {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 300px;
+}
+
+.contacts-list {
+  padding: 8px 0;
+}
+
+/* Contact Item */
+.contact-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  transition: all 0.2s;
+  cursor: pointer;
+  border-bottom: 1px solid #f9fafb;
+}
+
+.contact-item:hover {
+  background: #f9fafb;
+}
+
+.contact-item.selected {
+  background: rgba(37, 211, 102, 0.05);
+}
+
+.contact-checkbox {
+  margin-right: 12px;
+}
+
+.contact-checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.contact-checkbox label {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #d1d5db;
+  border-radius: 6px;
+  display: block;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.contact-checkbox input[type="checkbox"]:checked+label {
+  background: #25d366;
+  border-color: #25d366;
+}
+
+.contact-checkbox input[type="checkbox"]:checked+label::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.contact-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 12px;
+}
+
+.contact-avatar {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.contact-avatar i {
+  color: white;
+  font-size: 18px;
+}
+
+.contact-details {
+  flex: 1;
+}
+
+.contact-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 2px;
+}
+
+.contact-phone {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.contact-actions {
+  margin-left: 12px;
+}
+
+.contact-whatsapp-btn {
+  width: 32px;
+  height: 32px;
+  background: #25d366;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.contact-whatsapp-btn:hover {
+  background: #128c7e;
+  transform: scale(1.05);
+}
+
+.contact-whatsapp-btn i {
+  color: white;
+  font-size: 16px;
+}
+
+/* Invite Actions */
+.invite-actions {
+  padding: 24px;
+  border-top: 1px solid #f3f4f6;
+  background: #f9fafb;
+}
+
+.invite-message {
+  margin-bottom: 20px;
+}
+
+.invite-message label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+#customMessage {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 14px;
+  resize: vertical;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+#customMessage:focus {
+  outline: none;
+  border-color: #25d366;
+  box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.invite-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.whatsapp-invite-btn {
+  background: #25d366;
+  color: white;
+}
+
+.whatsapp-invite-btn:hover:not(:disabled) {
+  background: #128c7e;
+  transform: translateY(-1px);
+}
+
+.whatsapp-invite-btn:disabled {
+  background: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.copy-link-btn {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.copy-link-btn:hover {
+  background: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+/* Success Message */
+.invite-success {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  background: #10b981;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  animation: slideInSuccess 0.3s ease-out;
+  z-index: 10;
+}
+
+@keyframes slideInSuccess {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.invite-success i {
+  font-size: 16px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .invite-modal {
+    padding: 10px;
+  }
+
+  .invite-content {
+    max-width: 100%;
+    max-height: 90vh;
+  }
+
+  .invite-header {
+    padding: 20px 20px 12px 20px;
+  }
+
+  .invite-title h2 {
+    font-size: 18px;
+  }
+
+  .invite-search {
+    padding: 12px 20px;
+  }
+
+  .invite-stats {
+    padding: 12px 20px;
+  }
+
+  .contact-item {
+    padding: 10px 20px;
+  }
+
+  .invite-actions {
+    padding: 20px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .invite-btn {
+    width: 100%;
+  }
+}
+
+/* Invite Button Styles (for use in other components) */
+.invite-friends-btn {
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+.invite-friends-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+}
+
+.invite-friends-btn i {
+  font-size: 16px;
+}
+
+/* Loading States */
+.invite-btn.loading {
+  position: relative;
+  color: transparent;
+}
+
+.invite-btn.loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

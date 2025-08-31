@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supabase Debug</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ccc;
+    }
+
+    .success {
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+    }
+
+    .error {
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+    }
+
+    .warning {
+      background-color: #fff3cd;
+      border-color: #ffeaa7;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    pre {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🔐 Supabase Connection Debug</h1>
+
+  <div class="test-section">
+    <h3>1. SDK Loading Test</h3>
+    <button onclick="testSDK()">Test Supabase SDK</button>
+    <div id="sdk-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h3>2. Configuration Test</h3>
+    <button onclick="testConfig()">Test Configuration</button>
+    <div id="config-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h3>3. Database Connection Test</h3>
+    <button onclick="testDatabase()">Test Database</button>
+    <div id="database-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h3>4. Authentication Test</h3>
+    <button onclick="testAuth()">Test Authentication</button>
+    <div id="auth-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h3>5. Profile Creation Test</h3>
+    <button onclick="testProfile()">Test Profile Creation</button>
+    <div id="profile-result"></div>
+  </div>
+
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <script type="module">
+    let supabaseClient = null;
+
+    // Test 1: SDK Loading
+    window.testSDK = function () {
+      const result = document.getElementById('sdk-result');
+      result.innerHTML = '';
+
+      try {
+        if (typeof window.supabase !== 'undefined') {
+          result.innerHTML = '<div class="success">✅ Supabase SDK loaded successfully</div>';
+          result.innerHTML += '<pre>SDK Version: ' + window.supabase.SUPABASE_JS_VERSION + '</pre>';
+        } else {
+          result.innerHTML = '<div class="error">❌ Supabase SDK not loaded</div>';
+        }
+      } catch (error) {
+        result.innerHTML = '<div class="error">❌ Error: ' + error.message + '</div>';
+      }
+    };
+
+    // Test 2: Configuration
+    window.testConfig = async function () {
+      const result = document.getElementById('config-result');
+      result.innerHTML = '<div class="warning">⏳ Testing configuration...</div>';
+
+      try {
+        const config = await import('./supabase-config-secret.js');
+        result.innerHTML = '<div class="success">✅ Configuration loaded</div>';
+        result.innerHTML += '<pre>URL: ' + config.default.supabaseUrl + '\nKey Length: ' + config.default.supabaseAnonKey.length + '</pre>';
+
+        // Create client
+        supabaseClient = window.supabase.createClient(
+          config.default.supabaseUrl,
+          config.default.supabaseAnonKey
+        );
+        result.innerHTML += '<div class="success">✅ Supabase client created</div>';
+
+      } catch (error) {
+        result.innerHTML = '<div class="error">❌ Configuration error: ' + error.message + '</div>';
+      }
+    };
+
+    // Test 3: Database Connection
+    window.testDatabase = async function () {
+      const result = document.getElementById('database-result');
+      result.innerHTML = '<div class="warning">⏳ Testing database connection...</div>';
+
+      if (!supabaseClient) {
+        result.innerHTML = '<div class="error">❌ Supabase client not initialized. Run Test 2 first.</div>';
+        return;
+      }
+
+      try {
+        const { data, error } = await supabaseClient.from('profiles').select('count').limit(1);
+
+        if (error) {
+          result.innerHTML = '<div class="error">❌ Database error: ' + error.message + '</div>';
+          result.innerHTML += '<pre>Error Code: ' + error.code + '</pre>';
+
+          if (error.code === 'PGRST116') {
+            result.innerHTML += '<div class="warning">⚠️ Profiles table does not exist. Run the SQL schema first.</div>';
+          }
+        } else {
+          result.innerHTML = '<div class="success">✅ Database connection successful</div>';
+          result.innerHTML += '<pre>Profiles count: ' + data[0].count + '</pre>';
+        }
+      } catch (error) {
+        result.innerHTML = '<div class="error">❌ Database test failed: ' + error.message + '</div>';
+      }
+    };
+
+    // Test 4: Authentication
+    window.testAuth = async function () {
+      const result = document.getElementById('auth-result');
+      result.innerHTML = '<div class="warning">⏳ Testing authentication...</div>';
+
+      if (!supabaseClient) {
+        result.innerHTML = '<div class="error">❌ Supabase client not initialized. Run Test 2 first.</div>';
+        return;
+      }
+
+      try {
+        result.innerHTML = '<div class="warning">⚠️ Please enter a real email address to test authentication</div>';
+        result.innerHTML += '<div class="warning">⚠️ Test email generation has been disabled</div>';
+        return;
+
+        if (error) {
+          result.innerHTML = '<div class="error">❌ Authentication error: ' + error.message + '</div>';
+        } else {
+          result.innerHTML = '<div class="success">✅ Authentication successful</div>';
+          result.innerHTML += '<pre>User ID: ' + data.user.id + '\nEmail: ' + data.user.email + '</pre>';
+        }
+      } catch (error) {
+        result.innerHTML = '<div class="error">❌ Auth test failed: ' + error.message + '</div>';
+      }
+    };
+
+    // Test 5: Profile Creation
+    window.testProfile = async function () {
+      const result = document.getElementById('profile-result');
+      result.innerHTML = '<div class="warning">⏳ Testing profile creation...</div>';
+
+      if (!supabaseClient) {
+        result.innerHTML = '<div class="error">❌ Supabase client not initialized. Run Test 2 first.</div>';
+        return;
+      }
+
+      try {
+        // First create a user
+        result.innerHTML = '<div class="warning">⚠️ Please enter a real email address to test profile creation</div>';
+        result.innerHTML += '<div class="warning">⚠️ Test email generation has been disabled</div>';
+        return;
+
+        if (authError) {
+          result.innerHTML = '<div class="error">❌ Auth error: ' + authError.message + '</div>';
+          return;
+        }
+
+        // Then create profile
+        const { data: profileData, error: profileError } = await supabaseClient
+          .from('profiles')
+          .insert([
+            {
+              id: authData.user.id,
+              email: authData.user.email,
+              display_name: 'Test User',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ])
+          .select();
+
+        if (profileError) {
+          result.innerHTML = '<div class="error">❌ Profile creation error: ' + profileError.message + '</div>';
+          result.innerHTML += '<pre>Error Code: ' + profileError.code + '</pre>';
+        } else {
+          result.innerHTML = '<div class="success">✅ Profile created successfully</div>';
+          result.innerHTML += '<pre>Profile: ' + JSON.stringify(profileData[0], null, 2) + '</pre>';
+        }
+      } catch (error) {
+        result.innerHTML = '<div class="error">❌ Profile test failed: ' + error.message + '</div>';
+      }
+    };
+
+    // Auto-run first test
+    setTimeout(() => {
+      testSDK();
+    }, 1000);
+  </script>
+</body>
+
+</html>

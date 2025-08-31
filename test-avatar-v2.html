@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avatar System V2 Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ccc;
+    }
+
+    .success {
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+    }
+
+    .error {
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    pre {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🧪 Avatar System V2 Test</h1>
+
+  <div class="test-section">
+    <h3>Test Avatar System V2 Loading</h3>
+    <button onclick="testAvatarSystem()">Test Avatar System</button>
+    <div id="avatar-test-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h3>Test Supabase Connection</h3>
+    <button onclick="testSupabase()">Test Supabase</button>
+    <div id="supabase-test-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h3>Test Authentication</h3>
+    <button onclick="testAuth()">Test Auth</button>
+    <div id="auth-test-result"></div>
+  </div>
+
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <!-- Avatar System V2 -->
+  <script type="module" src="avatar-system-v2.js"></script>
+
+  <script>
+    // Test Avatar System V2
+    window.testAvatarSystem = function () {
+      const result = document.getElementById('avatar-test-result');
+      result.innerHTML = '<div class="warning">⏳ Testing Avatar System V2...</div>';
+
+      setTimeout(() => {
+        if (window.avatarSystemV2) {
+          result.innerHTML = '<div class="success">✅ Avatar System V2 loaded successfully!</div>';
+          result.innerHTML += '<pre>User: ' + (window.avatarSystemV2.user ? window.avatarSystemV2.user.email : 'Not signed in') + '</pre>';
+          result.innerHTML += '<pre>Initialized: ' + window.avatarSystemV2.initialized + '</pre>';
+        } else {
+          result.innerHTML = '<div class="error">❌ Avatar System V2 not found!</div>';
+        }
+      }, 2000);
+    };
+
+    // Test Supabase
+    window.testSupabase = function () {
+      const result = document.getElementById('supabase-test-result');
+      result.innerHTML = '<div class="warning">⏳ Testing Supabase...</div>';
+
+      if (window.supabase) {
+        result.innerHTML = '<div class="success">✅ Supabase SDK loaded!</div>';
+        result.innerHTML += '<pre>Version: ' + window.supabase.SUPABASE_JS_VERSION + '</pre>';
+      } else {
+        result.innerHTML = '<div class="error">❌ Supabase SDK not loaded!</div>';
+      }
+    };
+
+    // Test Authentication
+    window.testAuth = function () {
+      const result = document.getElementById('auth-test-result');
+      result.innerHTML = '<div class="warning">⏳ Testing Authentication...</div>';
+
+      if (window.avatarSystemV2 && window.avatarSystemV2.supabase) {
+        result.innerHTML = '<div class="success">✅ Supabase client available!</div>';
+        result.innerHTML += '<pre>Auth methods: ' + Object.keys(window.avatarSystemV2.supabase.auth).join(', ') + '</pre>';
+      } else {
+        result.innerHTML = '<div class="error">❌ Supabase client not available!</div>';
+      }
+    };
+
+    // Auto-run tests after page loads
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        testAvatarSystem();
+        testSupabase();
+        testAuth();
+      }, 3000);
+    });
+  </script>
+</body>
+
+</html>

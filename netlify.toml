@@ -1,0 +1,23 @@
+[build]
+  publish = "."
+  command = "npm run build"
+
+[build.environment]
+  VITE_SUPABASE_URL = "https://rpsbibwmbsllnvfithjw.supabase.co"
+  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc2JpYndtYnNsbG52Zml0aGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzA5NjQsImV4cCI6MjA3MTYwNjk2NH0.MdZz53RGQUIuCORdUtnFT-Uo0rFEK1a6chnMtS4Jjss"
+
+[functions]
+  directory = "netlify/functions"
+
+# Stripe environment variables should be set in Netlify dashboard
+# Go to Site settings > Environment variables
+# Add: STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET
+# Make sure to use LIVE keys (sk_live_, pk_live_, whsec_) for production
+#
+# Supabase environment variables:
+# Add: SUPABASE_SERVICE_ROLE_KEY (get this from Supabase Dashboard > Settings > API)
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
