@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fresh Auth Test - TagYou</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .auth-section {
+            margin-bottom: 40px;
+        }
+
+        .auth-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .status-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+        }
+
+        .status-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-value.premium {
+            color: #28a745;
+        }
+
+        .status-value.basic {
+            color: #6c757d;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .user-info {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .user-info h3 {
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .user-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .user-detail {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .user-detail-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .user-detail-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .features-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .features-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-icon {
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        .feature-icon.basic {
+            color: #6c757d;
+        }
+
+        .feature-icon.premium {
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Fresh Auth Test</h1>
+            <p>TagYou Authentication System - Basic → Premium</p>
+        </div>
+
+        <div class="content">
+            <!-- Status Card -->
+            <div class="status-card">
+                <h3>🔍 Authentication Status</h3>
+                <div class="status-item">
+                    <span class="status-label">Initialized:</span>
+                    <span class="status-value" id="authInitialized">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Authenticated:</span>
+                    <span class="status-value" id="authStatus">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">User Type:</span>
+                    <span class="status-value" id="userType">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Premium Status:</span>
+                    <span class="status-value" id="premiumStatus">Checking...</span>
+                </div>
+            </div>
+
+            <!-- User Info (shown when authenticated) -->
+            <div class="user-info hidden" id="userInfo">
+                <h3>👤 User Information</h3>
+                <div class="user-details">
+                    <div class="user-detail">
+                        <div class="user-detail-label">Email</div>
+                        <div class="user-detail-value" id="userEmail">-</div>
+                    </div>
+                    <div class="user-detail">
+                        <div class="user-detail-label">Display Name</div>
+                        <div class="user-detail-value" id="userDisplayName">-</div>
+                    </div>
+                    <div class="user-detail">
+                        <div class="user-detail-label">Login Count</div>
+                        <div class="user-detail-value" id="userLoginCount">-</div>
+                    </div>
+                    <div class="user-detail">
+                        <div class="user-detail-label">Last Login</div>
+                        <div class="user-detail-value" id="userLastLogin">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Authentication Forms -->
+            <div class="auth-section" id="authForms">
+                <h2>🔐 Authentication</h2>
+                
+                <!-- Sign Up Form -->
+                <div id="signUpForm">
+                    <h3>Create Account</h3>
+                    <div class="form-group">
+                        <label for="signUpEmail">Email</label>
+                        <input type="email" id="signUpEmail" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="signUpPassword">Password</label>
+                        <input type="password" id="signUpPassword" placeholder="Enter your password">
+                    </div>
+                    <div class="form-group">
+                        <label for="signUpDisplayName">Display Name (Optional)</label>
+                        <input type="text" id="signUpDisplayName" placeholder="Enter your display name">
+                    </div>
+                    <button class="btn" onclick="signUp()">Create Account</button>
+                </div>
+
+                <hr style="margin: 30px 0; border: none; border-top: 1px solid #e9ecef;">
+
+                <!-- Sign In Form -->
+                <div id="signInForm">
+                    <h3>Sign In</h3>
+                    <div class="form-group">
+                        <label for="signInEmail">Email</label>
+                        <input type="email" id="signInEmail" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="signInPassword">Password</label>
+                        <input type="password" id="signInPassword" placeholder="Enter your password">
+                    </div>
+                    <button class="btn" onclick="signIn()">Sign In</button>
+                    <button class="btn btn-secondary" onclick="resetPassword()">Reset Password</button>
+                </div>
+            </div>
+
+            <!-- Authenticated Actions -->
+            <div class="auth-section hidden" id="authenticatedActions">
+                <h2>🎯 User Actions</h2>
+                
+                <button class="btn btn-warning" onclick="signOut()">Sign Out</button>
+                <button class="btn btn-success" onclick="upgradeToPremium()" id="upgradeBtn">Upgrade to Premium</button>
+                <button class="btn btn-secondary" onclick="updateProfile()">Update Profile</button>
+                <button class="btn btn-secondary" onclick="checkPremiumStatus()">Check Premium Status</button>
+            </div>
+
+            <!-- Features Section -->
+            <div class="features-section">
+                <h3>🎁 Feature Comparison</h3>
+                <ul class="feature-list">
+                    <li>
+                        <span class="feature-icon basic">✅</span>
+                        <span>Basic: View carnival information</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon basic">✅</span>
+                        <span>Basic: Create account and sign in</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon basic">✅</span>
+                        <span>Basic: Update profile information</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon premium">💎</span>
+                        <span>Premium: Add carnivals to favorites</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon premium">💎</span>
+                        <span>Premium: Advanced carnival tracking</span>
+                    </li>
+                    <li>
+                        <span class="feature-icon premium">💎</span>
+                        <span>Premium: Priority support</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Alerts -->
+            <div id="alerts"></div>
+        </div>
+    </div>
+
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Fresh Auth Service -->
+    <script type="module">
+        import { freshAuthService, setSupabaseInstance } from './fresh-auth-service.js';
+
+        // Initialize Supabase
+        const supabaseUrl = 'YOUR_SUPABASE_URL';
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        setSupabaseInstance(supabase);
+
+        // Initialize auth service
+        freshAuthService.initialize().then(() => {
+            updateStatus();
+        });
+
+        // Listen for auth state changes
+        freshAuthService.addAuthStateListener((authState) => {
+            updateStatus();
+            updateUI(authState);
+        });
+
+        // Update status display
+        function updateStatus() {
+            document.getElementById('authInitialized').textContent = freshAuthService.isInitialized ? 'Yes' : 'No';
+            document.getElementById('authStatus').textContent = freshAuthService.isAuthenticated() ? 'Yes' : 'No';
+            
+            const profile = freshAuthService.getUserProfile();
+            if (profile) {
+                document.getElementById('userType').textContent = profile.user_type || 'basic';
+                document.getElementById('userType').className = `status-value ${profile.user_type || 'basic'}`;
+                document.getElementById('premiumStatus').textContent = freshAuthService.getIsPremium() ? 'Premium' : 'Basic';
+                document.getElementById('premiumStatus').className = `status-value ${freshAuthService.getIsPremium() ? 'premium' : 'basic'}`;
+            } else {
+                document.getElementById('userType').textContent = 'Not signed in';
+                document.getElementById('premiumStatus').textContent = 'Not signed in';
+            }
+        }
+
+        // Update UI based on auth state
+        function updateUI(authState) {
+            const authForms = document.getElementById('authForms');
+            const authenticatedActions = document.getElementById('authenticatedActions');
+            const userInfo = document.getElementById('userInfo');
+            const upgradeBtn = document.getElementById('upgradeBtn');
+
+            if (authState.isAuthenticated) {
+                authForms.classList.add('hidden');
+                authenticatedActions.classList.remove('hidden');
+                userInfo.classList.remove('hidden');
+                
+                // Update user info
+                const profile = authState.profile;
+                if (profile) {
+                    document.getElementById('userEmail').textContent = profile.email || '-';
+                    document.getElementById('userDisplayName').textContent = profile.display_name || '-';
+                    document.getElementById('userLoginCount').textContent = profile.login_count || 0;
+                    document.getElementById('userLastLogin').textContent = profile.last_login_at ? new Date(profile.last_login_at).toLocaleString() : '-';
+                }
+
+                // Show/hide upgrade button based on premium status
+                if (authState.isPremium) {
+                    upgradeBtn.textContent = 'Already Premium';
+                    upgradeBtn.disabled = true;
+                    upgradeBtn.style.opacity = '0.6';
+                } else {
+                    upgradeBtn.textContent = 'Upgrade to Premium';
+                    upgradeBtn.disabled = false;
+                    upgradeBtn.style.opacity = '1';
+                }
+            } else {
+                authForms.classList.remove('hidden');
+                authenticatedActions.classList.add('hidden');
+                userInfo.classList.add('hidden');
+            }
+        }
+
+        // Global functions for buttons
+        window.signUp = async function() {
+            const email = document.getElementById('signUpEmail').value;
+            const password = document.getElementById('signUpPassword').value;
+            const displayName = document.getElementById('signUpDisplayName').value;
+
+            if (!email || !password) {
+                showAlert('Please fill in all required fields', 'error');
+                return;
+            }
+
+            try {
+                const result = await freshAuthService.signUp(email, password, displayName);
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    clearForms();
+                } else {
+                    showAlert(result.message, 'error');
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        };
+
+        window.signIn = async function() {
+            const email = document.getElementById('signInEmail').value;
+            const password = document.getElementById('signInPassword').value;
+
+            if (!email || !password) {
+                showAlert('Please fill in all required fields', 'error');
+                return;
+            }
+
+            try {
+                const result = await freshAuthService.signIn(email, password);
+                if (result.success) {
+                    showAlert('Signed in successfully!', 'success');
+                    clearForms();
+                } else {
+                    showAlert(result.message, 'error');
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        };
+
+        window.signOut = async function() {
+            try {
+                await freshAuthService.signOut();
+                showAlert('Signed out successfully!', 'success');
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        };
+
+        window.upgradeToPremium = async function() {
+            try {
+                const result = await freshAuthService.upgradeToPremium({
+                    payment_provider_id: 'test_payment_' + Date.now(),
+                    current_period_start: new Date().toISOString(),
+                    current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+                });
+                
+                if (result.success) {
+                    showAlert('Upgraded to Premium successfully!', 'success');
+                } else {
+                    showAlert('Failed to upgrade to Premium', 'error');
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        };
+
+        window.updateProfile = async function() {
+            try {
+                const result = await freshAuthService.updateProfile({
+                    display_name: 'Updated User ' + Date.now(),
+                    bio: 'This is an updated bio'
+                });
+                
+                if (result.success) {
+                    showAlert('Profile updated successfully!', 'success');
+                } else {
+                    showAlert('Failed to update profile', 'error');
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        };
+
+        window.checkPremiumStatus = async function() {
+            try {
+                const isPremium = await freshAuthService.checkPremiumStatus();
+                showAlert(`Premium status: ${isPremium ? 'Premium' : 'Basic'}`, 'info');
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        };
+
+        window.resetPassword = function() {
+            const email = document.getElementById('signInEmail').value;
+            if (!email) {
+                showAlert('Please enter your email first', 'error');
+                return;
+            }
+
+            freshAuthService.resetPassword(email).then(() => {
+                showAlert('Password reset email sent!', 'success');
+            }).catch((error) => {
+                showAlert(error.message, 'error');
+            });
+        };
+
+        // Utility functions
+        function showAlert(message, type) {
+            const alertsContainer = document.getElementById('alerts');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            alertsContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        function clearForms() {
+            document.getElementById('signUpEmail').value = '';
+            document.getElementById('signUpPassword').value = '';
+            document.getElementById('signUpDisplayName').value = '';
+            document.getElementById('signInEmail').value = '';
+            document.getElementById('signInPassword').value = '';
+        }
+    </script>
+</body>
+</html>
