@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netlify Connection Test - TagYou</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 15px;
+        }
+
+        .test-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 Netlify Connection Test</h1>
+            <p>Testing Netlify Functions and Deployment</p>
+        </div>
+
+        <div class="content">
+            <!-- Basic Connection Test -->
+            <div class="test-section">
+                <h3>🌐 Basic Connection Test</h3>
+                <p>Test if Netlify is accessible and responding</p>
+                <button class="btn" onclick="testBasicConnection()">Test Basic Connection</button>
+                <div id="basicConnectionResult"></div>
+            </div>
+
+            <!-- Netlify Functions Test -->
+            <div class="test-section">
+                <h3>⚡ Netlify Functions Test</h3>
+                <p>Test if Netlify Functions are working</p>
+                <button class="btn" onclick="testNetlifyFunctions()">Test Functions</button>
+                <div id="functionsResult"></div>
+            </div>
+
+            <!-- Stripe Integration Test -->
+            <div class="test-section">
+                <h3>💳 Stripe Integration Test</h3>
+                <p>Test Stripe checkout session creation</p>
+                <div class="form-group">
+                    <label for="testEmail">Test Email</label>
+                    <input type="email" id="testEmail" placeholder="test@example.com" value="test@example.com">
+                </div>
+                <button class="btn btn-success" onclick="testStripeIntegration()">Test Stripe Integration</button>
+                <div id="stripeResult"></div>
+            </div>
+
+            <!-- Environment Variables Test -->
+            <div class="test-section">
+                <h3>🔧 Environment Variables Test</h3>
+                <p>Check if environment variables are accessible</p>
+                <button class="btn btn-warning" onclick="testEnvironmentVariables()">Test Environment Variables</button>
+                <div id="envResult"></div>
+            </div>
+
+            <!-- Deployment Info -->
+            <div class="test-section">
+                <h3>📊 Deployment Information</h3>
+                <div id="deploymentInfo"></div>
+            </div>
+
+            <!-- Console Log -->
+            <div class="test-section">
+                <h3>📝 Console Log</h3>
+                <div id="consoleLog" class="log"></div>
+                <button class="btn" onclick="clearLog()">Clear Log</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Logging function
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logElement = document.getElementById('consoleLog');
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logElement.appendChild(logEntry);
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+
+        // Show status
+        function showStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        // Test basic connection
+        async function testBasicConnection() {
+            log('🔗 Testing basic Netlify connection...');
+            
+            try {
+                // Test if we can access Netlify's default headers
+                const response = await fetch('/.netlify/functions/pricing-config');
+                
+                if (response.ok) {
+                    showStatus('basicConnectionResult', '✅ Netlify connection successful! Functions are accessible.', 'success');
+                    log('✅ Basic connection test passed');
+                } else {
+                    showStatus('basicConnectionResult', `❌ Connection failed with status: ${response.status}`, 'error');
+                    log(`❌ Connection failed with status: ${response.status}`);
+                }
+            } catch (error) {
+                showStatus('basicConnectionResult', `❌ Connection error: ${error.message}`, 'error');
+                log(`❌ Connection error: ${error.message}`);
+            }
+        }
+
+        // Test Netlify functions
+        async function testNetlifyFunctions() {
+            log('⚡ Testing Netlify functions...');
+            
+            try {
+                // Test pricing config function
+                const response = await fetch('/.netlify/functions/pricing-config');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showStatus('functionsResult', '✅ Netlify functions are working! Pricing config loaded successfully.', 'success');
+                    log('✅ Functions test passed');
+                    log(`📊 Available offers: ${Object.keys(data.offers).join(', ')}`);
+                } else {
+                    showStatus('functionsResult', `❌ Functions test failed with status: ${response.status}`, 'error');
+                    log(`❌ Functions test failed with status: ${response.status}`);
+                }
+            } catch (error) {
+                showStatus('functionsResult', `❌ Functions error: ${error.message}`, 'error');
+                log(`❌ Functions error: ${error.message}`);
+            }
+        }
+
+        // Test Stripe integration
+        async function testStripeIntegration() {
+            log('💳 Testing Stripe integration...');
+            
+            const email = document.getElementById('testEmail').value;
+            if (!email) {
+                showStatus('stripeResult', '❌ Please enter a test email', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/.netlify/functions/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        offerId: '3-month-promo'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showStatus('stripeResult', '✅ Stripe integration working! Checkout session created successfully.', 'success');
+                    log('✅ Stripe integration test passed');
+                    log(`🔗 Checkout URL: ${data.url}`);
+                } else {
+                    const errorData = await response.json();
+                    showStatus('stripeResult', `❌ Stripe test failed: ${errorData.error || 'Unknown error'}`, 'error');
+                    log(`❌ Stripe test failed: ${errorData.error || 'Unknown error'}`);
+                }
+            } catch (error) {
+                showStatus('stripeResult', `❌ Stripe error: ${error.message}`, 'error');
+                log(`❌ Stripe error: ${error.message}`);
+            }
+        }
+
+        // Test environment variables
+        async function testEnvironmentVariables() {
+            log('🔧 Testing environment variables...');
+            
+            try {
+                // Test if we can access environment variables through a function
+                const response = await fetch('/.netlify/functions/pricing-config');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showStatus('envResult', '✅ Environment variables are accessible!', 'success');
+                    log('✅ Environment variables test passed');
+                    log(`💰 Default currency: ${data.defaults?.currency || 'Not set'}`);
+                } else {
+                    showStatus('envResult', `❌ Environment test failed with status: ${response.status}`, 'error');
+                    log(`❌ Environment test failed with status: ${response.status}`);
+                }
+            } catch (error) {
+                showStatus('envResult', `❌ Environment error: ${error.message}`, 'error');
+                log(`❌ Environment error: ${error.message}`);
+            }
+        }
+
+        // Get deployment information
+        async function getDeploymentInfo() {
+            log('📊 Getting deployment information...');
+            
+            try {
+                // Check if we're on Netlify
+                const isNetlify = window.location.hostname.includes('netlify.app') || 
+                                window.location.hostname.includes('netlify.com');
+                
+                const deploymentInfo = document.getElementById('deploymentInfo');
+                let info = `
+                    <div class="status info">
+                        <strong>Deployment Information:</strong><br>
+                        • Hostname: ${window.location.hostname}<br>
+                        • Protocol: ${window.location.protocol}<br>
+                        • Port: ${window.location.port || 'default'}<br>
+                        • Is Netlify: ${isNetlify ? '✅ Yes' : '❌ No'}<br>
+                        • User Agent: ${navigator.userAgent.substring(0, 50)}...
+                    </div>
+                `;
+                
+                deploymentInfo.innerHTML = info;
+                log(`📊 Deployment info loaded. Is Netlify: ${isNetlify}`);
+            } catch (error) {
+                log(`❌ Error getting deployment info: ${error.message}`);
+            }
+        }
+
+        // Clear log
+        function clearLog() {
+            document.getElementById('consoleLog').innerHTML = '';
+        }
+
+        // Initialize
+        window.onload = function() {
+            log('🚀 Netlify connection test initialized');
+            getDeploymentInfo();
+        };
+    </script>
+</body>
+</html>
