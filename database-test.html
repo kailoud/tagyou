@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Test - TagYou</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+        }
+
+        .test-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .result.info {
+            background: #d1ecf1;
+            border-left-color: #17a2b8;
+        }
+
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗄️ Database Test</h1>
+            <p>Testing TagYou Database Connection and Permissions</p>
+        </div>
+
+        <div class="content">
+            <!-- Connection Test -->
+            <div class="test-section">
+                <h2>🔗 Database Connection Test</h2>
+                <p>Testing basic connection to Supabase...</p>
+                <button class="btn" onclick="testConnection()">Test Connection</button>
+                <div id="connectionResult"></div>
+            </div>
+
+            <!-- Profile Test -->
+            <div class="test-section">
+                <h2>👤 User Profile Test</h2>
+                <p>Testing user profile creation and retrieval...</p>
+                <button class="btn" onclick="testProfile()">Test Profile</button>
+                <div id="profileResult"></div>
+            </div>
+
+            <!-- Premium Test -->
+            <div class="test-section">
+                <h2>💎 Premium Status Test</h2>
+                <p>Testing premium user functionality...</p>
+                <button class="btn" onclick="testPremium()">Test Premium</button>
+                <div id="premiumResult"></div>
+            </div>
+
+            <!-- Carnivals Test -->
+            <div class="test-section">
+                <h2>🎪 Carnivals Test</h2>
+                <p>Testing carnival data access...</p>
+                <button class="btn" onclick="testCarnivals()">Test Carnivals</button>
+                <div id="carnivalsResult"></div>
+            </div>
+
+            <!-- Manual Profile Creation -->
+            <div class="test-section">
+                <h2>🔧 Manual Profile Creation</h2>
+                <p>Create a profile manually for the current user...</p>
+                <button class="btn" onclick="createProfileManually()">Create Profile</button>
+                <div id="manualResult"></div>
+            </div>
+
+            <!-- Console Log -->
+            <div class="test-section">
+                <h2>📋 Test Log</h2>
+                <div id="testLog" class="log"></div>
+                <button class="btn" onclick="clearLog()">Clear Log</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Supabase configuration
+        const supabaseUrl = 'https://rpsbibwmbsllnvfithjw.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc2JpYndtYnNsbG52Zml0aGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzA5NjQsImV4cCI6MjA3MTYwNjk2NH0.MdZz53RGQUIuCORdUtnFT-Uo0rFEK1a6chnMtS4Jjss';
+        
+        let supabase = null;
+        let currentUser = null;
+
+        // Initialize Supabase
+        function initializeSupabase() {
+            try {
+                supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+                log('✅ Supabase client created');
+                return true;
+            } catch (error) {
+                log('❌ Error creating Supabase client: ' + error.message);
+                return false;
+            }
+        }
+
+        // Test basic connection
+        async function testConnection() {
+            log('🔗 Testing database connection...');
+            
+            if (!initializeSupabase()) {
+                showResult('connectionResult', '❌ Failed to create Supabase client', 'error');
+                return;
+            }
+
+            try {
+                // Test basic query
+                const { data, error } = await supabase.from('carnivals').select('count').limit(1);
+                
+                if (error) {
+                    log('❌ Connection error: ' + error.message);
+                    showResult('connectionResult', '❌ Connection failed: ' + error.message, 'error');
+                } else {
+                    log('✅ Connection successful');
+                    showResult('connectionResult', '✅ Database connection successful!', 'success');
+                }
+            } catch (error) {
+                log('❌ Unexpected error: ' + error.message);
+                showResult('connectionResult', '❌ Unexpected error: ' + error.message, 'error');
+            }
+        }
+
+        // Test user profile
+        async function testProfile() {
+            log('👤 Testing user profile...');
+            
+            if (!supabase) {
+                showResult('profileResult', '❌ Supabase not initialized', 'error');
+                return;
+            }
+
+            try {
+                // Get current user
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                
+                if (sessionError) {
+                    log('❌ Session error: ' + sessionError.message);
+                    showResult('profileResult', '❌ Session error: ' + sessionError.message, 'error');
+                    return;
+                }
+
+                if (!session) {
+                    log('ℹ️ No active session');
+                    showResult('profileResult', 'ℹ️ No active session - please sign in first', 'info');
+                    return;
+                }
+
+                currentUser = session.user;
+                log('✅ User authenticated: ' + currentUser.email);
+
+                // Try to get user profile
+                const { data: profile, error: profileError } = await supabase
+                    .from('user_profiles')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                if (profileError) {
+                    log('❌ Profile error: ' + profileError.message);
+                    showResult('profileResult', '❌ Profile error: ' + profileError.message, 'error');
+                } else {
+                    log('✅ Profile retrieved: ' + JSON.stringify(profile));
+                    showResult('profileResult', '✅ Profile retrieved successfully! User type: ' + profile.user_type, 'success');
+                }
+            } catch (error) {
+                log('❌ Profile test error: ' + error.message);
+                showResult('profileResult', '❌ Profile test error: ' + error.message, 'error');
+            }
+        }
+
+        // Test premium status
+        async function testPremium() {
+            log('💎 Testing premium status...');
+            
+            if (!currentUser) {
+                showResult('premiumResult', '❌ No user authenticated', 'error');
+                return;
+            }
+
+            try {
+                // Test premium user query
+                const { data: premiumUser, error: premiumError } = await supabase
+                    .from('premium_users')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .single();
+
+                if (premiumError && premiumError.code !== 'PGRST116') {
+                    log('❌ Premium query error: ' + premiumError.message);
+                    showResult('premiumResult', '❌ Premium query error: ' + premiumError.message, 'error');
+                } else if (premiumUser) {
+                    log('✅ Premium user found: ' + JSON.stringify(premiumUser));
+                    showResult('premiumResult', '✅ Premium user found! Status: ' + premiumUser.subscription_status, 'success');
+                } else {
+                    log('ℹ️ No premium user record found (user is basic)');
+                    showResult('premiumResult', 'ℹ️ No premium user record found (user is basic)', 'info');
+                }
+            } catch (error) {
+                log('❌ Premium test error: ' + error.message);
+                showResult('premiumResult', '❌ Premium test error: ' + error.message, 'error');
+            }
+        }
+
+        // Test carnivals
+        async function testCarnivals() {
+            log('🎪 Testing carnivals access...');
+            
+            if (!supabase) {
+                showResult('carnivalsResult', '❌ Supabase not initialized', 'error');
+                return;
+            }
+
+            try {
+                const { data: carnivals, error } = await supabase
+                    .from('carnivals')
+                    .select('*')
+                    .limit(5);
+
+                if (error) {
+                    log('❌ Carnivals error: ' + error.message);
+                    showResult('carnivalsResult', '❌ Carnivals error: ' + error.message, 'error');
+                } else {
+                    log('✅ Carnivals retrieved: ' + carnivals.length + ' records');
+                    showResult('carnivalsResult', '✅ Carnivals access successful! Found ' + carnivals.length + ' carnivals', 'success');
+                }
+            } catch (error) {
+                log('❌ Carnivals test error: ' + error.message);
+                showResult('carnivalsResult', '❌ Carnivals test error: ' + error.message, 'error');
+            }
+        }
+
+        // Create profile manually
+        async function createProfileManually() {
+            log('🔧 Creating profile manually...');
+            
+            if (!currentUser) {
+                showResult('manualResult', '❌ No user authenticated', 'error');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase.rpc('create_user_profile_manual', {
+                    user_email: currentUser.email,
+                    user_id: currentUser.id
+                });
+
+                if (error) {
+                    log('❌ Manual profile creation error: ' + error.message);
+                    showResult('manualResult', '❌ Manual profile creation error: ' + error.message, 'error');
+                } else {
+                    log('✅ Manual profile creation successful');
+                    showResult('manualResult', '✅ Profile created manually!', 'success');
+                }
+            } catch (error) {
+                log('❌ Manual profile creation error: ' + error.message);
+                showResult('manualResult', '❌ Manual profile creation error: ' + error.message, 'error');
+            }
+        }
+
+        // Utility functions
+        function log(message) {
+            const logElement = document.getElementById('testLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+
+        function showResult(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+
+        function clearLog() {
+            document.getElementById('testLog').innerHTML = '';
+        }
+
+        // Auto-run connection test on page load
+        window.addEventListener('load', () => {
+            log('🚀 Database test page loaded');
+            setTimeout(() => {
+                testConnection();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
